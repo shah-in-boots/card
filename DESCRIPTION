@@ -13,4 +13,7 @@ LazyData: true
 RoxygenNote: 7.1.0
 Depends:
 	magrittr,
-	tidyverse
+	plyr,
+	dplyr,
+	tidyr
+	
