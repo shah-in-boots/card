@@ -18,17 +18,16 @@
 #' @param last Column with right/censoring time point, or last contact
 #' @param event.dates Vector of columns that contain event dates
 #' @param model.type Character/string = c("marginal", "pwptt", "pwpgt")
-#' @param death Column representing if patient died at right censoring (optional), default = 0 (no death event)
+#' @param death Column created if death is known (0 or 1), Must include in original dataframe (e.g. can add column of zeroes prn)
 #' @return A data frame organized into a survival table format
 #' @examples
 #' recurrent_survival_table(tibble, id, first.date, last.known.date, c(event.dates), "marginal", death.status)
-
 #' @export
-recurrent_survival_table <- function(data, id, first, last, event.dates, model.type, death) {
+recurrent_survival_table <- function(data, id, first, last, event.dates, model.type, death=NULL) {
 
 	# Check for missing optional parameter of death
 	# Creates minimally required table
-	if (missing(death)) {
+	if(is.null(death)) {
 		df <- data[c(id, first, last, event.dates)]
 		df$death <- 0
 	} else {
@@ -48,7 +47,7 @@ recurrent_survival_table <- function(data, id, first, last, event.dates, model.t
 		nest()
 
 	# Unique and sorted events and correct event numbering
-	for (i in 1:length(x[[id]])) {
+	for(i in 1:length(x[[id]])) {
 		# Make duplicate events NA values
 		# Replace duplicates with NA if duplicates exist
 		if (!empty(x[[i,2]][duplicated(x[[i,2]]$DATE),])) {

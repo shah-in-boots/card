@@ -4,7 +4,15 @@
 \alias{recurrent_survival_table}
 \title{Create data table of recurrent events for survival analysis}
 \usage{
-recurrent_survival_table(data, id, first, last, event.dates, model.type, death)
+recurrent_survival_table(
+  data,
+  id,
+  first,
+  last,
+  event.dates,
+  model.type,
+  death = NULL
+)
 }
 \arguments{
 \item{data}{A dataframe containing the subsequent parameters}
@@ -19,7 +27,7 @@ recurrent_survival_table(data, id, first, last, event.dates, model.type, death)
 
 \item{model.type}{Character/string = c("marginal", "pwptt", "pwpgt")}
 
-\item{death}{Column representing if patient died at right censoring (optional), default = 0 (no death event)}
+\item{death}{Column created if death is known (0 or 1), Must include in original dataframe (e.g. can add column of zeroes prn)}
 }
 \value{
 A data frame organized into a survival table format

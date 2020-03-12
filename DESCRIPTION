@@ -1,14 +1,16 @@
-Package: recurrentEvents
+Package: autonomicR
 Type: Package
-Title: Recurrent Event Analysis
+Title: Autonomic Research and Data Tools
 Version: 0.1.0
 Author: Anish Shah
 Maintainer: The package maintainer <asshah4@emory.edu>
-Description: For survival analysis, package oriented at reshaping data.
+Description: Research tools that have been built to evaluate autonomic 
+	function and data, including time series, longitudinal, and 
+	recurrent events.
 License: GNU License
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.0
-Imports:
+Depends:
 	magrittr,
 	tidyverse
