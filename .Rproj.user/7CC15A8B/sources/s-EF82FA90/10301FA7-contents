@@ -1,0 +1,10 @@
+Package: recurrentEvents
+Type: Package
+Title: Recurrent Event Analysis
+Version: 0.1.0
+Author: Anish Shah
+Maintainer: The package maintainer <asshah4@emory.edu>
+Description: The package is under
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
