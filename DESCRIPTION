@@ -1,11 +1,14 @@
 Package: recurrentEvents
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Recurrent Event Analysis
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Anish Shah
+Maintainer: The package maintainer <asshah4@emory.edu>
+Description: For survival analysis, package oriented at reshaping data.
+License: GNU License
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 7.1.0
+Imports:
+	magrittr,
+	tidyverse

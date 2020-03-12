@@ -4,7 +4,10 @@ Title: Recurrent Event Analysis
 Version: 0.1.0
 Author: Anish Shah
 Maintainer: The package maintainer <asshah4@emory.edu>
-Description: The package is under
-License: What license is it under?
+Description: For survival analysis, package oriented at reshaping data.
+License: GNU License
 Encoding: UTF-8
 LazyData: true
+Depends:
+	magrittr
+	tidyverse
