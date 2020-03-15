@@ -15,5 +15,8 @@ Depends:
 	magrittr,
 	plyr,
 	dplyr,
-	tidyr
+	tidyr,
+	stats,
+	broom
+	
 	

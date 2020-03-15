@@ -23,17 +23,6 @@
 #' @examples
 #' recurrent_survival_table(tibble, id, first.date, last.known.date, c(event.dates), "marginal", death.status)
 #' @export
-
-data = repeatEventsData
-id = "patid"
-first = "first_visit_date_bl"
-last = "ldka"
-event.dates = names(repeatEventsData)[4:9]
-model.type = "marginal"
-death = "DEATH_CV_YN"
-
-tmp <- recurrent_survival_table(data, id, first, last, event.dates, model.type, death)
-
 recurrent_survival_table <- function(data, id, first, last, event.dates, model.type, death=NULL) {
 
 	# Check for missing optional parameter of death
