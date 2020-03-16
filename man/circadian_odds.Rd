@@ -24,3 +24,6 @@ A data frame of odds ratios
 \details{
 This function creates an OR table based on the covariate names supplied. It requires that there is an appropriate outcome variable selected. It performs a logistic regression. This model does not allow for conditioning variables (yet).
 }
+\examples{
+circadian_odds(df, hour, outcome, c(covar1, covar2))
+}

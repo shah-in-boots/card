@@ -1,7 +1,7 @@
 Package: autonomicR
 Type: Package
 Title: Autonomic Research and Data Tools
-Version: 0.1.0
+Version: 0.1.3
 Author: Anish Shah
 Maintainer: The package maintainer <asshah4@emory.edu>
 Description: Research tools that have been built to evaluate autonomic 
@@ -17,6 +17,7 @@ Depends:
 	dplyr,
 	tidyr,
 	stats,
-	broom
+	broom,
+	ggplot2
 	
 	
