@@ -53,7 +53,7 @@ circadian_odds <- function(dataframe, time, outcome, covariates) {
 #' @param lower Lower boundary of 95% CI
 #' @param upper Upper boundary of 95% CI
 #' @examples
-#' geom_forest("hour", "OddsRatio", "LowerCI", "UpperCI")
+#' ggplot(OddsTable) + geom_forest("hour", "OddsRatio", "LowerCI", "UpperCI")
 #' @return A ggplot geom that has been configured for a forest plot.
 #' @export
 geom_forest <- function(group="time", or="OR", lower="Lower", upper="Upper", ...) {
