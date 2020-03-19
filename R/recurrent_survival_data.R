@@ -1,3 +1,4 @@
+
 # Script to define function for recurrent survival events
 # Will require dates of events, types of recurrent table, etc
 
@@ -11,7 +12,11 @@
 # Output
 	# Survival table
 
-#' Create data table of recurrent events for survival analysis
+#' @title Recurrent Survival Data Format
+#' @description
+#' `recurrent_survival_table` Reformat recurrent event data (wide) into different models for survival analysis
+#' @details
+#' This function takes every data event date, and creates several types of recurrent event tables. It orders the data chronologically for repeat events. Currently does marginal and conditional A and B models.
 #' @param data A dataframe containing the subsequent parameters
 #' @param id Column in dataframe that contains unique IDs for each row
 #' @param first Column with left/enrollment dates
@@ -252,3 +257,55 @@ recurrent_survival_table <- function(data, id, first, last, event.dates, model.t
 	return(y)
 }
 
+#' @title Recurrent Event Summary Table by Group
+#' @description
+#' `recurrent_summary_table` Creates a table with summary of recurrent events
+#' @details
+#' This function allows for taking the output of `recurrent_survival_table`, marginal format repeat event data, and creates a summary table that describes the number of events by strata/event.
+#' @param marginal.data Recurrent event data in marginal format. ID column must be present as first column.
+#' @param group Table that has ID in first column, and named covar as second column.
+#'
+#' @return Summary table by grouping variable, can be placed into a latex environment with kable and kable styling. Assumes that death events may be present when most recent non-EVENT has status 1.
+#' @examples
+#' tbl <- recurrent_summary_table(marg, grp)
+#' tbl %>% kable("latex", caption = "Summary of Recurrent Events", booktabs = TRUE) %>%
+#' kable_styling(font_size = 8)
+#' @export
+recurrent_summary_table <- function(marginal.data, group) {
+	# What is the ID for merging? Should merge by guessing.
+	df <- left_join(marginal.data, group)
+	id <- names(df)[1]
+
+	# What is the covariate of interest?
+	grpvar <- names(group)[2]
+
+	# Length of time between events for all individuals
+	df$TIME <- df$TSTOP - df$TSTART
+
+	# Did the last event dlead to fatality?
+	# Indicate by ... EVENT_DATE_0 and STATUS = 1
+	df$EVENT[df$EVENT == "EVENT_DATE_0" & df$STATUS == 1] <- "EVENT_DATE_DEATH"
+
+	# Create factors
+	df[[grpvar]] %<>% factor()
+	df$EVENT %<>% factor()
+
+	# Identify number of events per individual, and add back into DF
+	# Column name is "freq"
+	# This may not be necessary ... currently unused
+	df <-
+		plyr::count(df, "patid") %>%
+		left_join(df, ., by = id) %>%
+		as_tibble()
+
+	# Make a summary table
+	tbl <-
+		df %>%
+		group_by(!! rlang::sym(grpvar), EVENT) %>%
+		dplyr::summarise(Count = n(), Time = mean(TSTOP)) %>%
+		pivot_wider(id_cols = EVENT, names_from = msimi, values_from = c(Count, Time), names_sep = paste0("_", grpvar, "_")) %>%
+		arrange(EVENT)
+
+	# Return table, can be formatted externally
+	return(tbl)
+}

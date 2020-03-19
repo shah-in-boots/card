@@ -2,4 +2,5 @@
 
 export(circadian_odds)
 export(geom_forest)
+export(recurrent_summary_table)
 export(recurrent_survival_table)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/recurrent_survival_data.R
 \name{recurrent_survival_table}
 \alias{recurrent_survival_table}
-\title{Create data table of recurrent events for survival analysis}
+\title{Recurrent Survival Data Format}
 \usage{
 recurrent_survival_table(
   data,
@@ -33,7 +33,10 @@ recurrent_survival_table(
 A data frame organized into a survival table format
 }
 \description{
-Create data table of recurrent events for survival analysis
+`recurrent_survival_table` Reformat recurrent event data (wide) into different models for survival analysis
+}
+\details{
+This function takes every data event date, and creates several types of recurrent event tables. It orders the data chronologically for repeat events. Currently does marginal and conditional A and B models.
 }
 \examples{
 recurrent_survival_table(tibble, id, first.date, last.known.date, c(event.dates), "marginal", death.status)

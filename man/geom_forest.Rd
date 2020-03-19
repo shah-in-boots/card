@@ -25,5 +25,5 @@ A ggplot geom that has been configured for a forest plot.
 This function creates a forest plot using the OR developed by the `circadian_odds` function in this package. By default, it takes the output of `circadian odds`, which is a tibble named "ot", and will generate a forest plot based on the grouping variable (default is time of day). Original data can be restricted or the hours can be reduced).
 }
 \examples{
-geom_forest("hour", "OddsRatio", "LowerCI", "UpperCI")
+ggplot(OddsTable) + geom_forest("hour", "OddsRatio", "LowerCI", "UpperCI")
 }
