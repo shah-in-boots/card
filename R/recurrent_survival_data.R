@@ -268,7 +268,7 @@ recurrent_survival_table <- function(data, id, first, last, event.dates, model.t
 #' @return Summary table by grouping variable, can be placed into a latex environment with kable and kable styling. Assumes that death events may be present when most recent non-EVENT has status 1.
 #' @examples
 #' tbl <- recurrent_summary_table(marg, grp)
-#' tbl %>% kable("latex", caption = "Summary of Recurrent Events", booktabs = TRUE) %>%
+#' tbl %>% kable("latex", caption = "Title", booktabs = TRUE) %>%
 #' kable_styling(font_size = 8)
 #' @export
 recurrent_summary_table <- function(marginal.data, group) {
