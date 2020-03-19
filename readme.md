@@ -1,4 +1,5 @@
 # autonomicR
 
-This package is being built to store the functions I write/develop to simplify the methods-focused, computational research for studying autonomic physiology in an epidemiological context.
+This package was written to help study and research computational approaches in autonomic physiology, biostatistics, and epidemiology in R. A variety of the dependencies, such as data generated, will likely come from computationally intensive programs, such as Matlab/Octave.
+
 
