@@ -22,6 +22,6 @@ This function allows for taking the output of `recurrent_survival_table`, margin
 }
 \examples{
 tbl <- recurrent_summary_table(marg, grp)
-tbl \%>\% kable("latex", caption = "Summary of Recurrent Events", booktabs = TRUE) \%>\%
+tbl \%>\% kable("latex", caption = "Title", booktabs = TRUE) \%>\%
 kable_styling(font_size = 8)
 }
