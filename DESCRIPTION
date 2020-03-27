@@ -1,7 +1,7 @@
 Package: autonomicR
 Type: Package
 Title: Autonomic Research and Data Tools
-Version: 0.1.5
+Version: 0.1.6
 Author: Anish Shah
 Maintainer: The package maintainer <asshah4@emory.edu>
 Description: Research tools that have been built to evaluate autonomic 
@@ -19,6 +19,7 @@ Depends:
 	stats,
 	broom,
 	ggplot2,
-	survival
+	survival,
+	data.table
 	
 	

@@ -1,3 +1,5 @@
+# Odds Ratio Table by Time Point {{{ ====
+
 #' @title
 #' Odds Ratio Table by Time Point
 #' @description
@@ -42,6 +44,10 @@ circadian_odds <- function(dataframe, time, outcome, covariates) {
 	return(ot)
 }
 
+# }}}
+
+# Forest Plot of Hourly Odds {{{ ====
+
 #' @title
 #' Forest Plot of Hourly Odds
 #' @description
@@ -69,3 +75,5 @@ geom_forest <- function(group="time", or="OR", lower="Lower", upper="Upper", ...
 		theme_plot.caption = element_text(hjust = 0)
 	)
 }
+
+# }}}
