@@ -4,12 +4,12 @@
 \alias{recurrent_propensity}
 \title{Propensity Score Weighting}
 \usage{
-recurrent_propensity(data, covar)
+recurrent_propensity(data, vars)
 }
 \arguments{
 \item{data}{Data frame that contains all covariates and outcomes. First column should be ID}
 
-\item{covar}{Covariates, with first covariate being the outcome variable for logistic regression}
+\item{vars}{Variables used for regression. Outcome variable must be first.}
 }
 \value{
 Returns a modified table from what was originally given with the new columns propensity scores. Essentially original df + 2 columns.

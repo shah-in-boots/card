@@ -1,4 +1,3 @@
-
 # Recurrent Survival Table {{{ ====
 # Script to define function for recurrent survival events
 # Will require dates of events, types of recurrent table, etc
@@ -325,36 +324,36 @@ recurrent_summary_table <- function(marginal.data, group) {
 #' @details
 #' Using a logistic regression, will take covariates and create propensity scores, and adds the weights. Uses the standard logistic regression to evalute the propensity score.
 #' @param data Data frame that contains all covariates and outcomes. First column should be ID
-#' @param covar Covariates, with first covariate being the outcome variable for logistic regression
+#' @param vars Variables used for regression. Outcome variable must be first.
 #' @return Returns a modified table from what was originally given with the new columns propensity scores. Essentially original df + 2 columns.
 #' @examples
 #' ps <- recurrent_propensity(df, c("outcome", "exp1", "exp2"))
 #' ps[c("patid", "PROP_SCORE", "PROP_WEIGHT")]
 #' @export
-recurrent_propensity <- function(data, covar) {
+recurrent_propensity <- function(data, vars) {
 	# Most important columns
 	id <- names(data)[1]
-	outcome <- covar[1]
+	outcome <- vars[1]
+
+	# Decide if linear or logistic model based on outcome type
+	linLog <- length(unique(na.omit(data[[outcome]])))
 
 	# Create formula for regression
 	f <-
-		paste(covar[-1], collapse = " + ") %>%
-		paste(covar[1], ., sep = " ~ ") %>%
+		paste(vars[-1], collapse = " + ") %>%
+		paste(vars[1], ., sep = " ~ ") %>%
 		as.formula()
 
-	# Create model
-	m <- glm(f, data = data, family = binomial())
+	# Create model based on characteristic of outcome variable
+	if(linLog == 2) {
+		m <- glm(f, data = data, family = binomial())
+	} else {
+		m <- glm(f, data = data)
+	}
 
 	# PS scores
-	ps <-
-		predict(m, type = "response") %>%
-		as.data.frame() %>%
-		rownames_to_column(id)
-	names(ps)[2] <- "PROP_SCORE"
-	ps[[1]] %<>% as.numeric()
-
-	# Add weighted score back in
-	x <- left_join(data, ps, by = id)
+	PROP_SCORE <- predict(m, type = "response")
+	x <- cbind(data, PROP_SCORE)
 	x$PROP_WEIGHT <- ifelse(x[[outcome]] == 1, 1/x$PROP_SCORE, 1/(1-x$PROP_SCORE))
 
 	# Return new data frame
