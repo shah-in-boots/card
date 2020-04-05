@@ -2,6 +2,8 @@
 
 export(circadian_odds)
 export(geom_forest)
+export(geom_model_error)
+export(geom_residuals)
 export(hrv_linear_model)
 export(matlab_process_hrv)
 export(recurrent_model_building)

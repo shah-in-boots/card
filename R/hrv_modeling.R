@@ -42,3 +42,105 @@ hrv_linear_model <- function(data, covar, hrv, prop.weight = FALSE) {
 }
 
 # }}}
+
+
+# Plotting Error of Models {{{ ====
+
+#' @title Plotting Error of Models
+#' @description
+#' `geom_model_error` creates a ggplot geom that can be extended and accept other ggplot layers. Shows residual error from the regression mean for different types of regression models.
+#' @details Generate residuals for models. Currently accepts only linear models. Does not account for covariates yet, although may be able to do this in the future.
+#' @param model Model to be analyzed. The function will detect what type of family the model is (e.g. linear = "gaussian", logistic = "binomial") and plot the appropriate type of model.
+#' @return Returns a ggplot object of geom type, other layers can be added on as seen in example.
+#' @examples
+#' ggplot() + geom_residuals(model, exposure, outcome) + labs(x = "HRV values", y = "Depression Score", title = "Model Residuals")
+#' @export
+geom_model_error <- function(model) {
+
+	# Create an augmented df for visualizing
+	model_dx <- broom::augment(model, type.predict = "response")
+	yaxis <- names(model_dx)[1]
+	xaxis <- names(model_dx)[2]
+
+	# Identify what type of model
+	type <- family(model)$family
+
+	# Cases (either logistic or linear)
+	switch(
+		type,
+
+		# Linear
+		gaussian = {
+			# ggplot geom for linear models
+			list(
+				aes_string(x = xaxis, y = yaxis),
+				scale_color_continuous(type = "viridis"),
+				guides(color = FALSE, size = FALSE),
+				geom_point(data = model_dx, aes_string(y = ".fitted"), shape = 1),
+				geom_segment(data = model_dx, aes_string(xend = xaxis, yend = ".fitted"), alpha = 0.2),
+				geom_point(data = model_dx, aes(colour = abs(.resid), size = abs(.resid))),
+				stat_smooth(data = model_dx, method = "lm", se = FALSE, colour = "dimgrey"),
+				theme_minimal()
+			)
+		},
+
+		# Logistic
+		binomial = {
+			# ggplot geom for logistic models
+			list(
+				# Plot axes (actual data)
+				aes_string(x = xaxis, y = yaxis),
+				#scale_color_continuous(type = "viridis"),
+				#guides(color = FALSE, size = FALSE),
+				geom_point(data = model_dx, aes(y = .fitted), shape = 1),
+				#geom_point(data = model_dx %>% filter(!!sym(yaxis) != round(.fitted)), size = 2, color = "red"),
+				# Segment from geom
+				#geom_segment(data = model_dx, aes_string(xend = xaxis, yend = ".fitted"), alpha = 0.2),
+				#geom_point(data = model_dx, aes(colour = abs(.resid), size = abs(.resid))),
+				# Predicted values
+				#geom_line(data = model_dx, aes(y = .fitted)),
+				#stat_smooth(data = model_dx, method = "glm", se = FALSE, method.args = list(family=binomial), colour = "dimgrey"),
+				theme_minimal(),
+				ylim(range(as.numeric(as.character(model_dx[[yaxis]]))))
+			)
+		},
+
+		# Catch statement
+		stop("Neither a linear (lm) or logistic (glm(family = binomial)) model")
+	)
+}
+
+# }}}
+
+# Plotting Residual of a Model {{{ ====
+
+#' @title Plotting Residual of a Model
+#' @description
+#' `geom_residuals` makes a diagnostic plot of residuals versus fitted data for linear models
+#' @details Generate residuals versus fitted plot. Functions as an additional geom layer on ggplot
+#' @param model Model to be analyzed, currently only accepts linear models.
+#' @return Returns a ggplot object of geom type, other layers can be added on as seen in example.
+#' @examples
+#' ggplot() + geom_residuals(model)
+#' @export
+geom_residuals <- function(model) {
+
+	# Augment model
+	model_dx <- broom::augment(model, type.predict = "response")
+
+	# Make geom layer
+	list(
+		aes_string(x = ".fitted", y = ".resid"),
+		geom_point(data = model_dx, aes_string(x = ".fitted", y = ".resid")),
+		stat_smooth(data = model_dx, aes(x = .fitted, y = .resid), method = "loess", color = "cornflowerblue"),
+		geom_hline(yintercept = 0, col = "brown4", linetype = "dashed"),
+		labs(
+			title = "Residual versus fitted plot",
+			x = "Fitted",
+			y = "Residuals"
+		),
+		theme_minimal()
+	)
+}
+
+# }}}

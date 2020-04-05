@@ -72,8 +72,13 @@ geom_forest <- function(group="time", or="OR", lower="Lower", upper="Upper", ...
 		scale_color_viridis(),
 		theme_minimal(),
 		scale_y_log10(),
-		theme_plot.caption = element_text(hjust = 0)
+		theme(plot.caption = element_text(hjust = 0))
 	)
 }
 
 # }}}
+
+#  {{{ ====
+
+
+#  }}}
