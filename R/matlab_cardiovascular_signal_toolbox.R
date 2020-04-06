@@ -2,7 +2,7 @@
 
 #' @title Process Toolbox HRV
 #' @description
-#' `matlab_process_hrv` takes the output from HRV Toolbox and converts it for analysis. Uses the \code{\link[data.table]} for reading in data due to size/speed.
+#' `read_matlab_hrv` takes the output from HRV Toolbox and converts it for analysis. Uses the package [data.table::fread()] for reading in data due to size/speed.
 #' @details The data is taken sequentially (sliding windows), and summarized over the course of certain time lengths. The data comes in a standardized pattern from the toolbox. It requires processing due to its large file sizes (e.g. 24 hours of data for a single patient can be up to 2 MB in size).
 #' @param loc Location of the folder that contains all of the patients that were analyzed by the Main_HRV_Analysis.m function from the Toolbox.
 #' @param name Name of the patient/ID. There should exist a folder with the name inside the `loc` folder. Inside this folder are all the Toolbox parameters and HRV results in CSV format.
@@ -25,7 +25,7 @@
 #' }
 #' df <- rbindlist(d) %>% as_tibble()
 #' @export
-matlab_process_hrv <- function(loc, name, vars, time) {
+read_matlab_hrv <- function(loc, name, vars, time) {
 
 	# Selected HRV vars
 	svar <- c("t_start", "t_end", vars)
