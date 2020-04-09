@@ -53,7 +53,7 @@ hrv_linear_model <- function(data, covar, hrv, prop.weight = FALSE) {
 #' @param model Model to be analyzed. The function will detect what type of family the model is (e.g. linear = "gaussian", logistic = "binomial") and plot the appropriate type of model.
 #' @return Returns a ggplot object of geom type, other layers can be added on as seen in example.
 #' @examples
-#' ggplot() + geom_residuals(model, exposure, outcome) + labs(x = "HRV values", y = "Depression Score", title = "Model Residuals")
+#' ggplot() + geom_residuals(model) + labs(x = "HRV values", y = "Depression Score", title = "Model Residuals")
 #' @export
 geom_model_error <- function(model) {
 

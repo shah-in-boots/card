@@ -2,7 +2,7 @@
 
 #' @title Read in VivaLNK Patch Data
 #' @description
-#' `patch_read_vivalnk` Reads in VivaLNK log files, raw, and helps to organize the summary data.
+#' `read_vivalnk_patch` Reads in VivaLNK log files, raw, and helps to organize the summary data.
 #' @details Does not obtain the ECG signal, just the summary data from the log file for diagnostic purposes.
 #' @param name Name of the patient that the log file was created on. The variable does NOT have an extension.
 #' @param loc The raw, unprocessed data folder containining the log file (which is in a ".txt" format)
@@ -29,7 +29,7 @@
 #' 	write_csv(df, file.path(proc_folder, 'vivalnk_data.csv'), append = TRUE)
 #' }
 #' @export
-patch_read_vivalnk <- function(name, loc) {
+read_vivalnk_patch <- function(name, loc) {
 	# Read in file name
 	tmp <- read_delim(file.path(loc, paste0(name, '.txt')), delim = '\n', col_names = FALSE)
 

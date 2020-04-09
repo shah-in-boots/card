@@ -13,12 +13,11 @@ LazyData: true
 RoxygenNote: 7.1.0
 Depends:
 	magrittr,
+	tidyverse,
+	data.table
+Imports:
 	plyr,
-	dplyr,
-	tidyr,
 	stats,
 	broom,
-	ggplot2,
-	survival,
-	data.table
+	survival
 	
