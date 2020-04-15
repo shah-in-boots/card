@@ -119,8 +119,8 @@ geom_model_error <- function(model) {
 
 #' @title Plotting Residual of a Model
 #' @description
-#' `geom_residuals` makes a diagnostic plot of residuals versus fitted data for linear models
-#' @details Generate residuals versus fitted plot. Functions as an additional geom layer on ggplot
+#' `geom_residuals` makes a diagnostic plot of residuals versus fitted data for linear models. Does not yet accept logistic models
+#' @details Generate residuals versus fitted plot. Functions as an additional geom layer on ggplot. Models must be linear/gaussian in nature. Covariates can be included in the model.
 #' @param model Model to be analyzed, currently only accepts linear models.
 #' @return Returns a ggplot object of geom type, other layers can be added on as seen in example.
 #' @examples
