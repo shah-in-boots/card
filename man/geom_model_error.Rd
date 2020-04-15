@@ -19,5 +19,5 @@ Returns a ggplot object of geom type, other layers can be added on as seen in ex
 Generate residuals for models. Currently accepts only linear models. Does not account for covariates yet, although may be able to do this in the future.
 }
 \examples{
-ggplot() + geom_residuals(model) + labs(x = "HRV values", y = "Depression Score", title = "Model Residuals")
+ggplot() + geom_model_error(model) + labs(x = "HRV values", y = "Depression Score", title = "Model Residuals")
 }

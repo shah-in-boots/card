@@ -413,3 +413,71 @@ recurrent_model_building <- function(data, covar.builds, model, prop.scores = NU
 }
 
 # }}}
+
+### Initial and Final Visit Table {{{ ====
+
+#' @title Initial and Final Visit Table
+#' @description
+#' `recurrent_followup_table` makes a before/after dataset using a unique ID that follows patients between studies, to allow for comparison over time.
+#' @details Currently functions by taking two input IDs, one being a ID that is the same between studies (a true key ID) and an ID that is unique to that study itself. It will arrange by dates, and and slice data into an initial visit and the most recent visit. Each row should have a KEY ID and a STUDY ID. The data is in a long format, such that hte STUDY IDs are unique / not duplicated.
+#' @param data Data frame containing all clinical covariates of interest
+#' @param studyid Should be one ID for every study date/visit. Can have multiples ONLY if there were several data points gathered on a single visit (e.g. heart rate measured multiple times on the same day).
+#' @param keyid Should be the ID that corresponds to each studyid throughout each visit
+#' @param dates Name of column containing the date of each visit
+#' @return Returns list of initial and most recent data sets. These can easily be merged after with any naming nomenclature as chosen, or with any merging keys as chosen (in case there are several merging variables, like keyid + hour of day for circadian data).
+#' @example
+#' x <- recurrent_followup_table(dt, "patid", "vetrid", "date")
+#' df_predict <- inner_join(x$initial, x$final, by = c("vetrid", "hour", suffix = c("_0", "_1")))
+#' @export
+recurrent_followup_table <- function(data, studyid, keyid, date) {
+
+	# Make sure in tibble/tidy format
+	data <- as_tibble(data)
+
+	# Find which rows / IDs are repeated based on the keyid
+	# Should have multiple rows per keyid, but only 1 per studyid
+	repeats <-
+		data[c(keyid, studyid, date)] %>%
+		unique() %>%
+		group_by(!!sym(keyid)) %>%
+		tally() %>%
+		subset(n > 1)
+
+	# Initial visit IDs
+	beforeid <-
+		data[c(keyid, studyid, date)] %>%
+		unique() %>%
+		dplyr::filter(!!sym(keyid) %in% repeats[[keyid]]) %>%
+		dplyr::group_by(!!sym(keyid)) %>%
+		dplyr::arrange(!!sym(date)) %>%
+		dplyr::slice(1) %>%
+		.[studyid]
+
+	# Final visit IDs
+	afterid <-
+		data[c(keyid, studyid, date)] %>%
+		unique() %>%
+		dplyr::filter(!!sym(keyid) %in% repeats[[keyid]]) %>%
+		dplyr::group_by(!!sym(keyid)) %>%
+		dplyr::arrange(!!sym(date)) %>%
+		dplyr::slice(n()) %>%
+		.[studyid]
+
+	# Before data set (initial visit)
+	before <-
+		data %>%
+		filter(!!sym(studyid) %in% beforeid[[studyid]])
+
+	# After data set (most recent visit)
+	after <-
+		data %>%
+		filter(!!sym(studyid) %in% afterid[[studyid]])
+
+	# Return
+	x <- list()
+	x[["initial"]] <- before
+	x[["final"]] <- after
+	return(x)
+}
+
+### }}}
