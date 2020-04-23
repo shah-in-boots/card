@@ -5,3 +5,4 @@
 ^readme\.rmd$
 ^libraries\.R$
 ^LICENSE\.md$
+^README\.Rmd$
