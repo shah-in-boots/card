@@ -43,6 +43,50 @@ hrv_linear_model <- function(data, covar, hrv, prop.weight = FALSE) {
 
 # }}}
 
+# HRV Model Building {{{ ====
+
+#' @title HRV Model Building
+#' @description
+#' `hrv_model_building` creates a list of models using different builds of covariates.
+
+
+hrv_model_building <- function(data, covar.builds, model, prop.scores = NULL) {
+	# Important variables / columns
+	n <- length(covar.builds)
+	names(data)[1:5] <- c("ID", "TSTART", "TSTOP", "STATUS", "EVENT")
+	m <- list()
+
+	# Create all the models in sequence
+	for(i in 1:n) {
+		# Create formulas
+		f <-
+			paste(get(covar.builds[i]), collapse = " + ") %>%
+			paste("Surv(TSTART, TSTOP, STATUS)", ., sep = " ~ ") %>%
+			# Different recurrent event models with cluster and strata
+			purrr::when(
+				model == "marginal" ~ paste(., "cluster(ID)", sep = " + "),
+				model == "pwptt" ~ paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
+				model == "pwpgt" ~ paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
+				~ as.formula()
+			) %>%
+			as.formula()
+
+		# Assess need for propensity weighting
+		# Dynamically save the models
+		if(covar.builds[i] %in% prop.scores) {
+			# Uses the recurrent_propensity function
+			x <- recurrent_propensity(data, get(covar.builds[i]))
+			m[[i]] <- coxph(f, method = "breslow", data = x, weights=x$PROP_WEIGHT)
+		} else {
+			m[[i]] <- coxph(f, method = "breslow", data = data)
+		}
+	}
+
+	# Return output
+	return(m)
+}
+
+# }}}
 
 # Plotting Error of Models {{{ ====
 

@@ -1,23 +1,27 @@
 Package: autonomicR
 Type: Package
-Title: Autonomic Research and Data Tools
-Version: 0.1.91
-Author: Anish Shah
+Title: Tools to Study Autonomic Regulation of Cardiac Physiology
+Version: 0.1.92
+Author: Anish Shah, MD
 Maintainer: The package maintainer <asshah4@emory.edu>
-Description: Research tools that have been built to evaluate autonomic 
-	function and data, including time series, longitudinal, and 
-	recurrent events.
-License: GNU License
+Description: This package contains tools needed for the management of
+	data that has been collected to study autonomic physiology, 
+	particularly of how the autnomic nervous system effects the 
+	cardiovascular system (neurocardiology). The package uses tools
+	built to study electrocardiographic time series data, focused on
+	heart rate variability and morphology in companionship with MATLAB.
+	It also helps with the management of extended time series, such as
+	longitudinal data and recurrent events. It also contains methods
+	for analyzing and studying circadian events.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.0
-Depends:
+Imports:
 	magrittr,
 	tidyverse,
-	data.table
-Imports:
+	data.table,
 	plyr,
 	stats,
 	broom,
 	survival
-	

@@ -13,7 +13,10 @@ circadian_ttest(data, time, cvar, group)
 
 \item{cvar}{Continuous variable of interest (x ~ y)}
 
-\item{group}{Grouping variable to apply to the `cvar` (x ~ y)}
+\item{group}{Grouping variable to apply to the `cvar` (x ~ y). Must be binary for t-test.}
+}
+\value{
+Returns a dataframe that has the time variable, the categorical variable, and the statistics (including p-value) of the continuous variable
 }
 \description{
 `circadian_ttest` takes data and returns a table of t-test based on the continuous variable of interest and a grouping variable.

@@ -4,7 +4,12 @@
 \alias{geom_circadian}
 \title{Circadian Plot by Group}
 \usage{
-geom_circadian(time = "timegrp", group = "catvar")
+geom_circadian(time, group, pval = FALSE)
+}
+\arguments{
+\item{time}{Name of time group variable, such as hours of day, which ends up being the x-axis}
+
+\item{group}{Name of categorical variable to stratify the y-axis}
 }
 \value{
 Returns a ggplot object of geom type, other layers can be added on as seen in example.
@@ -13,8 +18,8 @@ Returns a ggplot object of geom type, other layers can be added on as seen in ex
 `geom_circadian` converts the output of [autonomicR::circadian_ttest] into a complex geom that is broken down by time/hour and HRV (or any other continuous variable). Each hour is then separated by the grouping variable.
 }
 \details{
-Currently creates a geom_layer that shows a error bar and point estimate of values by group (e.g. clinical status). As t-test values should be available in the data frame, shows points of significance.
+Currently creates a geom_layer that shows a error bar and point estimate of values by group (e.g. clinical status). If t-test values are available in the data frame, shows points of significance.
 }
 \examples{
-ggplot(df_ttest) + geom_circadian()
+ggplot(df_with_ttest) + geom_circadian("hour", "catvar", TRUE)
 }

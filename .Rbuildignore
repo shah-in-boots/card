@@ -2,3 +2,6 @@
 ^\.Rprofile$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^readme\.rmd$
+^libraries\.R$
+^LICENSE\.md$
