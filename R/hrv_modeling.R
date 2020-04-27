@@ -13,6 +13,7 @@
 #' m <- hrv_linear_model(df, c("DEPRESSION", "CHD", "HTN"), c("HF", "LF", SDNN"), FALSE)
 #' m[[1:3]] # Models of HF, LF and SDNN as linear outcome variables
 #' @export
+
 hrv_linear_model <- function(data, covar, hrv, prop.weight = FALSE) {
 	# Important variables/columns
 	n <- length(hrv) # number of models to make
@@ -48,8 +49,6 @@ hrv_linear_model <- function(data, covar, hrv, prop.weight = FALSE) {
 #' @title HRV Model Building
 #' @description
 #' `hrv_model_building` creates a list of models using different builds of covariates.
-
-
 hrv_model_building <- function(data, covar.builds, model, prop.scores = NULL) {
 	# Important variables / columns
 	n <- length(covar.builds)

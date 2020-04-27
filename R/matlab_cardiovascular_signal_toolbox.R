@@ -6,7 +6,6 @@
 #' @details The data is taken sequentially (sliding windows), and summarized over the course of certain time lengths. The data comes in a standardized pattern from the toolbox. It requires processing due to its large file sizes (e.g. 24 hours of data for a single patient can be up to 2 MB in size).
 #' @param loc Location of the folder that contains all of the patients that were analyzed by the Main_HRV_Analysis.m function from the Toolbox.
 #' @param name Name of the patient/ID. There should exist a folder with the name inside the `loc` folder. Inside this folder are all the Toolbox parameters and HRV results in CSV format.
-#' @param vars Vector of the HRV variables to be collected
 #' @param time Number of seconds to group the HRV data by. Defaults to 3600 seconds (which is 1 hour)
 #' @return Data frame of HRV summarized by the grouping variable (e.g. 3600 seconds = 1 hour). Also returns an additional column of percent missing (e.g. 20.0% missing data) by time group.
 #' @examples

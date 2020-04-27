@@ -12,8 +12,6 @@ read_hrv_matlab(loc, name, time = 3600)
 \item{name}{Name of the patient/ID. There should exist a folder with the name inside the `loc` folder. Inside this folder are all the Toolbox parameters and HRV results in CSV format.}
 
 \item{time}{Number of seconds to group the HRV data by. Defaults to 3600 seconds (which is 1 hour)}
-
-\item{vars}{Vector of the HRV variables to be collected}
 }
 \value{
 Data frame of HRV summarized by the grouping variable (e.g. 3600 seconds = 1 hour). Also returns an additional column of percent missing (e.g. 20.0% missing data) by time group.
