@@ -11,9 +11,9 @@ geom_forest(group = "time", or = "OR", lower = "Lower", upper = "Upper", ...)
 
 \item{or}{Odds ratio}
 
-\item{lower}{Lower boundary of 95% CI}
+\item{lower}{Lower boundary of 95 percent CI}
 
-\item{upper}{Upper boundary of 95% CI}
+\item{upper}{Upper boundary of 95 percent CI}
 }
 \value{
 A ggplot geom that has been configured for a forest plot.

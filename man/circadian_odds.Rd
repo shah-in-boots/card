@@ -4,10 +4,10 @@
 \alias{circadian_odds}
 \title{Odds Ratio Table by Time Point}
 \usage{
-circadian_odds(dataframe, time, outcome, covariates)
+circadian_odds(data, time, outcome, covariates)
 }
 \arguments{
-\item{dataframe}{Dataframe containing subsequent columns}
+\item{data}{Dataframe containing subsequent columns}
 
 \item{time}{Column name that contains the grouping variable of time}
 

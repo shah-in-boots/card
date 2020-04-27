@@ -2,8 +2,8 @@ Package: autonomicR
 Type: Package
 Title: Tools to Study Autonomic Regulation of Cardiac Physiology
 Version: 0.1.0
-Author: Anish Shah, MD
-Maintainer: The package maintainer <asshah4@emory.edu>
+Author@R: person("Anish", "Shah", email = "asshah4@emory.edu"), 
+	c("aut", "cre"))
 Description: This package contains tools needed for the management of
 	data that has been collected to study autonomic physiology, 
 	particularly of how the autnomic nervous system effects the 
@@ -17,11 +17,17 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.0
+Depends:
+    data.table,
+    ggplot2,
+    magrittr,
+    R (>= 2.10)
 Imports:
 	magrittr,
 	tidyverse,
-	data.table,
 	plyr,
 	stats,
 	broom,
-	survival
+	survival,
+	suncalc,
+	hardhat

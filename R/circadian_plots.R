@@ -6,7 +6,7 @@
 #' `circadian_odds` creates an OR table for each time point of data given, initially applied to any grouping variable (particularly hour/time of day).
 #' @details
 #' This function creates an OR table based on the covariate names supplied. It requires that there is an appropriate outcome variable selected. It performs a logistic regression. This model does not allow for conditioning variables (yet).
-#' @param dataframe Dataframe containing subsequent columns
+#' @param data Dataframe containing subsequent columns
 #' @param time Column name that contains the grouping variable of time
 #' @param outcome Column name that identifies the per-row outcome, binary
 #' @param covariates Vector of independent variables names. First variable needs to be exposure.
@@ -14,14 +14,14 @@
 #' @examples
 #' circadian_odds(df, hour, outcome, c(covar1, covar2))
 #' @export
-circadian_odds <- function(dataframe, time, outcome, covariates) {
+circadian_odds <- function(data, time, outcome, covariates) {
 	# Create formula
     f <-
 		paste(outcome, paste(covariates, collapse=" + "), sep = " ~ ") %>%
 		as.formula()
 
 	# Data frame to use
-	df <- dataframe[c(time, outcome, covariates)]
+	df <- data[c(time, outcome, covariates)]
 	colnames(df)[1] <- "time"
 	df$time %<>% as.factor()
 
@@ -56,8 +56,8 @@ circadian_odds <- function(dataframe, time, outcome, covariates) {
 #' This function creates a forest plot using the OR developed by the `circadian_odds` function in this package. By default, it takes the output of `circadian odds`, which is a tibble named "ot", and will generate a forest plot based on the grouping variable (default is time of day). Original data can be restricted or the hours can be reduced).
 #' @param group Is the grouping variable from data in ggplot, like hour
 #' @param or Odds ratio
-#' @param lower Lower boundary of 95% CI
-#' @param upper Upper boundary of 95% CI
+#' @param lower Lower boundary of 95 percent CI
+#' @param upper Upper boundary of 95 percent CI
 #' @examples
 #' ggplot(OddsTable) + geom_forest("hour", "OddsRatio", "LowerCI", "UpperCI")
 #' @return A ggplot geom that has been configured for a forest plot.
@@ -69,7 +69,7 @@ geom_forest <- function(group="time", or="OR", lower="Lower", upper="Upper", ...
 		geom_errorbar(aes_string(ymin = lower, ymax = upper), size = 0.2, width = 1/3),
 		geom_point(aes_string(colour = or), size = 3),
 		geom_hline(yintercept = 1),
-		scale_color_viridis(),
+		scale_color_viridis_c(),
 		theme_minimal(),
 		scale_y_log10(),
 		theme(plot.caption = element_text(hjust = 0))
@@ -78,29 +78,27 @@ geom_forest <- function(group="time", or="OR", lower="Lower", upper="Upper", ...
 
 # }}}
 
-# T-test Table by Time Point {{{ ====
+# Compare Repeated Measurements by Group {{{ ====
 
-#' @title T-test Table by Time Point
-#' @description
-#' `circadian_ttest` takes data and returns a table of t-test based on the continuous variable of interest and a grouping variable.
-#' @details Applies a simple data transformation to identify the summary statistics of the data frame by the stated variables. Results in a mean, standard deviation, and standard error term. This data is also used for making a t-test based table, which can then also be graphed in [autonomic::geom_circadian].
+#' @title Compare Repeated Measurements by Group
+#' @description Takes data and returns a summary table of continuous variable based on a categorical variable. This summary is repeat by time groups to help describe a circadian pattern.
+#' @details Applies a simple data transformation to identify the summary statistics of the data frame by the stated variables. Results in a mean, standard deviation, and standard error term. This data is also used for making a t-test based table, which can then also be graphed in [autonomicR::geom_circadian].
 #' @param data Dataframe containing all the following variables
 #' @param time Name of the time-dependent variable, usually hours
-#' @param cvar Continuous variable of interest (x ~ y)
-#' @param group Grouping variable to apply to the `cvar` (x ~ y). Must be binary for t-test.
+#' @param x Continuous variable of interest (x ~ y)
+#' @param y Grouping variable to apply to the `cvar` (x ~ y). Must be binary for t-test, otherwise will return data set without pvalues
 #' @return Returns a dataframe that has the time variable, the categorical variable, and the statistics (including p-value) of the continuous variable
 #' @example
 #' # Data
-#' df <-
-#' 	inner_join(df_demo[c("patid", "sad_bin")], df_dyx, by = "patid") %>%
-#' 	circadian_ttest(., "hour", "rDYX", "sad_bin")
+#' dataDemo %>% # Sample data in package
+#' circ_compare_groups(., x = "rDYX", y = "sad_cat", time = "hour")
 #' @export
-circadian_ttest <- function(data, time, cvar, group) {
+circ_compare_groups <- function(data, x, y, time) {
 
 	# Important variables
-	dt <- as.data.table(data[c(time, cvar, group)])
-	names(dt) <- c("timegrp", "contvar", "catvar")
-
+	dt <- data.table::as.data.table(data[c(x, y, time)])
+	names(dt) <- c("contvar", "catvar", "timegrp")
+	dt$catvar %<>% factor() # Ensure categorical variable is factor
 
 	# Data set needs to be summarized
 	dt_summary <-
@@ -111,18 +109,31 @@ circadian_ttest <- function(data, time, cvar, group) {
 		   by = .(timegrp, catvar),
 		   .SDcols = "contvar"]
 
-	# T-tests per each time point and group
-	dt_ttest <-
-		dt[, .(pval = t.test(data=.SD, contvar ~ catvar)$p.value), by = timegrp]
+	# If only two groups, perform t-test
+	if(nlevels(dt$catvar) == 2) {
+
+		# T-tests per each time point and group
+		dt_ttest <-
+			dt[, .(pval = t.test(data=.SD, contvar ~ catvar)$p.value), by = timegrp]
+
+		# Merge in summary data
+		x <- dt_summary[dt_ttest, on = "timegrp"] %>%
+			unnest(cols = c(mean, n, sd, se))
+
+		# For groups > 2
+	} else {
+
+		x <- dt_summary %>%
+			unnest(cols = c(mean, n, sd, se))
+	}
+
 
 	# Combine data
-	merge(dt_summary, dt_ttest, by = "timegrp")
-	x <- dt_summary[dt_ttest, on = "timegrp"] %>% unnest()
 	x$timegrp %<>% factor()
 
 	# Rename columns before returning data
 	names(x)[names(x) == "timegrp"] <- eval(time)
-	names(x)[names(x) == "catvar"] <- eval(group)
+	names(x)[names(x) == "catvar"] <- eval(y)
 
 	# Return as tibble
 	return(x)
@@ -164,8 +175,7 @@ geom_circadian <- function(time, group, pval=FALSE) {
 					  aes(y = 2.2, label = "***"),
 					  colour = "black", size = 4),
 			labs(caption = "*p < .05, **p<.005, ***p<.0005"),
-			scale_color_viridis(option = "cividis",
-								discrete = TRUE,
+			scale_color_viridis_d(option = "E",
 								begin = .1, end = .9),
 			theme_minimal(),
 			theme(
@@ -185,8 +195,7 @@ geom_circadian <- function(time, group, pval=FALSE) {
 			geom_errorbar(aes(ymin = mean - se, ymax = mean + se),
 						  width = 0.2,
 						  position = position_dodge(.3)),
-			scale_color_viridis(option = "cividis",
-								discrete = TRUE,
+			scale_color_viridis_d(option = "E",
 								begin = .1, end = .9),
 			theme_minimal(),
 			theme(
@@ -201,7 +210,4 @@ geom_circadian <- function(time, group, pval=FALSE) {
 }
 
 
-# }}}
-
-# Cosinor Analysis {{{ ====
 # }}}
