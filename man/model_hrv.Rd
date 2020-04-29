@@ -4,7 +4,7 @@
 \alias{model_hrv}
 \title{Modeling HRV Variables}
 \usage{
-model_hrv(data, outcome, exposure, covar, ...)
+model_hrv(data, outcome, exposure, covar = NULL, ...)
 }
 \arguments{
 \item{data}{Data containing names of outcome, exposure, and covars}

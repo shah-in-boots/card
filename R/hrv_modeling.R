@@ -97,6 +97,7 @@ hrv_model_building <- function(data, covar.builds, model, prop.scores = NULL) {
 #' @return Returns a ggplot object of geom type, other layers can be added on as seen in example.
 #' @examples
 #' ggplot() + geom_model_error(model) + labs(x = "HRV values", y = "Depression Score", title = "Model Residuals")
+#' @import ggplot2
 #' @export
 geom_model_error <- function(model) {
 
@@ -168,6 +169,7 @@ geom_model_error <- function(model) {
 #' @return Returns a ggplot object of geom type, other layers can be added on as seen in example.
 #' @examples
 #' ggplot() + geom_residuals(model)
+#' @import ggplot2
 #' @export
 geom_residuals <- function(model) {
 

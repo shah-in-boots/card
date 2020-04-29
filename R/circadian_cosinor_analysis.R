@@ -1,3 +1,5 @@
+#' @import magrittr
+
 # Model Constructor {{{ ====
 new_cosinor <- function(coefs, coef_names, blueprint) {
 
@@ -30,7 +32,8 @@ new_cosinor <- function(coefs, coef_names, blueprint) {
 
 ### Testing
 
-manual_model <- new_cosinor(1, "my_coef", hardhat::default_xy_blueprint())
+manual_model <-
+	new_cosinor(1, "my_coef", hardhat::default_xy_blueprint())
 
 # }}}
 
