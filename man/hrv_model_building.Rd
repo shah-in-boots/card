@@ -7,5 +7,5 @@
 hrv_model_building(data, covar.builds, model, prop.scores = NULL)
 }
 \description{
-`hrv_model_building` creates a list of models using different builds of covariates.
+\code{hrv_model_building} creates a list of models using different builds of covariates.
 }

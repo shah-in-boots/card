@@ -33,7 +33,7 @@ recurrent_survival_table(
 A data frame organized into a survival table format
 }
 \description{
-`recurrent_survival_table` Reformat recurrent event data (wide) into different models for survival analysis
+\code{recurrent_survival_table} Reformat recurrent event data (wide) into different models for survival analysis
 }
 \details{
 This function takes every data event date, and creates several types of recurrent event tables. It orders the data chronologically for repeat events. Currently does marginal and conditional A and B models.

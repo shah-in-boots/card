@@ -12,7 +12,7 @@ that were analyzed by the Main_HRV_Analysis.m function from the
 Toolbox.}
 
 \item{name}{Name of the patient/ID. There should exist a folder with
-the name inside the `loc` folder. Inside this folder are all the
+the name inside the \code{loc} folder. Inside this folder are all the
 Toolbox parameters and HRV results in CSV format.}
 
 \item{time}{Number of seconds to group the HRV data by. Defaults to
@@ -20,20 +20,20 @@ Toolbox parameters and HRV results in CSV format.}
 }
 \value{
 Data frame of HRV summarized by the grouping variable (e.g.
-  3600 seconds = 1 hour). Also returns an additional column of
-  percent missing (e.g. 20.0% missing data) by time group.
+3600 seconds = 1 hour). Also returns an additional column of
+percent missing (e.g. 20.0\% missing data) by time group.
 }
 \description{
-`read_matlab_hrv` takes the output from HRV Toolbox and
-  converts it for analysis. Uses the package [data.table::fread()]
-  for reading in data due to size/speed.
+\code{read_matlab_hrv} takes the output from HRV Toolbox and
+converts it for analysis. Uses the package \code{\link[data.table:fread]{data.table::fread()}}
+for reading in data due to size/speed.
 }
 \details{
 The data is taken sequentially (sliding windows), and
-  summarized over the course of certain time lengths. The data comes
-  in a standardized pattern from the toolbox. It requires processing
-  due to its large file sizes (e.g. 24 hours of data for a single
-  patient can be up to 2 MB in size).
+summarized over the course of certain time lengths. The data comes
+in a standardized pattern from the toolbox. It requires processing
+due to its large file sizes (e.g. 24 hours of data for a single
+patient can be up to 2 MB in size).
 }
 \examples{
 proc_hrv_matlab(location, patid, hrv_variables, 3600)

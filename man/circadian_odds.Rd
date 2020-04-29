@@ -11,18 +11,25 @@ circadian_odds(data, time, outcome, covariates)
 
 \item{time}{Column name that contains the grouping variable of time}
 
-\item{outcome}{Column name that identifies the per-row outcome, binary}
+\item{outcome}{Column name that identifies the per-row outcome,
+binary}
 
-\item{covariates}{Vector of independent variables names. First variable needs to be exposure.}
+\item{covariates}{Vector of independent variables names. First
+variable needs to be exposure.}
 }
 \value{
 A data frame of odds ratios
 }
 \description{
-`circadian_odds` creates an OR table for each time point of data given, initially applied to any grouping variable (particularly hour/time of day).
+\code{circadian_odds} creates an OR table for each time point
+of data given, initially applied to any grouping variable
+(particularly hour/time of day).
 }
 \details{
-This function creates an OR table based on the covariate names supplied. It requires that there is an appropriate outcome variable selected. It performs a logistic regression. This model does not allow for conditioning variables (yet).
+This function creates an OR table based on the covariate
+names supplied. It requires that there is an appropriate outcome
+variable selected. It performs a logistic regression. This model
+does not allow for conditioning variables (yet).
 }
 \examples{
 circadian_odds(df, hour, outcome, c(covar1, covar2))

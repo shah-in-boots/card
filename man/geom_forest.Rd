@@ -19,10 +19,16 @@ geom_forest(group = "time", or = "OR", lower = "Lower", upper = "Upper", ...)
 A ggplot geom that has been configured for a forest plot.
 }
 \description{
-`geom_forest` creates an OR plot for each hour of data given. Its a ggplot format so additional variables, like titles, can be added in.
+\code{geom_forest} creates an OR plot for each hour of data given. Its a
+ggplot format so additional variables, like titles, can be added in.
 }
 \details{
-This function creates a forest plot using the OR developed by the `circadian_odds` function in this package. By default, it takes the output of `circadian odds`, which is a tibble named "ot", and will generate a forest plot based on the grouping variable (default is time of day). Original data can be restricted or the hours can be reduced).
+This function creates a forest plot using the OR developed
+by the \code{circadian_odds} function in this package. By default, it
+takes the output of \verb{circadian odds}, which is a tibble named "ot",
+and will generate a forest plot based on the grouping variable
+(default is time of day). Original data can be restricted or the
+hours can be reduced).
 }
 \examples{
 ggplot(OddsTable) + geom_forest("hour", "OddsRatio", "LowerCI", "UpperCI")

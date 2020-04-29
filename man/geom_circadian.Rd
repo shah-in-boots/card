@@ -14,7 +14,7 @@ ends up being the x-axis}
 }
 \value{
 Returns a ggplot object of geom type, other layers can be
-  added on as seen in example.
+added on as seen in example.
 }
 \description{
 \code{\link{geom_circadian}} converts the output of
@@ -24,9 +24,9 @@ variable). Each hour is then separated by the grouping variable.
 }
 \details{
 Currently creates a geom_layer that shows a error bar and
-  point estimate of values by group (e.g. clinical status). If t-test
-  values are available in the data frame, shows points of
-  significance.
+point estimate of values by group (e.g. clinical status). If t-test
+values are available in the data frame, shows points of
+significance.
 }
 \examples{
 ggplot(df_with_ttest) + geom_circadian("hour", "catvar", TRUE)

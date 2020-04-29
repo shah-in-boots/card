@@ -24,15 +24,18 @@
 #'   offset.
 #' @import lubridate
 #' @export
-circ_sun <- function(date, lat, lon, zenith = "official",
+circ_sun <- function(date,
+					 lat,
+					 lon,
+					 zenith = "official",
 					 sunset = FALSE) {
-
 	# Check to see if arguments are correct
-	if(nargs < 3) stop("Missing arguments", call. = FALSE)
+	if (nargs < 3)
+		stop("Missing arguments", call. = FALSE)
 
 	# Check to see if date column is correct
 	dateGiven <- as.Date(date)
-	if(!is.Date(dateGiven)) {
+	if (!is.Date(dateGiven)) {
 		stop("Requires Date or POSIX as date vector", call. = FALSE)
 	}
 
@@ -43,24 +46,25 @@ circ_sun <- function(date, lat, lon, zenith = "official",
 	day <- day(dateGiven)
 
 	# Set zenith
-	zenith <- switch(zenith,
-		   "official" = 90.8333,
-		   "civil" = 96,
-		   "nautical" = 102,
-		   astronomical = 108
+	zenith <- switch(
+		zenith,
+		"official" = 90.8333,
+		"civil" = 96,
+		"nautical" = 102,
+		astronomical = 108
 	)
 
 	# Calculate Julian day
 	n1 = floor(275 * month / 9)
 	n2 = floor((month + 9) / 12)
 	n3 = 1 + floor((year - 4 * floor(year / 4) + 2) / 3)
-	n = n1 - (n2*n3) + day - 31
+	n = n1 - (n2 * n3) + day - 31
 
 	# For sunrise or sunset
 	# Latitude and longitude to hour value and approximate time
 	longhour <- lon / 15
 
-	if(sunset == FALSE) {
+	if (sunset == FALSE) {
 		t <- n + ((6 - longhour) / 24)
 	} else {
 		t <- n + ((18 - longhour) / 24)
@@ -71,13 +75,14 @@ circ_sun <- function(date, lat, lon, zenith = "official",
 
 	# Calculate sun's true longitude
 	# l needs to be within [0,360)
-	l <- m + (1.916 * sin((pi/180) * m)) + (0.020 * sin(2 * (pi/180) * m)) + 282.634
+	l <-
+		m + (1.916 * sin((pi / 180) * m)) + (0.020 * sin(2 * (pi / 180) * m)) + 282.634
 	l[l <= 0] <- l[l <= 0] + 360
 	l[l > 360] <- l[l > 360] - 360
 
 	# Calculate sun's right ascension (angles must be in degrees)
 	# ra need sto be within [0, 360)
-	ra <- (180/pi) * atan(0.91764 * tan((pi/180) * l))
+	ra <- (180 / pi) * atan(0.91764 * tan((pi / 180) * l))
 	ra[ra <= 0] <- ra[ra <= 0] + 360
 	ra[ra > 360] <- ra[ra > 360] - 360
 
@@ -91,22 +96,24 @@ circ_sun <- function(date, lat, lon, zenith = "official",
 	ra <- ra / 15
 
 	# Calculate sun's declination
-	sinDec = 0.39782 * sin((pi/180) * l)
+	sinDec = 0.39782 * sin((pi / 180) * l)
 	cosDec = cos(asin(sinDec))
 
 	# Calculate sun's local hour angle
 	cosSun <-
-		(cos((pi/180) * zenith) - (sinDec * sin((pi/180) * lat))) /
-		(cosDec * cos((pi/180) * lat))
+		(cos((pi / 180) * zenith) - (sinDec * sin((pi / 180) * lat))) /
+		(cosDec * cos((pi / 180) * lat))
 
-	if(max(cosSun) > 1) warning("The sun never rises on this location")
-	if(min(cosSun) < -1) warning("The sun never sets on this location")
+	if (max(cosSun) > 1)
+		warning("The sun never rises on this location")
+	if (min(cosSun) < -1)
+		warning("The sun never sets on this location")
 
 	# calculate and convert into hours
-	if(sunset == FALSE) {
-		sun <- (360 - ((180/pi) * acos(cosSun))) / 15
+	if (sunset == FALSE) {
+		sun <- (360 - ((180 / pi) * acos(cosSun))) / 15
 	} else {
-		sun <- ((180/pi) * acos(cosSun)) / 15
+		sun <- ((180 / pi) * acos(cosSun)) / 15
 	}
 
 	# calculate local time of sunrise/sunset
@@ -121,7 +128,8 @@ circ_sun <- function(date, lat, lon, zenith = "official",
 	hr <- ut
 	min <- 60 * (ut - floor(ut))
 	sec <- 60 * (min - floor(min))
-	sun <- dateGiven + hours(floor(hr)) + minutes(floor(min)) + seconds(floor(sec))
+	sun <-
+		dateGiven + hours(floor(hr)) + minutes(floor(min)) + seconds(floor(sec))
 
 	# Return it
 	return(sun)

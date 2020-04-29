@@ -12,21 +12,21 @@ that were analyzed by the Main_HRV_Analysis.m function from the
 Toolbox}
 
 \item{name}{Name of the patient/ID. There should exist a folder with
-the name inside the `loc` folder. Inside this folder are all the
+the name inside the \code{loc} folder. Inside this folder are all the
 Toolbox parameters and HRV results in CSV format.
 3600 seconds (which is 1 hour)}
 }
 \value{
 Data frame of HRV summarized by the grouping variable (e.g.
-  3600 seconds = 1 hour). Also returns an additional column of
-  percent missing (e.g. 20.0% missing data) by time group.
+3600 seconds = 1 hour). Also returns an additional column of
+percent missing (e.g. 20.0\% missing data) by time group.
 }
 \description{
-`read_hrv_matlab` takes the output from HRV Toolbox and
-  reads it in for an individual patient. Unlike
-  \code{\link{proc_hrv_matlab}}, this does not process or summarize
-  the data, it just reads it in raw analysis. Uses the package
-  [data.table::fread()] for reading in data due to size/speed.
+\code{read_hrv_matlab} takes the output from HRV Toolbox and
+reads it in for an individual patient. Unlike
+\code{\link{proc_hrv_matlab}}, this does not process or summarize
+the data, it just reads it in raw analysis. Uses the package
+\code{\link[data.table:fread]{data.table::fread()}} for reading in data due to size/speed.
 }
 \details{
 The data is taken sequentially (sliding windows), and is not processed. It is reported and is likely a large file.

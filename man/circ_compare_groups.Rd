@@ -11,16 +11,25 @@ circ_compare_groups(data, x, y, time)
 
 \item{x}{Continuous variable of interest (x ~ y)}
 
-\item{y}{Grouping variable to apply to the `cvar` (x ~ y). Must be binary for t-test, otherwise will return data set without pvalues}
+\item{y}{Grouping variable to apply to the \code{cvar} (x ~ y). Must be
+binary for t-test, otherwise will return data set without pvalues}
 
 \item{time}{Name of the time-dependent variable, usually hours}
 }
 \value{
-Returns a dataframe that has the time variable, the categorical variable, and the statistics (including p-value) of the continuous variable
+Returns a dataframe that has the time variable, the
+categorical variable, and the statistics (including p-value) of the
+continuous variable
 }
 \description{
-Takes data and returns a summary table of continuous variable based on a categorical variable. This summary is repeat by time groups to help describe a circadian pattern.
+Takes data and returns a summary table of continuous
+variable based on a categorical variable. This summary is repeat by
+time groups to help describe a circadian pattern.
 }
 \details{
-Applies a simple data transformation to identify the summary statistics of the data frame by the stated variables. Results in a mean, standard deviation, and standard error term. This data is also used for making a t-test based table, which can then also be graphed in [autonomicR::geom_circadian].
+Applies a simple data transformation to identify the summary
+statistics of the data frame by the stated variables. Results in a
+mean, standard deviation, and standard error term. This data is
+also used for making a t-test based table, which can then also be
+graphed in \link[autonomicR:geom_circadian]{autonomicR::geom_circadian}.
 }

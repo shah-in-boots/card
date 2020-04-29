@@ -15,10 +15,10 @@ recurrent_summary_table(marginal.data, group)
 Summary table by grouping variable, can be placed into a latex environment with kable and kable styling. Assumes that death events may be present when most recent non-EVENT has status 1.
 }
 \description{
-`recurrent_summary_table` Creates a table with summary of recurrent events
+\code{recurrent_summary_table} Creates a table with summary of recurrent events
 }
 \details{
-This function allows for taking the output of `recurrent_survival_table`, marginal format repeat event data, and creates a summary table that describes the number of events by strata/event.
+This function allows for taking the output of \code{recurrent_survival_table}, marginal format repeat event data, and creates a summary table that describes the number of events by strata/event.
 }
 \examples{
 tbl <- recurrent_summary_table(marg, grp)

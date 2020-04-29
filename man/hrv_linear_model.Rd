@@ -11,7 +11,7 @@ hrv_linear_model(data, covar, hrv, prop.weight = FALSE)
 
 \item{covar}{Vector names of the covariates, with first covariate being the primary exposure variable for linear regression}
 
-\item{hrv}{Vector names of the HRV measures, contained in `data`, that should be used. Can be generalized to any dependent variable set.}
+\item{hrv}{Vector names of the HRV measures, contained in \code{data}, that should be used. Can be generalized to any dependent variable set.}
 
 \item{prop.weight}{This is a logical value if propensity weighting should be done instead of traditional covariate adjustment. This calls for the propensity weighting function defined by  \code{\link{recurrent_propensity}} that will generate both a PROP_SCORE column and PROP_WEIGHT column. Defaults to FALSE}
 }
@@ -19,7 +19,7 @@ hrv_linear_model(data, covar, hrv, prop.weight = FALSE)
 List of models with names
 }
 \description{
-`hrv_linear_model` Linear models for each HRV measure.
+\code{hrv_linear_model} Linear models for each HRV measure.
 }
 \details{
 Linear models built with dependent variable being the HRV measures (e.g. HF, LF, SDNN, etc). Allows for covariates to be included as available.

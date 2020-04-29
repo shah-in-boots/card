@@ -11,13 +11,13 @@ recurrent_model_building(data, covar.builds, model, prop.scores = NULL)
 
 \item{covar.builds}{This is a vector that names the individual vectors for each model, likely sequential and additive. The individual vectors contain the names of the columns in the data frame that will generate regressions.}
 
-\item{prop.scores}{This is a vector of the names of which `covar.builds` should be performed with propensity weighting. This will call a separate function \code{\link{recurrent_propensity}} that will generate both a PROP_SCORE column and PROP_WEIGHT column. Optional parameter, defaults to NULL.}
+\item{prop.scores}{This is a vector of the names of which \code{covar.builds} should be performed with propensity weighting. This will call a separate function \code{\link{recurrent_propensity}} that will generate both a PROP_SCORE column and PROP_WEIGHT column. Optional parameter, defaults to NULL.}
 }
 \value{
 List of models in sequential order.
 }
 \description{
-`recurrent_model_building` Takes a different covariate groups to generate several models for recurrent event survival analyses.
+\code{recurrent_model_building} Takes a different covariate groups to generate several models for recurrent event survival analyses.
 }
 \details{
 Using the survival models in different types (e.g. marginal, PWP, etc), to create Cox regressions that are in a sequential order. Using the covariates given, will create the models on the fly. Need to specify model type and provide data in a certain format.

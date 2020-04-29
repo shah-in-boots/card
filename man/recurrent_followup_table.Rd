@@ -19,7 +19,7 @@ recurrent_followup_table(data, studyid, keyid, date)
 Returns list of initial and most recent data sets. These can easily be merged after with any naming nomenclature as chosen, or with any merging keys as chosen (in case there are several merging variables, like keyid + hour of day for circadian data).
 }
 \description{
-`recurrent_followup_table` makes a before/after dataset using a unique ID that follows patients between studies, to allow for comparison over time.
+\code{recurrent_followup_table} makes a before/after dataset using a unique ID that follows patients between studies, to allow for comparison over time.
 }
 \details{
 Currently functions by taking two input IDs, one being a ID that is the same between studies (a true key ID) and an ID that is unique to that study itself. It will arrange by dates, and and slice data into an initial visit and the most recent visit. Each row should have a KEY ID and a STUDY ID. The data is in a long format, such that hte STUDY IDs are unique / not duplicated.

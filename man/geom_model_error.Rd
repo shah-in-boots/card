@@ -13,7 +13,7 @@ geom_model_error(model)
 Returns a ggplot object of geom type, other layers can be added on as seen in example.
 }
 \description{
-`geom_model_error` creates a ggplot geom that can be extended and accept other ggplot layers. Shows residual error from the regression mean for different types of regression models.
+\code{geom_model_error} creates a ggplot geom that can be extended and accept other ggplot layers. Shows residual error from the regression mean for different types of regression models.
 }
 \details{
 Generate residuals for models. Currently accepts only linear models. Does not account for covariates yet, although may be able to do this in the future.
