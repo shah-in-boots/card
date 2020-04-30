@@ -105,20 +105,21 @@ cosinor.recipe <- function(x, data, ...) {
 
 cosinor_bridge <- function(processed, ...) {
 
-  # Regression parameters
-  predictors <- processed$predictors
-  outcome <- processed$outcomes[[1]]
-
   # Make sure outcome is numeric
-  hardhat::validate_outcomes_are_univariate(outcome)
-  hardhat::validate_outcomes_are_numeric(outcome)
+  hardhat::validate_outcomes_are_univariate(processed$outcomes)
+  hardhat::validate_outcomes_are_numeric(processed$outcomes)
 
-  # Place actual function here
+  # Outcomes need correct format, predictors shaped in implementation
+  predictors <- processed$predictors
+  outcomes <- processed$outcomes[[1]]
+
+  # Implempented function requires
   fit <- cosinor_impl(predictors, outcome)
 
   # Receives from implemented function (fit$*)
   new_cosinor(
     coefs = fit$coefs,
+    coef_names = fit$coef_names,
     blueprint = processed$blueprint
   )
 }
@@ -129,43 +130,35 @@ cosinor_bridge <- function(processed, ...) {
 
 cosinor_impl <- function(predictors, outcome) {
 
-    # Preprocessing
-    hardhat::validate_predictors_are_numeric(predictors)
+  # Preprocessing
+  hardhat::validate_predictors_are_numeric(predictors)
 
-    # Period of 24 hours in a day
-    period <- 24
+  # Period of 24 hours in a day
+  period <- 24
 
-    # Time variable
-    tvar <- predictors[[1]]
+  # Time variables (as predictors is just a variable for hours)
+  # Needs to be shaped as a matrix for regression
+  tcos <- cos((2 * pi * predictors) / period) %>% as.matrix()
+  colnames(tcos) <- "tcos"
+  tsin <- sin((2 * pi * predictors) / period) %>% as.matrix()
+  colnames(tsin) <- "tsin"
 
-    cos((2 * pi * tvar) / period)
+  # Fit
+  cosinor_fit <- lm(outcomes ~ tcos + tsin)
 
-    cosinor_fit <- lm.fit(predictors, outcomes)
+  # Coefs
+  coefs <- cosinor_fit$coefficients
+
+  # Coef names
+  coef_names <- names(coefs)
+  coefs <- unname(coefs)
+
+  # List to return
+  list(
+    coefs = coefs,
+    coef_names = coef_names
+  )
+
 }
-
-twins$cosh <- cos((2*pi*twins$hour)/period)
-twins$sinh <- sin((2*pi*twins$hour)/period)
-
-m <- lm(rDYX ~ hour, data = twins)
-n <- lm(rDYX ~ cosh, data = twins)
-o <- lm(rDYX ~ sinh, data = twins)
-p <- lm(rDYX ~ cosh + sinh, data = twins)
-ggplot(twins, aes(x = hour, y = rDYX)) +
-    geom_point(alpha = 0.2, colour = "grey") +
-    geom_line(aes(y = m$fitted.values), colour = "black") +
-    geom_line(aes(y = n$fitted.values), colour = "blue") +
-    geom_line(aes(y = o$fitted.values), colour = "red") +
-    geom_line(aes(y = p$fitted.values), colour = "purple") +
-    theme_minimal() +
-    labs(x = "Hours",
-         y = "DYX",
-         title = "Model building: Y = B1*cos(hr) + B2*sin(hr) + intercept",
-         caption = "Black = linear, Red = sin, Blue = cos, Purple = sin+cos"
-    ) +
-    ylim(2.5,3.3)
-
-
-ggplot(m, aes(x = hour, y = rDYX)) +
-    geom_smooth(method = "lm", se = TRUE)
 
 # }}}

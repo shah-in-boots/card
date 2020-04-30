@@ -26,8 +26,7 @@ new_cosinor <- function(coefs, coef_names, blueprint) {
 		coef_names = coef_names,
 		blueprint = blueprint,
 		class = "cosinor"
-	  	)
-
+	)
 }
 
 

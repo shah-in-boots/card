@@ -1,7 +1,7 @@
 Package: autonomicR
 Type: Package
 Title: Tools to Study Autonomic Regulation of Cardiac Physiology
-Version: 0.1.0
+Version: 0.1.1
 Author: Anish Shah, MD
 Maintainer: Can be contacted at <asshah4@emory.ed>
 Description: This package contains tools needed for the management of
