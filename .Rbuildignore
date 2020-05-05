@@ -1,11 +1,2 @@
-^packrat/
-^\.Rprofile$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^readme\.rmd$
-^libraries\.R$
-^LICENSE\.md$
-^README\.Rmd$
-^_pkgdown\.yml$
-^docs$
-^pkgdown$
