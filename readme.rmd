@@ -15,26 +15,26 @@ knitr::opts_chunk$set(
 )
 ```
 
-# autonomicR
+# __card__
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of autonomicR is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools.
+The goal of __card__ is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools.
 
 ## Installation
 
 Once published, you can install the released version of autonomicR from [CRAN](https://CRAN.R-project.org) with:
 
 ```{r}
-#install.packages("autonomicR")
+#install.packages("__card__")
 ```
 
 And the development version from [GitHub](https://github.com/) with:
 
 ```{r}
 # install.packages("devtools")
-devtools::install_github("asshah4/autonomicR")
+devtools::install_github("asshah4/card")
 ```
 
 ## Example
