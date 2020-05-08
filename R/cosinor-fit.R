@@ -1,5 +1,5 @@
-### Cosinor implementation
-cosinor_impl <- function(predictors, outcome) {
+# Cosinor Implementation
+cosinor_impl <- function(predictors, outcomes) {
 
 	# Parameters for normal equations {{{ ====
 
@@ -48,13 +48,13 @@ cosinor_impl <- function(predictors, outcome) {
 	# }}}
 
 	# Solve System of Equations {{{ ====
-	coef <- solve(t(xmat) %*% xmat) %*% (t(xmat) %*% ymat)
+	coefs <- solve(t(xmat) %*% xmat) %*% (t(xmat) %*% ymat)
 	mesor <- coef[1] # mesor
 	beta <- coef[2]  # beta
 	gamma <- coef[3] # gamma
 
 	# Amplitude
-	amp <- sqrt(b^2 + g^2)
+	amp <- sqrt(beta^2 + gamma^2)
 
 	# Acrophase (phi) must be in correct quadrant
 	sb <- sign(beta)
@@ -92,9 +92,6 @@ cosinor_impl <- function(predictors, outcome) {
 	if(TSS == MSS + RSS) {
 		paste0("The model fits. F = ", signif(fstat, 4))
 	}
-
-	# }}}
-
 	# Confidence Intervals for the MESOR {{{ ====
 
 	# Matrix to get standard errors and confidence intervals
@@ -142,6 +139,8 @@ cosinor_impl <- function(predictors, outcome) {
 	gseq <- gseq[index]
 	bs1 <- Re(bs1[index])
 	bs2 <- Re(bs2[index])
+
+	ellipse <- cbind(gseq, bs1, bs2)
 
 	# Determine if ellipse regions overlap the pole (if overlap, cannot get CI)
 	if(
@@ -202,24 +201,29 @@ cosinor_impl <- function(predictors, outcome) {
 	)
 	rownames(coefmat) <- c("mesor", "amp", "phi")
 
-	# Model coefficients
-	coefs <- c(mesor, amp, phi)
-	names(coefs) <- c("MESOR", "Amplitude", "Acrophase")
 
+	# Model coefficients
   # Coef names
-  coef_names <- names(coefs)
+	coefs <- t(coefs)
+  coef_names <- colnames(coefs)
   coefs <- unname(coefs)
 
   # List to return
   list(
+  	# Raw coefficients
     coefs = coefs,
-    coef_names = coef_names
+    coef_names = coef_names,
+
+    # Cosinor variables
+    amp = amp,
+    phi = phi,
+
+    # Statistics of the ellipse
+    ellipse = ellipse
+
   )
 
   # }}}
 
 }
-
-
-
 

@@ -115,13 +115,16 @@ cosinor_bridge <- function(processed, ...) {
   outcomes <- processed$outcomes[[1]]
 
   # Implempented function requires
-  fit <- cosinor_impl(predictors, outcome, ...)
+  fit <- cosinor_impl(predictors, outcomes)
 
-  # Receives from implemented function (fit$*)
+  # Constructor function recieves from implemented function (fit$*)
   new_cosinor(
     coefs = fit$coefs,
     coef_names = fit$coef_names,
-    blueprint = processed$blueprint
+    ellipse = fit$ellipse,
+    amp = fit$amp,
+    phi = fit$phi,
+    blueprint = processed$blueprint # Made from hardhat, not from fit
   )
 }
 
