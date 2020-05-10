@@ -31,6 +31,3 @@ names supplied. It requires that there is an appropriate outcome
 variable selected. It performs a logistic regression. This model
 does not allow for conditioning variables (yet).
 }
-\examples{
-circadian_odds(df, hour, outcome, c(covar1, covar2))
-}

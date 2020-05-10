@@ -7,17 +7,27 @@
 geom_model_error(model)
 }
 \arguments{
-\item{model}{Model to be analyzed. The function will detect what type of family the model is (e.g. linear = "gaussian", logistic = "binomial") and plot the appropriate type of model.}
+\item{model}{Model to be analyzed. The function will detect what type of
+family the model is (e.g. linear = "gaussian", logistic = "binomial") and
+plot the appropriate type of model.}
 }
 \value{
-Returns a ggplot object of geom type, other layers can be added on as seen in example.
+Returns a ggplot object of geom type, other layers can be added on as
+seen in example.
 }
 \description{
-\code{geom_model_error} creates a ggplot geom that can be extended and accept other ggplot layers. Shows residual error from the regression mean for different types of regression models.
+\code{geom_model_error} creates a ggplot geom that can be extended
+and accept other ggplot layers. Shows residual error from the regression mean
+for different types of regression models.
 }
 \details{
-Generate residuals for models. Currently accepts only linear models. Does not account for covariates yet, although may be able to do this in the future.
+Generate residuals for models. Currently accepts only linear models.
+Does not account for covariates yet, although may be able to do this in the
+future.
 }
 \examples{
-ggplot() + geom_model_error(model) + labs(x = "HRV values", y = "Depression Score", title = "Model Residuals")
+ggplot() +
+  geom_model_error(model) +
+  labs(x = "HRV values", y = "Depression Score", title = "Model Residuals")
+
 }

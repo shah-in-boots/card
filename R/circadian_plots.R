@@ -1,22 +1,30 @@
 # Odds Ratio Table by Time Point {{{ ====
 
 #' @title Odds Ratio Table by Time Point
+#'
 #' @description `circadian_odds` creates an OR table for each time point
 #'   of data given, initially applied to any grouping variable
 #'   (particularly hour/time of day).
+#'
 #' @details This function creates an OR table based on the covariate
 #'   names supplied. It requires that there is an appropriate outcome
 #'   variable selected. It performs a logistic regression. This model
 #'   does not allow for conditioning variables (yet).
+#'
 #' @param data Dataframe containing subsequent columns
+#'
 #' @param time Column name that contains the grouping variable of time
+#'
 #' @param outcome Column name that identifies the per-row outcome,
 #'   binary
+#'
 #' @param covariates Vector of independent variables names. First
 #'   variable needs to be exposure.
+#'
+#' @import magrittr
+#'
 #' @return A data frame of odds ratios
-#' @examples
-#' circadian_odds(df, hour, outcome, c(covar1, covar2))
+#'
 #' @export
 circadian_odds <- function(data, time, outcome, covariates) {
 	# Create formula
@@ -32,16 +40,16 @@ circadian_odds <- function(data, time, outcome, covariates) {
 	# Regressions by hour, limited to just stated variables
 	odds <-
 		df %>%
-		group_by(time) %>%
-		nest() %>%
-		mutate(
-			regression = map(data, ~ glm(formula = f, data = .x, family = binomial("logit")))
+		dplyr::group_by(time) %>%
+		dplyr::nest() %>%
+		dplyr::mutate(
+			regression = purrr::map(data, ~ glm(formula = f, data = .x, family = binomial("logit")))
 		)
 
 	# Clean and exponentiate
-	odds$OR <- map_dbl(odds$regression, function(x) {exp(coef(x)[2])})
-	odds$Lower <- map_dbl(odds$regression, function(x) {exp(confint(x)[2,1])})
-	odds$Upper <- map_dbl(odds$regression, function(x) {exp(confint(x)[2,2])})
+	odds$OR <- purrr::map_dbl(odds$regression, function(x) {exp(coef(x)[2])})
+	odds$Lower <- purrr::map_dbl(odds$regression, function(x) {exp(confint(x)[2,1])})
+	odds$Upper <- purrr::map_dbl(odds$regression, function(x) {exp(confint(x)[2,2])})
 
 	# Subset the data and return a table of odds
 	ot <- subset(odds, select = c(time, OR, Lower, Upper))

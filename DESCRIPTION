@@ -19,18 +19,22 @@ LazyData: true
 RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE)
 Depends:
-    R (>= 2.10),
+  R (>= 2.10),
 Imports:
-    ggplot2,
-    lubridate,
-    survival,
-    broom,
-    hardhat,
-    recipes,
-    data.table,
-    magrittr,
-    rlang,
-    stats,
-    tibble
+  magrittr,
+  ggplot2,
+  tidyr,
+  plyr,
+  dplyr,
+  lubridate,
+  survival,
+  broom,
+  hardhat,
+  recipes,
+  data.table,
+  rlang,
+  stats,
+  tibble,
+  Hmisc
 Suggests:
-	recipes
+	kableExtra

@@ -3,10 +3,7 @@
 library(tidyverse)
 library(fs)
 library(devtools)
-library(rmarkdown)
-library(knitr)
 library(usethis)
-library(testthat)
 library(hardhat)
 library(data.table)
 

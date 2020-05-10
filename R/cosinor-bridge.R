@@ -35,20 +35,17 @@
 #'
 #' # Data setup
 #' data("twins")
-#' predictors <- twins["hour"]
-#' outcome <- twins["rDYX"]
 #'
 #' # XY interface
-#' mod1 <- cosinor(predictors, outcome)
+#' #mod1 <- cosinor(twins["hour"], twins$rDYX)
 #'
 #' # Formula interface
-#' mod2 <- cosinor(rDYX ~ hour, twins)
+#' #mod2 <- cosinor(rDYX ~ hour, twins)
 #'
-#' # Recipes interface
-#' library(recipes)
-#' rec <- recipe(rDYX ~ hour, twins)
-#' rec <- step_log(rec, rDYX)
-#' mod3 <- cosinor(rec, mtcars)
+#' # Recipes interface (still needs work)
+#' #rec <- recipes::recipe(rDYX ~ hour, twins)
+#' #rec <- recipes::step_log(rec, rDYX)
+#' #mod3 <- cosinor(rec, twins)
 #'
 #' @export
 cosinor <- function(x, ...) {

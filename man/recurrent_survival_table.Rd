@@ -27,17 +27,39 @@ recurrent_survival_table(
 
 \item{model.type}{Character/string = c("marginal", "pwptt", "pwpgt")}
 
-\item{death}{Column created if death is known (0 or 1), Must include in original dataframe (e.g. can add column of zeroes prn)}
+\item{death}{Column created for if death is known (0 or 1), original
+dataframe (e.g. can add column of zeroes PRN), but is currently set to
+null.}
 }
 \value{
 A data frame organized into a survival table format
 }
 \description{
-\code{recurrent_survival_table} Reformat recurrent event data (wide) into different models for survival analysis
+\code{recurrent_survival_table} Reformat recurrent event data (wide)
+into different models for survival analysis
 }
 \details{
-This function takes every data event date, and creates several types of recurrent event tables. It orders the data chronologically for repeat events. Currently does marginal and conditional A and B models.
+This function takes every data event date, and creates several types
+
+of recurrent event tables. It orders the data chronologically for repeat
+events. Currently does marginal and conditional A and B models.
 }
 \examples{
-recurrent_survival_table(tibble, id, first.date, last.known.date, c(event.dates), "marginal", death.status)
+# Data
+data("mims")
+data <- mims
+
+# Parameters
+id <- "patid"
+first <- "first_visit_date_bl"
+last <- "ldka"
+event.dates <- c("mi_date_1", "mi_date_2", "mi_date_3")
+model.type <- "marginal"
+death <- "DEATH_CV_YN"
+
+# Run analysis
+tbl <- recurrent_survival_table(
+  mims, id, first, last, event.dates, model.type, death
+)
+
 }
