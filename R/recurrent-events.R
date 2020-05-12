@@ -14,11 +14,10 @@
 
 #' @title Recurrent Survival Data Format
 #'
-#' @description `recurrent_survival_table` Reformat recurrent event data (wide)
+#' @description `recur_table` Reformat recurrent event data (wide)
 #' into different models for survival analysis
 #'
 #' @details This function takes every data event date, and creates several types
-#'
 #' of recurrent event tables. It orders the data chronologically for repeat
 #' events. Currently does marginal and conditional A and B models.
 #'
@@ -35,8 +34,8 @@
 #' @param model.type Character/string = c("marginal", "pwptt", "pwpgt")
 #'
 #' @param death Column created for if death is known (0 or 1), original
-#'   dataframe (e.g. can add column of zeroes PRN), but is currently set to
-#'   null.
+#'   dataframe (e.g. can add column of zeroes PRN). Death defaults to null for
+#'   intermediate calculations otherwise.
 #'
 #' @import dplyr
 #'
@@ -56,18 +55,19 @@
 #' death <- "DEATH_CV_YN"
 #'
 #' # Run analysis
-#' tbl <- recurrent_survival_table(
+#' tbl <- recur_table(
 #'   mims, id, first, last, event.dates, model.type, death
 #' )
 #'
 #' @export
-recurrent_survival_table <- function(data, id, first, last, event.dates, model.type, death=NULL) {
+recur_table <- function(data, id, first, last, event.dates, model.type, death=NULL) {
 
 	# Check for missing optional parameter of death
 	# Creates minimally required table
 	if(is.null(death)) {
 		df <- data[c(id, first, last, event.dates)]
-		df$death <- 0
+		death <- "null_death"
+		df$null_death <- 0
 	} else {
 		df <- data[c(id, first, last, event.dates, death)]
 	}
@@ -296,23 +296,18 @@ recurrent_survival_table <- function(data, id, first, last, event.dates, model.t
 
 #' @title Recurrent Event Summary Table by Group
 #'
-#' @description `recurrent_summary_table` Creates a table with summary of
+#' @description `recur_summary` Creates a table with summary of
 #' recurrent events
 #'
 #' @details This function allows for taking the output of
-#'   \code{\link{recurrent_survival_table}} marginal format repeat event data,
+#'   \code{\link{recur_table}} marginal format repeat event data,
 #'   and creates a summary table that describes the number of events by
 #'   strata/event.
 #'
-#' @param marginal.data Recurrent event data in marginal format. There must be
-#'   an ID column and a grouping variable column as described below. be present
-#'   as first column.
+#' @param data Recurrent event data in marginal format. There must be
+#' an ID column. Must merge in the covariate of interest into this data set.
 #'
-#' @param id ID that is included in the dataset. Will be used for merging
-#'   internally.
-#'
-#' @param group Name of covariate that is used for grouping, in the dataset.
-#'   column.
+#' @param covar Name of covariate of interest to serve as grouping variable.
 #'
 #' @return Summary table by grouping variable, can be placed into a latex
 #'   environment with kableExtra. Assumes that death events may be
@@ -321,25 +316,30 @@ recurrent_survival_table <- function(data, id, first, last, event.dates, model.t
 #' @examples
 #' # Data
 #' data("mims")
-#' data <- mims
+#'
+#' # Marginal data (as above)
 #' marg <-
-#'   recurrent_survival_table(
-#'     data, "patid", "first_visit_date_bl", "ldka",
-#'     c("mi_date_1", "mi_date_2", "mi_date_3"), "marginal"
+#'   recur_table(
+#'     mims, "patid", "first_visit_date_bl", "ldka",
+#'     c("mi_date_1", "mi_date_2", "mi_date_3"), "marginal", "DEATH_CV_YN"
 #'   )
 #'
-#' tbl <- recurrent_summary_table(marg, grp)
-#' tbl %>% kable("latex", caption = "Title", booktabs = TRUE) %>%
-#' kable_styling(font_size = 8)
+#' # Grouping variable
+#' covar <- "RDR_ISCHEMIA_M_YN_bl"
+#' df <- left_join(marg, mims[c("patid", covar)], by = c("ID" = "patid"))
+#'
+#' # Make summary table
+#' tbl <- recur_summary(df, covar)
+#' tbl %>%
+#'   kableExtra::kable("latex", caption = "Title", booktabs = TRUE) %>%
+#'   kableExtra::kable_styling(font_size = 8)
 #'
 #' @export
-recurrent_summary_table <- function(marginal.data, id, group) {
-	# What is the ID for merging? Should merge by guessing.
-	df <- left_join(marginal.data, group)
-	id <- names(df)[1]
+recur_summary <- function(data, covar) {
+	# What is the ID for merging? Using example, should be likely called "ID"
 
-	# What is the covariate of interest?
-	grpvar <- names(group)[2]
+	# Shorten data frame name
+	df <- data
 
 	# Length of time between events for all individuals
 	df$TIME <- df$TSTOP - df$TSTART
@@ -349,24 +349,24 @@ recurrent_summary_table <- function(marginal.data, id, group) {
 	df$EVENT[df$EVENT == "EVENT_DATE_0" & df$STATUS == 1] <- "EVENT_DATE_DEATH"
 
 	# Create factors
-	df[[grpvar]] %<>% factor()
+	df[[covar]] %<>% factor()
 	df$EVENT %<>% factor()
 
 	# Identify number of events per individual, and add back into DF
 	# Column name is "freq"
 	# This may not be necessary ... currently unused
 	df <-
-		plyr::count(df, "patid") %>%
-		left_join(df, ., by = id) %>%
+		dplyr::count(df, ID) %>%
+		dplyr::left_join(df, ., by = "ID") %>%
 		as_tibble()
 
 	# Make a summary table
 	tbl <-
 		df %>%
-		group_by(!! rlang::sym(grpvar), EVENT) %>%
+		group_by(!! rlang::sym(covar), EVENT) %>%
 		dplyr::summarise(Count = n(), Time = mean(TSTOP)) %>%
-		tidyr::pivot_wider(id_cols = EVENT, names_from = msimi, values_from = c(Count, Time), names_sep = paste0("_", grpvar, "_")) %>%
-		arrange(EVENT)
+		tidyr::pivot_wider(id_cols = EVENT, names_from = !! rlang::sym(covar), values_from = c(Count, Time), names_sep = paste0("_", covar, "_")) %>%
+		dplyr::arrange(EVENT)
 
 	# Return table, can be formatted externally
 	return(tbl)
@@ -427,7 +427,7 @@ recurrent_propensity <- function(data, vars) {
 #' @description
 #' `recurrent_model_building` Takes a different covariate groups to generate several models for recurrent event survival analyses.
 #' @details Using the survival models in different types (e.g. marginal, PWP, etc), to create Cox regressions that are in a sequential order. Using the covariates given, will create the models on the fly. Need to specify model type and provide data in a certain format.
-#' @param data Data frame that is the survival format, potentially made by the \code{\link{recurrent_survival_table}}. Has to be merged with the superset of covariates that are being tested.
+#' @param data Data frame that is the survival format, potentially made by the \code{\link{recur_table}}. Has to be merged with the superset of covariates that are being tested.
 #' @param covar.builds This is a vector that names the individual vectors for each model, likely sequential and additive. The individual vectors contain the names of the columns in the data frame that will generate regressions.
 #' @param prop.scores This is a vector of the names of which `covar.builds` should be performed with propensity weighting. This will call a separate function \code{\link{recurrent_propensity}} that will generate both a PROP_SCORE column and PROP_WEIGHT column. Optional parameter, defaults to NULL.
 #' @return List of models in sequential order.

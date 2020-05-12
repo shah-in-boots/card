@@ -19,6 +19,6 @@ Graphical Assessment of Amplitude and Acrophase
 \examples{
 data("twins")
 m <- cosinor(rDYX ~ hour, twins)
-ggcosinorfit(model)
+ggcosinorfit(m)
 
 }

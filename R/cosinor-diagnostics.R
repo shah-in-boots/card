@@ -15,7 +15,7 @@
 #' @examples
 #' data("twins")
 #' m <- cosinor(rDYX ~ hour, twins)
-#' ggcosinorfit(model)
+#' ggcosinorfit(m)
 #'
 #' @export
 ggcosinorfit <- function(model) {

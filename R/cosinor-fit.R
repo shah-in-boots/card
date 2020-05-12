@@ -49,9 +49,9 @@ cosinor_impl <- function(predictors, outcomes) {
 
 	# Solve System of Equations {{{ ====
 	coefs <- solve(t(xmat) %*% xmat) %*% (t(xmat) %*% ymat)
-	mesor <- coef[1] # mesor
-	beta <- coef[2]  # beta
-	gamma <- coef[3] # gamma
+	mesor <- coefs[1] # mesor
+	beta <- coefs[2]  # beta
+	gamma <- coefs[3] # gamma
 
 	# Amplitude
 	amp <- sqrt(beta^2 + gamma^2)

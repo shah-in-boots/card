@@ -24,7 +24,6 @@ Imports:
   magrittr,
   ggplot2,
   tidyr,
-  plyr,
   dplyr,
   lubridate,
   survival,

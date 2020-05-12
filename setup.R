@@ -1,9 +1,7 @@
 # Libraries for package development ====
 
 library(tidyverse)
-library(fs)
 library(devtools)
-library(usethis)
 library(hardhat)
 library(data.table)
 

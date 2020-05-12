@@ -18,6 +18,3 @@ Returns a ggplot object of geom type, other layers can be added on as seen in ex
 \details{
 Generate residuals versus fitted plot. Functions as an additional geom layer on ggplot. Models must be linear/gaussian in nature. Covariates can be included in the model.
 }
-\examples{
-ggplot() + geom_residuals(model)
-}
