@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fit a <code>cosinor</code> — cosinor • autonomicR</title>
+<title>Fit a <code>cosinor</code> — cosinor • card</title>
 
 
 <!-- jquery -->
@@ -71,8 +71,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">autonomicR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <a class="navbar-link" href="../index.html">card</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -89,7 +89,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/asshah4/card/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -104,7 +109,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Fit a <code>cosinor</code></h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/cosinor-bridge.R'><code>R/cosinor-bridge.R</code></a></small>
     <div class="hidden name"><code>cosinor.Rd</code></div>
     </div>
 
@@ -175,26 +180,17 @@ and the predictor terms on the right-hand side.</p></td>
     <pre class="examples"><div class='input'>
 <span class='co'># Data setup</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"twins"</span>)
-<span class='no'>predictors</span> <span class='kw'>&lt;-</span> <span class='no'>twins</span>[<span class='st'>"hour"</span>]
-<span class='no'>outcome</span> <span class='kw'>&lt;-</span> <span class='no'>twins</span>[<span class='st'>"rDYX"</span>]
 
 <span class='co'># XY interface</span>
-<span class='no'>mod1</span> <span class='kw'>&lt;-</span> <span class='fu'>cosinor</span>(<span class='no'>predictors</span>, <span class='no'>outcome</span>)</div><div class='output co'>#&gt; <span class='error'>Error in model.frame.default(formula = outcomes ~ tcos + tsin, drop.unused.levels = TRUE): variable lengths differ (found for 'tcos')</span></div><div class='input'>
+<span class='co'>#mod1 &lt;- cosinor(twins["hour"], twins$rDYX)</span>
+
 <span class='co'># Formula interface</span>
-<span class='no'>mod2</span> <span class='kw'>&lt;-</span> <span class='fu'>cosinor</span>(<span class='no'>rDYX</span> ~ <span class='no'>hour</span>, <span class='no'>twins</span>)</div><div class='output co'>#&gt; <span class='error'>Error in model.frame.default(formula = outcomes ~ tcos + tsin, drop.unused.levels = TRUE): variable lengths differ (found for 'tcos')</span></div><div class='input'>
-<span class='co'># Recipes interface</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>recipes</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: dplyr</span></div><div class='output co'>#&gt; <span class='message'></span>
-#&gt; <span class='message'>Attaching package: 'dplyr'</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from 'package:stats':</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    filter, lag</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from 'package:base':</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    intersect, setdiff, setequal, union</span></div><div class='output co'>#&gt; <span class='message'></span>
-#&gt; <span class='message'>Attaching package: 'recipes'</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from 'package:stats':</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    step</span></div><div class='input'><span class='no'>rec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/recipes/man/recipe.html'>recipe</a></span>(<span class='no'>rDYX</span> ~ <span class='no'>hour</span>, <span class='no'>twins</span>)
-<span class='no'>rec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/recipes/man/step_log.html'>step_log</a></span>(<span class='no'>rec</span>, <span class='no'>rDYX</span>)
-<span class='no'>mod3</span> <span class='kw'>&lt;-</span> <span class='fu'>cosinor</span>(<span class='no'>rec</span>, <span class='no'>mtcars</span>)</div><div class='output co'>#&gt; <span class='error'>Error: Not all variables in the recipe are present in the supplied training set</span></div><div class='input'>
-</div></pre>
+<span class='co'>#mod2 &lt;- cosinor(rDYX ~ hour, twins)</span>
+
+<span class='co'># Recipes interface (still needs work)</span>
+<span class='co'>#rec &lt;- recipes::recipe(rDYX ~ hour, twins)</span>
+<span class='co'>#rec &lt;- recipes::step_log(rec, rDYX)</span>
+<span class='co'>#mod3 &lt;- cosinor(rec, twins)</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -206,7 +202,7 @@ and the predictor terms on the right-hand side.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Can be contacted at.</p>
+  <p>Developed by Anish S. Shah.</p>
 </div>
 
 <div class="pkgdown">

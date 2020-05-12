@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Recurrent Event Sequential Model Building — recurrent_model_building • card</title>
+<title>card: Cardiovascular and Autonomic Research Designs — card-package • card</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,16 @@
 
 
 
-<meta property="og:title" content="Recurrent Event Sequential Model Building — recurrent_model_building" />
-<meta property="og:description" content="Takes a different covariate groups to generate several models
-for recurrent event survival analyses." />
+<meta property="og:title" content="card: Cardiovascular and Autonomic Research Designs — card-package" />
+<meta property="og:description" content="This package contains tools needed for the management of
+		data that has been collected to study autonomic physiology, 
+		particularly of how the autnomic nervous system effects the 
+		cardiovascular system (neurocardiology). The package uses tools
+		built to study electrocardiographic time series data, focused on
+		heart rate variability and morphology in companionship with MATLAB.
+		It also helps with the management of extended time series, such as
+		longitudinal data and recurrent events. It also contains methods
+		for analyzing and studying circadian events." />
 
 
 
@@ -109,62 +116,34 @@ for recurrent event survival analyses." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Recurrent Event Sequential Model Building</h1>
-    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/recurrent-events.R'><code>R/recurrent-events.R</code></a></small>
-    <div class="hidden name"><code>recurrent_model_building.Rd</code></div>
+    <h1>card: Cardiovascular and Autonomic Research Designs</h1>
+    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/autonomicR-package.R'><code>R/autonomicR-package.R</code></a></small>
+    <div class="hidden name"><code>card-package.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Takes a different covariate groups to generate several models
-for recurrent event survival analyses.</p>
+    <p>This package contains tools needed for the management of
+		data that has been collected to study autonomic physiology, 
+		particularly of how the autnomic nervous system effects the 
+		cardiovascular system (neurocardiology). The package uses tools
+		built to study electrocardiographic time series data, focused on
+		heart rate variability and morphology in companionship with MATLAB.
+		It also helps with the management of extended time series, such as
+		longitudinal data and recurrent events. It also contains methods
+		for analyzing and studying circadian events.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>recurrent_model_building</span>(<span class='no'>data</span>, <span class='no'>covar.builds</span>, <span class='no'>model.type</span>, <span class='kw'>prop.scores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>data</th>
-      <td><p>Data frame that is the survival format, potentially made by the
-<a href='recur_survival_table.html'>card::recur_survival_table</a>. Has to be merged with the superset of
-covariates that are being tested.</p></td>
-    </tr>
-    <tr>
-      <th>covar.builds</th>
-      <td><p>This is a vector that names the individual vectors for
-each model, likely sequential and additive. The individual vectors contain
-the names of the columns in the data frame that will generate regressions.</p></td>
-    </tr>
-    <tr>
-      <th>model.type</th>
-      <td><p>Type of recurrent event data, selected from c("marginal",
-"pwptt", "pwpgt")</p></td>
-    </tr>
-    <tr>
-      <th>prop.scores</th>
-      <td><p>This is a vector of the names of which <code>covar.builds</code>
-should be performed with propensity weighting. This will call a separate
-function <a href='recurrent_propensity.html'>card::recurrent_propensity</a> that will generate both a PROP_SCORE
-column and PROP_WEIGHT column. Optional parameter, defaults to NULL.</p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p>List of models in sequential order.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <div class='dont-index'><p>Useful links:</p><ul>
+<li><p><a href='https://asshah4.github.io/card'>https://asshah4.github.io/card</a></p></li>
+<li><p>Report bugs at <a href='https://github.com/asshah4/card/issues'>https://github.com/asshah4/card/issues</a></p></li>
+</ul>
 
-    <p>Using the survival models in different types (e.g. marginal, PWP,
-etc), to create Cox regressions that are in a sequential order. Using the
-covariates given, will create the models on the fly. Need to specify model
-type and provide data in a certain format.</p>
+</div>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>#recurrent_model_building(df, c("covar1", covar2"), "marginal", c("covar3"))
-#m[[1:3]] # Models using covar1, covar2, covar3 (propensity weighted)
-
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

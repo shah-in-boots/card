@@ -4,7 +4,7 @@
 \alias{ggforest}
 \title{Forest Plot of Hourly Odds}
 \usage{
-ggforest(ot, time = "time", or = "OR", lower = "Lower", upper = "Upper", ...)
+ggforest(ot, time = "time", or = "OR", lower = "Lower", upper = "Upper")
 }
 \arguments{
 \item{ot}{Odd Ratio table with the following columns.}

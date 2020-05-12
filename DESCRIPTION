@@ -2,38 +2,47 @@ Package: card
 Type: Package
 Title: Cardiovascular and Autonomic Research Designs
 Version: 0.1.0
-Author: Anish Shah, MD
+Authors@R: c(
+			person("Anish S. Shah", 
+			email = "asshah4@emory.edu", 
+			role = c("aut", "cre"),
+			comment = c(ORCID = "0000-0002-9729-1558"))
+		)
 Maintainer: Can be contacted at <asshah4@emory.ed>
 Description: This package contains tools needed for the management of
-	data that has been collected to study autonomic physiology, 
-	particularly of how the autnomic nervous system effects the 
-	cardiovascular system (neurocardiology). The package uses tools
-	built to study electrocardiographic time series data, focused on
-	heart rate variability and morphology in companionship with MATLAB.
-	It also helps with the management of extended time series, such as
-	longitudinal data and recurrent events. It also contains methods
-	for analyzing and studying circadian events.
+		data that has been collected to study autonomic physiology, 
+		particularly of how the autnomic nervous system effects the 
+		cardiovascular system (neurocardiology). The package uses tools
+		built to study electrocardiographic time series data, focused on
+		heart rate variability and morphology in companionship with MATLAB.
+		It also helps with the management of extended time series, such as
+		longitudinal data and recurrent events. It also contains methods
+		for analyzing and studying circadian events.
 License: MIT + file LICENSE
+URL: https://asshah4.github.io/card
+BugReports: https://github.com/asshah4/card/issues
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE)
 Depends:
-  R (>= 2.10),
+	  R (>= 2.10),
 Imports:
-  magrittr,
-  ggplot2,
-  tidyr,
-  dplyr,
-  lubridate,
-  survival,
-  broom,
-  hardhat,
-  recipes,
-  data.table,
-  rlang,
-  stats,
-  tibble,
-  Hmisc
+	  magrittr,
+	  ggplot2,
+	  tidyr,
+	  dplyr,
+	  purrr,
+	  lubridate,
+	  survival,
+	  broom,
+	  hardhat,
+	  recipes,
+	  data.table,
+	  rlang,
+	  stats,
+	  tibble,
+	  Hmisc
 Suggests:
-	kableExtra
+		kableExtra,
+		plyr

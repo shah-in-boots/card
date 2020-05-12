@@ -23,17 +23,21 @@ recurrent events
 }
 \details{
 This function allows for taking the output of
-\code{\link{recur_table}} marginal format repeat event data,
+\link[card:recur_survival_table]{card::recur_survival_table} marginal format repeat event data,
 and creates a summary table that describes the number of events by
 strata/event.
 }
 \examples{
-# Data
+# setup
+library(magrittr)
+library(dplyr)
+library(kableExtra)
+
 data("mims")
 
 # Marginal data (as above)
 marg <-
-  recur_table(
+  recur_survival_table(
     mims, "patid", "first_visit_date_bl", "ldka",
     c("mi_date_1", "mi_date_2", "mi_date_3"), "marginal", "DEATH_CV_YN"
   )
@@ -45,7 +49,7 @@ df <- left_join(marg, mims[c("patid", covar)], by = c("ID" = "patid"))
 # Make summary table
 tbl <- recur_summary(df, covar)
 tbl \%>\%
-  kableExtra::kable("latex", caption = "Title", booktabs = TRUE) \%>\%
-  kableExtra::kable_styling(font_size = 8)
+  kable("latex", caption = "Title", booktabs = TRUE) \%>\%
+  kable_styling(font_size = 8)
 
 }

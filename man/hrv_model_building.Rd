@@ -6,6 +6,9 @@
 \usage{
 hrv_model_building(data, covar.builds, model, prop.scores = NULL)
 }
+\arguments{
+\item{data, covar.builds, model, prop.scores}{Still developing}
+}
 \description{
 \code{hrv_model_building} creates a list of models using different builds of covariates.
 }

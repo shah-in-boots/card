@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Recurrent Event Sequential Model Building — recurrent_model_building • card</title>
+<title>Plotting Error of Models — ggerror • card</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,10 @@
 
 
 
-<meta property="og:title" content="Recurrent Event Sequential Model Building — recurrent_model_building" />
-<meta property="og:description" content="Takes a different covariate groups to generate several models
-for recurrent event survival analyses." />
+<meta property="og:title" content="Plotting Error of Models — ggerror" />
+<meta property="og:description" content="Creates a ggplot geom that can be extended
+and accept other ggplot layers. Shows residual error from the regression mean
+for different types of regression models." />
 
 
 
@@ -109,61 +110,44 @@ for recurrent event survival analyses." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Recurrent Event Sequential Model Building</h1>
-    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/recurrent-events.R'><code>R/recurrent-events.R</code></a></small>
-    <div class="hidden name"><code>recurrent_model_building.Rd</code></div>
+    <h1>Plotting Error of Models</h1>
+    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/hrv_modeling.R'><code>R/hrv_modeling.R</code></a></small>
+    <div class="hidden name"><code>ggerror.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Takes a different covariate groups to generate several models
-for recurrent event survival analyses.</p>
+    <p>Creates a ggplot geom that can be extended
+and accept other ggplot layers. Shows residual error from the regression mean
+for different types of regression models.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>recurrent_model_building</span>(<span class='no'>data</span>, <span class='no'>covar.builds</span>, <span class='no'>model.type</span>, <span class='kw'>prop.scores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>ggerror</span>(<span class='no'>model</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>data</th>
-      <td><p>Data frame that is the survival format, potentially made by the
-<a href='recur_survival_table.html'>card::recur_survival_table</a>. Has to be merged with the superset of
-covariates that are being tested.</p></td>
-    </tr>
-    <tr>
-      <th>covar.builds</th>
-      <td><p>This is a vector that names the individual vectors for
-each model, likely sequential and additive. The individual vectors contain
-the names of the columns in the data frame that will generate regressions.</p></td>
-    </tr>
-    <tr>
-      <th>model.type</th>
-      <td><p>Type of recurrent event data, selected from c("marginal",
-"pwptt", "pwpgt")</p></td>
-    </tr>
-    <tr>
-      <th>prop.scores</th>
-      <td><p>This is a vector of the names of which <code>covar.builds</code>
-should be performed with propensity weighting. This will call a separate
-function <a href='recurrent_propensity.html'>card::recurrent_propensity</a> that will generate both a PROP_SCORE
-column and PROP_WEIGHT column. Optional parameter, defaults to NULL.</p></td>
+      <th>model</th>
+      <td><p>Model to be analyzed. The function will detect what type of
+family the model is (e.g. linear = "gaussian", logistic = "binomial") and
+plot the appropriate type of model.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>List of models in sequential order.</p>
+    <p>Returns a ggplot object of geom type, other layers can be added on as
+seen in example.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Using the survival models in different types (e.g. marginal, PWP,
-etc), to create Cox regressions that are in a sequential order. Using the
-covariates given, will create the models on the fly. Need to specify model
-type and provide data in a certain format.</p>
+    <p>Generate residuals for models. Currently accepts only linear models.
+Does not account for covariates yet, although may be able to do this in the
+future.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>#recurrent_model_building(df, c("covar1", covar2"), "marginal", c("covar3"))
-#m[[1:3]] # Models using covar1, covar2, covar3 (propensity weighted)
-
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"twins"</span>)
+<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span>(<span class='no'>beck_total</span> ~ <span class='no'>HR</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span>(<span class='no'>twins</span>, <span class='no'>hour</span> <span class='kw'>==</span> <span class='fl'>7</span>))
+<span class='fu'>ggerror</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; <span class='message'>`geom_smooth()` using formula 'y ~ x'</span></div><div class='img'><img src='ggerror-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

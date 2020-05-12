@@ -6,27 +6,27 @@
 #' @param name Name of the patient that the log file was created on. The variable does NOT have an extension.
 #' @param loc The raw, unprocessed data folder containining the log file (which is in a ".txt" format)
 #' @return Returns a simple data frame wiith the start and endtime of the ECG data. Has several additional markers available internally, but currently not called.
-#' @example
+#' @examples
 #' # Apply fn to each element of vector
-#' for(i in seq_along(patid)) {
+#' # for(i in seq_along(patid)) {
 #'
-#' 	# Print out line
-#' 	print(patid[i])
+#' # 	# Print out line
+#' # 	print(patid[i])
 #'
-#' 	# Extraction of data
-#' 	x <- read_patch_vivalnk(patid[i])
+#' # 	# Extraction of data
+#' # 	x <- read_patch_vivalnk(patid[i])
 #'
-#' 	# Make data frame
-#' 	df <- data.frame(
-#' 		'patid' = patid[i],
-#' 		'Start' = x[[1]],
-#' 		'End' = x[[2]],
-#' 		'Duration' = x[[3]]
-#' 	)
+#' # 	# Make data frame
+#' # 	df <- data.frame(
+#' # 		'patid' = patid[i],
+#' # 		'Start' = x[[1]],
+#' # 		'End' = x[[2]],
+#' # 		'Duration' = x[[3]]
+#' # 	)
 #'
-#' 	# Write this to a file, appending as we go
-#' 	write_csv(df, file.path(proc_folder, 'vivalnk_data.csv'), append = TRUE)
-#' }
+#' # 	# Write this to a file, appending as we go
+#' # 	write_csv(df, file.path(proc_folder, 'vivalnk_data.csv'), append = TRUE)
+#' # }
 #' @export
 proc_patch_vivalnk <- function(name, loc) {
 	# Read in file name

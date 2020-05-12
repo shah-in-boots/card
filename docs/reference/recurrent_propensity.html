@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Propensity Score Weighting — recurrent_propensity • autonomicR</title>
+<title>Propensity Score Weighting — recurrent_propensity • card</title>
 
 
 <!-- jquery -->
@@ -71,8 +71,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">autonomicR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <a class="navbar-link" href="../index.html">card</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -89,7 +89,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/asshah4/card/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -104,7 +109,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Propensity Score Weighting</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/recurrent-events.R'><code>R/recurrent-events.R</code></a></small>
     <div class="hidden name"><code>recurrent_propensity.Rd</code></div>
     </div>
 
@@ -135,7 +140,10 @@
     <p>Using a logistic regression, will take covariates and create propensity scores, and adds the weights. Uses the standard logistic regression to evalute the propensity score.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>ps</span> <span class='kw'>&lt;-</span> <span class='fu'>recurrent_propensity</span>(<span class='no'>df</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"outcome"</span>, <span class='st'>"exp1"</span>, <span class='st'>"exp2"</span>))</div><div class='output co'>#&gt; <span class='error'>Error in data[[outcome]]: object of type 'closure' is not subsettable</span></div><div class='input'><span class='no'>ps</span>[<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"patid"</span>, <span class='st'>"PROP_SCORE"</span>, <span class='st'>"PROP_WEIGHT"</span>)]</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'ps' not found</span></div></pre>
+    <pre class="examples"><div class='input'>#ps &lt;- recurrent_propensity(df, c("outcome", "exp1", "exp2"))
+#ps[c("patid", "PROP_SCORE", "PROP_WEIGHT")]
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -147,7 +155,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Can be contacted at.</p>
+  <p>Developed by Anish S. Shah.</p>
 </div>
 
 <div class="pkgdown">

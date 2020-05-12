@@ -33,3 +33,8 @@ mean, standard deviation, and standard error term. This data is
 also used for making a t-test based table, which can then also be
 graphed in \link[card:ggcircadian]{card::ggcircadian}.
 }
+\examples{
+data("twins")
+circ_compare_groups(data = twins, x = "rDYX", y = "sad_cat", time = "hour")
+
+}

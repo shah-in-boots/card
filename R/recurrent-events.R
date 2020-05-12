@@ -14,7 +14,7 @@
 
 #' @title Recurrent Survival Data Format
 #'
-#' @description `recur_table` Reformat recurrent event data (wide)
+#' @description `recur_survival_table` Reformat recurrent event data (wide)
 #' into different models for survival analysis
 #'
 #' @details This function takes every data event date, and creates several types
@@ -55,12 +55,12 @@
 #' death <- "DEATH_CV_YN"
 #'
 #' # Run analysis
-#' tbl <- recur_table(
+#' tbl <- recur_survival_table(
 #'   mims, id, first, last, event.dates, model.type, death
 #' )
 #'
 #' @export
-recur_table <- function(data, id, first, last, event.dates, model.type, death=NULL) {
+recur_survival_table <- function(data, id, first, last, event.dates, model.type, death=NULL) {
 
 	# Check for missing optional parameter of death
 	# Creates minimally required table
@@ -300,7 +300,7 @@ recur_table <- function(data, id, first, last, event.dates, model.type, death=NU
 #' recurrent events
 #'
 #' @details This function allows for taking the output of
-#'   \code{\link{recur_table}} marginal format repeat event data,
+#'   [card::recur_survival_table] marginal format repeat event data,
 #'   and creates a summary table that describes the number of events by
 #'   strata/event.
 #'
@@ -314,12 +314,16 @@ recur_table <- function(data, id, first, last, event.dates, model.type, death=NU
 #'   present when most recent non-EVENT has status 1.
 #'
 #' @examples
-#' # Data
+#' # setup
+#' library(magrittr)
+#' library(dplyr)
+#' library(kableExtra)
+#'
 #' data("mims")
 #'
 #' # Marginal data (as above)
 #' marg <-
-#'   recur_table(
+#'   recur_survival_table(
 #'     mims, "patid", "first_visit_date_bl", "ldka",
 #'     c("mi_date_1", "mi_date_2", "mi_date_3"), "marginal", "DEATH_CV_YN"
 #'   )
@@ -331,8 +335,8 @@ recur_table <- function(data, id, first, last, event.dates, model.type, death=NU
 #' # Make summary table
 #' tbl <- recur_summary(df, covar)
 #' tbl %>%
-#'   kableExtra::kable("latex", caption = "Title", booktabs = TRUE) %>%
-#'   kableExtra::kable_styling(font_size = 8)
+#'   kable("latex", caption = "Title", booktabs = TRUE) %>%
+#'   kable_styling(font_size = 8)
 #'
 #' @export
 recur_summary <- function(data, covar) {
@@ -378,16 +382,23 @@ recur_summary <- function(data, covar) {
 # Propensity Score Weighting {{{ ====
 
 #' @title Propensity Score Weighting
+#'
 #' @description
 #' `recurrent_propensity` Adds propensity score to any data set that is being regressed upon.
+#'
 #' @details
 #' Using a logistic regression, will take covariates and create propensity scores, and adds the weights. Uses the standard logistic regression to evalute the propensity score.
+#'
 #' @param data Data frame that contains all covariates and outcomes. First column should be ID
+#'
 #' @param vars Variables used for regression. Outcome variable must be first.
+#'
 #' @return Returns a modified table from what was originally given with the new columns propensity scores. Essentially original df + 2 columns.
+#'
 #' @examples
-#' ps <- recurrent_propensity(df, c("outcome", "exp1", "exp2"))
-#' ps[c("patid", "PROP_SCORE", "PROP_WEIGHT")]
+#' #ps <- recurrent_propensity(df, c("outcome", "exp1", "exp2"))
+#' #ps[c("patid", "PROP_SCORE", "PROP_WEIGHT")]
+#'
 #' @export
 recurrent_propensity <- function(data, vars) {
 	# Most important columns
@@ -424,71 +435,126 @@ recurrent_propensity <- function(data, vars) {
 # Recurrent Event Sequential Model Building {{{ ====
 
 #' @title Recurrent Event Sequential Model Building
-#' @description
-#' `recurrent_model_building` Takes a different covariate groups to generate several models for recurrent event survival analyses.
-#' @details Using the survival models in different types (e.g. marginal, PWP, etc), to create Cox regressions that are in a sequential order. Using the covariates given, will create the models on the fly. Need to specify model type and provide data in a certain format.
-#' @param data Data frame that is the survival format, potentially made by the \code{\link{recur_table}}. Has to be merged with the superset of covariates that are being tested.
-#' @param covar.builds This is a vector that names the individual vectors for each model, likely sequential and additive. The individual vectors contain the names of the columns in the data frame that will generate regressions.
-#' @param prop.scores This is a vector of the names of which `covar.builds` should be performed with propensity weighting. This will call a separate function \code{\link{recurrent_propensity}} that will generate both a PROP_SCORE column and PROP_WEIGHT column. Optional parameter, defaults to NULL.
+#'
+#' @description Takes a different covariate groups to generate several models
+#'   for recurrent event survival analyses.
+#'
+#' @details Using the survival models in different types (e.g. marginal, PWP,
+#'   etc), to create Cox regressions that are in a sequential order. Using the
+#'   covariates given, will create the models on the fly. Need to specify model
+#'   type and provide data in a certain format.
+#'
+#' @param data Data frame that is the survival format, potentially made by the
+#'   [card::recur_survival_table]. Has to be merged with the superset of
+#'   covariates that are being tested.
+#'
+#' @param covar.builds This is a vector that names the individual vectors for
+#'   each model, likely sequential and additive. The individual vectors contain
+#'   the names of the columns in the data frame that will generate regressions.
+#'
+#' @param model.type Type of recurrent event data, selected from c("marginal",
+#'   "pwptt", "pwpgt")
+#'
+#' @param prop.scores This is a vector of the names of which `covar.builds`
+#'   should be performed with propensity weighting. This will call a separate
+#'   function [card::recurrent_propensity] that will generate both a PROP_SCORE
+#'   column and PROP_WEIGHT column. Optional parameter, defaults to NULL.
+#'
 #' @return List of models in sequential order.
+#'
 #' @examples
-#' recurrent_model_building(df, c("covar1", covar2", "covar3"), "marginal", c("covar3"))
-#' m[[1:3]] # Models using covar1, covar2, covar3 (propensity weighted)
+#' #recurrent_model_building(df, c("covar1", covar2"), "marginal", c("covar3"))
+#' #m[[1:3]] # Models using covar1, covar2, covar3 (propensity weighted)
+#'
 #' @export
-recurrent_model_building <- function(data, covar.builds, model, prop.scores = NULL) {
-	# Important variables / columns
-	n <- length(covar.builds)
-	names(data)[1:5] <- c("ID", "TSTART", "TSTOP", "STATUS", "EVENT")
-	m <- list()
+recurrent_model_building <-
+	function(data, covar.builds, model.type, prop.scores = NULL) {
+		# Important variables / columns
+		n <- length(covar.builds)
+		names(data)[1:5] <- c("ID", "TSTART", "TSTOP", "STATUS", "EVENT")
+		m <- list()
 
-	# Create all the models in sequence
-	for(i in 1:n) {
-		# Create formulas
-		f <-
-			paste(get(covar.builds[i]), collapse = " + ") %>%
-			paste("Surv(TSTART, TSTOP, STATUS)", ., sep = " ~ ") %>%
-			# Different recurrent event models with cluster and strata
-			purrr::when(
-				model == "marginal" ~ paste(., "cluster(ID)", sep = " + "),
-				model == "pwptt" ~ paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
-				model == "pwpgt" ~ paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
-				~ as.formula()
-			) %>%
-			as.formula()
+		# Create all the models in sequence
+		for (i in 1:n) {
+			# Create formulas
+			f <-
+				paste(get(covar.builds[i]), collapse = " + ") %>%
+				paste("Surv(TSTART, TSTOP, STATUS)", ., sep = " ~ ") %>%
+				# Different recurrent event models with cluster and strata
+				purrr::when(
+					model.type == "marginal" ~
+						paste(., "cluster(ID)", sep = " + "),
+					model.type == "pwptt" ~
+						paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
+					model.type == "pwpgt" ~
+						paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
+					~ as.formula()
+				) %>%
+				as.formula()
 
-		# Assess need for propensity weighting
-		# Dynamically save the models
-		if(covar.builds[i] %in% prop.scores) {
-			# Uses the recurrent_propensity function
-			x <- recurrent_propensity(data, get(covar.builds[i]))
-			m[[i]] <- coxph(f, method = "breslow", data = x, weights=x$PROP_WEIGHT)
-		} else {
-			m[[i]] <- coxph(f, method = "breslow", data = data)
+			# Assess need for propensity weighting
+			# Dynamically save the models
+			if (covar.builds[i] %in% prop.scores) {
+				# Uses the recurrent_propensity function
+				x <- recurrent_propensity(data, get(covar.builds[i]))
+				m[[i]] <-
+					coxph(
+						f,
+						method = "breslow",
+						data = x,
+						weights = x$PROP_WEIGHT
+					)
+			} else {
+				m[[i]] <- coxph(f, method = "breslow", data = data)
+			}
 		}
-	}
 
-	# Return output
-	return(m)
-}
+		# Return output
+		return(m)
+	}
 
 # }}}
 
 ### Initial and Final Visit Table {{{ ====
 
 #' @title Initial and Final Visit Table
-#' @description
-#' `recurrent_followup_table` makes a before/after dataset using a unique ID that follows patients between studies, to allow for comparison over time.
-#' @details Currently functions by taking two input IDs, one being a ID that is the same between studies (a true key ID) and an ID that is unique to that study itself. It will arrange by dates, and and slice data into an initial visit and the most recent visit. Each row should have a KEY ID and a STUDY ID. The data is in a long format, such that hte STUDY IDs are unique / not duplicated.
+#'
+#' @description Makes a before/after dataset using a unique ID that follows
+#'   patients between studies, to allow for comparison over time.
+#'
+#' @details Currently functions by taking two input IDs, one being a ID that is
+#'   the same between studies (a true key ID) and an ID that is unique to that
+#'   study itself. It will arrange by dates, and and slice data into an initial
+#'   visit and the most recent visit. Each row should have a KEY ID and a STUDY
+#'   ID. The data is in a long format, such that hte STUDY IDs are unique / not
+#'   duplicated.
+#'
 #' @param data Data frame containing all clinical covariates of interest
-#' @param studyid Should be one ID for every study date/visit. Can have multiples ONLY if there were several data points gathered on a single visit (e.g. heart rate measured multiple times on the same day).
-#' @param keyid Should be the ID that corresponds to each studyid throughout each visit
-#' @param dates Name of column containing the date of each visit
-#' @return Returns list of initial and most recent data sets. These can easily be merged after with any naming nomenclature as chosen, or with any merging keys as chosen (in case there are several merging variables, like keyid + hour of day for circadian data).
-#' @example
-#' x <- recurrent_followup_table(dt, "patid", "vetrid", "date")
-#' df_predict <- inner_join(x$initial, x$final, by = c("vetrid", "hour", suffix = c("_0", "_1")))
+#'
+#' @param studyid Should be one ID for every study date/visit. Can have
+#'   multiples ONLY if there were several data points gathered on a single visit
+#'   (e.g. heart rate measured multiple times on the same day).
+#'
+#' @param keyid Should be the ID that corresponds to each studyid throughout
+#'   each visit
+#'
+#' @param date Name of column containing the date of each visit
+#'
+#' @return Returns list of initial and most recent data sets. These can easily
+#'   be merged after with any naming nomenclature as chosen, or with any merging
+#'   keys as chosen (in case there are several merging variables, like keyid +
+#'   hour of day for circadian data).
+#'
+#' @examples
+#' #data("twins")
+#' #x <- recur_followup_table(dt, "patid", "vetrid", "date")
+#' #df_predict <- inner_join(x$initial, x$final, by = c("vetrid", "hour", suffix
+#' #= c("_0", "_1")))
+#'
+#' @import dplyr
+#'
 #' @export
-recurrent_followup_table <- function(data, studyid, keyid, date) {
+recur_followup_table <- function(data, studyid, keyid, date) {
 
 	# Make sure in tibble/tidy format
 	data <- as_tibble(data)
@@ -506,20 +572,20 @@ recurrent_followup_table <- function(data, studyid, keyid, date) {
 	beforeid <-
 		data[c(keyid, studyid, date)] %>%
 		unique() %>%
-		dplyr::filter(!!sym(keyid) %in% repeats[[keyid]]) %>%
-		dplyr::group_by(!!sym(keyid)) %>%
-		dplyr::arrange(!!sym(date)) %>%
-		dplyr::slice(1) %>%
+		filter(!!sym(keyid) %in% repeats[[keyid]]) %>%
+		group_by(!!sym(keyid)) %>%
+		arrange(!!sym(date)) %>%
+		slice(1) %>%
 		.[studyid]
 
 	# Final visit IDs
 	afterid <-
 		data[c(keyid, studyid, date)] %>%
 		unique() %>%
-		dplyr::filter(!!sym(keyid) %in% repeats[[keyid]]) %>%
-		dplyr::group_by(!!sym(keyid)) %>%
-		dplyr::arrange(!!sym(date)) %>%
-		dplyr::slice(n()) %>%
+		filter(!!sym(keyid) %in% repeats[[keyid]]) %>%
+		group_by(!!sym(keyid)) %>%
+		arrange(!!sym(date)) %>%
+		slice(n()) %>%
 		.[studyid]
 
 	# Before data set (initial visit)

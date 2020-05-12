@@ -56,7 +56,7 @@ proc_hrv_matlab <- function(loc, name, time = 3600) {
 
 	# Read in the HRV data
 	dt <-
-		list.files(file.path(loc, name), pattern = "HRV", full.name = TRUE) %>%
+		list.files(file.path(loc, name), pattern = "HRV", full.names = TRUE) %>%
 		fread()
 
 	# Time grouping variable
@@ -124,7 +124,7 @@ read_hrv_matlab <- function(loc, name) {
 
 	# Read in the HRV data
 	dt <-
-		list.files(file.path(loc, name), pattern = "HRV", full.name = TRUE) %>%
+		list.files(file.path(loc, name), pattern = "HRV", full.names = TRUE) %>%
 		fread()
 
 	# Create a summary data set by grouping times

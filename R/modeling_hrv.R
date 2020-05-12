@@ -6,11 +6,11 @@
 #' @param outcome Outcome of interest
 #' @param exposure Exposure(s) of interest. If multiple given, will create a list of models to return.
 #' @return List of models
-#' @example
-#' models <- model_hrv(df, "death", c("HF", "LF"), c("hptn", "dm"))
+#' @examples
+#' #models <- model_hrv(df, "death", c("HF", "LF"), c("hptn", "dm"))
 #' @param covar Covariates to include in model
 #' @export
-model_hrv <- function(data, outcome, exposure, covar=NULL, ...) {
+model_hrv <- function(data, outcome, exposure, covar=NULL) {
 
 	# Trim to only important data
 	df <- data[c(outcome, exposure, covar)]

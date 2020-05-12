@@ -1,24 +1,34 @@
 # Compare Repeated Measurements by Group {{{ ====
 
 #' @title Compare Repeated Measurements by Group
+#'
 #' @description Takes data and returns a summary table of continuous
 #'   variable based on a categorical variable. This summary is repeat by
 #'   time groups to help describe a circadian pattern.
+#'
 #' @details Applies a simple data transformation to identify the summary
 #'   statistics of the data frame by the stated variables. Results in a
 #'   mean, standard deviation, and standard error term. This data is
 #'   also used for making a t-test based table, which can then also be
 #'   graphed in [card::ggcircadian].
+#'
 #' @param data Dataframe containing all the following variables
+#'
 #' @param time Name of the time-dependent variable, usually hours
+#'
 #' @param x Continuous variable of interest (x ~ y)
+#'
 #' @param y Grouping variable to apply to the `cvar` (x ~ y). Must be
 #'   binary for t-test, otherwise will return data set without pvalues
+#'
 #' @return Returns a dataframe that has the time variable, the
 #'   categorical variable, and the statistics (including p-value) of the
 #'   continuous variable
-#' @example # Data dataDemo %>% # Sample data in package
-#'   circ_compare_groups(., x = "rDYX", y = "sad_cat", time = "hour")
+#'
+#' @examples
+#' data("twins")
+#' circ_compare_groups(data = twins, x = "rDYX", y = "sad_cat", time = "hour")
+#'
 #' @import data.table
 #' @export
 circ_compare_groups <- function(data, x, y, time) {
@@ -283,7 +293,7 @@ circ_odds <- function(data, time, outcome, covar) {
 #' @import ggplot2
 #'
 #' @export
-ggforest <- function(ot, time = "time", or = "OR", lower = "Lower", upper = "Upper", ...) {
+ggforest <- function(ot, time = "time", or = "OR", lower = "Lower", upper = "Upper") {
 
 	# Ggplot
 	gg <- ggplot(data = ot, aes_string(x = time, y = or)) +

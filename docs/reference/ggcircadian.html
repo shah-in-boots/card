@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Recurrent Event Sequential Model Building — recurrent_model_building • card</title>
+<title>Circadian Plot by Group — ggcircadian • card</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,11 @@
 
 
 
-<meta property="og:title" content="Recurrent Event Sequential Model Building — recurrent_model_building" />
-<meta property="og:description" content="Takes a different covariate groups to generate several models
-for recurrent event survival analyses." />
+<meta property="og:title" content="Circadian Plot by Group — ggcircadian" />
+<meta property="og:description" content="Converts the output of
+card::circ_compare_groups into a complex geom
+that is broken down by time/hour and HRV (or any other continuous
+variable). Each hour is then separated by the grouping variable." />
 
 
 
@@ -109,61 +111,75 @@ for recurrent event survival analyses." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Recurrent Event Sequential Model Building</h1>
-    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/recurrent-events.R'><code>R/recurrent-events.R</code></a></small>
-    <div class="hidden name"><code>recurrent_model_building.Rd</code></div>
+    <h1>Circadian Plot by Group</h1>
+    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/circadian-patterns.R'><code>R/circadian-patterns.R</code></a></small>
+    <div class="hidden name"><code>ggcircadian.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Takes a different covariate groups to generate several models
-for recurrent event survival analyses.</p>
+    <p>Converts the output of
+<a href='circ_compare_groups.html'>card::circ_compare_groups</a> into a complex geom
+that is broken down by time/hour and HRV (or any other continuous
+variable). Each hour is then separated by the grouping variable.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>recurrent_model_building</span>(<span class='no'>data</span>, <span class='no'>covar.builds</span>, <span class='no'>model.type</span>, <span class='kw'>prop.scores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>ggcircadian</span>(
+  <span class='no'>data</span>,
+  <span class='no'>outcome</span>,
+  <span class='kw'>time</span> <span class='kw'>=</span> <span class='st'>"hour"</span>,
+  <span class='kw'>mean</span> <span class='kw'>=</span> <span class='st'>"mean"</span>,
+  <span class='kw'>n</span> <span class='kw'>=</span> <span class='st'>"n"</span>,
+  <span class='kw'>sd</span> <span class='kw'>=</span> <span class='st'>"sd"</span>,
+  <span class='kw'>se</span> <span class='kw'>=</span> <span class='st'>"se"</span>,
+  <span class='kw'>pval</span> <span class='kw'>=</span> <span class='st'>"pval"</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>Data frame that is the survival format, potentially made by the
-<a href='recur_survival_table.html'>card::recur_survival_table</a>. Has to be merged with the superset of
-covariates that are being tested.</p></td>
+      <td><p>Table generated which has time variable, categorical outcome
+variable, and summary statistics, including a possible column called "pval"
+which, if present, will document statistical significance in plot.</p></td>
     </tr>
     <tr>
-      <th>covar.builds</th>
-      <td><p>This is a vector that names the individual vectors for
-each model, likely sequential and additive. The individual vectors contain
-the names of the columns in the data frame that will generate regressions.</p></td>
+      <th>outcome</th>
+      <td><p>Name of categorical variable to stratify the y-axis</p></td>
     </tr>
     <tr>
-      <th>model.type</th>
-      <td><p>Type of recurrent event data, selected from c("marginal",
-"pwptt", "pwpgt")</p></td>
+      <th>time</th>
+      <td><p>Name of time group variable, such as hours of day, which
+ends up being the x-axis</p></td>
     </tr>
     <tr>
-      <th>prop.scores</th>
-      <td><p>This is a vector of the names of which <code>covar.builds</code>
-should be performed with propensity weighting. This will call a separate
-function <a href='recurrent_propensity.html'>card::recurrent_propensity</a> that will generate both a PROP_SCORE
-column and PROP_WEIGHT column. Optional parameter, defaults to NULL.</p></td>
+      <th>mean, n, sd, se, pval</th>
+      <td><p>Summary statistics to be included in graphics.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>List of models in sequential order.</p>
+    <p>Returns a ggplot object of geom type, other layers can be
+added on as seen in example.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Using the survival models in different types (e.g. marginal, PWP,
-etc), to create Cox regressions that are in a sequential order. Using the
-covariates given, will create the models on the fly. Need to specify model
-type and provide data in a certain format.</p>
+    <p>Currently creates a ggplot that shows a error bar and
+point estimate of values by group (e.g. clinical status). If t-test
+values are available in the data frame, shows points of
+significance.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>#recurrent_model_building(df, c("covar1", covar2"), "marginal", c("covar3"))
-#m[[1:3]] # Models using covar1, covar2, covar3 (propensity weighted)
+    <pre class="examples"><div class='input'><span class='co'># Data</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>twins</span>)
+<span class='no'>tbl</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='circ_compare_groups.html'>circ_compare_groups</a></span>(<span class='no'>twins</span>, <span class='st'>"rDYX"</span>, <span class='st'>"sad_cat"</span>, <span class='st'>"hour"</span>)
 
+<span class='co'># Plot</span>
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>ggplot2</span>)
+<span class='fu'>ggcircadian</span>(<span class='no'>tbl</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"sad_cat"</span>) +
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span>(<span class='kw'>title</span> <span class='kw'>=</span> <span class='st'>"Example"</span>) +
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_viridis.html'>scale_color_viridis_d</a></span>(<span class='kw'>option</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>begin</span> <span class='kw'>=</span> <span class='fl'>0.0</span>, <span class='kw'>end</span> <span class='kw'>=</span> <span class='fl'>0.75</span>)</div><div class='output co'>#&gt; <span class='message'>Scale for 'colour' is already present. Adding another scale for 'colour',</span>
+#&gt; <span class='message'>which will replace the existing scale.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 24 rows containing missing values (geom_point).</span></div><div class='img'><img src='ggcircadian-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

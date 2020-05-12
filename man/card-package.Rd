@@ -7,13 +7,25 @@
 \title{card: Cardiovascular and Autonomic Research Designs}
 \description{
 This package contains tools needed for the management of
-	data that has been collected to study autonomic physiology, 
-	particularly of how the autnomic nervous system effects the 
-	cardiovascular system (neurocardiology). The package uses tools
-	built to study electrocardiographic time series data, focused on
-	heart rate variability and morphology in companionship with MATLAB.
-	It also helps with the management of extended time series, such as
-	longitudinal data and recurrent events. It also contains methods
-	for analyzing and studying circadian events.
+		data that has been collected to study autonomic physiology, 
+		particularly of how the autnomic nervous system effects the 
+		cardiovascular system (neurocardiology). The package uses tools
+		built to study electrocardiographic time series data, focused on
+		heart rate variability and morphology in companionship with MATLAB.
+		It also helps with the management of extended time series, such as
+		longitudinal data and recurrent events. It also contains methods
+		for analyzing and studying circadian events.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://asshah4.github.io/card}
+  \item Report bugs at \url{https://github.com/asshah4/card/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Anish S. Shah \email{asshah4@emory.edu} (\href{https://orcid.org/0000-0002-9729-1558}{ORCID})
+
 }
 \keyword{internal}

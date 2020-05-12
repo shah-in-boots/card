@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Predict from a <code>cosinor</code> — predict.cosinor • autonomicR</title>
+<title>Predict from a <code>cosinor</code> — predict.cosinor • card</title>
 
 
 <!-- jquery -->
@@ -71,8 +71,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">autonomicR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <a class="navbar-link" href="../index.html">card</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -89,7 +89,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/asshah4/card/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -104,7 +109,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Predict from a <code>cosinor</code></h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/cosinor-predict.R'><code>R/cosinor-predict.R</code></a></small>
     <div class="hidden name"><code>predict.cosinor.Rd</code></div>
     </div>
 
@@ -149,9 +154,24 @@ to be the same as the number of rows in <code>new_data</code>.</p>
 <span class='no'>test</span> <span class='kw'>&lt;-</span> <span class='no'>mtcars</span>[<span class='fl'>21</span>:<span class='fl'>32</span>, -<span class='fl'>1</span>]
 
 <span class='co'># Fit</span>
-<span class='no'>mod</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cosinor.html'>cosinor</a></span>(<span class='no'>mpg</span> ~ <span class='no'>cyl</span> + <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='no'>drat</span>), <span class='no'>train</span>)</div><div class='output co'>#&gt; <span class='error'>Error in dimnames(x) &lt;- dn: length of 'dimnames' [2] not equal to array extent</span></div><div class='input'>
+<span class='no'>mod</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cosinor.html'>cosinor</a></span>(<span class='no'>mpg</span> ~ <span class='no'>cyl</span> + <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='no'>drat</span>), <span class='no'>train</span>)
+
 <span class='co'># Predict, with preprocessing</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span>(<span class='no'>mod</span>, <span class='no'>test</span>)</div><div class='output co'>#&gt; <span class='error'>Error in predict(mod, test): object 'mod' not found</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span>(<span class='no'>mod</span>, <span class='no'>test</span>)</div><div class='output co'>#&gt; # A tibble: 12 x 1
+#&gt;    .pred
+#&gt;    &lt;int&gt;
+#&gt;  1     1
+#&gt;  2     1
+#&gt;  3     1
+#&gt;  4     1
+#&gt;  5     1
+#&gt;  6     1
+#&gt;  7     1
+#&gt;  8     1
+#&gt;  9     1
+#&gt; 10     1
+#&gt; 11     1
+#&gt; 12     1</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -164,7 +184,7 @@ to be the same as the number of rows in <code>new_data</code>.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Can be contacted at.</p>
+  <p>Developed by Anish S. Shah.</p>
 </div>
 
 <div class="pkgdown">

@@ -4,7 +4,7 @@
 \alias{model_hrv}
 \title{Modeling HRV Variables}
 \usage{
-model_hrv(data, outcome, exposure, covar = NULL, ...)
+model_hrv(data, outcome, exposure, covar = NULL)
 }
 \arguments{
 \item{data}{Data containing names of outcome, exposure, and covars}
@@ -20,4 +20,7 @@ List of models
 }
 \description{
 Different HRV variables (e.g. HF, LF, SDNN) can be modeling as predictors for an outcome with adjustment by covariates. Can choose between logistic and linear based on the outcome variable as needed. Shortens process for modeling
+}
+\examples{
+#models <- model_hrv(df, "death", c("HF", "LF"), c("hptn", "dm"))
 }
