@@ -37,15 +37,15 @@ hrv_linear_model <-
 			f <-
 				paste(covar, collapse = " + ") %>%
 				paste(hrv[i], ., sep = " ~ ") %>%
-				as.formula()
+				stats::as.formula()
 
 			# Assess propensity weighting and dynamically build models
 			# Propensity scoring for linear models DOES NOT WORK
 			if (prop.weight == TRUE) {
 				x <- recurrent_propensity(data, c(hrv[i], covar))
-				m[[hrv[i]]] <- lm(f, data = x, weights = x$PROP_WEIGHT)
+				m[[hrv[i]]] <- stats::lm(f, data = x, weights = x$PROP_WEIGHT)
 			} else {
-				m[[hrv[i]]] <- lm(f, data = data)
+				m[[hrv[i]]] <- stats::lm(f, data = data)
 			}
 		}
 
@@ -79,9 +79,9 @@ hrv_model_building <-
 					model == "marginal" ~ paste(., "cluster(ID)", sep = " + "),
 					model == "pwptt" ~ paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
 					model == "pwpgt" ~ paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
-					~ as.formula()
+					~ stats::as.formula()
 				) %>%
-				as.formula()
+				stats::as.formula()
 
 			# Assess need for propensity weighting
 			# Dynamically save the models
@@ -89,14 +89,14 @@ hrv_model_building <-
 				# Uses the recurrent_propensity function
 				x <- recurrent_propensity(data, get(covar.builds[i]))
 				m[[i]] <-
-					coxph(
+					survival::coxph(
 						f,
 						method = "breslow",
 						data = x,
 						weights = x$PROP_WEIGHT
 					)
 			} else {
-				m[[i]] <- coxph(f, method = "breslow", data = data)
+				m[[i]] <- survival::coxph(f, method = "breslow", data = data)
 			}
 		}
 
@@ -144,7 +144,7 @@ ggerror <- function(model) {
 	xaxis <- var[2]
 
 	# Identify what type of model
-	type <- family(model)$family
+	type <- stats::family(model)$family
 
 	switch(
 		type,

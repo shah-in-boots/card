@@ -57,7 +57,7 @@ circ_compare_groups <- function(data, x, y, time) {
 
 		# T-tests per each time point and group
 		dt_ttest <-
-			dt[, .(pval = t.test(data=.SD, contvar ~ catvar)$p.value), by = timegrp]
+			dt[, .(pval = stats::t.test(data=.SD, contvar ~ catvar)$p.value), by = timegrp]
 
 		# Merge in summary data
 		x <- dt_summary[dt_ttest, on = "timegrp"] %>%
@@ -223,7 +223,7 @@ circ_odds <- function(data, time, outcome, covar) {
 	# Create formula
     f <-
 		paste(outcome, paste(covar, collapse=" + "), sep = " ~ ") %>%
-		as.formula()
+		stats::as.formula()
 
 	# Data frame to use
 	df <- data[c(time, outcome, covar)]
@@ -240,9 +240,12 @@ circ_odds <- function(data, time, outcome, covar) {
 		)
 
 	# Clean and exponentiate
-	odds$OR <- purrr::map_dbl(odds$regression, function(x) {exp(coef(x)[2])})
-	odds$Lower <- purrr::map_dbl(odds$regression, function(x) {exp(confint(x)[2,1])})
-	odds$Upper <- purrr::map_dbl(odds$regression, function(x) {exp(confint(x)[2,2])})
+	odds$OR <-
+		purrr::map_dbl(odds$regression, function(x) {exp(stats::coef(x)[2])})
+	odds$Lower <-
+		purrr::map_dbl(odds$regression, function(x) {exp(stats::confint(x)[2,1])})
+	odds$Upper <-
+		purrr::map_dbl(odds$regression, function(x) {exp(stats::confint(x)[2,2])})
 
 	# Subset the data and return a table of odds
 	ot <- subset(odds, select = c(time, OR, Lower, Upper))

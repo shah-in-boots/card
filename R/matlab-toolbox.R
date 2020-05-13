@@ -78,7 +78,7 @@ proc_hrv_matlab <- function(loc, name, time = 3600) {
 	# Keys for merging
 	setkeyv(x, paste0("t_", tvar))
 	setkeyv(y, paste0("t_", tvar))
-	z <- na.omit(x[y])
+	z <- stats::na.omit(x[y])
 
 	# Add patid
 	z <- cbind(patid = name, z)

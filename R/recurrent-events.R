@@ -124,7 +124,7 @@ recur_survival_table <- function(data, id, first, last, event.dates, model.type,
 	x <-
 		df[c("ID", paste0("EVENT_DATE_", n))] %>%
 		tidyr::pivot_longer(-c("ID"), names_to = "EVENT", values_to = "DATE") %>%
-		na.omit() %>%
+		stats::na.omit() %>%
 		left_join(df, ., by = "ID")
 
 	# THis leads to "x" which is both long and wide (events by name, and in each column)
@@ -406,23 +406,23 @@ recurrent_propensity <- function(data, vars) {
 	outcome <- vars[1]
 
 	# Decide if linear or logistic model based on outcome type
-	linLog <- length(unique(na.omit(data[[outcome]])))
+	linLog <- length(unique(stats::na.omit(data[[outcome]])))
 
 	# Create formula for regression
 	f <-
 		paste(vars[-1], collapse = " + ") %>%
 		paste(vars[1], ., sep = " ~ ") %>%
-		as.formula()
+		stats::as.formula()
 
 	# Create model based on characteristic of outcome variable
 	if(linLog == 2) {
-		m <- glm(f, data = data, family = binomial())
+		m <- stats::glm(f, data = data, family = binomial())
 	} else {
-		m <- glm(f, data = data)
+		m <- stats::glm(f, data = data)
 	}
 
 	# PS scores
-	PROP_SCORE <- predict(m, type = "response")
+	PROP_SCORE <- stats::predict(m, type = "response")
 	x <- cbind(data, PROP_SCORE)
 	x$PROP_WEIGHT <- ifelse(x[[outcome]] == 1, 1/x$PROP_SCORE, 1/(1-x$PROP_SCORE))
 
@@ -488,9 +488,9 @@ recurrent_model_building <-
 						paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
 					model.type == "pwpgt" ~
 						paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
-					~ as.formula()
+					~ stats::as.formula()
 				) %>%
-				as.formula()
+				stats::as.formula()
 
 			# Assess need for propensity weighting
 			# Dynamically save the models
@@ -498,14 +498,14 @@ recurrent_model_building <-
 				# Uses the recurrent_propensity function
 				x <- recurrent_propensity(data, get(covar.builds[i]))
 				m[[i]] <-
-					coxph(
+					survival::coxph(
 						f,
 						method = "breslow",
 						data = x,
 						weights = x$PROP_WEIGHT
 					)
 			} else {
-				m[[i]] <- coxph(f, method = "breslow", data = data)
+				m[[i]] <- survival::coxph(f, method = "breslow", data = data)
 			}
 		}
 

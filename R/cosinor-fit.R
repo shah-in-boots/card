@@ -99,7 +99,7 @@ cosinor_impl <- function(predictors, outcomes) {
 
 	# MESOR parameter estimates
 	sigma <- sqrt(RSS/(n-3))
-	tdist <- qt(1 - alpha/2, df = n - 3)
+	tdist <- stats::qt(1 - alpha/2, df = n - 3)
 	ciM <- tdist * sigma * sqrt(s[1,1])
 	ciMesorMax <- mesor + ciM
 	ciMesorMin <- mesor - ciM
@@ -114,7 +114,7 @@ cosinor_impl <- function(predictors, outcomes) {
 	tc <- 1/n * sum((x - mean(x)) * (z - mean(z)))
 
 	# Find beta and gamma CI region
-	fdist <- qf(1 - alpha/2, df1 = 2, df2 = n-3)
+	fdist <- stats::qf(1 - alpha/2, df1 = 2, df2 = n-3)
 
 	# Quadratic formula setup
 	a <- xc

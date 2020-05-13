@@ -1,6 +1,6 @@
 Package: card
 Type: Package
-Title: Cardiovascular and Autonomic Research Designs
+Title: Cardiovascular and Autonomic Research Design
 Version: 0.1.0
 Authors@R: c(
 			person("Anish S. Shah", 
@@ -19,30 +19,34 @@ Description: This package contains tools needed for the management of
 		longitudinal data and recurrent events. It also contains methods
 		for analyzing and studying circadian events.
 License: MIT + file LICENSE
-URL: https://asshah4.github.io/card
+URL: https://github.com/asshah4/card
 BugReports: https://github.com/asshah4/card/issues
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE)
 Depends:
-	  R (>= 2.10),
+	  R (>= 3.50),
 Imports:
+	  utils,
+	  stats,
 	  magrittr,
 	  ggplot2,
 	  tidyr,
 	  dplyr,
 	  purrr,
+	  tibble,
+	  readr,
 	  lubridate,
+	  stringr,
+	  rlang,
 	  survival,
 	  broom,
 	  hardhat,
 	  recipes,
 	  data.table,
-	  rlang,
-	  stats,
-	  tibble,
 	  Hmisc
 Suggests:
 		kableExtra,
-		plyr
+		plyr,
+		stargazer

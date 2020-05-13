@@ -4,7 +4,7 @@
 \name{card-package}
 \alias{card}
 \alias{card-package}
-\title{card: Cardiovascular and Autonomic Research Designs}
+\title{card: Cardiovascular and Autonomic Research Design}
 \description{
 This package contains tools needed for the management of
 		data that has been collected to study autonomic physiology, 
@@ -19,7 +19,7 @@ This package contains tools needed for the management of
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://asshah4.github.io/card}
+  \item \url{https://github.com/asshah4/card}
   \item Report bugs at \url{https://github.com/asshah4/card/issues}
 }
 

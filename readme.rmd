@@ -1,7 +1,5 @@
 ---
-output:
-  md_document:
-    variant: gfm
+output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -10,7 +8,7 @@ output:
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-#  fig.path = "man/figures/README-",
+  fig.path = "man/figures/",
   out.width = "100%"
 )
 ```
@@ -18,16 +16,22 @@ knitr::opts_chunk$set(
 # __card__
 
 <!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![Github last commit](https://img.shields.io/github/last-commit/asshah4/card)]
+[![Github commit frequency](https://img.shields.io/github/commit-activity/w/asshah4/card)]
+[![Travis build status](https://travis-ci.com/asshah4/card.svg?branch=master)](https://travis-ci.com/asshah4/card)
 <!-- badges: end -->
+
+## Cardiovascular and Autonomic Research Design
 
 The goal of __card__ is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools.
 
 ## Installation
 
-Once published, you can install the released version of autonomicR from [CRAN](https://CRAN.R-project.org) with:
+Once published, you can install the released version of __card__ from [CRAN](https://CRAN.R-project.org) with:
 
 ```{r}
-#install.packages("__card__")
+#install.packages("card")
 ```
 
 And the development version from [GitHub](https://github.com/) with:
@@ -35,5 +39,13 @@ And the development version from [GitHub](https://github.com/) with:
 ```{r}
 # install.packages("devtools")
 devtools::install_github("asshah4/card")
+```
+
+## Examples
+
+This package is intended for analyzing cardiovascular signals and autonomic physiology. For example, here is an analysis that detects circadian rhythmicity of a regression.
+
+```{r}
+knitr::include_graphics("man/figures/cosinor-building-curves.jpeg")
 ```
 

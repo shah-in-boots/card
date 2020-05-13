@@ -30,7 +30,7 @@
 #' @export
 proc_patch_vivalnk <- function(name, loc) {
 	# Read in file name
-	tmp <- read_delim(file.path(loc, paste0(name, '.txt')), delim = '\n', col_names = FALSE)
+	tmp <- readr::read_delim(file.path(loc, paste0(name, '.txt')), delim = '\n', col_names = FALSE)
 
 	# Structure is a very tall, tall tibble. Extract only relevant rows
 	time <- tmp$X1[grep('Sample', tmp$X1)]
@@ -40,26 +40,26 @@ proc_patch_vivalnk <- function(name, loc) {
 	# Split into columns to help extract time stamps
 	df <-
 		# combine into a single data frame
-		inner_join(enframe(time, value = 'time'), enframe(rr, value = 'RR'), by = 'name') %>%
+		inner_join(tibble::enframe(time, value = 'time'), tibble::enframe(rr, value = 'RR'), by = 'name') %>%
 		# Split strings into components
-		separate(time, sep = ',',
+		tidyr::separate(time, sep = ',',
 				 into = c('index', 'datetime', 'lead', 'flash', 'hr', 'resp', 'activity', 'mag'),
 				 remove = TRUE) %>%
 		# Extract time
-		separate(index, into = c('sample', 'index'), sep = '=', remove = TRUE, convert = TRUE) %>%
+		tidyr::separate(index, into = c('sample', 'index'), sep = '=', remove = TRUE, convert = TRUE) %>%
 		# Convert date time column later
-		separate(datetime, into = c('trash', 'datetime'), sep = '=', remove = TRUE, convert = TRUE) %>%
+		tidyr::separate(datetime, into = c('trash', 'datetime'), sep = '=', remove = TRUE, convert = TRUE) %>%
 		# Pull HR into BPM
-		separate(hr, into = c('hr', 'bpm'), sep = '=', remove = TRUE, convert = TRUE)  %>%
+		tidyr::separate(hr, into = c('hr', 'bpm'), sep = '=', remove = TRUE, convert = TRUE)  %>%
 		# Respiratory rate
-		separate(resp, into = c('rr', 'resp'), sep = '=', remove = TRUE, convert = TRUE)
+		tidyr::separate(resp, into = c('rr', 'resp'), sep = '=', remove = TRUE, convert = TRUE)
 
 	# Convert date time format, but need to preserve miliseconds
 	options(digits.secs = 3)
 	df$datetime %<>% ymd_hms()
 
 	# Extract the RR intervals as well
-	df$RR <- str_extract(df$RR, '\\d+') %>% as.integer(.)
+	df$RR <- stringr::str_extract(df$RR, '\\d+') %>% as.integer(.)
 
 	# Select relevant columns
 	df <- df[c('index', 'datetime', 'bpm', 'resp', 'RR')]
@@ -68,8 +68,8 @@ proc_patch_vivalnk <- function(name, loc) {
 	df <- df[order(df$index),]
 
 	# Return start time, end time, and length in list
-	startTime <- head(df$datetime, 1)
-	endTime <- tail(df$datetime, 1)
+	startTime <- utils::head(df$datetime, 1)
+	endTime <- utils::tail(df$datetime, 1)
 	lengthECG <-
 		interval(startTime, endTime) %>%
 		time_length(., 'hours')
