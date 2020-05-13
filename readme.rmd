@@ -13,14 +13,14 @@ knitr::opts_chunk$set(
 )
 ```
 
-# __card__
-
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 ![Github last commit](https://img.shields.io/github/last-commit/asshah4/card)
 ![Github commit frequency](https://img.shields.io/github/commit-activity/w/asshah4/card)
 [![Travis build status](https://travis-ci.com/asshah4/card.svg?branch=master)](https://travis-ci.com/asshah4/card)
 <!-- badges: end -->
+
+# __card__
 
 ## Cardiovascular and Autonomic Research Design
 

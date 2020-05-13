@@ -48,7 +48,7 @@
 #' # mod3 <- cosinor(rec, twins)
 #'
 #' @export
-cosinor <- function(x, ...) {
+cosinor <- function(t, ...) {
   UseMethod("cosinor")
 }
 

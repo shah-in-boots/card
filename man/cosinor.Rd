@@ -9,7 +9,7 @@
 \alias{cosinor.recipe}
 \title{Fit a \code{cosinor}}
 \usage{
-cosinor(x, ...)
+cosinor(t, ...)
 
 \method{cosinor}{default}(t, ...)
 
@@ -22,8 +22,6 @@ cosinor(x, ...)
 \method{cosinor}{recipe}(t, data, ...)
 }
 \arguments{
-\item{...}{Not currently used, but required for extensibility.}
-
 \item{t}{Depending on the context:
 \itemize{
 \item A \strong{data frame} of time-based predictors/indices.
@@ -31,6 +29,8 @@ cosinor(x, ...)
 \item A \strong{recipe} specifying a set of preprocessing steps
 created from \code{\link[recipes:recipe]{recipes::recipe()}}.
 }}
+
+\item{...}{Not currently used, but required for extensibility.}
 
 \item{y}{When \code{t} is a \strong{data frame} or \strong{matrix}, \code{y} is the outcome
 specified as:
