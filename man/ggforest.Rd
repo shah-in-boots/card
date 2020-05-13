@@ -42,6 +42,5 @@ ot <- circ_odds(twins, "hour", "sad_bin", "rDYX")
 library(ggplot2)
 ggforest(ot) +
   labs(title = "Example") +
-  scale_color_viridis_c(option="A")
-
+  scale_color_viridis_c(option = "A")
 }

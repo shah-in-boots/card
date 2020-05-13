@@ -37,9 +37,8 @@ ID. The data is in a long format, such that hte STUDY IDs are unique / not
 duplicated.
 }
 \examples{
-#data("twins")
-#x <- recur_followup_table(dt, "patid", "vetrid", "date")
-#df_predict <- inner_join(x$initial, x$final, by = c("vetrid", "hour", suffix
-#= c("_0", "_1")))
-
+# data("twins")
+# x <- recur_followup_table(dt, "patid", "vetrid", "date")
+# df_predict <- inner_join(x$initial, x$final, by = c("vetrid", "hour", suffix
+# = c("_0", "_1")))
 }

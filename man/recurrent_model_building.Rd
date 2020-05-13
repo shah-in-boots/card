@@ -37,7 +37,6 @@ covariates given, will create the models on the fly. Need to specify model
 type and provide data in a certain format.
 }
 \examples{
-#recurrent_model_building(df, c("covar1", covar2"), "marginal", c("covar3"))
-#m[[1:3]] # Models using covar1, covar2, covar3 (propensity weighted)
-
+# recurrent_model_building(df, c("covar1", covar2"), "marginal", c("covar3"))
+# m[[1:3]] # Models using covar1, covar2, covar3 (propensity weighted)
 }

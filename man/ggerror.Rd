@@ -29,5 +29,4 @@ future.
 data("twins")
 model <- lm(beck_total ~ HR, data = subset(twins, hour == 7))
 ggerror(model)
-
 }

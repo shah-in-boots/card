@@ -36,5 +36,4 @@ data(twins)
 
 # Create odds ratio tables by hour of day for covariate of interest
 ot <- circ_odds(twins, "hour", "sad_bin", "rDYX")
-
 }

@@ -60,5 +60,4 @@ death <- "DEATH_CV_YN"
 tbl <- recur_survival_table(
   mims, id, first, last, event.dates, model.type, death
 )
-
 }

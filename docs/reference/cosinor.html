@@ -109,7 +109,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Fit a <code>cosinor</code></h1>
-    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/cosinor-bridge.R'><code>R/cosinor-bridge.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/cosinor-construction.R'><code>R/cosinor-construction.R</code></a></small>
     <div class="hidden name"><code>cosinor.Rd</code></div>
     </div>
 
@@ -120,39 +120,39 @@
     <pre class="usage"><span class='fu'>cosinor</span>(<span class='no'>x</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for default</span>
-<span class='fu'>cosinor</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'>cosinor</span>(<span class='no'>t</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for data.frame</span>
-<span class='fu'>cosinor</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='no'>...</span>)
+<span class='fu'>cosinor</span>(<span class='no'>t</span>, <span class='no'>y</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for matrix</span>
-<span class='fu'>cosinor</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='no'>...</span>)
+<span class='fu'>cosinor</span>(<span class='no'>t</span>, <span class='no'>y</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for formula</span>
 <span class='fu'>cosinor</span>(<span class='no'>formula</span>, <span class='no'>data</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for recipe</span>
-<span class='fu'>cosinor</span>(<span class='no'>x</span>, <span class='no'>data</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>cosinor</span>(<span class='no'>t</span>, <span class='no'>data</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
+      <th>...</th>
+      <td><p>Not currently used, but required for extensibility.</p></td>
+    </tr>
+    <tr>
+      <th>t</th>
       <td><p>Depending on the context:</p><ul>
-<li><p>A <strong>data frame</strong> of predictors.</p></li>
-<li><p>A <strong>matrix</strong> of predictors.</p></li>
+<li><p>A <strong>data frame</strong> of time-based predictors/indices.</p></li>
+<li><p>A <strong>matrix</strong> of time-based predictors/indices.</p></li>
 <li><p>A <strong>recipe</strong> specifying a set of preprocessing steps
 created from <code><a href='https://rdrr.io/pkg/recipes/man/recipe.html'>recipes::recipe()</a></code>.</p></li>
 </ul></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>Not currently used, but required for extensibility.</p></td>
-    </tr>
-    <tr>
       <th>y</th>
-      <td><p>When <code>x</code> is a <strong>data frame</strong> or <strong>matrix</strong>, <code>y</code> is the outcome
+      <td><p>When <code>t</code> is a <strong>data frame</strong> or <strong>matrix</strong>, <code>y</code> is the outcome
 specified as:</p><ul>
 <li><p>A <strong>data frame</strong> with 1 numeric column.</p></li>
 <li><p>A <strong>matrix</strong> with 1 numeric column.</p></li>
@@ -182,15 +182,15 @@ and the predictor terms on the right-hand side.</p></td>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"twins"</span>)
 
 <span class='co'># XY interface</span>
-<span class='co'>#mod1 &lt;- cosinor(twins["hour"], twins$rDYX)</span>
+<span class='co'># mod1 &lt;- cosinor(twins["hour"], twins$rDYX)</span>
 
 <span class='co'># Formula interface</span>
-<span class='co'>#mod2 &lt;- cosinor(rDYX ~ hour, twins)</span>
+<span class='no'>mod2</span> <span class='kw'>&lt;-</span> <span class='fu'>cosinor</span>(<span class='no'>rDYX</span> ~ <span class='no'>hour</span>, <span class='no'>twins</span>)
 
 <span class='co'># Recipes interface (still needs work)</span>
-<span class='co'>#rec &lt;- recipes::recipe(rDYX ~ hour, twins)</span>
-<span class='co'>#rec &lt;- recipes::step_log(rec, rDYX)</span>
-<span class='co'>#mod3 &lt;- cosinor(rec, twins)</span></div></pre>
+<span class='co'># rec &lt;- recipes::recipe(rDYX ~ hour, twins)</span>
+<span class='co'># rec &lt;- recipes::step_log(rec, rDYX)</span>
+<span class='co'># mod3 &lt;- cosinor(rec, twins)</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

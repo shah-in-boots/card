@@ -17,8 +17,8 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-[![Github last commit](https://img.shields.io/github/last-commit/asshah4/card)]
-[![Github commit frequency](https://img.shields.io/github/commit-activity/w/asshah4/card)]
+![Github last commit](https://img.shields.io/github/last-commit/asshah4/card)
+![Github commit frequency](https://img.shields.io/github/commit-activity/w/asshah4/card)
 [![Travis build status](https://travis-ci.com/asshah4/card.svg?branch=master)](https://travis-ci.com/asshah4/card)
 <!-- badges: end -->
 
@@ -41,11 +41,10 @@ And the development version from [GitHub](https://github.com/) with:
 devtools::install_github("asshah4/card")
 ```
 
-## Examples
+## Usage
 
-This package is intended for analyzing cardiovascular signals and autonomic physiology. For example, here is an analysis that detects circadian rhythmicity of a regression.
+This package is intended for analyzing cardiovascular signals and autonomic physiology. For example, __card__ can provide an analysis that detects circadian rhythmicity of a regression.
 
 ```{r}
-knitr::include_graphics("man/figures/cosinor-building-curves.jpeg")
+knitr::include_graphics("./man/figures/cosinor-building-curves.jpeg")
 ```
-

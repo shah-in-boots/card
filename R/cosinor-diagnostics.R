@@ -20,18 +20,16 @@
 ggcosinorfit <- function(model) {
 
   # Extract ellipse statistics
-  ellipse <- model$ellipse
-  gseq <- ellipse[, "gseq"]
-  bs1 <- ellipse[, "bs1"]
-  bs2 <- ellipse[, "bs2"]
+  area <- model$area
+  gseq <- area[, "gseq"]
+  bs1 <- area[, "bs1"]
+  bs2 <- area[, "bs2"]
 
   # Model parameters
-  coefs <- model$coefs
-  colnames(coefs) <- model$coef_names
-  beta <- coefs[, "beta"]
-  gamma <- coefs[, "gamma"]
   amp <- model$amp
   phi <- model$phi
+  beta <- model$beta
+  gamma <- model$gamma
   period <- 24
 
   # Necessary values for the plot

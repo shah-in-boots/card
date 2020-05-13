@@ -6,18 +6,15 @@ cosinor_impl <- function(predictors, outcomes) {
 
   ## Parameters for normal equations {{{ ====
 
+  # Validate predictors
+  hardhat::validate_predictors_are_numeric(predictors)
+
   # Period of 24 hours in a day
   period <- 24
   alpha <- 0.05
 
-  # Time variables (as predictors is just a variable for hours)
-  # Needs to be shaped as a matrix for regression
-  # tcos <- cos((2 * pi * predictors) / period) %>% as.matrix()
-  # colnames(tcos) <- "tcos"
-  # tsin <- sin((2 * pi * predictors) / period) %>% as.matrix()
-  # colnames(tsin) <- "tsin"
-
   # Formal equation
+  # y(t) = M + A*cos(2*pi*t/period + phi)
   # y(t) = M + beta*x + gamma*z + error(t)
   # beta = A*cos(phi)
   # gamma = -A*sin(phi)
@@ -35,8 +32,8 @@ cosinor_impl <- function(predictors, outcomes) {
   # sum(y*z) = M*sum(z) + beta*sum(x*z) + gamma*sum(z^2)
 
   # Parameters using the predictors (time) and outcomes (y)
-  y <- outcomes
-  t <- predictors
+  y <- outcomes[[1]]
+  t <- predictors[[1]]
   n <- length(t)
   x <- cos((2 * pi * t) / period)
   z <- sin((2 * pi * t) / period)
@@ -146,7 +143,6 @@ cosinor_impl <- function(predictors, outcomes) {
   bs1 <- Re(bs1[index])
   bs2 <- Re(bs2[index])
 
-  ellipse <- cbind(gseq, bs1, bs2)
 
   # Determine if ellipse regions overlap the pole (if overlap, cannot get CI)
   if (
@@ -208,23 +204,45 @@ cosinor_impl <- function(predictors, outcomes) {
 
 
   # Model coefficients
-  # Coef names
-  coefs <- t(coefs)
-  coef_names <- colnames(coefs)
-  coefs <- unname(coefs)
+  coefficients <- c(mesor, amp, phi)
+  coef_names <- c("mesor", "amp", "phi")
+  names(coefficients) <- coef_names
+  beta <- beta
+  gamma <- gamma
+
+  # Fit and residuals
+  fitted.values <- yhat
+  residuals <- y - yhat
+
+  # Model formula
+  formula <-
+    paste0("amp * cos(2 * pi * ", names(predictors), " / period + phi)") %>%
+    paste(names(outcomes), "~  MESOR +", .) %>%
+    stats::as.formula()
+
+  # Area of ellipse for circadian rhythmicity
+  area <- cbind(gseq, bs1, bs2)
 
   # List to return
   list(
     # Raw coefficients
-    coefs = coefs,
+    coefficients = coefficients,
     coef_names = coef_names,
-
-    # Cosinor variables
+    mesor = mesor,
+    beta = beta,
+    gamma = gamma,
     amp = amp,
     phi = phi,
 
-    # Statistics of the ellipse
-    ellipse = ellipse
+    # Fitted and residual values
+    fitted.values = fitted.values,
+    residuals = residuals,
+
+    # Formula
+    formula = formula,
+
+    # Description of ellipse that generates CI
+    area = area
   )
 
   # }}}

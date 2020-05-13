@@ -4,14 +4,14 @@
 #'
 #' `cosinor()` fits a regression model of a time variable to a continuous outcome use trigonometric features.
 #'
-#' @param x Depending on the context:
+#' @param t Depending on the context:
 #'
-#'   * A __data frame__ of predictors.
-#'   * A __matrix__ of predictors.
+#'   * A __data frame__ of time-based predictors/indices.
+#'   * A __matrix__ of time-based predictors/indices.
 #'   * A __recipe__ specifying a set of preprocessing steps
 #'     created from [recipes::recipe()].
 #'
-#' @param y When `x` is a __data frame__ or __matrix__, `y` is the outcome
+#' @param y When `t` is a __data frame__ or __matrix__, `y` is the outcome
 #' specified as:
 #'
 #'   * A __data frame__ with 1 numeric column.
@@ -40,7 +40,7 @@
 #' # mod1 <- cosinor(twins["hour"], twins$rDYX)
 #'
 #' # Formula interface
-#' # mod2 <- cosinor(rDYX ~ hour, twins)
+#' mod2 <- cosinor(rDYX ~ hour, twins)
 #'
 #' # Recipes interface (still needs work)
 #' # rec <- recipes::recipe(rDYX ~ hour, twins)
@@ -56,16 +56,16 @@ cosinor <- function(x, ...) {
 
 #' @export
 #' @rdname cosinor
-cosinor.default <- function(x, ...) {
-  stop("`cosinor()` is not defined for a '", class(x)[1], "'.", call. = FALSE)
+cosinor.default <- function(t, ...) {
+  stop("`cosinor()` is not defined for a '", class(t)[1], "'.", call. = FALSE)
 }
 
 # XY method - data frame
 
 #' @export
 #' @rdname cosinor
-cosinor.data.frame <- function(x, y, ...) {
-  processed <- hardhat::mold(x, y)
+cosinor.data.frame <- function(t, y, ...) {
+  processed <- hardhat::mold(t, y)
   cosinor_bridge(processed, ...)
 }
 
@@ -73,8 +73,8 @@ cosinor.data.frame <- function(x, y, ...) {
 
 #' @export
 #' @rdname cosinor
-cosinor.matrix <- function(x, y, ...) {
-  processed <- hardhat::mold(x, y)
+cosinor.matrix <- function(t, y, ...) {
+  processed <- hardhat::mold(t, y)
   cosinor_bridge(processed, ...)
 }
 
@@ -91,8 +91,8 @@ cosinor.formula <- function(formula, data, ...) {
 
 #' @export
 #' @rdname cosinor
-cosinor.recipe <- function(x, data, ...) {
-  processed <- hardhat::mold(x, data)
+cosinor.recipe <- function(t, data, ...) {
+  processed <- hardhat::mold(t, data)
   cosinor_bridge(processed, ...)
 }
 
@@ -110,22 +110,27 @@ cosinor_bridge <- function(processed, ...) {
   # Make sure input is appropriate format
   hardhat::validate_outcomes_are_univariate(processed$outcomes)
   hardhat::validate_outcomes_are_numeric(processed$outcomes)
-  hardhat::validate_predictors_are_numeric(processed$predictors)
 
   # Outcomes and predictors converted to vectors to process in fit
-  predictors <- processed$predictors[[1]]
-  outcomes <- processed$outcomes[[1]]
+  predictors <- processed$predictors
+  outcomes <- processed$outcomes
 
   # Implempented function requires
   fit <- cosinor_impl(predictors, outcomes)
 
   # Constructor function recieves from implemented function
   new_cosinor(
-    coefs = fit$coefs,
+    coefficients = fit$coefficients,
     coef_names = fit$coef_names,
-    ellipse = fit$ellipse,
+    mesor = fit$mesor,
+    beta = fit$beta,
+    gamma = fit$gamma,
     amp = fit$amp,
     phi = fit$phi,
+    fitted.values = fit$fitted.values,
+    residuals = fit$residuals,
+    formula = fit$formula,
+    area = fit$area,
     blueprint = processed$blueprint # Made from hardhat, not from fit
   )
 }
@@ -137,15 +142,21 @@ cosinor_bridge <- function(processed, ...) {
 #' @description Accepts the output from the fit of the implemented model
 #' @noRd
 new_cosinor <- function(
-                        coefs,
+                        coefficients,
                         coef_names,
-                        amp,
-                        phi,
-                        ellipse,
+                        mesor = mesor,
+                        beta = beta,
+                        gamma = gamma,
+                        amp = amp,
+                        phi = phi,
+                        fitted.values,
+                        residuals,
+                        formula,
+                        area,
                         blueprint) {
 
   # Can validate coefs here
-  if (!is.numeric(coefs)) {
+  if (!is.numeric(coefficients)) {
     stop("`coef` should be a numeric vector.",
       call. = FALSE
     )
@@ -159,17 +170,23 @@ new_cosinor <- function(
   }
 
   # Length check
-  if (length(coefs) != length(coef_names)) {
+  if (length(coefficients) != length(coef_names)) {
     stop("`coefs` and `coef_names` must have same length.")
   }
 
   # Fit outputs need to match here
   hardhat::new_model(
-    coefs = coefs,
+    coefficients = coefficients,
     coef_names = coef_names,
+    mesor = mesor,
+    beta = beta,
+    gamma = gamma,
     amp = amp,
     phi = phi,
-    ellipse = ellipse,
+    fitted.values = fitted.values,
+    residuals = residuals,
+    formula = formula,
+    area = area,
     blueprint = blueprint,
     class = "cosinor"
   )

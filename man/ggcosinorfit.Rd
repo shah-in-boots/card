@@ -23,5 +23,4 @@ the amplitude, acrophase,
 data("twins")
 m <- cosinor(rDYX ~ hour, twins)
 ggcosinorfit(m)
-
 }

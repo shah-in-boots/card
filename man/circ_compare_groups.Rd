@@ -36,5 +36,4 @@ graphed in \link[card:ggcircadian]{card::ggcircadian}.
 \examples{
 data("twins")
 circ_compare_groups(data = twins, x = "rDYX", y = "sad_cat", time = "hour")
-
 }
