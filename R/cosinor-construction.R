@@ -37,15 +37,15 @@
 #' data("twins")
 #'
 #' # XY interface
-#' #mod1 <- cosinor(twins["hour"], twins$rDYX)
+#' # mod1 <- cosinor(twins["hour"], twins$rDYX)
 #'
 #' # Formula interface
-#' #mod2 <- cosinor(rDYX ~ hour, twins)
+#' # mod2 <- cosinor(rDYX ~ hour, twins)
 #'
 #' # Recipes interface (still needs work)
-#' #rec <- recipes::recipe(rDYX ~ hour, twins)
-#' #rec <- recipes::step_log(rec, rDYX)
-#' #mod3 <- cosinor(rec, twins)
+#' # rec <- recipes::recipe(rDYX ~ hour, twins)
+#' # rec <- recipes::step_log(rec, rDYX)
+#' # mod3 <- cosinor(rec, twins)
 #'
 #' @export
 cosinor <- function(x, ...) {
@@ -100,6 +100,11 @@ cosinor.recipe <- function(x, data, ...) {
 
 # Bridge {{{ ====
 
+#' @description Bridging function takes user-facing call, after it is processed,
+#'   and moves it to `cosinor_bridge`, which then calls both `cosinor_impl`, the
+#'   fitting algorithm, and `new_cosinor`, the constructor for a new type of S3
+#'   class.
+#' @noRd
 cosinor_bridge <- function(processed, ...) {
 
   # Make sure input is appropriate format
@@ -107,14 +112,14 @@ cosinor_bridge <- function(processed, ...) {
   hardhat::validate_outcomes_are_numeric(processed$outcomes)
   hardhat::validate_predictors_are_numeric(processed$predictors)
 
-  # Outcomes need correct format, predictors shaped in implementation
+  # Outcomes and predictors converted to vectors to process in fit
   predictors <- processed$predictors[[1]]
   outcomes <- processed$outcomes[[1]]
 
   # Implempented function requires
   fit <- cosinor_impl(predictors, outcomes)
 
-  # Constructor function recieves from implemented function (fit$*)
+  # Constructor function recieves from implemented function
   new_cosinor(
     coefs = fit$coefs,
     coef_names = fit$coef_names,
@@ -124,5 +129,51 @@ cosinor_bridge <- function(processed, ...) {
     blueprint = processed$blueprint # Made from hardhat, not from fit
   )
 }
+
+# }}}
+
+# Constructor function {{{ ====
+
+#' @description Accepts the output from the fit of the implemented model
+#' @noRd
+new_cosinor <- function(
+                        coefs,
+                        coef_names,
+                        amp,
+                        phi,
+                        ellipse,
+                        blueprint) {
+
+  # Can validate coefs here
+  if (!is.numeric(coefs)) {
+    stop("`coef` should be a numeric vector.",
+      call. = FALSE
+    )
+  }
+
+  # Names check
+  if (!is.character(coef_names)) {
+    stop("`coef_names` should be a character vector.",
+      call. = FALSE
+    )
+  }
+
+  # Length check
+  if (length(coefs) != length(coef_names)) {
+    stop("`coefs` and `coef_names` must have same length.")
+  }
+
+  # Fit outputs need to match here
+  hardhat::new_model(
+    coefs = coefs,
+    coef_names = coef_names,
+    amp = amp,
+    phi = phi,
+    ellipse = ellipse,
+    blueprint = blueprint,
+    class = "cosinor"
+  )
+}
+
 
 # }}}

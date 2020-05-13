@@ -16,70 +16,72 @@
 #' data("twins")
 #' m <- cosinor(rDYX ~ hour, twins)
 #' ggcosinorfit(m)
-#'
 #' @export
 ggcosinorfit <- function(model) {
 
-	# Extract ellipse statistics
-	ellipse <- model$ellipse
-	gseq <- ellipse[, "gseq"]
-	bs1 <- ellipse[, "bs1"]
-	bs2 <- ellipse[, "bs2"]
+  # Extract ellipse statistics
+  ellipse <- model$ellipse
+  gseq <- ellipse[, "gseq"]
+  bs1 <- ellipse[, "bs1"]
+  bs2 <- ellipse[, "bs2"]
 
-	# Model parameters
-	coefs <- model$coefs
-	colnames(coefs) <- model$coef_names
-	beta <- coefs[,"beta"]
-	gamma <- coefs[, "gamma"]
-	amp <- model$amp
-	phi <- model$phi
-	period <- 24
+  # Model parameters
+  coefs <- model$coefs
+  colnames(coefs) <- model$coef_names
+  beta <- coefs[, "beta"]
+  gamma <- coefs[, "gamma"]
+  amp <- model$amp
+  phi <- model$phi
+  period <- 24
 
-	# Necessary values for the plot
-	theta_clock <- seq(0, 2*pi, length.out = 24^2)
-	clock <- cbind(2*amp*cos(theta_clock), 2*amp*sin(theta_clock))
-	rad <- seq(0, 2*pi-pi/4, by = pi/4)
-	rad_clock <- cbind(2.2*amp*cos(rad), 2.2*amp*sin(rad))
+  # Necessary values for the plot
+  theta_clock <- seq(0, 2 * pi, length.out = 24^2)
+  clock <- cbind(2 * amp * cos(theta_clock), 2 * amp * sin(theta_clock))
+  rad <- seq(0, 2 * pi - pi / 4, by = pi / 4)
+  rad_clock <- cbind(2.2 * amp * cos(rad), 2.2 * amp * sin(rad))
 
-	# GGplot the values
-	ggplot() +
-		# Ellipse
-		geom_line(aes(x = gseq, y = bs1), col = "goldenrod", size = 1) +
-		geom_line(aes(x = gseq, y = bs2), col = "goldenrod", size = 1) +
-		# Line from origin to ellipse
-		geom_line(aes(x = c(0, gamma),
-			y = c(0, beta)
-			),
-			lty = 1,
-			size = 1,
-			col = "black") +
-		# Line from ellipse to circumference
-		geom_line(aes(
-			x = c(gamma,-2 * amp * sin(phi)),
-			y = c(beta, 2 * amp * cos(phi)),
-			group = 0
-		),
-		size = 1,
-		col = "black",
-		lty = 3) +
-		# Axes
-		geom_line(aes(x = c(0, 0), y = c(-2*amp, 2*amp)), lty = 5, col = "grey") +
-		geom_line(aes(y = c(0, 0), x = c(-2*amp, 2*amp)), lty = 5, col = "grey") +
-		# "Clock" shape to help show degrees on unit circle
-		geom_path(aes(x = clock[, 1], y = clock[, 2]), col = "cornflowerblue") +
-		geom_path(aes(x = 1.2 * clock[, 1], y = 1.2 * clock[, 2]), col = "cornflowerblue") +
-		annotate(
-			geom = "text",
-			x = rad_clock[, 1],
-			y = rad_clock[, 2],
-			label = paste(rad * 180 / pi, "\u00B0")
-		) +
-		# Labels
-		xlab(expression(paste(gamma))) +
-		ylab(expression(paste(beta))) +
-		xlim(-2.5 * amp, 2.5 * amp) +
-		ylim(-2.5 * amp, 2.5 * amp) +
-		theme_minimal()
+  # GGplot the values
+  ggplot() +
+    # Ellipse
+    geom_line(aes(x = gseq, y = bs1), col = "goldenrod", size = 1) +
+    geom_line(aes(x = gseq, y = bs2), col = "goldenrod", size = 1) +
+    # Line from origin to ellipse
+    geom_line(aes(
+      x = c(0, gamma),
+      y = c(0, beta)
+    ),
+    lty = 1,
+    size = 1,
+    col = "black"
+    ) +
+    # Line from ellipse to circumference
+    geom_line(aes(
+      x = c(gamma, -2 * amp * sin(phi)),
+      y = c(beta, 2 * amp * cos(phi)),
+      group = 0
+    ),
+    size = 1,
+    col = "black",
+    lty = 3
+    ) +
+    # Axes
+    geom_line(aes(x = c(0, 0), y = c(-2 * amp, 2 * amp)), lty = 5, col = "grey") +
+    geom_line(aes(y = c(0, 0), x = c(-2 * amp, 2 * amp)), lty = 5, col = "grey") +
+    # "Clock" shape to help show degrees on unit circle
+    geom_path(aes(x = clock[, 1], y = clock[, 2]), col = "cornflowerblue") +
+    geom_path(aes(x = 1.2 * clock[, 1], y = 1.2 * clock[, 2]), col = "cornflowerblue") +
+    annotate(
+      geom = "text",
+      x = rad_clock[, 1],
+      y = rad_clock[, 2],
+      label = paste(rad * 180 / pi, "\u00B0")
+    ) +
+    # Labels
+    xlab(expression(paste(gamma))) +
+    ylab(expression(paste(beta))) +
+    xlim(-2.5 * amp, 2.5 * amp) +
+    ylim(-2.5 * amp, 2.5 * amp) +
+    theme_minimal()
 }
 
 # }}}

@@ -37,8 +37,8 @@ patient can be up to 2 MB in size).
 }
 \examples{
 # Setup
-library(data.table)
-data(hrv)
+#library(data.table)
+#data(hrv)
 
 # Assuming in "root/code" folder, need to get to data in STUDY
 parent <- dirname(getwd())

@@ -3,14 +3,14 @@
 # Will require dates of events, types of recurrent table, etc
 
 # Input
-	# patient ID column
-	# enrollment date (first date available on left)
-	# last known date of follow up
-	# dates of events
-	# type of survival table to create (marginal, conditional, etc)
-	# Optional = death parameter
+# patient ID column
+# enrollment date (first date available on left)
+# last known date of follow up
+# dates of events
+# type of survival table to create (marginal, conditional, etc)
+# Optional = death parameter
 # Output
-	# Survival table
+# Survival table
 
 #' @title Recurrent Survival Data Format
 #'
@@ -37,7 +37,7 @@
 #'   dataframe (e.g. can add column of zeroes PRN). Death defaults to null for
 #'   intermediate calculations otherwise.
 #'
-#' @import dplyr
+#' @importFrom magrittr %>% %<>%
 #'
 #' @return A data frame organized into a survival table format
 #'
@@ -58,236 +58,231 @@
 #' tbl <- recur_survival_table(
 #'   mims, id, first, last, event.dates, model.type, death
 #' )
-#'
 #' @export
-recur_survival_table <- function(data, id, first, last, event.dates, model.type, death=NULL) {
+recur_survival_table <- function(data, id, first, last, event.dates, model.type, death = NULL) {
 
-	# Check for missing optional parameter of death
-	# Creates minimally required table
-	if(is.null(death)) {
-		df <- data[c(id, first, last, event.dates)]
-		death <- "null_death"
-		df$null_death <- 0
-	} else {
-		df <- data[c(id, first, last, event.dates, death)]
-	}
+  # Check for missing optional parameter of death
+  # Creates minimally required table
+  if (is.null(death)) {
+    df <- data[c(id, first, last, event.dates)]
+    death <- "null_death"
+    df$null_death <- 0
+  } else {
+    df <- data[c(id, first, last, event.dates, death)]
+  }
 
-	# Identify number of events
-	n <- 0:length(event.dates)
-	events <- paste0("EVENT_DATE_", c(1:(length(n) - 1)))
+  # Identify number of events
+  n <- 0:length(event.dates)
+  events <- paste0("EVENT_DATE_", c(1:(length(n) - 1)))
 
-	# Event dates need to be organized by actual values
-	x <- df[c(id, event.dates)] %>%
-		tidyr::pivot_longer(-c(id), names_to = "EVENT", values_to = "DATE") %>%
-		group_by_(id) %>%
-		arrange(DATE) %>%
-		arrange_(id) %>%
-		tidyr::nest()
+  # Event dates need to be organized by actual values
+  x <- df[c(id, event.dates)] %>%
+    tidyr::pivot_longer(-c(id), names_to = "EVENT", values_to = "DATE") %>%
+    dplyr::group_by_(id) %>%
+    dplyr::arrange(DATE) %>%
+    dplyr::arrange_(id) %>%
+    tidyr::nest()
 
-	# Unique and sorted events and correct event numbering
-	for(i in 1:length(x[[id]])) {
-		# Make duplicate events NA values
-		# Replace duplicates with NA if duplicates exist
-		if (!plyr::empty(x[[i,2]][[1]][duplicated(x[[i,2]][[1]]$DATE),])) {
-			x[[i,2]][[1]][duplicated(x[[i,2]][[1]]$DATE),]$DATE <- NA
-		}
+  # Unique and sorted events and correct event numbering
+  for (i in 1:length(x[[id]])) {
+    # Make duplicate events NA values
+    # Replace duplicates with NA if duplicates exist
+    if (!plyr::empty(x[[i, 2]][[1]][duplicated(x[[i, 2]][[1]]$DATE), ])) {
+      x[[i, 2]][[1]][duplicated(x[[i, 2]][[1]]$DATE), ]$DATE <- NA
+    }
 
-		# Arrange in correct order
-		x[[i,2]][[1]] %<>% arrange(DATE)
+    # Arrange in correct order
+    x[[i, 2]][[1]] %<>% dplyr::arrange(DATE)
 
-		# Call each tibble for each ID number and rename the events
-		x[[i,2]][[1]]$EVENT <- events
-	}
+    # Call each tibble for each ID number and rename the events
+    x[[i, 2]][[1]]$EVENT <- events
+  }
 
-	# Make table wide again and add back other columns
-	df <-
-		tidyr::unnest(x) %>%
-		tidyr::pivot_wider(names_from = "EVENT", values_from = "DATE") %>%
-		inner_join(df[c(id, first, last, death)], ., by = id)
+  # Make table wide again and add back other columns
+  df <-
+    tidyr::unnest(x) %>%
+    tidyr::pivot_wider(names_from = "EVENT", values_from = "DATE") %>%
+    dplyr::inner_join(df[c(id, first, last, death)], ., by = id)
 
-	# Rename for cleaner manipulations
-	names(df) <- c("ID", "FIRST", "LAST", "DEATH", events)
+  # Rename for cleaner manipulations
+  names(df) <- c("ID", "FIRST", "LAST", "DEATH", events)
 
-	# EVENT_DATE_0 = most recent event (could be enrollment date)
-	df$EVENT_DATE_0 <- df$FIRST
+  # EVENT_DATE_0 = most recent event (could be enrollment date)
+  df$EVENT_DATE_0 <- df$FIRST
 
-	# For loop for identifying most recent event per patient
-	for(i in 1:length(n)) {
+  # For loop for identifying most recent event per patient
+  for (i in 1:length(n)) {
 
-		# Identify most recent event by taking non-NA dates
-		df$EVENT_DATE_0[!is.na(df[paste0("EVENT_DATE_", n[i])])] <-
-			df[[paste0("EVENT_DATE_", n[i])]][!is.na(df[paste0("EVENT_DATE_", n[i])])]
+    # Identify most recent event by taking non-NA dates
+    df$EVENT_DATE_0[!is.na(df[paste0("EVENT_DATE_", n[i])])] <-
+      df[[paste0("EVENT_DATE_", n[i])]][!is.na(df[paste0("EVENT_DATE_", n[i])])]
+  }
 
-	}
+  # Each row should be an individual event (or non-event)
+  x <-
+    df[c("ID", paste0("EVENT_DATE_", n))] %>%
+    tidyr::pivot_longer(-c("ID"), names_to = "EVENT", values_to = "DATE") %>%
+    stats::na.omit() %>%
+    dplyr::left_join(df, ., by = "ID")
 
-	# Each row should be an individual event (or non-event)
-	x <-
-		df[c("ID", paste0("EVENT_DATE_", n))] %>%
-		tidyr::pivot_longer(-c("ID"), names_to = "EVENT", values_to = "DATE") %>%
-		stats::na.omit() %>%
-		left_join(df, ., by = "ID")
+  # THis leads to "x" which is both long and wide (events by name, and in each column)
+  # This data set can be moved into the switch operations to create appropriate recurrent model
 
-	# THis leads to "x" which is both long and wide (events by name, and in each column)
-	# This data set can be moved into the switch operations to create appropriate recurrent model
+  # Now switch to options based on type of data
+  switch(
+    model.type,
 
-	# Now switch to options based on type of data
-	switch(
-		model.type,
+    # Marginal order
+    marginal = {
+      # Initialize survival table data
+      x$STATUS <- x$TSTART <- x$TSTOP <- 0
 
-		# Marginal order
-		marginal = {
-			# Initialize survival table data
-			x$STATUS <- x$TSTART <- x$TSTOP <- 0
+      ### TSTOP
 
-			### TSTOP
+      # Start time is always at beginning for marginal model
+      # Stop time needs to be generated as for EVENTS (>0)
+      # TIME = DATE OF EVENT - FIRST
+      for (i in 2:length(n)) {
+        x$TSTOP[x$EVENT == paste0("EVENT_DATE_", n[i])] <-
+          x[[paste0("EVENT_DATE_", n[i])]][x$EVENT == paste0("EVENT_DATE_", n[i])] - x$FIRST[x$EVENT == paste0("EVENT_DATE_", n[i])]
+      }
 
-			# Start time is always at beginning for marginal model
-			# Stop time needs to be generated as for EVENTS (>0)
-			# TIME = DATE OF EVENT - FIRST
-			for(i in 2:length(n)) {
-				x$TSTOP[x$EVENT == paste0("EVENT_DATE_", n[i])] <-
-					x[[paste0("EVENT_DATE_", n[i])]][x$EVENT == paste0("EVENT_DATE_", n[i])] - x$FIRST[x$EVENT == paste0("EVENT_DATE_", n[i])]
-			}
+      # Stop time from most recent event (EVENT_DATE_0)
+      # For no events.. sames as LAST - FIRST
+      # Otherwise its LAST - MOST RECENT EVENT DATE
+      x$TSTOP[x$EVENT == "EVENT_DATE_0"] <-
+        x$LAST[x$EVENT == "EVENT_DATE_0"] - x$FIRST[x$EVENT == "EVENT_DATE_0"]
 
-			# Stop time from most recent event (EVENT_DATE_0)
-			# For no events.. sames as LAST - FIRST
-			# Otherwise its LAST - MOST RECENT EVENT DATE
-			x$TSTOP[x$EVENT == "EVENT_DATE_0"] <-
-				x$LAST[x$EVENT == "EVENT_DATE_0"] - x$FIRST[x$EVENT == "EVENT_DATE_0"]
+      ### STATUS
 
-			### STATUS
+      # For those had death as final event in their life
+      x$STATUS[x$EVENT == "EVENT_DATE_0" & x$DEATH == 1] <- 1
 
-			# For those had death as final event in their life
-			x$STATUS[x$EVENT == "EVENT_DATE_0" & x$DEATH == 1] <- 1
+      # For those that had just an event
+      x$STATUS[x$EVENT != "EVENT_DATE_0"] <- 1
+    },
 
-			# For those that had just an event
-			x$STATUS[x$EVENT != "EVENT_DATE_0"] <- 1
+    # PWP-TT model (conditional A)
+    pwptt = {
+      #  Initialize model
+      x$STATUS <- x$TSTART <- x$TSTOP <- 0
 
-		},
+      ### TSTOP
 
-		# PWP-TT model (conditional A)
-		pwptt = {
-			#  Initialize model
-			x$STATUS <- x$TSTART <- x$TSTOP <- 0
+      # For "final" (most recent) event (EVENT_DATE_0)
+      x$TSTOP[x$EVENT == "EVENT_DATE_0"] <-
+        x$LAST[x$EVENT == "EVENT_DATE_0"] -
+        x$FIRST[x$EVENT == "EVENT_DATE_0"]
 
-			### TSTOP
+      # Stop time is the same as marginal stop time
+      for (i in 2:length(n)) {
+        x$TSTOP[x$EVENT == paste0("EVENT_DATE_", n[i])] <-
+          x[[paste0("EVENT_DATE_", n[i])]][x$EVENT == paste0("EVENT_DATE_", n[i])] - x$FIRST[x$EVENT == paste0("EVENT_DATE_", n[i])]
+      }
 
-			# For "final" (most recent) event (EVENT_DATE_0)
-			x$TSTOP[x$EVENT == "EVENT_DATE_0"] <-
-				x$LAST[x$EVENT == "EVENT_DATE_0"] -
-				x$FIRST[x$EVENT == "EVENT_DATE_0"]
+      ### TSTART
 
-			# Stop time is the same as marginal stop time
-			for(i in 2:length(n)) {
-				x$TSTOP[x$EVENT == paste0("EVENT_DATE_", n[i])] <-
-					x[[paste0("EVENT_DATE_", n[i])]][x$EVENT == paste0("EVENT_DATE_", n[i])] - x$FIRST[x$EVENT == paste0("EVENT_DATE_", n[i])]
-			}
-
-			### TSTART
-
-			# start for very first event = 0
-			# Start for subsequent events are stop time of prior
+      # start for very first event = 0
+      # Start for subsequent events are stop time of prior
 
 
-			# For the "most recent event", EVENT_DATE_0, can either..
-				# A = person with no events, thus DATE=FIRST,
-					# TSTART = DATE - FIRST = 0
-				# B = person with some events, last event is DATE
-					#  TSTART = DATE - FIRST =/= 0
-			x$TSTART[x$EVENT == "EVENT_DATE_0"] <-
-				x$EVENT_DATE_0[x$EVENT == "EVENT_DATE_0"] - x$FIRST[x$EVENT == "EVENT_DATE_0"]
+      # For the "most recent event", EVENT_DATE_0, can either..
+      # A = person with no events, thus DATE=FIRST,
+      # TSTART = DATE - FIRST = 0
+      # B = person with some events, last event is DATE
+      #  TSTART = DATE - FIRST =/= 0
+      x$TSTART[x$EVENT == "EVENT_DATE_0"] <-
+        x$EVENT_DATE_0[x$EVENT == "EVENT_DATE_0"] - x$FIRST[x$EVENT == "EVENT_DATE_0"]
 
-			# Determine start time for recurrent events
-			for (i in 2:length(n)) {
-				# Everything but first event has time-dependent TSTART
-				if (n[i] == 1) {
-					# Start of first event is always 0
-					x$TSTART[x$EVENT == paste0("EVENT_DATE_", n[i])] <- 0
-				} else {
-					# START of new event is STOP of last event
-					x$TSTART[x$EVENT == paste0("EVENT_DATE_", n[i])] <-
-						as.numeric(unlist(x[x$EVENT == paste0("EVENT_DATE_", n[i]), paste0("EVENT_DATE_", n[i-1])] - x[x$EVENT == paste0("EVENT_DATE_", n[i]), "FIRST"]))
-				}
-			}
+      # Determine start time for recurrent events
+      for (i in 2:length(n)) {
+        # Everything but first event has time-dependent TSTART
+        if (n[i] == 1) {
+          # Start of first event is always 0
+          x$TSTART[x$EVENT == paste0("EVENT_DATE_", n[i])] <- 0
+        } else {
+          # START of new event is STOP of last event
+          x$TSTART[x$EVENT == paste0("EVENT_DATE_", n[i])] <-
+            as.numeric(unlist(x[x$EVENT == paste0("EVENT_DATE_", n[i]), paste0("EVENT_DATE_", n[i - 1])] - x[x$EVENT == paste0("EVENT_DATE_", n[i]), "FIRST"]))
+        }
+      }
 
-			### STATUS
+      ### STATUS
 
-			# For those had death as final event in their life
-			x$STATUS[x$EVENT == "EVENT_DATE_0" & x$DEATH == 1] <- 1
+      # For those had death as final event in their life
+      x$STATUS[x$EVENT == "EVENT_DATE_0" & x$DEATH == 1] <- 1
 
-			# For those that had just an event
-			x$STATUS[x$EVENT != "EVENT_DATE_0"] <- 1
+      # For those that had just an event
+      x$STATUS[x$EVENT != "EVENT_DATE_0"] <- 1
+    },
 
-		},
+    # PWP-GT model (conditional B)
+    pwpgt = {
+      #  Initialize model
+      x$STATUS <- x$TSTART <- x$TSTOP <- 0
 
-		# PWP-GT model (conditional B)
-		pwpgt = {
-			#  Initialize model
-			x$STATUS <- x$TSTART <- x$TSTOP <- 0
+      ### TSTOP
 
-			### TSTOP
+      # For "final" (most recent) event (EVENT_DATE_0)
+      x$TSTOP[x$EVENT == "EVENT_DATE_0"] <-
+        x$LAST[x$EVENT == "EVENT_DATE_0"] -
+        x$FIRST[x$EVENT == "EVENT_DATE_0"]
 
-			# For "final" (most recent) event (EVENT_DATE_0)
-			x$TSTOP[x$EVENT == "EVENT_DATE_0"] <-
-				x$LAST[x$EVENT == "EVENT_DATE_0"] -
-				x$FIRST[x$EVENT == "EVENT_DATE_0"]
+      # Stop time is the same as marginal stop time
+      for (i in 2:length(n)) {
+        x$TSTOP[x$EVENT == paste0("EVENT_DATE_", n[i])] <-
+          x[[paste0("EVENT_DATE_", n[i])]][x$EVENT == paste0("EVENT_DATE_", n[i])] - x$FIRST[x$EVENT == paste0("EVENT_DATE_", n[i])]
+      }
 
-			# Stop time is the same as marginal stop time
-			for(i in 2:length(n)) {
-				x$TSTOP[x$EVENT == paste0("EVENT_DATE_", n[i])] <-
-					x[[paste0("EVENT_DATE_", n[i])]][x$EVENT == paste0("EVENT_DATE_", n[i])] - x$FIRST[x$EVENT == paste0("EVENT_DATE_", n[i])]
-			}
+      ### TSTART
 
-			### TSTART
-
-			# start for very first event = 0
-			# Start for subsequent events are stop time of prior
-
-
-			# For the "most recent event", EVENT_DATE_0, can either..
-				# A = person with no events, thus DATE=FIRST,
-					# TSTART = DATE - FIRST = 0
-				# B = person with some events, last event is DATE
-					#  TSTART = DATE - FIRST =/= 0
-			x$TSTART[x$EVENT == "EVENT_DATE_0"] <-
-				x$EVENT_DATE_0[x$EVENT == "EVENT_DATE_0"] - x$FIRST[x$EVENT == "EVENT_DATE_0"]
-
-			# Determine start time for recurrent events
-			for (i in 2:length(n)) {
-				# Everything but first event has time-dependent TSTART
-				if (n[i] == 1) {
-					# Start of first event is always 0
-					x$TSTART[x$EVENT == paste0("EVENT_DATE_", n[i])] <- 0
-				} else {
-					# START of new event is STOP of last event
-					x$TSTART[x$EVENT == paste0("EVENT_DATE_", n[i])] <-
-						as.numeric(unlist(x[x$EVENT == paste0("EVENT_DATE_", n[i]), paste0("EVENT_DATE_", n[i-1])] - x[x$EVENT == paste0("EVENT_DATE_", n[i]), "FIRST"]))
-				}
-			}
-
-			### STATUS
-
-			# For those had death as final event in their life
-			x$STATUS[x$EVENT == "EVENT_DATE_0" & x$DEATH == 1] <- 1
-
-			# For those that had just an event
-			x$STATUS[x$EVENT != "EVENT_DATE_0"] <- 1
+      # start for very first event = 0
+      # Start for subsequent events are stop time of prior
 
 
-			# This is essentially the PWP-TT model, but collapsed
-			# All tstarts are essentially shifted to 0
-			# All tstops are reduced to interval
-			x$TSTOP <- x$TSTOP - x$TSTART
-			x$TSTART <- x$TSTART - x$TSTART
+      # For the "most recent event", EVENT_DATE_0, can either..
+      # A = person with no events, thus DATE=FIRST,
+      # TSTART = DATE - FIRST = 0
+      # B = person with some events, last event is DATE
+      #  TSTART = DATE - FIRST =/= 0
+      x$TSTART[x$EVENT == "EVENT_DATE_0"] <-
+        x$EVENT_DATE_0[x$EVENT == "EVENT_DATE_0"] - x$FIRST[x$EVENT == "EVENT_DATE_0"]
 
-		},
-		stop("Need the correct repeat event model: marginal, pwptt, pwpgt")
-	)
+      # Determine start time for recurrent events
+      for (i in 2:length(n)) {
+        # Everything but first event has time-dependent TSTART
+        if (n[i] == 1) {
+          # Start of first event is always 0
+          x$TSTART[x$EVENT == paste0("EVENT_DATE_", n[i])] <- 0
+        } else {
+          # START of new event is STOP of last event
+          x$TSTART[x$EVENT == paste0("EVENT_DATE_", n[i])] <-
+            as.numeric(unlist(x[x$EVENT == paste0("EVENT_DATE_", n[i]), paste0("EVENT_DATE_", n[i - 1])] - x[x$EVENT == paste0("EVENT_DATE_", n[i]), "FIRST"]))
+        }
+      }
+
+      ### STATUS
+
+      # For those had death as final event in their life
+      x$STATUS[x$EVENT == "EVENT_DATE_0" & x$DEATH == 1] <- 1
+
+      # For those that had just an event
+      x$STATUS[x$EVENT != "EVENT_DATE_0"] <- 1
 
 
-	y <- x[c("ID", "TSTART", "TSTOP", "STATUS", "EVENT", "DATE")]
-	# Return survival dataset
-	return(y)
+      # This is essentially the PWP-TT model, but collapsed
+      # All tstarts are essentially shifted to 0
+      # All tstops are reduced to interval
+      x$TSTOP <- x$TSTOP - x$TSTART
+      x$TSTART <- x$TSTART - x$TSTART
+    },
+    stop("Need the correct repeat event model: marginal, pwptt, pwpgt")
+  )
+
+
+  y <- x[c("ID", "TSTART", "TSTOP", "STATUS", "EVENT", "DATE")]
+  # Return survival dataset
+  return(y)
 }
 
 # }}}
@@ -337,43 +332,42 @@ recur_survival_table <- function(data, id, first, last, event.dates, model.type,
 #' tbl %>%
 #'   kable("latex", caption = "Title", booktabs = TRUE) %>%
 #'   kable_styling(font_size = 8)
-#'
 #' @export
 recur_summary <- function(data, covar) {
-	# What is the ID for merging? Using example, should be likely called "ID"
+  # What is the ID for merging? Using example, should be likely called "ID"
 
-	# Shorten data frame name
-	df <- data
+  # Shorten data frame name
+  df <- data
 
-	# Length of time between events for all individuals
-	df$TIME <- df$TSTOP - df$TSTART
+  # Length of time between events for all individuals
+  df$TIME <- df$TSTOP - df$TSTART
 
-	# Did the last event dlead to fatality?
-	# Indicate by ... EVENT_DATE_0 and STATUS = 1
-	df$EVENT[df$EVENT == "EVENT_DATE_0" & df$STATUS == 1] <- "EVENT_DATE_DEATH"
+  # Did the last event dlead to fatality?
+  # Indicate by ... EVENT_DATE_0 and STATUS = 1
+  df$EVENT[df$EVENT == "EVENT_DATE_0" & df$STATUS == 1] <- "EVENT_DATE_DEATH"
 
-	# Create factors
-	df[[covar]] %<>% factor()
-	df$EVENT %<>% factor()
+  # Create factors
+  df[[covar]] %<>% factor()
+  df$EVENT %<>% factor()
 
-	# Identify number of events per individual, and add back into DF
-	# Column name is "freq"
-	# This may not be necessary ... currently unused
-	df <-
-		dplyr::count(df, ID) %>%
-		dplyr::left_join(df, ., by = "ID") %>%
-		as_tibble()
+  # Identify number of events per individual, and add back into DF
+  # Column name is "freq"
+  # This may not be necessary ... currently unused
+  df <-
+    dplyr::count(df, ID) %>%
+    dplyr::left_join(df, ., by = "ID") %>%
+    dplyr::as_tibble()
 
-	# Make a summary table
-	tbl <-
-		df %>%
-		group_by(!! rlang::sym(covar), EVENT) %>%
-		dplyr::summarise(Count = n(), Time = mean(TSTOP)) %>%
-		tidyr::pivot_wider(id_cols = EVENT, names_from = !! rlang::sym(covar), values_from = c(Count, Time), names_sep = paste0("_", covar, "_")) %>%
-		dplyr::arrange(EVENT)
+  # Make a summary table
+  tbl <-
+    df %>%
+    dplyr::group_by(!!rlang::sym(covar), EVENT) %>%
+    dplyr::summarise(Count = n(), Time = mean(TSTOP)) %>%
+    tidyr::pivot_wider(id_cols = EVENT, names_from = !!rlang::sym(covar), values_from = c(Count, Time), names_sep = paste0("_", covar, "_")) %>%
+    dplyr::arrange(EVENT)
 
-	# Return table, can be formatted externally
-	return(tbl)
+  # Return table, can be formatted externally
+  return(tbl)
 }
 
 # }}}
@@ -396,38 +390,37 @@ recur_summary <- function(data, covar) {
 #' @return Returns a modified table from what was originally given with the new columns propensity scores. Essentially original df + 2 columns.
 #'
 #' @examples
-#' #ps <- recurrent_propensity(df, c("outcome", "exp1", "exp2"))
-#' #ps[c("patid", "PROP_SCORE", "PROP_WEIGHT")]
-#'
+#' # ps <- recurrent_propensity(df, c("outcome", "exp1", "exp2"))
+#' # ps[c("patid", "PROP_SCORE", "PROP_WEIGHT")]
 #' @export
 recurrent_propensity <- function(data, vars) {
-	# Most important columns
-	id <- names(data)[1]
-	outcome <- vars[1]
+  # Most important columns
+  id <- names(data)[1]
+  outcome <- vars[1]
 
-	# Decide if linear or logistic model based on outcome type
-	linLog <- length(unique(stats::na.omit(data[[outcome]])))
+  # Decide if linear or logistic model based on outcome type
+  linLog <- length(unique(stats::na.omit(data[[outcome]])))
 
-	# Create formula for regression
-	f <-
-		paste(vars[-1], collapse = " + ") %>%
-		paste(vars[1], ., sep = " ~ ") %>%
-		stats::as.formula()
+  # Create formula for regression
+  f <-
+    paste(vars[-1], collapse = " + ") %>%
+    paste(vars[1], ., sep = " ~ ") %>%
+    stats::as.formula()
 
-	# Create model based on characteristic of outcome variable
-	if(linLog == 2) {
-		m <- stats::glm(f, data = data, family = binomial())
-	} else {
-		m <- stats::glm(f, data = data)
-	}
+  # Create model based on characteristic of outcome variable
+  if (linLog == 2) {
+    m <- stats::glm(f, data = data, family = binomial())
+  } else {
+    m <- stats::glm(f, data = data)
+  }
 
-	# PS scores
-	PROP_SCORE <- stats::predict(m, type = "response")
-	x <- cbind(data, PROP_SCORE)
-	x$PROP_WEIGHT <- ifelse(x[[outcome]] == 1, 1/x$PROP_SCORE, 1/(1-x$PROP_SCORE))
+  # PS scores
+  PROP_SCORE <- stats::predict(m, type = "response")
+  x <- cbind(data, PROP_SCORE)
+  x$PROP_WEIGHT <- ifelse(x[[outcome]] == 1, 1 / x$PROP_SCORE, 1 / (1 - x$PROP_SCORE))
 
-	# Return new data frame
-	return(x)
+  # Return new data frame
+  return(x)
 }
 
 # }}}
@@ -463,55 +456,54 @@ recurrent_propensity <- function(data, vars) {
 #' @return List of models in sequential order.
 #'
 #' @examples
-#' #recurrent_model_building(df, c("covar1", covar2"), "marginal", c("covar3"))
-#' #m[[1:3]] # Models using covar1, covar2, covar3 (propensity weighted)
-#'
+#' # recurrent_model_building(df, c("covar1", covar2"), "marginal", c("covar3"))
+#' # m[[1:3]] # Models using covar1, covar2, covar3 (propensity weighted)
 #' @export
 recurrent_model_building <-
-	function(data, covar.builds, model.type, prop.scores = NULL) {
-		# Important variables / columns
-		n <- length(covar.builds)
-		names(data)[1:5] <- c("ID", "TSTART", "TSTOP", "STATUS", "EVENT")
-		m <- list()
+  function(data, covar.builds, model.type, prop.scores = NULL) {
+    # Important variables / columns
+    n <- length(covar.builds)
+    names(data)[1:5] <- c("ID", "TSTART", "TSTOP", "STATUS", "EVENT")
+    m <- list()
 
-		# Create all the models in sequence
-		for (i in 1:n) {
-			# Create formulas
-			f <-
-				paste(get(covar.builds[i]), collapse = " + ") %>%
-				paste("Surv(TSTART, TSTOP, STATUS)", ., sep = " ~ ") %>%
-				# Different recurrent event models with cluster and strata
-				purrr::when(
-					model.type == "marginal" ~
-						paste(., "cluster(ID)", sep = " + "),
-					model.type == "pwptt" ~
-						paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
-					model.type == "pwpgt" ~
-						paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
-					~ stats::as.formula()
-				) %>%
-				stats::as.formula()
+    # Create all the models in sequence
+    for (i in 1:n) {
+      # Create formulas
+      f <-
+        paste(get(covar.builds[i]), collapse = " + ") %>%
+        paste("Surv(TSTART, TSTOP, STATUS)", ., sep = " ~ ") %>%
+        # Different recurrent event models with cluster and strata
+        purrr::when(
+          model.type == "marginal" ~
+          paste(., "cluster(ID)", sep = " + "),
+          model.type == "pwptt" ~
+          paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
+          model.type == "pwpgt" ~
+          paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
+          ~ stats::as.formula()
+        ) %>%
+        stats::as.formula()
 
-			# Assess need for propensity weighting
-			# Dynamically save the models
-			if (covar.builds[i] %in% prop.scores) {
-				# Uses the recurrent_propensity function
-				x <- recurrent_propensity(data, get(covar.builds[i]))
-				m[[i]] <-
-					survival::coxph(
-						f,
-						method = "breslow",
-						data = x,
-						weights = x$PROP_WEIGHT
-					)
-			} else {
-				m[[i]] <- survival::coxph(f, method = "breslow", data = data)
-			}
-		}
+      # Assess need for propensity weighting
+      # Dynamically save the models
+      if (covar.builds[i] %in% prop.scores) {
+        # Uses the recurrent_propensity function
+        x <- recurrent_propensity(data, get(covar.builds[i]))
+        m[[i]] <-
+          survival::coxph(
+            f,
+            method = "breslow",
+            data = x,
+            weights = x$PROP_WEIGHT
+          )
+      } else {
+        m[[i]] <- survival::coxph(f, method = "breslow", data = data)
+      }
+    }
 
-		# Return output
-		return(m)
-	}
+    # Return output
+    return(m)
+  }
 
 # }}}
 
@@ -546,63 +538,62 @@ recurrent_model_building <-
 #'   hour of day for circadian data).
 #'
 #' @examples
-#' #data("twins")
-#' #x <- recur_followup_table(dt, "patid", "vetrid", "date")
-#' #df_predict <- inner_join(x$initial, x$final, by = c("vetrid", "hour", suffix
-#' #= c("_0", "_1")))
-#'
-#' @import dplyr
+#' # data("twins")
+#' # x <- recur_followup_table(dt, "patid", "vetrid", "date")
+#' # df_predict <- inner_join(x$initial, x$final, by = c("vetrid", "hour", suffix
+#' # = c("_0", "_1")))
+#' @importFrom magrittr %>%
 #'
 #' @export
 recur_followup_table <- function(data, studyid, keyid, date) {
 
-	# Make sure in tibble/tidy format
-	data <- as_tibble(data)
+  # Make sure in tibble/tidy format
+  data <- dplyr::as_tibble(data)
 
-	# Find which rows / IDs are repeated based on the keyid
-	# Should have multiple rows per keyid, but only 1 per studyid
-	repeats <-
-		data[c(keyid, studyid, date)] %>%
-		unique() %>%
-		group_by(!!sym(keyid)) %>%
-		tally() %>%
-		subset(n > 1)
+  # Find which rows / IDs are repeated based on the keyid
+  # Should have multiple rows per keyid, but only 1 per studyid
+  repeats <-
+    data[c(keyid, studyid, date)] %>%
+    unique() %>%
+    dplyr::group_by(!!rlang::sym(keyid)) %>%
+    dplyr::tally() %>%
+    subset(n > 1)
 
-	# Initial visit IDs
-	beforeid <-
-		data[c(keyid, studyid, date)] %>%
-		unique() %>%
-		filter(!!sym(keyid) %in% repeats[[keyid]]) %>%
-		group_by(!!sym(keyid)) %>%
-		arrange(!!sym(date)) %>%
-		slice(1) %>%
-		.[studyid]
+  # Initial visit IDs
+  beforeid <-
+    data[c(keyid, studyid, date)] %>%
+    unique() %>%
+    dplyr::filter(!!rlang::sym(keyid) %in% repeats[[keyid]]) %>%
+    dplyr::group_by(!!rlang::sym(keyid)) %>%
+    dplyr::arrange(!!rlang::sym(date)) %>%
+    dplyr::slice(1) %>%
+    .[studyid]
 
-	# Final visit IDs
-	afterid <-
-		data[c(keyid, studyid, date)] %>%
-		unique() %>%
-		filter(!!sym(keyid) %in% repeats[[keyid]]) %>%
-		group_by(!!sym(keyid)) %>%
-		arrange(!!sym(date)) %>%
-		slice(n()) %>%
-		.[studyid]
+  # Final visit IDs
+  afterid <-
+    data[c(keyid, studyid, date)] %>%
+    unique() %>%
+    dplyr::filter(!!rlang::sym(keyid) %in% repeats[[keyid]]) %>%
+    dplyr::group_by(!!rlang::sym(keyid)) %>%
+    dplyr::arrange(!!rlang::sym(date)) %>%
+    dplyr::slice(n()) %>%
+    .[studyid]
 
-	# Before data set (initial visit)
-	before <-
-		data %>%
-		filter(!!sym(studyid) %in% beforeid[[studyid]])
+  # Before data set (initial visit)
+  before <-
+    data %>%
+    dplyr::filter(!!rlang::sym(studyid) %in% beforeid[[studyid]])
 
-	# After data set (most recent visit)
-	after <-
-		data %>%
-		filter(!!sym(studyid) %in% afterid[[studyid]])
+  # After data set (most recent visit)
+  after <-
+    data %>%
+    dplyr::filter(!!rlang::sym(studyid) %in% afterid[[studyid]])
 
-	# Return
-	x <- list()
-	x[["initial"]] <- before
-	x[["final"]] <- after
-	return(x)
+  # Return
+  x <- list()
+  x[["initial"]] <- before
+  x[["final"]] <- after
+  return(x)
 }
 
 ### }}}

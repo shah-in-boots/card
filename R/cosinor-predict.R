@@ -19,7 +19,7 @@
 #' to be the same as the number of rows in `new_data`.
 #'
 #' @examples
-#' train <- mtcars[1:20,]
+#' train <- mtcars[1:20, ]
 #' test <- mtcars[21:32, -1]
 #'
 #' # Fit
@@ -27,10 +27,8 @@
 #'
 #' # Predict, with preprocessing
 #' predict(mod, test)
-#'
 #' @export
 predict.cosinor <- function(object, new_data, type = "numeric", ...) {
-
   forged <- hardhat::forge(new_data, object$blueprint)
   rlang::arg_match(type, valid_predict_types())
   predict_cosinor_bridge(type, object, forged$predictors)

@@ -27,64 +27,60 @@
 #'   3600 seconds = 1 hour). Also returns an additional column of
 #'   percent missing (e.g. 20.0% missing data) by time group.
 #'
-#' @import data.table
+#' @importFrom data.table data.table .N .I .SD .BY fread :=
 #'
 #' @examples
 #' # Setup
-#' library(data.table)
-#' data(hrv)
+#' # library(data.table)
+#' # data(hrv)
 #'
 #' # Assuming in "root/code" folder, need to get to data in STUDY
 #' parent <- dirname(getwd())
-#' loc <- file.path(parent, 'data', 'proc_hrv', 'STUDY')
+#' loc <- file.path(parent, "data", "proc_hrv", "STUDY")
 #' vars <- Hmisc::Cs(SDNN, RMSSD, pnn50, ulf, vlf, lf, hf, lfhf, ttlpwr, ac, dc, SampEn, ApEn)
 #' time <- 3600 # number of seconds in an hour
 #' names <- list.files(path = loc)
 #'
 #' # Create for loop to eventually make data frame (not currently working)
-#' #d <- list()
-#' #for(i in 1:length(names)) {
+#' # d <- list()
+#' # for(i in 1:length(names)) {
 #' #  d[[paste(names[i])]] <- proc_hrv_matlab(loc, names[i], vars, time)
-#' #}
-#' #df <- rbindlist(d) %>% as_tibble()
+#' # }
+#' # df <- rbindlist(d) %>% as_tibble()
 #' @export
 proc_hrv_matlab <- function(loc, name, time = 3600) {
 
-	# Selected variables from HRV analysis
-	svar <- c("NNmean", "SDNN", "RMSSD", "pnn50", "ulf", "vlf", "lf", "hf", "lfhf", "ttlpwr", "ac", "dc", "SampEn", "ApEn")
-	vars <- c("patID", "t_start", "t_end", svar)
+  # Selected variables from HRV analysis
+  svar <- c("NNmean", "SDNN", "RMSSD", "pnn50", "ulf", "vlf", "lf", "hf", "lfhf", "ttlpwr", "ac", "dc", "SampEn", "ApEn")
+  vars <- c("patID", "t_start", "t_end", svar)
 
-	# Read in the HRV data
-	dt <-
-		list.files(file.path(loc, name), pattern = "HRV", full.names = TRUE) %>%
-		fread()
+  # Read in the HRV data
+  dt <-
+    list.files(file.path(loc, name), pattern = "HRV", full.names = TRUE) %>%
+    fread()
 
-	# Time grouping variable
-	### Need to add different increments
-	tvar <- ifelse(time/3600 == 1, "hour")
+  # Time grouping variable
+  ### Need to add different increments
+  tvar <- ifelse(time / 3600 == 1, "hour")
 
-	# Create a summary data set by grouping times
-	x <-
-		dt[, vars, with = FALSE
-		   ][, paste0("t_",tvar) := floor(t_start/time)
-		     ][, lapply(.SD, mean, na.rm=T), by=eval(paste0("t_", tvar)), .SDcols=svar]
+  # Create a summary data set by grouping times
+  x <-
+    dt[, vars, with = FALSE][, paste0("t_", tvar) := floor(t_start / time)][, lapply(.SD, mean, na.rm = T), by = eval(paste0("t_", tvar)), .SDcols = svar]
 
-	# Identify missing percent by group (for quality)
-	y <-
-		dt[, vars, with = FALSE
-		   ][, paste0("t_", tvar) := floor(t_start/time)
-		     ][, list(missing=(sum(is.na(SDNN)) / .N * 100)), by=eval(paste0("t_", tvar))]
+  # Identify missing percent by group (for quality)
+  y <-
+    dt[, vars, with = FALSE][, paste0("t_", tvar) := floor(t_start / time)][, list(missing = (sum(is.na(SDNN)) / .N * 100)), by = eval(paste0("t_", tvar))]
 
-	# Keys for merging
-	setkeyv(x, paste0("t_", tvar))
-	setkeyv(y, paste0("t_", tvar))
-	z <- stats::na.omit(x[y])
+  # Keys for merging
+  data.table::setkeyv(x, paste0("t_", tvar))
+  data.table::setkeyv(y, paste0("t_", tvar))
+  z <- stats::na.omit(x[y])
 
-	# Add patid
-	z <- cbind(patid = name, z)
+  # Add patid
+  z <- cbind(patid = name, z)
 
-	# Return data table
-	return(z)
+  # Return data table
+  return(z)
 }
 
 # }}}
@@ -113,25 +109,25 @@ proc_hrv_matlab <- function(loc, name, time = 3600) {
 #'   3600 seconds = 1 hour). Also returns an additional column of
 #'   percent missing (e.g. 20.0% missing data) by time group.
 #'
-#' @import data.table
+#' @importFrom data.table data.table .N .I .SD .BY fread :=
 #'
 #' @export
 read_hrv_matlab <- function(loc, name) {
 
-	# Selected variables from HRV analysis
-	svar <- c("NNmean", "SDNN", "RMSSD", "pnn50", "ulf", "vlf", "lf", "hf", "lfhf", "ttlpwr", "ac", "dc", "SampEn", "ApEn")
-	vars <- c("patID", "t_start", svar)
+  # Selected variables from HRV analysis
+  svar <- c("NNmean", "SDNN", "RMSSD", "pnn50", "ulf", "vlf", "lf", "hf", "lfhf", "ttlpwr", "ac", "dc", "SampEn", "ApEn")
+  vars <- c("patID", "t_start", svar)
 
-	# Read in the HRV data
-	dt <-
-		list.files(file.path(loc, name), pattern = "HRV", full.names = TRUE) %>%
-		fread()
+  # Read in the HRV data
+  dt <-
+    list.files(file.path(loc, name), pattern = "HRV", full.names = TRUE) %>%
+    fread()
 
-	# Create a summary data set by grouping times
-	x <- dt[, vars, with = FALSE]
+  # Create a summary data set by grouping times
+  x <- dt[, vars, with = FALSE]
 
-	# Return data table
-	return(x)
+  # Return data table
+  return(x)
 }
 
 
