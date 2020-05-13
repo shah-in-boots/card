@@ -33,7 +33,7 @@ Currently functions by taking two input IDs, one being a ID that is
 the same between studies (a true key ID) and an ID that is unique to that
 study itself. It will arrange by dates, and and slice data into an initial
 visit and the most recent visit. Each row should have a KEY ID and a STUDY
-ID. The data is in a long format, such that hte STUDY IDs are unique / not
+ID. The data is in a long format, such that the STUDY IDs are unique / not
 duplicated.
 }
 \examples{

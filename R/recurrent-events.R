@@ -381,7 +381,7 @@ recur_summary <- function(data, covar) {
 #' `recurrent_propensity` Adds propensity score to any data set that is being regressed upon.
 #'
 #' @details
-#' Using a logistic regression, will take covariates and create propensity scores, and adds the weights. Uses the standard logistic regression to evalute the propensity score.
+#' Using a logistic regression, will take covariates and create propensity scores, and adds the weights. Uses the standard logistic regression to evaluate the propensity score.
 #'
 #' @param data Data frame that contains all covariates and outcomes. First column should be ID
 #'
@@ -518,7 +518,7 @@ recurrent_model_building <-
 #'   the same between studies (a true key ID) and an ID that is unique to that
 #'   study itself. It will arrange by dates, and and slice data into an initial
 #'   visit and the most recent visit. Each row should have a KEY ID and a STUDY
-#'   ID. The data is in a long format, such that hte STUDY IDs are unique / not
+#'   ID. The data is in a long format, such that the STUDY IDs are unique / not
 #'   duplicated.
 #'
 #' @param data Data frame containing all clinical covariates of interest

@@ -1,7 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^setup\.R$
-^readme\.rmd$
+^README\.rmd$
 ^_pkgdown\.yml$
 ^cran-comments\.md$
 ^docs$

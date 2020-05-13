@@ -4,8 +4,8 @@
 #' @description
 #' \code{proc_patch_vivalnk} reads in VivaLNK log files and helps to organize the summary data. Does not obtain the ECG signal, just the summary data from the log file for diagnostic purposes. This is a slow function, and is best for troubleshooting.
 #' @param name Name of the patient that the log file was created on. The variable does NOT have an extension.
-#' @param loc The raw, unprocessed data folder containining the log file (which is in a ".txt" format)
-#' @return Returns a simple data frame wiith the start and endtime of the ECG data. Has several additional markers available internally, but currently not called.
+#' @param loc The raw, unprocessed data folder containing the log file (which is in a ".txt" format)
+#' @return Returns a simple data frame with the start and endtime of the ECG data. Has several additional markers available internally, but currently not called.
 #' @examples
 #' # Apply fn to each element of vector
 #' # for(i in seq_along(patid)) {

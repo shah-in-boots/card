@@ -8,16 +8,13 @@ Authors@R: c(
 			role = c("aut", "cre"),
 			comment = c(ORCID = "0000-0002-9729-1558"))
 		)
-Maintainer: Can be contacted at <asshah4@emory.ed>
-Description: This package contains tools needed for the management of
-		data that has been collected to study autonomic physiology, 
-		particularly of how the autnomic nervous system effects the 
-		cardiovascular system (neurocardiology). The package uses tools
-		built to study electrocardiographic time series data, focused on
-		heart rate variability and morphology in companionship with MATLAB.
-		It also helps with the management of extended time series, such as
-		longitudinal data and recurrent events. It also contains methods
-		for analyzing and studying circadian events.
+Maintainer: Can be contacted at <asshah4@emory.edu>
+Description: Tools that can aid in the assessment of the autonomic regulation 
+		of cardiovascular physiology. The aims of this package are to: 1) study 
+		ECG-based time signals (both RR intervals and morphology) as extensions 
+		of signal processing, 2) study circadian rhythms and how it effects 
+		autonomic physiology, 3) assess clinical risk of autonomic dysfunction on 
+		cardiovascular health through the lense of epidemiology and causality.
 License: MIT + file LICENSE
 URL: https://github.com/asshah4/card
 BugReports: https://github.com/asshah4/card/issues

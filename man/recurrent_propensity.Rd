@@ -18,7 +18,7 @@ Returns a modified table from what was originally given with the new columns pro
 \code{recurrent_propensity} Adds propensity score to any data set that is being regressed upon.
 }
 \details{
-Using a logistic regression, will take covariates and create propensity scores, and adds the weights. Uses the standard logistic regression to evalute the propensity score.
+Using a logistic regression, will take covariates and create propensity scores, and adds the weights. Uses the standard logistic regression to evaluate the propensity score.
 }
 \examples{
 # ps <- recurrent_propensity(df, c("outcome", "exp1", "exp2"))
