@@ -7,12 +7,11 @@
 \title{card: Cardiovascular and Autonomic Research Design}
 \description{
 Tools that can aid in the assessment of the autonomic regulation 
-		of cardiovascular physiology (neurocardiology). The aims of this package 
-		are to: 1) study ECG-based time signals (both RR intervals and morphology) 
-		as extensions of signal processing, 2) study circadian rhythmicity and how 
-		it effects autonomic physiology, 3) assess clinical risk of autonomic 
-		dysfunction on cardiovascular health through the lense of epidemiology 
-		and causality.
+		of cardiovascular physiology. The aims of this package are to: 1) study 
+		ECG-based time signals (both RR intervals and morphology) as extensions 
+		of signal processing, 2) study circadian rhythms and how it effects 
+		autonomic physiology, 3) assess clinical risk of autonomic dysfunction on 
+		cardiovascular health through the lense of epidemiology and causality.
 }
 \seealso{
 Useful links:
