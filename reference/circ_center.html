@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Hourly time series data with clinical covariates — twins • card</title>
+<title>Center Time Around a Zeitgeiber — circ_center • card</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Hourly time series data with clinical covariates — twins" />
-<meta property="og:description" content="Data is from an algorithm that generates a summary HRV measure using the Poincare phase-space plot, generated from kurtoses of the x and y axis. Clinical data is also available for visualization and comparison. There are repeat rows for each hour that Dyx was taken." />
+<meta property="og:title" content="Center Time Around a Zeitgeiber — circ_center" />
+<meta property="og:description" content="Based on a centering time point, shifts a vector to a &quot;before&quot; and &quot;after&quot; system to help align multiple individuals to a universal time, like the sunrise or any other appropriate zeitgeiber." />
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:creator" content="@asshah4" />
 <meta name="twitter:site" content="@asshah4" />
@@ -126,21 +126,18 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Hourly time series data with clinical covariates</h1>
-    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/data.R'><code>R/data.R</code></a></small>
-    <div class="hidden name"><code>twins.Rd</code></div>
+    <h1>Center Time Around a Zeitgeiber</h1>
+    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/zeitgeiber.R'><code>R/zeitgeiber.R</code></a></small>
+    <div class="hidden name"><code>circ_center.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Data is from an algorithm that generates a summary HRV measure using the Poincare phase-space plot, generated from kurtoses of the x and y axis. Clinical data is also available for visualization and comparison. There are repeat rows for each hour that Dyx was taken.</p>
+    <p>Based on a centering time point, shifts a vector to a "before" and "after" system to help align multiple individuals to a universal time, like the sunrise or any other appropriate <em>zeitgeiber</em>.</p>
     </div>
 
-    <pre class="usage"><span class='no'>twins</span></pre>
+    <pre class="usage"><span class='fu'>circ_center</span>()</pre>
 
 
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
-
-    <p>An tibble data frame</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
