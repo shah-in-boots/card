@@ -152,3 +152,15 @@ circ_sun <- function(date,
 }
 
 # }}}
+
+# Center Time Around a Zeitgeiber {{{ ====
+
+#' @title Center Time Around a Zeitgeiber
+#'
+#' @description Based on a centering time point, shifts a vector to a "before" and "after" system to help align multiple individuals to a universal time, like the sunrise or any other appropriate _zeitgeiber_.
+#'
+#' @export
+circ_center <- function() {
+
+}
+# }}}

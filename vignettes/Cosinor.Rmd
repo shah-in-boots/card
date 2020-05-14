@@ -1,0 +1,52 @@
+---
+title: "Cosinor"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Cosinor}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+__This vignette is still under construction. The cosinor function is still being developed.__
+
+The function `cosinor()` is built off of literature supporting the analysis of circadian rhythms. There are two other packages on CRAN that provide cosinor analyses that are very good, [cosinor](https://cran.r-project.org/web/packages/cosinor/) and [cosinor2](https://cran.r-project.org/web/packages/cosinor2/index.html). This package was built for 1) learning about regression and model development, and 2) the raw material generated to allow for more expansive and experimental analysis of cosinor functions.
+
+```{r, setup}
+library(card)
+
+# Using the provide dataset
+data("twins")
+head(twins)
+```
+
+The `twins` dataset contains clinical covariates and continuous time measures, such as heart rate variability at each hour of the day. These continuous measures follow a circadian pattern.
+
+```{r}
+library(ggplot2)
+ggplot(twins, aes(x = hour, y = rDYX)) +
+  geom_smooth(method = "gam")
+```
+
+The cosinor analysis is straightforward, although currently rudimentary. Confidence intervals of the amplitude and acrophase can be generated (but are currently internal only). It creates the model using the [hardhat](https://tidymodels.github.io/hardhat/index.html) package from _tidymodels_. 
+
+```{r}
+# Model
+m <- cosinor(rDYX ~ hour, twins)
+
+# Summary
+summary(m)
+
+# Output
+m$coefficients
+m$beta 
+m$gamma
+```
+
+Diagnostics can also be run. The most important is generating confidence intervals over the amplitude and acrophase. This is done through an elliptical method as described by Cornillessen (TODO).

@@ -11,7 +11,7 @@ Tools that can aid in the assessment of the autonomic regulation
 		ECG-based time signals (both RR intervals and morphology) as extensions 
 		of signal processing, 2) study circadian rhythms and how it effects 
 		autonomic physiology, 3) assess clinical risk of autonomic dysfunction on 
-		cardiovascular health through the lense of epidemiology and causality.
+		cardiovascular health through the perspective of epidemiology and causality.
 }
 \seealso{
 Useful links:
