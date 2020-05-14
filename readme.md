@@ -5,12 +5,14 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-![Github last
-commit](https://img.shields.io/github/last-commit/asshah4/card) ![Github
-commit
-frequency](https://img.shields.io/github/commit-activity/w/asshah4/card)
+[![R build
+status](https://github.com/asshah4/card/workflows/R-CMD-check/badge.svg)](https://github.com/asshah4/card/actions)
 [![Travis build
 status](https://travis-ci.com/asshah4/card.svg?branch=master)](https://travis-ci.com/asshah4/card)
+\[![Github last
+commit](https://img.shields.io/github/last-commit/asshah4/card)\]
+![Github commit
+frequency](https://img.shields.io/github/commit-activity/w/asshah4/card)\](<https://github.com/asshah4/card/graphs/commit-activity>)
 <!-- badges: end -->
 
 # **card**
@@ -37,19 +39,18 @@ And the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("asshah4/card")
 #> Downloading GitHub repo asshah4/card@master
-#> backports (1.1.6 -> 1.1.7) [CRAN]
-#> Installing 1 packages: backports
 #> 
-#>   There is a binary version available but the source version is later:
-#>           binary source needs_compilation
-#> backports  1.1.6  1.1.7              TRUE
-#> installing the source package 'backports'
-#>      checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/Rtmpy0rvQl/remotes41df5dacbf1/asshah4-card-cd38bda/DESCRIPTION’ ...  ✓  checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/Rtmpy0rvQl/remotes41df5dacbf1/asshah4-card-cd38bda/DESCRIPTION’
+#>      checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/Rtmp8MQrJn/remotese0734ee6c335/asshah4-card-0b557a6/DESCRIPTION’ ...  ✓  checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/Rtmp8MQrJn/remotese0734ee6c335/asshah4-card-0b557a6/DESCRIPTION’
 #>   ─  preparing ‘card’:
-#>    checking DESCRIPTION meta-information ...  ✓  checking DESCRIPTION meta-information
+#>      checking DESCRIPTION meta-information ...  ✓  checking DESCRIPTION meta-information
+#>   ─  excluding invalid files
+#>      Subdirectory 'R' contains invalid file names:
+#>      ‘NEWS.md’
 #>   ─  checking for LF line-endings in source and make files and shell scripts
 #>   ─  checking for empty or unneeded directories
-#>   ─  building ‘card_0.1.0.tar.gz’
+#>        NB: this package now depends on R (>= 3.5.0)
+#>      WARNING: Added dependency on R >= 3.5.0 because serialized objects in  serialize/load version 3 cannot be read in older versions of R.  File(s) containing such objects: ‘card/data/hrv.rda’
+#> ─  building ‘card_0.1.0.tar.gz’
 #>      
 #> 
 ```
