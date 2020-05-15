@@ -40,9 +40,6 @@
 
 
 <meta property="og:title" content="Changelog" />
-<meta name="twitter:card" content="summary" />
-<meta name="twitter:creator" content="@asshah4" />
-<meta name="twitter:site" content="@asshah4" />
 
 
 
@@ -89,17 +86,8 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/Cosinor.html">Cosinor</a>
-    </li>
-  </ul>
+<li>
+  <a href="../articles/index.html">Articles</a>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
@@ -132,17 +120,18 @@
     <div id="card-development-version" class="section level1">
 <h1 class="page-header" data-toc-text="development version">
 <a href="#card-development-version" class="anchor"></a>card (development version)</h1>
+<div id="in-development" class="section level2">
+<h2 class="hasAnchor">
+<a href="#in-development" class="anchor"></a>In Development</h2>
 <ul>
 <li><p>Working on confidence interval extraction and prediction functions for <code><a href="../reference/cosinor.html">cosinor()</a></code>.</p></li>
 <li><p>Creating a function to center time series data around an event.</p></li>
 <li><p>Improve functionality of ECG patch intake and cleaning. A lot of these functions are to extend or work with the <a href="https://alpha.physionet.org/content/pcst/1.0.0/Tools/ECG_Analysis_Tools/">MATLAB HRV Toolbox</a>.</p></li>
-<li><p>Add first vignette on using <code><a href="../reference/cosinor.html">cosinor()</a></code> and <code><a href="../reference/ggcosinorfit.html">ggcosinorfit()</a></code> in the analysis of heart rate variability data over time.</p></li>
+<li><p>Adding first vignette on using <code><a href="../reference/cosinor.html">cosinor()</a></code> and <code><a href="../reference/ggcosinorfit.html">ggcosinorfit()</a></code> in the analysis of heart rate variability data over time.</p></li>
+<li><p>Add vignette on correcting for circadian rhythm in time series analysis, using the <code><a href="../reference/circ_sun.html">circ_sun()</a></code> and <code><a href="../reference/circ_center.html">circ_center()</a></code> functions.</p></li>
 <li><p>Add vignette on using <code><a href="../reference/recur_survival_table.html">recur_survival_table()</a></code> by expanding examples.</p></li>
 </ul>
 </div>
-    <div id="card-010" class="section level1">
-<h1 class="page-header" data-toc-text="0.1.0">
-<a href="#card-010" class="anchor"></a>card 0.1.0</h1>
 <div id="features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#features" class="anchor"></a>Features</h2>
@@ -150,14 +139,15 @@
 <li><p>Circadian rhythm analysis has also created an initial family of functions that will work to simplify the process of analyzing 24-hour data. The <code><a href="../reference/circ_compare_groups.html">circ_compare_groups()</a></code> helps to summarize circadian data by an covariate and time. This is visualized using <code><a href="../reference/ggcircadian.html">ggcircadian()</a></code>. Also includes the <code><a href="../reference/ggforest.html">ggforest()</a></code> to create forest plots of odds ratios. This is dependent on the <code><a href="../reference/circ_odds.html">circ_odds()</a></code> function to generate odds ratios by time.</p></li>
 <li><p>An important regression function, built with the <em>tidymodels</em> <a href="https://tidymodels.github.io/hardhat/">hardhat</a> package, <code><a href="../reference/cosinor.html">cosinor()</a></code> introduced as a new function to allow for diagnostic analysis of circadian patterns. Although the algorithm is well known, having an implementation in R allows potential diagnostics. This includes the <code><a href="../reference/ggcosinorfit.html">ggcosinorfit()</a></code> allows for assessing rhythmicity and confidence intervals of amplitude and acrophase of cosinor model.</p></li>
 <li><p>Recurrent events can now be analyzed using a powerful function called <code><a href="../reference/recur_survival_table.html">recur_survival_table()</a></code>, which allows for redesigning longitudinal data tables into a model appropriate for analysis. It is built to extend survival analyses. The <code>recur_summary_table()</code> function allows for reviewing the findings from recurrent events by category to help understand event strata.</p></li>
-<li><p>The <code><a href="../reference/circ_sun.html">circ_sun()</a></code> function allows for identifying the sunrise and sunset times based on geographical location. This is intended to couple with a future function to center a time series around an event, such as sunrise.</p></li>
+<li><p>The <code><a href="../reference/circ_sun.html">circ_sun()</a></code> function allows for identifying the sunrise and sunset times based on geographical location. This is intended to couple with the <code><a href="../reference/circ_center.html">circ_center()</a></code> function to center a time series around an event, such as sunrise.</p></li>
 </ul>
 </div>
 <div id="bugs" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bugs" class="anchor"></a>Bugs</h2>
 <ul>
-<li>A number of functions are internal facing, and have not yet been checked for compatibility or generalizability. Particularly, there will need to be an overhaul of the package structure with regards to heart rate variability modeling.</li>
+<li><p>A number of functions are internal facing, and have not yet been checked for compatibility or generalizability. Particularly, there will need to be an overhaul of the package structure with regards to heart rate variability modeling.</p></li>
+<li><p>There are issues with the dataset validity, which makes the examples not run as expected. The functions currently exported work, but the examples are not yet the most enlightening.</p></li>
 </ul>
 </div>
 </div>
