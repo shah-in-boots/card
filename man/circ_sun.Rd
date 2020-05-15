@@ -9,11 +9,11 @@ circ_sun(date, lat, lon, zenith = "official", sunset = FALSE)
 \arguments{
 \item{date}{Vector of dates to calculate sun times for}
 
-\item{lat}{Latitude in degrees (e.g. Atlanta is 33.749), with negative values
-representing south}
+\item{lat}{Latitude vector in degrees (e.g. Atlanta is 33.749), with negative
+values representing south. Each date must have a corresponding latitude.}
 
-\item{lon}{Longitude in degrees (e.g. Atlanta is -84.388), with negative
-values representing west}
+\item{lon}{Longitude vector in degrees (e.g. Atlanta is -84.388), with
+negative values representing west}
 
 \item{zenith}{Zenith is the sun's zenith. There are several types, with
 different values. "official" = 90.8333 degrees, "civil" = 96 degrees,
@@ -26,8 +26,10 @@ Default is FALSE (thus returning sunrises).}
 }
 \value{
 Returns vector of sunrise/sunset times based on the date and location
-given. The times are based on UTC and will need to be adjusted for timezone
-offset.
+given. The time zone offset is included for the time zone represented by
+the latitude/longitude. The vector always returns UTC, but it has actually
+been corrected to the appropriate time-zone. Can use \code{as.character()} to
+strip the time zone away.
 }
 \description{
 Gets sunrise and sunset times based on date and location using
@@ -35,5 +37,14 @@ the algorithm by the
 \href{http://www.edwilliams.org/sunrise_sunset_algorithm.htm}{United States
 Naval Observatory}. Uses the sensible default of official zenith for
 calculations. Requires geographic position in latitude and longitude to
-calculate sunrise or sunset.
+calculate sunrise or sunset. Uses the function \link[lutz:tz_lookup_coords]{lutz::tz_lookup_coords}.
+}
+\examples{
+data("twins")
+twins$lat <- 33.749
+twins$lon <- -84.388
+
+# Using latitude/longitude from Atlanta, GA, USA
+twins$sunrise <- circ_sun(twins$date, twins$lat, twins$lon)
+
 }

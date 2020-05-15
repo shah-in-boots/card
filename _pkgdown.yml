@@ -1,12 +1,11 @@
+url: https://asshah4.github.io/card/
+
 destination: docs
+
 home:
   title: An R package in Computational Neurocardiology
   description: Analyze the autonomic regulation of cardiovascular physiology.
-url: https://asshah4.github.io/card/
-template:
-  opengraph:
-    twitter:
-      creator: "@asshah4"
+
 navbar:
   structure:
     left:
@@ -27,8 +26,36 @@ navbar:
     github:
       icon: fab fa-github fa-lg
       href: https://github.com/asshah4/card/
+
+reference:
+- title: Cosinor Analysis
+- contents:
+  - cosinor
+  - ggcosinorfit
+- title: Circadian Rhythm
+- contents:
+  - starts_with("circ_")
+  - ggcircadian
+  - ggforest
+- title: Recurrent Events
+- contents:
+  - starts_with("recur_")
+- title: Electrocardiography
+- contents:
+  - read_hrv_matlab
+  - proc_hrv_matlab
+  - proc_patch_vivalnk
+  - hrv_linear_model
+  - hrv_model_building
+  - ggerror
+  - geom_residuals
+
 articles:
-- title: All vignettes
-  navbar: ~
+- title: Circadian Rhythm
   contents:
-  - Cosinor
+  - cosinor
+  - circadian
+
+
+news:
+  releases:

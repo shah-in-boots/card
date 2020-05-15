@@ -1,15 +1,18 @@
 # card (development version)
 
+## In Development
+
 * Working on confidence interval extraction and prediction functions for `cosinor()`.
 
 * Creating a function to center time series data around an event.
 
 * Improve functionality of ECG patch intake and cleaning. A lot of these functions are to extend or work with the [MATLAB HRV Toolbox](https://alpha.physionet.org/content/pcst/1.0.0/Tools/ECG_Analysis_Tools/). 
-* Add first vignette on using `cosinor()` and `ggcosinorfit()` in the analysis of heart rate variability data over time.
+
+* Adding first vignette on using `cosinor()` and `ggcosinorfit()` in the analysis of heart rate variability data over time.
+
+* Add vignette on correcting for circadian rhythm in time series analysis, using the `circ_sun()` and `circ_center()` functions.
 
 * Add vignette on using `recur_survival_table()` by expanding examples.
-
-# card 0.1.0
 
 ## Features
 
@@ -19,8 +22,10 @@
 
 * Recurrent events can now be analyzed using a powerful function called `recur_survival_table()`, which allows for redesigning longitudinal data tables into a model appropriate for analysis. It is built to extend survival analyses. The `recur_summary_table()` function allows for reviewing the findings from recurrent events by category to help understand event strata.
 
-* The `circ_sun()` function allows for identifying the sunrise and sunset times based on geographical location. This is intended to couple with a future function to center a time series around an event, such as sunrise.
+* The `circ_sun()` function allows for identifying the sunrise and sunset times based on geographical location. This is intended to couple with the `circ_center()` function to center a time series around an event, such as sunrise.
 
 ## Bugs
 
 * A number of functions are internal facing, and have not yet been checked for compatibility or generalizability. Particularly, there will need to be an overhaul of the package structure with regards to heart rate variability modeling.
+
+* There are issues with the dataset validity, which makes the examples not run as expected. The functions currently exported work, but the examples are not yet the most enlightening.

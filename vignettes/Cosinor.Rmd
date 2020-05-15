@@ -1,8 +1,8 @@
 ---
-title: "Cosinor"
+title: "cosinor"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Cosinor}
+  %\VignetteIndexEntry{cosinor}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

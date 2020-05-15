@@ -4,8 +4,37 @@
 \alias{circ_center}
 \title{Center Time Around a Zeitgeiber}
 \usage{
-circ_center()
+circ_center(times, zeitgeiber)
+}
+\arguments{
+\item{times}{Vector of time series. The earliest time point is presumed to be
+the time series onset. Built with the assumption that the duration would be
+approximately 24 hours (or less) to remove issues with circadian rhythms
+and repeat zeitgeibers (e.g. sunrise). Most importantly, the time series
+should be roughly equally spaced, such as 1 hour apart.}
+
+\item{zeitgeiber}{A single timestamp that should exist within the proposed
+\code{times}. It can be a POSIX* variable or it can just be a character of a
+time stamp in an HMS format. Its used to create a centering point.}
+}
+\value{
+Vector of centered times around zeitgeiber. Function guesses units of
+time based on time series that is input (e.g. duration / number of events).
+It returns a vector of relative time in guessed units as \code{double}, which
+allows centering around the zeitgeiber (Z=0).
 }
 \description{
-Based on a centering time point, shifts a vector to a "before" and "after" system to help align multiple individuals to a universal time, like the sunrise or any other appropriate \emph{zeitgeiber}.
+Based on a centering time point, shifts a vector to a "before"
+and "after" system to help align multiple individuals to a universal time,
+like the sunrise or any other appropriate
+\href{https://en.wikipedia.org/wiki/Zeitgeber}{zeitgeiber}. Originally intended
+to expand upon the \link[card:circ_sun]{card::circ_sun} function.
+}
+\examples{
+data("twins")
+df <- subset(twins, patid == 7) # Single patient
+times <- df$dyxtime
+zeitgeiber <- as.POSIXct("2002-03-22 06:40:18", tz = "UTC")
+df$zeit <- circ_center(times, zeitgeiber)
+
 }

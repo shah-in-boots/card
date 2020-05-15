@@ -26,6 +26,8 @@ Depends:
 Imports:
 	  utils,
 	  stats,
+	  sf,
+	  lutz,
 	  magrittr,
 	  ggplot2,
 	  tidyr,

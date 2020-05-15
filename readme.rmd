@@ -46,5 +46,5 @@ devtools::install_github("asshah4/card")
 This package is intended for analyzing cardiovascular signals and autonomic physiology. For example, __card__ can provide an analysis that detects circadian rhythmicity of a regression.
 
 ```{r}
-knitr::include_graphics("./man/figures/cosinor-building-curves.jpeg")
+knitr::include_graphics("man/figures/cosinor-building-curves.jpeg")
 ```
