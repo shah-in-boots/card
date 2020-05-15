@@ -50,3 +50,8 @@ m$gamma
 ```
 
 Diagnostics can also be run. The most important is generating confidence intervals over the amplitude and acrophase. This is done through an elliptical method as described by Cornillessen (TODO).
+
+```{r}
+ggcosinorfit(m)
+```
+
