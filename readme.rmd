@@ -24,7 +24,14 @@ knitr::opts_chunk$set(
 
 ## Cardiovascular and Autonomic Research Design
 
-The goal of __card__ is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools.
+The goal of __card__ is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools. Its being developed to fit the _tidy_ approach to statistical analysis.
+
+The areas of focus of this package are the following:
+
+- cardiovascular disease
+- circadian rhythms
+- electrocardiography (heart rate variability and morphology)
+- signal processing
 
 ## Installation
 
@@ -43,7 +50,7 @@ devtools::install_github("asshah4/card")
 
 ## Usage
 
-This package is intended for analyzing cardiovascular signals and autonomic physiology. For example, __card__ can provide an analysis that detects circadian rhythmicity of a regression.
+This package is intended for analyzing cardiovascular signals and autonomic physiology. Here is an example of the process of fitting a cosinor model to time-series data.
 
 ```{r}
 knitr::include_graphics("man/figures/cosinor-building-curves.jpeg")

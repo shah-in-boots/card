@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 __This vignette is still under construction. The cosinor function is still being developed.__
 
-The function `cosinor()` is built off of literature supporting the analysis of circadian rhythms. There are two other packages on CRAN that provide cosinor analyses that are very good, [cosinor](https://cran.r-project.org/web/packages/cosinor/) and [cosinor2](https://cran.r-project.org/web/packages/cosinor2/index.html). This package was built for 1) learning about regression and model development, and 2) the raw material generated to allow for more expansive and experimental analysis of cosinor functions.
+The function `cosinor()` is built off of literature supporting the analysis of circadian rhythms. There are two other packages on CRAN that provide cosinor analyses that are very good, [cosinor](https://CRAN.R-project.org/package=cosinor) and [cosinor2](https://CRAN.R-project.org/package=cosinor2). This package was built for 1) learning about regression and model development, and 2) the raw material generated to allow for more expansive and experimental analysis of cosinor functions and circadian rhythms.
 
 ```{r, setup}
 library(card)
