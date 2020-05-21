@@ -9,20 +9,20 @@
 \alias{cosinor.recipe}
 \title{Fit a \code{cosinor}}
 \usage{
-cosinor(t, ...)
+cosinor(x, ...)
 
-\method{cosinor}{default}(t, ...)
+\method{cosinor}{default}(x, ...)
 
-\method{cosinor}{data.frame}(t, y, ...)
+\method{cosinor}{data.frame}(x, y, ...)
 
-\method{cosinor}{matrix}(t, y, ...)
+\method{cosinor}{matrix}(x, y, ...)
 
 \method{cosinor}{formula}(formula, data, ...)
 
-\method{cosinor}{recipe}(t, data, ...)
+\method{cosinor}{recipe}(x, data, ...)
 }
 \arguments{
-\item{t}{Depending on the context:
+\item{x}{Depending on the context:
 \itemize{
 \item A \strong{data frame} of time-based predictors/indices.
 \item A \strong{matrix} of time-based predictors/indices.
@@ -32,7 +32,7 @@ created from \code{\link[recipes:recipe]{recipes::recipe()}}.
 
 \item{...}{Not currently used, but required for extensibility.}
 
-\item{y}{When \code{t} is a \strong{data frame} or \strong{matrix}, \code{y} is the outcome
+\item{y}{When \code{x} is a \strong{data frame} or \strong{matrix}, \code{y} is the outcome
 specified as:
 \itemize{
 \item A \strong{data frame} with 1 numeric column.

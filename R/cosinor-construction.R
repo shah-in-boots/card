@@ -4,14 +4,14 @@
 #'
 #' `cosinor()` fits a regression model of a time variable to a continuous outcome use trigonometric features.
 #'
-#' @param t Depending on the context:
+#' @param x Depending on the context:
 #'
 #'   * A __data frame__ of time-based predictors/indices.
 #'   * A __matrix__ of time-based predictors/indices.
 #'   * A __recipe__ specifying a set of preprocessing steps
 #'     created from [recipes::recipe()].
 #'
-#' @param y When `t` is a __data frame__ or __matrix__, `y` is the outcome
+#' @param y When `x` is a __data frame__ or __matrix__, `y` is the outcome
 #' specified as:
 #'
 #'   * A __data frame__ with 1 numeric column.
@@ -48,7 +48,7 @@
 #' # mod3 <- cosinor(rec, twins)
 #'
 #' @export
-cosinor <- function(t, ...) {
+cosinor <- function(x, ...) {
   UseMethod("cosinor")
 }
 
@@ -56,7 +56,7 @@ cosinor <- function(t, ...) {
 
 #' @export
 #' @rdname cosinor
-cosinor.default <- function(t, ...) {
+cosinor.default <- function(x, ...) {
   stop("`cosinor()` is not defined for a '", class(t)[1], "'.", call. = FALSE)
 }
 
@@ -64,8 +64,8 @@ cosinor.default <- function(t, ...) {
 
 #' @export
 #' @rdname cosinor
-cosinor.data.frame <- function(t, y, ...) {
-  processed <- hardhat::mold(t, y)
+cosinor.data.frame <- function(x, y, ...) {
+  processed <- hardhat::mold(x, y)
   cosinor_bridge(processed, ...)
 }
 
@@ -73,8 +73,8 @@ cosinor.data.frame <- function(t, y, ...) {
 
 #' @export
 #' @rdname cosinor
-cosinor.matrix <- function(t, y, ...) {
-  processed <- hardhat::mold(t, y)
+cosinor.matrix <- function(x, y, ...) {
+  processed <- hardhat::mold(x, y)
   cosinor_bridge(processed, ...)
 }
 
@@ -87,12 +87,12 @@ cosinor.formula <- function(formula, data, ...) {
   cosinor_bridge(processed, ...)
 }
 
-# Recipe method
+# Recipe method - unstable
 
 #' @export
 #' @rdname cosinor
-cosinor.recipe <- function(t, data, ...) {
-  processed <- hardhat::mold(t, data)
+cosinor.recipe <- function(x, data, ...) {
+  processed <- hardhat::mold(x, data)
   cosinor_bridge(processed, ...)
 }
 
@@ -122,14 +122,9 @@ cosinor_bridge <- function(processed, ...) {
   new_cosinor(
     coefficients = fit$coefficients,
     coef_names = fit$coef_names,
-    mesor = fit$mesor,
-    beta = fit$beta,
-    gamma = fit$gamma,
-    amp = fit$amp,
-    phi = fit$phi,
     fitted.values = fit$fitted.values,
     residuals = fit$residuals,
-    formula = fit$formula,
+    call = fit$call,
     area = fit$area,
     blueprint = processed$blueprint # Made from hardhat, not from fit
   )
@@ -139,21 +134,17 @@ cosinor_bridge <- function(processed, ...) {
 
 # Constructor function {{{ ====
 
-#' @description Accepts the output from the fit of the implemented model
+#' @description Accepts the output from the fit of the implemented model. Makes a new S3 class with the correct structure.
 #' @noRd
 new_cosinor <- function(
-                        coefficients,
-                        coef_names,
-                        mesor = mesor,
-                        beta = beta,
-                        gamma = gamma,
-                        amp = amp,
-                        phi = phi,
-                        fitted.values,
-                        residuals,
-                        formula,
-                        area,
-                        blueprint) {
+  coefficients,
+  coef_names,
+  fitted.values,
+  residuals,
+  call,
+  area,
+  blueprint
+) {
 
   # Can validate coefs here
   if (!is.numeric(coefficients)) {
@@ -178,14 +169,9 @@ new_cosinor <- function(
   hardhat::new_model(
     coefficients = coefficients,
     coef_names = coef_names,
-    mesor = mesor,
-    beta = beta,
-    gamma = gamma,
-    amp = amp,
-    phi = phi,
     fitted.values = fitted.values,
     residuals = residuals,
-    formula = formula,
+    call = call,
     area = area,
     blueprint = blueprint,
     class = "cosinor"

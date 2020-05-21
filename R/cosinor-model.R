@@ -204,42 +204,33 @@ cosinor_impl <- function(predictors, outcomes) {
 
 
   # Model coefficients
-  coefficients <- c(mesor, amp, phi)
-  coef_names <- c("mesor", "amp", "phi")
+  coefficients <- c(mesor, beta, gamma, amp, phi)
+  coef_names <- c("mesor", "beta", "gamma", "amp", "phi")
   names(coefficients) <- coef_names
-  beta <- beta
-  gamma <- gamma
 
   # Fit and residuals
   fitted.values <- yhat
   residuals <- y - yhat
 
-  # Model formula
-  formula <-
-    paste0("amp * cos(2 * pi * ", names(predictors), " / period + phi)") %>%
-    paste(names(outcomes), "~  MESOR +", .) %>%
-    stats::as.formula()
-
   # Area of ellipse for circadian rhythmicity
   area <- cbind(gseq, bs1, bs2)
 
+  # Make call
+  call <- call("cosinor", paste0(names(outcomes), " ~ ", names(predictors)))
+
   # List to return
   list(
+
     # Raw coefficients
     coefficients = coefficients,
     coef_names = coef_names,
-    mesor = mesor,
-    beta = beta,
-    gamma = gamma,
-    amp = amp,
-    phi = phi,
 
     # Fitted and residual values
     fitted.values = fitted.values,
     residuals = residuals,
 
-    # Formula
-    formula = formula,
+    # Function call
+    call = call,
 
     # Description of ellipse that generates CI
     area = area
