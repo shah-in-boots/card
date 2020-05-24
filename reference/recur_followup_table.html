@@ -167,11 +167,10 @@ ID. The data is in a long format, such that the STUDY IDs are unique / not
 duplicated.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'># data("twins")
-# x &lt;- recur_followup_table(dt, "patid", "vetrid", "date")
-# df_predict &lt;- inner_join(x$initial, x$final, by = c("vetrid", "hour", suffix
-# = c("_0", "_1")))
-</div></pre>
+    <pre class="examples"><div class='input'><span class='co'># data("twins")</span>
+<span class='co'># x &lt;- recur_followup_table(dt, "patid", "vetrid", "date")</span>
+<span class='co'># df_predict &lt;- inner_join(x$initial, x$final, by = c("vetrid", "hour", suffix</span>
+<span class='co'># = c("_0", "_1")))</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

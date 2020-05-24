@@ -143,27 +143,26 @@
     <p>Returns a simple data frame with the start and endtime of the ECG data. Has several additional markers available internally, but currently not called.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'># Apply fn to each element of vector
-# for(i in seq_along(patid)) {
+    <pre class="examples"><div class='input'><span class='co'># Apply fn to each element of vector</span>
+<span class='co'># for(i in seq_along(patid)) {</span>
 
-# 	# Print out line
-# 	print(patid[i])
+<span class='co'># 	# Print out line</span>
+<span class='co'># 	print(patid[i])</span>
 
-# 	# Extraction of data
-# 	x &lt;- read_patch_vivalnk(patid[i])
+<span class='co'># 	# Extraction of data</span>
+<span class='co'># 	x &lt;- read_patch_vivalnk(patid[i])</span>
 
-# 	# Make data frame
-# 	df &lt;- data.frame(
-# 		'patid' = patid[i],
-# 		'Start' = x[[1]],
-# 		'End' = x[[2]],
-# 		'Duration' = x[[3]]
-# 	)
+<span class='co'># 	# Make data frame</span>
+<span class='co'># 	df &lt;- data.frame(</span>
+<span class='co'># 		'patid' = patid[i],</span>
+<span class='co'># 		'Start' = x[[1]],</span>
+<span class='co'># 		'End' = x[[2]],</span>
+<span class='co'># 		'Duration' = x[[3]]</span>
+<span class='co'># 	)</span>
 
-# 	# Write this to a file, appending as we go
-# 	write_csv(df, file.path(proc_folder, 'vivalnk_data.csv'), append = TRUE)
-# }
-</div></pre>
+<span class='co'># 	# Write this to a file, appending as we go</span>
+<span class='co'># 	write_csv(df, file.path(proc_folder, 'vivalnk_data.csv'), append = TRUE)</span>
+<span class='co'># }</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

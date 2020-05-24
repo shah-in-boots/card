@@ -129,7 +129,7 @@ cosinor model to be fit with the model <a href='cosinor.html'>card::cosinor</a>.
 the amplitude, acrophase,</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ggcosinorfit</span>(<span class='no'>model</span>)</pre>
+    <pre class="usage"><span class='fu'>ggcosinorfit</span>(<span class='no'>model</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -138,6 +138,14 @@ the amplitude, acrophase,</p>
       <th>model</th>
       <td><p>Requires a cosinor model to extract the correct statistics to
 generate the plot.</p></td>
+    </tr>
+    <tr>
+      <th>alpha</th>
+      <td><p>Defaults to 0.05.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Additional parameters may be needed for extensibility</p></td>
     </tr>
     </table>
 

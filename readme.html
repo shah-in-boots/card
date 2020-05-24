@@ -123,23 +123,30 @@
 <div id="cardiovascular-and-autonomic-research-design" class="section level2">
 <h2 class="hasAnchor">
 <a href="#cardiovascular-and-autonomic-research-design" class="anchor"></a>Cardiovascular and Autonomic Research Design</h2>
-<p>The goal of <strong>card</strong> is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools.</p>
+<p>The goal of <strong>card</strong> is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools. Its being developed to fit the <em>tidy</em> approach to statistical analysis.</p>
+<p>The areas of focus of this package are the following:</p>
+<ul>
+<li>cardiovascular disease</li>
+<li>circadian rhythms</li>
+<li>electrocardiography (heart rate variability and morphology)</li>
+<li>signal processing</li>
+</ul>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>Once published, you can install the released version of <strong>card</strong> from <a href="https://CRAN.R-project.org">CRAN</a> with:</p>
-<div class="sourceCode" id="cb1"><html><pre class="r">#install.packages("card")</pre></html></div>
+<div class="sourceCode" id="cb1"><html><pre class="r"><span class="co">#install.packages("card")</span></pre></html></div>
 <p>And the development version from <a href="https://github.com/">GitHub</a> with:</p>
 <div class="sourceCode" id="cb2"><html><pre class="r"><span class="co"># install.packages("devtools")</span>
 <span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu">install_github</span>(<span class="st">"asshah4/card"</span>)
-<span class="co">#&gt; Skipping install of 'card' from a github remote, the SHA1 (298cbf54) has not changed since last install.</span>
+<span class="co">#&gt; Skipping install of 'card' from a github remote, the SHA1 (bd978e39) has not changed since last install.</span>
 <span class="co">#&gt;   Use `force = TRUE` to force installation</span></pre></html></div>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
-<p>This package is intended for analyzing cardiovascular signals and autonomic physiology. For example, <strong>card</strong> can provide an analysis that detects circadian rhythmicity of a regression.</p>
+<p>This package is intended for analyzing cardiovascular signals and autonomic physiology. Here is an example of the process of fitting a cosinor model to time-series data.</p>
 <div class="sourceCode" id="cb3"><html><pre class="r"><span class="kw pkg">knitr</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html">include_graphics</a></span>(<span class="st">"man/figures/cosinor-building-curves.jpeg"</span>)</pre></html></div>
 <p><img src="man/figures/cosinor-building-curves.jpeg" width="100%"></p>
 </div>
