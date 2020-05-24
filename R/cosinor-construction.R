@@ -125,6 +125,7 @@ cosinor_bridge <- function(processed, ...) {
     fitted.values = fit$fitted.values,
     residuals = fit$residuals,
     call = fit$call,
+    model = fit$model,
     area = fit$area,
     blueprint = processed$blueprint # Made from hardhat, not from fit
   )
@@ -142,6 +143,7 @@ new_cosinor <- function(
   fitted.values,
   residuals,
   call,
+  model,
   area,
   blueprint
 ) {
@@ -172,6 +174,7 @@ new_cosinor <- function(
     fitted.values = fitted.values,
     residuals = residuals,
     call = call,
+    model = model,
     area = area,
     blueprint = blueprint,
     class = "cosinor"

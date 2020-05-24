@@ -38,6 +38,10 @@ cosinor_impl <- function(predictors, outcomes) {
   x <- cos((2 * pi * t) / period)
   z <- sin((2 * pi * t) / period)
 
+  # Return / save the model
+  model <- cbind(y, t, x, z)
+
+
   # Matrices
   ymat <- as.matrix(cbind(y = c(sum(y), sum(y * x), sum(y * z))))
   mcol <- c(n, sum(x), sum(z)) # Mesor column
@@ -48,6 +52,7 @@ cosinor_impl <- function(predictors, outcomes) {
   # }}}
 
   ## Solve System of Equations {{{ ====
+
   coefs <- solve(t(xmat) %*% xmat) %*% (t(xmat) %*% ymat)
   mesor <- coefs[1] # mesor
   beta <- coefs[2] # beta
@@ -103,13 +108,18 @@ cosinor_impl <- function(predictors, outcomes) {
   # MESOR parameter estimates
   sigma <- sqrt(RSS / (n - 3))
   tdist <- stats::qt(1 - alpha / 2, df = n - 3)
-  ciM <- tdist * sigma * sqrt(s[1, 1])
-  ciMesorMax <- mesor + ciM
-  ciMesorMin <- mesor - ciM
+  mesorConf <- tdist * sigma * sqrt(1/n)
+  mesorUpper <- mesor + mesorConf
+  mesorLower <- mesor - mesorConf
 
   # }}}
 
-  ## Confidence Intervals for Amplitude and Acrophase {{{ ====
+	# Residual sum of squared errors
+  RSS <- sum((y - yhat)^2)
+
+  # Confidence interval for MESOR
+  sigma <- sqrt(RSS / (n - 3))
+  tdist <- stats::qt(1 - alpha / 2, df = n - 3)
 
   # Correction of sum of squares for each parameter
   xc <- 1 / n * sum((x - mean(x))^2)
@@ -119,13 +129,17 @@ cosinor_impl <- function(predictors, outcomes) {
   # Find beta and gamma CI region
   fdist <- stats::qf(1 - alpha / 2, df1 = 2, df2 = n - 3)
 
-  # Quadratic formula setup
+  # Quadratic/ellipse formula setup
   a <- xc
   b <- 2 * tc
   c <- zc
   d <- -2 * xc * beta - 2 * tc * gamma
   e <- -2 * tc * beta - 2 * zc * gamma
-  f <- xc * beta^2 + 2 * tc * beta * gamma + zc * gamma^2 - (2 / n) * sigma^2 * fdist
+  f <-
+  	xc * beta^2 +
+  	2 * tc * beta * gamma +
+  	zc * gamma^2 -
+  	(2 / n) * sigma^2 * fdist
   gmax <- -(2 * a * e - d * b) / (4 * a * c - b^2)
 
   # Identify parameters for ellipses
@@ -143,7 +157,6 @@ cosinor_impl <- function(predictors, outcomes) {
   bs1 <- Re(bs1[index])
   bs2 <- Re(bs2[index])
 
-
   # Determine if ellipse regions overlap the pole (if overlap, cannot get CI)
   if (
     (diff(range(gseq)) >= max(gseq)) &
@@ -152,8 +165,8 @@ cosinor_impl <- function(predictors, outcomes) {
     print("Confidence regions overlap the poles. Confidence intervals for amplitude and acrophase cannot be determined.")
   } else {
     # CI for Amplitude
-    ciAmpMax <- max(c(sqrt(bs1^2 + gseq^2), sqrt(bs2^2 + gseq^2)))
-    ciAmpMin <- min(c(sqrt(bs1^2 + gseq^2), sqrt(bs2^2 + gseq^2)))
+    ampUpper <- max(c(sqrt(bs1^2 + gseq^2), sqrt(bs2^2 + gseq^2)))
+    ampLower <- min(c(sqrt(bs1^2 + gseq^2), sqrt(bs2^2 + gseq^2)))
 
     # CI for Acrophase
     theta <- c(atan(abs(gseq / bs1)), atan(abs(gseq / bs2)))
@@ -161,47 +174,38 @@ cosinor_impl <- function(predictors, outcomes) {
     sb <- sign(c(gseq, gseq)) * 3
     sc <- sa + sb
     tmp <- sc
-    ciPhi <- vector(mode = "double", length = length(theta))
+    phiConf <- vector(mode = "double", length = length(theta))
 
     # Place theta in correct quadrant for phi
     for (i in 1:length(sc)) {
       if (sc[i] == 4 | sc[i] == 3) {
-        ciPhi[i] <- -theta[i]
+        phiConf[i] <- -theta[i]
         sc[i] <- 1
       } else if (sc[i] == 2 || sc[i] == -1) {
-        ciPhi[i] <- -pi + theta[i]
+        phiConf[i] <- -pi + theta[i]
         sc[i] <- 2
       } else if (sc[i] == -4 || sc[i] == -3) {
-        ciPhi[i] <- -pi - theta[i]
+        phiConf[i] <- -pi - theta[i]
         sc[i] <- 3
       } else if (sc[i] == -2 || sc[i] == -1) {
-        ciPhi[i] <- -2 * pi + theta[i]
+        phiConf[i] <- -2 * pi + theta[i]
         sc[i] <- 4
       }
     }
 
     # Get max and min values for phi / acrophase
     if (max(sc) - min(sc) == 3) {
-      ciPhiMax <- min(ciPhi[sc == 1])
-      ciPhiMin <- max(ciPhi[sc == 4])
+      phiUpper <- min(phiConf[sc == 1])
+      phiLower <- max(phiConf[sc == 4])
     } else {
-      ciPhiMax <- max(ciPhi)
-      ciPhiMin <- min(ciPhi)
+      phiUpper <- max(phiConf)
+      phiLower <- min(phiConf)
     }
   }
 
   # }}}
 
   ## Model Output {{{ ====
-
-  # Model findings
-  coefmat <- cbind(
-    estimate = c(mesor, amp, phi),
-    lowerCI = c(ciMesorMin, ciAmpMin, ciPhiMin),
-    upperCI = c(ciMesorMax, ciAmpMax, ciPhiMax)
-  )
-  rownames(coefmat) <- c("mesor", "amp", "phi")
-
 
   # Model coefficients
   coefficients <- c(mesor, beta, gamma, amp, phi)
@@ -231,6 +235,9 @@ cosinor_impl <- function(predictors, outcomes) {
 
     # Function call
     call = call,
+
+    # Overall model of cosinor
+    model = model,
 
     # Description of ellipse that generates CI
     area = area

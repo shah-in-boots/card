@@ -18,9 +18,6 @@ knitr::opts_chunk$set(
 
 ```{r, setup}
 library(card)
-library(lubridate)
-library(tidyr)
-library(dplyr)
 library(magrittr)
 library(ggplot2)
 ```
@@ -46,52 +43,52 @@ twins$lat <- 33.749
 twins$lon <- -84.388
 
 # Sunrise is dependent on location and date
-twins$sunrise <- circ_sun(date = twins$date, lat = twins$lat, lon = twins$lon)
+#twins$sunrise <- circ_sun(date = twins$date, lat = twins$lat, lon = twins$lon)
 ```
 
 Another limitation is the issues in R with POSIX. The time zone of the sunrise is demarcated by "UTC", but is actually corrected for the timezone by location. Next, we have continuous measures of autonomic physiology measured by ECG, called _Dyx_. These are recorded in a variable called `dyxtime`. The recordings start in the afternoon, and continue to the next day. The sunrise in between is likely the best marker to center around. We need to use the circadian centering function for each patient to be able to compare them fairly.
 
 ```{r}
-# Time series data
-length(twins$dyxtime)
-
-# Number of participants
-length(unique(twins$patid))
-
-# Unique sunrise times per patient
-zeit <- 
-  twins %>%
-  group_by(patid) %>%
-  arrange(dyxtime) %>%
-  select(patid, sunrise) %>%
-  unique() %>%
-  group_by(patid) %>%
-  slice(n()) # Take sunrise time during study, not morning prior
-names(zeit)[2] <- "zeit"
-
-# Add back in the sunrise time chosen
-twins %<>% left_join(., zeit, by = "patid")
-
-# Create centering variable for each patient
-x <- twins %>%
-  group_by(patid) %>%
-  nest()
-
-# Slow and steady method for going through all the potential vectors
-# Will look to "tidy" this in the future (TODO)
-for(i in seq(x$patid)) {
-  z <- unique(x[[i,2]][[1]]$zeit)
-  t <- x[[i,2]][[1]]$dyxtime
-  x[[i,2]][[1]]$zvec <- circ_center(x[[i,2]][[1]]$dyxtime, z)
-}
-
-# Visualize data trend
-df <- unnest(x)
-summary(df$zvec)
-ggplot(df, aes(x = zvec, y = rDYX)) +
-  geom_point(alpha = 0.1) +
-  geom_smooth(method = "gam") + 
-  xlim(-20, 10)
+## Time series data
+#length(twins$dyxtime)
+#
+## Number of participants
+#length(unique(twins$patid))
+#
+## Unique sunrise times per patient
+#zeit <- 
+#  twins %>%
+#  dplyr::group_by(patid) %>%
+#  dplyr::arrange(dyxtime) %>%
+#  dplyr::select(patid, sunrise) %>%
+#  unique() %>%
+#  dplyr::group_by(patid) %>%
+#  dplyr::slice(dplyr::n()) # Take sunrise time during study, not morning prior
+#names(zeit)[2] <- "zeit"
+#
+## Add back in the sunrise time chosen
+#twins %<>% dplyr::left_join(., zeit, by = "patid")
+#
+## Create centering variable for each patient
+#x <- twins %>%
+#  dplyr::group_by(patid) %>%
+#  tidyr::nest()
+#
+## Slow and steady method for going through all the potential vectors
+## Will look to "tidy" this in the future (TODO)
+#for(i in seq(x$patid)) {
+#  z <- unique(x[[i,2]][[1]]$zeit)
+#  t <- x[[i,2]][[1]]$dyxtime
+#  x[[i,2]][[1]]$zvec <- circ_center(x[[i,2]][[1]]$dyxtime, z)
+#}
+#
+## Visualize data trend
+#df <- tidyr::unnest(x)
+#summary(df$zvec)
+#ggplot(df, aes(x = zvec, y = rDYX)) +
+#  geom_point(alpha = 0.1) +
+#  geom_smooth(method = "gam") + 
+#  xlim(-20, 10)
 ```
 
 
