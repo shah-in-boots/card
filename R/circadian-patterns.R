@@ -330,3 +330,31 @@ ggforest <- function(ot, time = "time", or = "OR", lower = "Lower", upper = "Upp
 }
 
 # }}}
+
+# Convert Time to Radians {{{
+
+#' @title
+#' Convert Time to Radians
+#'
+#' @description Converts a time unit to radians given a known period. Allows for vectorization.
+#'
+#' @details This function supports other centering functions to study time series.
+#'
+#' @param t vector of time units
+#'
+#' @param period period of the time units (e.g. 24 hours)
+#'
+#' @return Vector converted into radians
+#'
+#' @export
+circ_rad <- function(t, period) {
+
+  # Convert to radians
+  trad <- (2 * pi * t) / period
+
+  # Return
+  return(trad)
+
+}
+
+# }}}

@@ -102,7 +102,7 @@
 <span class="co">#&gt; 6     1    49  27.4 0     1       1     0     0     0       0               </span>
 <span class="co">#&gt; # … with 13 more variables: med_antidepr &lt;fct&gt;, beck_total &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   sad_bin &lt;fct&gt;, sad_cat &lt;fct&gt;, PETdiff_2 &lt;fct&gt;, dyxtime &lt;dttm&gt;, date &lt;date&gt;,</span>
-<span class="co">#&gt; #   hour &lt;dbl&gt;, rDYX &lt;dbl&gt;, sDYX &lt;dbl&gt;, HR &lt;dbl&gt;, CP &lt;dbl&gt;, zip &lt;dbl&gt;</span></pre></body></html></div>
+<span class="co">#&gt; #   hour &lt;dbl&gt;, rDYX &lt;dbl&gt;, sDYX &lt;dbl&gt;, HR &lt;dbl&gt;, CP &lt;dbl&gt;, zip &lt;chr&gt;</span></pre></body></html></div>
 <p>The <code>twins</code> dataset contains clinical covariates and continuous time measures, such as heart rate variability at each hour of the day. These continuous measures follow a circadian pattern.</p>
 <div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">twins</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">hour</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">rDYX</span>)) +

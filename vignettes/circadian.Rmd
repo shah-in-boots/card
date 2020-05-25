@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
 library(card)
 library(magrittr)
 library(ggplot2)
+library(dplyr)
 ```
 
 # Zeitgeibers
@@ -30,65 +31,74 @@ This vignette demonstrates the use of the circadian rhythm analysis functions. I
 # Data set to be used is included
 data("twins")
 head(twins)
-twins %<>% subset(patid %in% c(1:30))
+df <- 
+  twins %>%
+  subset(patid %in% c(1:30))
 ```
 
 The research problem is that participants came from around the country for a study. Continuous, 24-hour measures were obtained. However, the patients came in from different time zones and on different dates over the course of 10 years. Findings could reflect perhaps jetlag instead of physiological disturbances. We could use sunrise and sunset times as natural _zeitgeibers_ to standardize the time series data.
 
-The first step is inclusion of geographical locations, along with study date, to calculate sunrise times. This dataset was recorded in Atlanta, GA, which will make up the latitude and longitude values. This is a limitation, and when the actual / true locations are available, the vignette will be updated (TODO).
+The first step is inclusion of geographical locations, along with study date, to calculate sunrise times. This dataset was recorded in Atlanta, GA, but the individuals flew from across the country. The zipcodes are available in the dataset. This can then be converted to latitude and longitude using the {zipcode} package (which is archived on CRAN).
 
 ```{r}
-# Geographic data is needed to calculate sunrise
-twins$lat <- 33.749
-twins$lon <- -84.388
+# Zipcodes, contained as characters (because of leading 0)
+library(zipcode)
+data("zipcode")
+head(zipcode)
+
+# Get the zipcodes merged into to get latitude and longitude
+df <- left_join(df, zipcode[c("zip", "latitude", "longitude")], by = "zip")
 
 # Sunrise is dependent on location and date
-twins$sunrise <- circ_sun(date = twins$date, lat = twins$lat, lon = twins$lon)
+df$sunrise <- circ_sun(date = df$date, lat = df$latitude, lon = df$longitude)
 ```
 
 Another limitation is the issues in R with POSIX. The time zone of the sunrise is demarcated by "UTC", but is actually corrected for the timezone by location. Next, we have continuous measures of autonomic physiology measured by ECG, called _Dyx_. These are recorded in a variable called `dyxtime`. The recordings start in the afternoon, and continue to the next day. The sunrise in between is likely the best marker to center around. We need to use the circadian centering function for each patient to be able to compare them fairly.
 
 ```{r}
 ## Time series data
-#length(twins$dyxtime)
-#
-## Number of participants
-#length(unique(twins$patid))
-#
-## Unique sunrise times per patient
-#zeit <- 
-#  twins %>%
-#  dplyr::group_by(patid) %>%
-#  dplyr::arrange(dyxtime) %>%
-#  dplyr::select(patid, sunrise) %>%
-#  unique() %>%
-#  dplyr::group_by(patid) %>%
-#  dplyr::slice(dplyr::n()) # Take sunrise time during study, not morning prior
-#names(zeit)[2] <- "zeit"
-#
-## Add back in the sunrise time chosen
-#twins %<>% dplyr::left_join(., zeit, by = "patid")
-#
-## Create centering variable for each patient
-#x <- twins %>%
-#  dplyr::group_by(patid) %>%
-#  tidyr::nest()
-#
-## Slow and steady method for going through all the potential vectors
-## Will look to "tidy" this in the future (TODO)
-#for(i in seq(x$patid)) {
-#  z <- unique(x[[i,2]][[1]]$zeit)
-#  t <- x[[i,2]][[1]]$dyxtime
-#  x[[i,2]][[1]]$zvec <- circ_center(x[[i,2]][[1]]$dyxtime, z)
-#}
-#
-## Visualize data trend
-#df <- tidyr::unnest(x)
-#summary(df$zvec)
-#ggplot(df, aes(x = zvec, y = rDYX)) +
-#  geom_point(alpha = 0.1) +
-#  geom_smooth(method = "gam") + 
-#  xlim(-20, 10)
+length(df$dyxtime)
+
+# Number of participants
+length(unique(df$patid))
+
+# Unique sunrise times per patient
+zeit <- 
+  df %>%
+  group_by(patid) %>%
+  arrange(dyxtime) %>%
+  select(patid, sunrise) %>%
+  unique() %>%
+  group_by(patid) %>%
+  slice(n()) # Sunrise time during study
+names(zeit)[2] <- "zeit"
+  
+
+# Add surnsie zeitgeiber back in
+df %<>% left_join(., zeit, by = "patid")
+
+x <- df %>%
+  group_by(patid) %>%
+  tidyr::nest()
+
+# Slow and steady method for going through all the potential vectors
+# Will look to "tidy" this in the future (TODO)
+for(i in seq(x$patid)) {
+  z <- unique(x[[i,2]][[1]]$zeit)
+  t <- x[[i,2]][[1]]$dyxtime
+  x[[i,2]][[1]]$zvec <- circ_center(x[[i,2]][[1]]$dyxtime, z)
+}
+
+# Visualize data trend
+df <- tidyr::unnest(x)
+summary(df$zvec)
+
+ggplot(df, aes(x = hour, y = rDYX, group = hour, fill = hour)) + 
+  geom_boxplot() +   
+  coord_polar(theta = "x", start = 0, direction = 1) + 
+  scale_x_continuous(expand = c(0,0), breaks = seq(0, 24, 1)) + 
+  scale_fill_viridis_c() + 
+  theme_minimal()
 ```
 
 

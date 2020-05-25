@@ -10,6 +10,8 @@
 #' @param model Requires a cosinor model to extract the correct statistics to
 #'   generate the plot.
 #'
+#' @param level Confidence level for ellipse
+#'
 #' @param ... Additional parameters may be needed for extensibility
 #'
 #' @return ggplot object that has has multiple components
@@ -19,10 +21,10 @@
 #' m <- cosinor(rDYX ~ hour, twins)
 #' ggcosinorfit(m)
 #' @export
-ggcosinorfit <- function(model, ...) {
+ggcosinorfit <- function(model, level = 0.95, ...) {
 
   # Extract ellipse statistics
-  tmp <- stats::confint(model)
+  tmp <- stats::confint(model, level)
   coefs <- stats::coef(model)
   area <- tmp$area
   area <- model$area

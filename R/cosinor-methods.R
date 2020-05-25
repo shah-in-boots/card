@@ -25,6 +25,22 @@ summary.cosinor <- function(object, ...) {
 	# Generic method
 	summary(object)
 
+	# Call
+	cat("Call: \n")
+	print(object$call)
+
+	# Residuals
+	cat("\n")
+	cat("Residuals: \n")
+	print(summary(object$residuals))
+
+	# Coefficients
+	cat("\n")
+	cat("Coefficients: \n")
+	object$coefficients
+
+
+
 }
 
 # }}}
@@ -155,6 +171,9 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
   	dimnames = list(c("mesor", "amp", "phi"),
   									c(paste0(100*(alpha/2),"%"), paste0(100*(1-alpha/2), "%")))
   )
+
+  # Print output
+  print(confints)
 
   # Returned
   list(
