@@ -85,15 +85,30 @@
     
 <p><strong>This vignette is still under construction. The cosinor function is still being developed.</strong></p>
 <p>The function <code><a href="../reference/cosinor.html">cosinor()</a></code> is built off of literature supporting the analysis of circadian rhythms. There are two other packages on CRAN that provide cosinor analyses that are very good, <a href="https://CRAN.R-project.org/package=cosinor">cosinor</a> and <a href="https://CRAN.R-project.org/package=cosinor2">cosinor2</a>. This package was built for 1) learning about regression and model development, and 2) the raw material generated to allow for more expansive and experimental analysis of cosinor functions and circadian rhythms.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="co">#library(card)</span>
-<span class="co">#</span>
-<span class="co">## Using the provide dataset</span>
-<span class="co">#data("twins")</span>
-<span class="co">#head(twins)</span></pre></body></html></div>
+<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">card</span>)
+
+<span class="co"># Using the provide dataset</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"twins"</span>)
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">twins</span>)
+<span class="co">#&gt; # A tibble: 6 x 23</span>
+<span class="co">#&gt; # Groups:   patid, hour [6]</span>
+<span class="co">#&gt;   patid   age   bmi race  smoking hptn  dm    chf   prevchd med_beta_blocke…</span>
+<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt; &lt;fct&gt; &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt;           </span>
+<span class="co">#&gt; 1     1    49  27.4 0     1       1     0     0     0       0               </span>
+<span class="co">#&gt; 2     1    49  27.4 0     1       1     0     0     0       0               </span>
+<span class="co">#&gt; 3     1    49  27.4 0     1       1     0     0     0       0               </span>
+<span class="co">#&gt; 4     1    49  27.4 0     1       1     0     0     0       0               </span>
+<span class="co">#&gt; 5     1    49  27.4 0     1       1     0     0     0       0               </span>
+<span class="co">#&gt; 6     1    49  27.4 0     1       1     0     0     0       0               </span>
+<span class="co">#&gt; # … with 13 more variables: med_antidepr &lt;fct&gt;, beck_total &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   sad_bin &lt;fct&gt;, sad_cat &lt;fct&gt;, PETdiff_2 &lt;fct&gt;, dyxtime &lt;dttm&gt;, date &lt;date&gt;,</span>
+<span class="co">#&gt; #   hour &lt;dbl&gt;, rDYX &lt;dbl&gt;, sDYX &lt;dbl&gt;, HR &lt;dbl&gt;, CP &lt;dbl&gt;, zip &lt;dbl&gt;</span></pre></body></html></div>
 <p>The <code>twins</code> dataset contains clinical covariates and continuous time measures, such as heart rate variability at each hour of the day. These continuous measures follow a circadian pattern.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="co">#library(ggplot2)</span>
-<span class="co">#ggplot(twins, aes(x = hour, y = rDYX)) +</span>
-<span class="co">#  geom_smooth(method = "gam")</span></pre></body></html></div>
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">twins</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">hour</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">rDYX</span>)) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">geom_smooth</a></span>(<span class="kw">method</span> <span class="kw">=</span> <span class="st">"gam"</span>)
+<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></pre></body></html></div>
+<p><img src="Cosinor_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 <p>The cosinor analysis is straightforward, although currently rudimentary. Confidence intervals of the amplitude and acrophase can be generated (but are currently internal only). It creates the model using the <a href="https://tidymodels.github.io/hardhat/index.html">hardhat</a> package from <em>tidymodels</em>.</p>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="co"># Model</span>
 <span class="co">#m &lt;- cosinor(rDYX ~ hour, twins)</span>

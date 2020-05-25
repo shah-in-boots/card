@@ -115,7 +115,7 @@
 <span class="no">twins</span>$<span class="no">lon</span> <span class="kw">&lt;-</span> -<span class="fl">84.388</span>
 
 <span class="co"># Sunrise is dependent on location and date</span>
-<span class="co">#twins$sunrise &lt;- circ_sun(date = twins$date, lat = twins$lat, lon = twins$lon)</span></pre></body></html></div>
+<span class="no">twins</span>$<span class="no">sunrise</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/circ_sun.html">circ_sun</a></span>(<span class="kw">date</span> <span class="kw">=</span> <span class="no">twins</span>$<span class="no">date</span>, <span class="kw">lat</span> <span class="kw">=</span> <span class="no">twins</span>$<span class="no">lat</span>, <span class="kw">lon</span> <span class="kw">=</span> <span class="no">twins</span>$<span class="no">lon</span>)</pre></body></html></div>
 <p>Another limitation is the issues in R with POSIX. The time zone of the sunrise is demarcated by “UTC”, but is actually corrected for the timezone by location. Next, we have continuous measures of autonomic physiology measured by ECG, called <em>Dyx</em>. These are recorded in a variable called <code>dyxtime</code>. The recordings start in the afternoon, and continue to the next day. The sunrise in between is likely the best marker to center around. We need to use the circadian centering function for each patient to be able to compare them fairly.</p>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="co">## Time series data</span>
 <span class="co">#length(twins$dyxtime)</span>
