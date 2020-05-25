@@ -160,8 +160,8 @@ to be the same as the number of rows in <code>new_data</code>.</p>
 <span class='no'>test</span> <span class='kw'>&lt;-</span> <span class='no'>mtcars</span>[<span class='fl'>21</span>:<span class='fl'>32</span>, -<span class='fl'>1</span>]
 
 <span class='co'># Fit</span>
-<span class='no'>mod</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cosinor.html'>cosinor</a></span>(<span class='no'>mpg</span> ~ <span class='no'>cyl</span> + <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='no'>drat</span>), <span class='no'>train</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.</span>
-#&gt; <span class='warning'>  Consider formula(paste(x, collapse = " ")) instead.</span></div><div class='input'>
+<span class='no'>mod</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cosinor.html'>cosinor</a></span>(<span class='no'>mpg</span> ~ <span class='no'>cyl</span> + <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='no'>drat</span>), <span class='no'>train</span>)
+
 <span class='co'># Predict, with preprocessing</span>
 <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span>(<span class='no'>mod</span>, <span class='no'>test</span>)</div><div class='output co'>#&gt; # A tibble: 12 x 1
 #&gt;    .pred

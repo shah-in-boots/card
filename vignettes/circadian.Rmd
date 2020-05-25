@@ -43,7 +43,7 @@ twins$lat <- 33.749
 twins$lon <- -84.388
 
 # Sunrise is dependent on location and date
-#twins$sunrise <- circ_sun(date = twins$date, lat = twins$lat, lon = twins$lon)
+twins$sunrise <- circ_sun(date = twins$date, lat = twins$lat, lon = twins$lon)
 ```
 
 Another limitation is the issues in R with POSIX. The time zone of the sunrise is demarcated by "UTC", but is actually corrected for the timezone by location. Next, we have continuous measures of autonomic physiology measured by ECG, called _Dyx_. These are recorded in a variable called `dyxtime`. The recordings start in the afternoon, and continue to the next day. The sunrise in between is likely the best marker to center around. We need to use the circadian centering function for each patient to be able to compare them fairly.

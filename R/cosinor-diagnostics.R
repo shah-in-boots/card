@@ -10,8 +10,6 @@
 #' @param model Requires a cosinor model to extract the correct statistics to
 #'   generate the plot.
 #'
-#' @param alpha Defaults to 0.05.
-#'
 #' @param ... Additional parameters may be needed for extensibility
 #'
 #' @return ggplot object that has has multiple components
@@ -21,11 +19,11 @@
 #' m <- cosinor(rDYX ~ hour, twins)
 #' ggcosinorfit(m)
 #' @export
-ggcosinorfit <- function(model, alpha = 0.05, ...) {
+ggcosinorfit <- function(model, ...) {
 
   # Extract ellipse statistics
-  tmp <- confint(model)
-  coefs <- coef(model)
+  tmp <- stats::confint(model)
+  coefs <- stats::coef(model)
   area <- tmp$area
   area <- model$area
   gseq <- area[, "gseq"]

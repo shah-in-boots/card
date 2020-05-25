@@ -19,19 +19,19 @@ __This vignette is still under construction. The cosinor function is still being
 The function `cosinor()` is built off of literature supporting the analysis of circadian rhythms. There are two other packages on CRAN that provide cosinor analyses that are very good, [cosinor](https://CRAN.R-project.org/package=cosinor) and [cosinor2](https://CRAN.R-project.org/package=cosinor2). This package was built for 1) learning about regression and model development, and 2) the raw material generated to allow for more expansive and experimental analysis of cosinor functions and circadian rhythms.
 
 ```{r, setup}
-#library(card)
-#
-## Using the provide dataset
-#data("twins")
-#head(twins)
+library(card)
+
+# Using the provide dataset
+data("twins")
+head(twins)
 ```
 
 The `twins` dataset contains clinical covariates and continuous time measures, such as heart rate variability at each hour of the day. These continuous measures follow a circadian pattern.
 
 ```{r}
-#library(ggplot2)
-#ggplot(twins, aes(x = hour, y = rDYX)) +
-#  geom_smooth(method = "gam")
+library(ggplot2)
+ggplot(twins, aes(x = hour, y = rDYX)) +
+  geom_smooth(method = "gam")
 ```
 
 The cosinor analysis is straightforward, although currently rudimentary. Confidence intervals of the amplitude and acrophase can be generated (but are currently internal only). It creates the model using the [hardhat](https://tidymodels.github.io/hardhat/index.html) package from _tidymodels_. 

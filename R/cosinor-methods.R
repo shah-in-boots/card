@@ -16,14 +16,14 @@ print.cosinor <- function(x, ...) {
 }
 
 #' @description Generic summary method
-#' @param x Model of class `cosinor`
+#' @param object Model of class `cosinor`
 #' @param ... arguments to pass on
 #' @noRd
 #' @export
-summary.cosinor <- function(x, ...) {
+summary.cosinor <- function(object, ...) {
 
 	# Generic method
-	summary(x)
+	summary(object)
 
 }
 
@@ -32,14 +32,16 @@ summary.cosinor <- function(x, ...) {
 # Statistical Methods {{{ ====
 
 #' @description Generic confidence interval method
-#' @param x Model of class `cosinor`
+#' @param object model of class `cosinor`
+#' @param level the confidence level required
+#' @param parm specification of which parameters (not currently used)
 #' @param ... arguments to pass on
 #' @noRd
 #' @export
-confint.cosinor <- function(x, alpha = 0.05, ...) {
+confint.cosinor <- function(object, parm, level = 0.95, ...) {
 
-	# Model object
-	object <- x
+	# Confidence level
+	alpha <- 1 - level
 
   # Matrix data
 	y <- object$model[,"y"]

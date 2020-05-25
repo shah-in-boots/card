@@ -4,13 +4,11 @@
 \alias{ggcosinorfit}
 \title{Graphical Assessment of Amplitude and Acrophase}
 \usage{
-ggcosinorfit(model, alpha = 0.05, ...)
+ggcosinorfit(model, ...)
 }
 \arguments{
 \item{model}{Requires a cosinor model to extract the correct statistics to
 generate the plot.}
-
-\item{alpha}{Defaults to 0.05.}
 
 \item{...}{Additional parameters may be needed for extensibility}
 }
