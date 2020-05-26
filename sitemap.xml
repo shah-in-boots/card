@@ -16,6 +16,9 @@
     <loc>https://asshah4.github.io/card//reference/circ_odds.html</loc>
   </url>
   <url>
+    <loc>https://asshah4.github.io/card//reference/circ_rad.html</loc>
+  </url>
+  <url>
     <loc>https://asshah4.github.io/card//reference/circ_sun.html</loc>
   </url>
   <url>
@@ -41,9 +44,6 @@
   </url>
   <url>
     <loc>https://asshah4.github.io/card//reference/hrv_linear_model.html</loc>
-  </url>
-  <url>
-    <loc>https://asshah4.github.io/card//reference/hrv_model_building.html</loc>
   </url>
   <url>
     <loc>https://asshah4.github.io/card//reference/mims.html</loc>
@@ -76,7 +76,13 @@
     <loc>https://asshah4.github.io/card//reference/recurrent_propensity.html</loc>
   </url>
   <url>
+    <loc>https://asshah4.github.io/card//reference/test_goodness_of_fit.html</loc>
+  </url>
+  <url>
     <loc>https://asshah4.github.io/card//reference/twins.html</loc>
+  </url>
+  <url>
+    <loc>https://asshah4.github.io/card//reference/zipcode.html</loc>
   </url>
   <url>
     <loc>https://asshah4.github.io/card//articles/Cosinor.html</loc>

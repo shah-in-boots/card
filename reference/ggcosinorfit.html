@@ -129,15 +129,19 @@ cosinor model to be fit with the model <a href='cosinor.html'>card::cosinor</a>.
 the amplitude, acrophase,</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ggcosinorfit</span>(<span class='no'>model</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>ggcosinorfit</span>(<span class='no'>object</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>model</th>
+      <th>object</th>
       <td><p>Requires a cosinor model to extract the correct statistics to
 generate the plot.</p></td>
+    </tr>
+    <tr>
+      <th>level</th>
+      <td><p>Confidence level for ellipse</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -152,7 +156,11 @@ generate the plot.</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"twins"</span>)
 <span class='no'>m</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cosinor.html'>cosinor</a></span>(<span class='no'>rDYX</span> ~ <span class='no'>hour</span>, <span class='no'>twins</span>)
-<span class='fu'>ggcosinorfit</span>(<span class='no'>m</span>)</div><div class='img'><img src='ggcosinorfit-1.png' alt='' width='700' height='433' /></div></pre>
+<span class='fu'>ggcosinorfit</span>(<span class='no'>m</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: longer object length is not a multiple of shorter object length</span></div><div class='output co'>#&gt; <span class='warning'>Warning: longer object length is not a multiple of shorter object length</span></div><div class='output co'>#&gt;             2.5%      97.5%
+#&gt; mesor  2.8485315  2.8724394
+#&gt; amp    0.2814656  0.3157546
+#&gt; phi   -2.7252732 -2.6121357</div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 1 row(s) containing missing values (geom_path).</span></div><div class='output co'>#&gt; <span class='message'>geom_path: Each group consists of only one observation. Do you need to adjust</span>
+#&gt; <span class='message'>the group aesthetic?</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 2 row(s) containing missing values (geom_path).</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 2 row(s) containing missing values (geom_path).</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 2 row(s) containing missing values (geom_path).</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 576 row(s) containing missing values (geom_path).</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 576 row(s) containing missing values (geom_path).</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 8 rows containing missing values (geom_text).</span></div><div class='img'><img src='ggcosinorfit-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

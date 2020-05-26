@@ -83,10 +83,18 @@
 
     
     
-<p><strong>This vignette is still under construction.</strong></p>
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">card</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">magrittr</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'dplyr'</span>
+<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     filter, lag</span>
+<span class="co">#&gt; The following objects are masked from 'package:base':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     intersect, setdiff, setequal, union</span></pre></body></html></div>
 <div id="zeitgeibers" class="section level1">
 <h1 class="hasAnchor">
 <a href="#zeitgeibers" class="anchor"></a>Zeitgeibers</h1>
@@ -106,57 +114,80 @@
 <span class="co">#&gt; 6     1    49  27.4 0     1       1     0     0     0       0               </span>
 <span class="co">#&gt; # … with 13 more variables: med_antidepr &lt;fct&gt;, beck_total &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   sad_bin &lt;fct&gt;, sad_cat &lt;fct&gt;, PETdiff_2 &lt;fct&gt;, dyxtime &lt;dttm&gt;, date &lt;date&gt;,</span>
-<span class="co">#&gt; #   hour &lt;dbl&gt;, rDYX &lt;dbl&gt;, sDYX &lt;dbl&gt;, HR &lt;dbl&gt;, CP &lt;dbl&gt;, zip &lt;dbl&gt;</span>
-<span class="no">twins</span> <span class="kw">%&lt;&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(<span class="no">patid</span> <span class="kw">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>:<span class="fl">30</span>))</pre></body></html></div>
+<span class="co">#&gt; #   hour &lt;dbl&gt;, rDYX &lt;dbl&gt;, sDYX &lt;dbl&gt;, HR &lt;dbl&gt;, CP &lt;dbl&gt;, zip &lt;chr&gt;</span>
+<span class="no">df</span> <span class="kw">&lt;-</span>
+  <span class="no">twins</span> <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(<span class="no">patid</span> <span class="kw">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>:<span class="fl">30</span>))</pre></body></html></div>
 <p>The research problem is that participants came from around the country for a study. Continuous, 24-hour measures were obtained. However, the patients came in from different time zones and on different dates over the course of 10 years. Findings could reflect perhaps jetlag instead of physiological disturbances. We could use sunrise and sunset times as natural <em>zeitgeibers</em> to standardize the time series data.</p>
-<p>The first step is inclusion of geographical locations, along with study date, to calculate sunrise times. This dataset was recorded in Atlanta, GA, which will make up the latitude and longitude values. This is a limitation, and when the actual / true locations are available, the vignette will be updated (TODO).</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="co"># Geographic data is needed to calculate sunrise</span>
-<span class="no">twins</span>$<span class="no">lat</span> <span class="kw">&lt;-</span> <span class="fl">33.749</span>
-<span class="no">twins</span>$<span class="no">lon</span> <span class="kw">&lt;-</span> -<span class="fl">84.388</span>
+<p>The first step is inclusion of geographical locations, along with study date, to calculate sunrise times. This dataset was recorded in Atlanta, GA, but the individuals flew from across the country. The zipcodes are available in the dataset. This can then be converted to latitude and longitude using the {zipcode} package (which is archived on CRAN) - the zipcode data was bundled in this package for simplicity.</p>
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="co"># Zipcodes, contained as characters (because of leading 0)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"zipcode"</span>)
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">zipcode</span>)
+<span class="co">#&gt;     zip       city state latitude longitude</span>
+<span class="co">#&gt; 1 00210 Portsmouth    NH  43.0059  -71.0132</span>
+<span class="co">#&gt; 2 00211 Portsmouth    NH  43.0059  -71.0132</span>
+<span class="co">#&gt; 3 00212 Portsmouth    NH  43.0059  -71.0132</span>
+<span class="co">#&gt; 4 00213 Portsmouth    NH  43.0059  -71.0132</span>
+<span class="co">#&gt; 5 00214 Portsmouth    NH  43.0059  -71.0132</span>
+<span class="co">#&gt; 6 00215 Portsmouth    NH  43.0059  -71.0132</span>
+
+<span class="co"># Get the zipcodes merged into to get latitude and longitude</span>
+<span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join.html">left_join</a></span>(<span class="no">df</span>, <span class="no">zipcode</span>[<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"zip"</span>, <span class="st">"latitude"</span>, <span class="st">"longitude"</span>)], <span class="kw">by</span> <span class="kw">=</span> <span class="st">"zip"</span>)
 
 <span class="co"># Sunrise is dependent on location and date</span>
-<span class="no">twins</span>$<span class="no">sunrise</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/circ_sun.html">circ_sun</a></span>(<span class="kw">date</span> <span class="kw">=</span> <span class="no">twins</span>$<span class="no">date</span>, <span class="kw">lat</span> <span class="kw">=</span> <span class="no">twins</span>$<span class="no">lat</span>, <span class="kw">lon</span> <span class="kw">=</span> <span class="no">twins</span>$<span class="no">lon</span>)</pre></body></html></div>
+<span class="no">df</span>$<span class="no">sunrise</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/circ_sun.html">circ_sun</a></span>(<span class="kw">date</span> <span class="kw">=</span> <span class="no">df</span>$<span class="no">date</span>, <span class="kw">lat</span> <span class="kw">=</span> <span class="no">df</span>$<span class="no">latitude</span>, <span class="kw">lon</span> <span class="kw">=</span> <span class="no">df</span>$<span class="no">longitude</span>)</pre></body></html></div>
 <p>Another limitation is the issues in R with POSIX. The time zone of the sunrise is demarcated by “UTC”, but is actually corrected for the timezone by location. Next, we have continuous measures of autonomic physiology measured by ECG, called <em>Dyx</em>. These are recorded in a variable called <code>dyxtime</code>. The recordings start in the afternoon, and continue to the next day. The sunrise in between is likely the best marker to center around. We need to use the circadian centering function for each patient to be able to compare them fairly.</p>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="co">## Time series data</span>
-<span class="co">#length(twins$dyxtime)</span>
-<span class="co">#</span>
-<span class="co">## Number of participants</span>
-<span class="co">#length(unique(twins$patid))</span>
-<span class="co">#</span>
-<span class="co">## Unique sunrise times per patient</span>
-<span class="co">#zeit &lt;- </span>
-<span class="co">#  twins %&gt;%</span>
-<span class="co">#  dplyr::group_by(patid) %&gt;%</span>
-<span class="co">#  dplyr::arrange(dyxtime) %&gt;%</span>
-<span class="co">#  dplyr::select(patid, sunrise) %&gt;%</span>
-<span class="co">#  unique() %&gt;%</span>
-<span class="co">#  dplyr::group_by(patid) %&gt;%</span>
-<span class="co">#  dplyr::slice(dplyr::n()) # Take sunrise time during study, not morning prior</span>
-<span class="co">#names(zeit)[2] &lt;- "zeit"</span>
-<span class="co">#</span>
-<span class="co">## Add back in the sunrise time chosen</span>
-<span class="co">#twins %&lt;&gt;% dplyr::left_join(., zeit, by = "patid")</span>
-<span class="co">#</span>
-<span class="co">## Create centering variable for each patient</span>
-<span class="co">#x &lt;- twins %&gt;%</span>
-<span class="co">#  dplyr::group_by(patid) %&gt;%</span>
-<span class="co">#  tidyr::nest()</span>
-<span class="co">#</span>
-<span class="co">## Slow and steady method for going through all the potential vectors</span>
-<span class="co">## Will look to "tidy" this in the future (TODO)</span>
-<span class="co">#for(i in seq(x$patid)) {</span>
-<span class="co">#  z &lt;- unique(x[[i,2]][[1]]$zeit)</span>
-<span class="co">#  t &lt;- x[[i,2]][[1]]$dyxtime</span>
-<span class="co">#  x[[i,2]][[1]]$zvec &lt;- circ_center(x[[i,2]][[1]]$dyxtime, z)</span>
-<span class="co">#}</span>
-<span class="co">#</span>
-<span class="co">## Visualize data trend</span>
-<span class="co">#df &lt;- tidyr::unnest(x)</span>
-<span class="co">#summary(df$zvec)</span>
-<span class="co">#ggplot(df, aes(x = zvec, y = rDYX)) +</span>
-<span class="co">#  geom_point(alpha = 0.1) +</span>
-<span class="co">#  geom_smooth(method = "gam") + </span>
-<span class="co">#  xlim(-20, 10)</span></pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">df</span>$<span class="no">dyxtime</span>)
+<span class="co">#&gt; [1] 317</span>
+
+<span class="co"># Number of participants</span>
+<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="no">df</span>$<span class="no">patid</span>))
+<span class="co">#&gt; [1] 14</span>
+
+<span class="co"># Unique sunrise times per patient</span>
+<span class="no">zeit</span> <span class="kw">&lt;-</span>
+  <span class="no">df</span> <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="no">patid</span>) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(<span class="no">dyxtime</span>) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">patid</span>, <span class="no">sunrise</span>) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>() <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="no">patid</span>) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice</a></span>(<span class="fu"><a href="https://dplyr.tidyverse.org/reference/n.html">n</a></span>()) <span class="co"># Sunrise time during study</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">zeit</span>)[<span class="fl">2</span>] <span class="kw">&lt;-</span> <span class="st">"zeit"</span>
+
+
+<span class="co"># Add surnsie zeitgeiber back in</span>
+<span class="no">df</span> <span class="kw">%&lt;&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join.html">left_join</a></span>(<span class="no">.</span>, <span class="no">zeit</span>, <span class="kw">by</span> <span class="kw">=</span> <span class="st">"patid"</span>)
+
+<span class="no">x</span> <span class="kw">&lt;-</span> <span class="no">df</span> <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="no">patid</span>) <span class="kw">%&gt;%</span>
+  <span class="kw pkg">tidyr</span><span class="kw ns">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/nest.html">nest</a></span>()
+
+<span class="co"># Slow and steady method for going through all the potential vectors</span>
+<span class="co"># Will look to "tidy" this in the future (TODO)</span>
+<span class="kw">for</span>(<span class="no">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="no">x</span>$<span class="no">patid</span>)) {
+  <span class="no">z</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="no">x</span><span class="kw">[[</span><span class="no">i</span>,<span class="fl">2</span>]]<span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">zeit</span>)
+  <span class="no">t</span> <span class="kw">&lt;-</span> <span class="no">x</span><span class="kw">[[</span><span class="no">i</span>,<span class="fl">2</span>]]<span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">dyxtime</span>
+  <span class="no">x</span><span class="kw">[[</span><span class="no">i</span>,<span class="fl">2</span>]]<span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">zvec</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/circ_center.html">circ_center</a></span>(<span class="no">x</span><span class="kw">[[</span><span class="no">i</span>,<span class="fl">2</span>]]<span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">dyxtime</span>, <span class="no">z</span>)
+}
+
+<span class="co"># Visualize data trend</span>
+<span class="no">df</span> <span class="kw">&lt;-</span> <span class="kw pkg">tidyr</span><span class="kw ns">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/nest.html">unnest</a></span>(<span class="no">x</span>)
+<span class="co">#&gt; Warning: `cols` is now required when using unnest().</span>
+<span class="co">#&gt; Please use `cols = c(data)`</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">df</span>$<span class="no">zvec</span>)
+<span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span>
+<span class="co">#&gt; -22.327 -10.938  -4.856  -4.563   1.629  17.664</span>
+
+<span class="co"># Pseudo-rose plot</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">hour</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">rDYX</span>, <span class="kw">group</span> <span class="kw">=</span> <span class="no">hour</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="no">hour</span>)) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_boxplot.html">geom_boxplot</a></span>() +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar</a></span>(<span class="kw">theta</span> <span class="kw">=</span> <span class="st">"x"</span>, <span class="kw">start</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">direction</span> <span class="kw">=</span> <span class="fl">1</span>) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous</a></span>(<span class="kw">expand</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>,<span class="fl">0</span>), <span class="kw">breaks</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">0</span>, <span class="fl">24</span>, <span class="fl">1</span>)) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">scale_fill_viridis_c</a></span>() +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span>()</pre></body></html></div>
+<p><img src="circadian_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 </div>
   </div>
 
