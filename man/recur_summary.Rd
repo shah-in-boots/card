@@ -51,4 +51,5 @@ tbl <- recur_summary(df, covar)
 tbl \%>\%
   kable("latex", caption = "Title", booktabs = TRUE) \%>\%
   kable_styling(font_size = 8)
+
 }

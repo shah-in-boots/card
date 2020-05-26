@@ -44,8 +44,27 @@ And the development version from [GitHub](https://github.com/) with:
 ``` r
 # install.packages("devtools")
 devtools::install_github("asshah4/card")
-#> Skipping install of 'card' from a github remote, the SHA1 (bd978e39) has not changed since last install.
-#>   Use `force = TRUE` to force installation
+#> Downloading GitHub repo asshah4/card@master
+#> broom (5fc28ca50... -> a56ab063d...) [GitHub]
+#> Downloading GitHub repo tidymodels/broom@master
+#> 
+#>      checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpwfflM5/remotes16b382a33e418/tidymodels-broom-a56ab06/DESCRIPTION’ ...  ✓  checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpwfflM5/remotes16b382a33e418/tidymodels-broom-a56ab06/DESCRIPTION’
+#>   ─  preparing ‘broom’:
+#>      checking DESCRIPTION meta-information ...  ✓  checking DESCRIPTION meta-information
+#>   ─  checking for LF line-endings in source and make files and shell scripts (387ms)
+#>   ─  checking for empty or unneeded directories
+#>   ─  building ‘broom_0.7.0.9000.tar.gz’
+#>      
+#>      checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpwfflM5/remotes16b387d8cee7a/asshah4-card-eb6cd17/DESCRIPTION’ ...  ✓  checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpwfflM5/remotes16b387d8cee7a/asshah4-card-eb6cd17/DESCRIPTION’
+#>   ─  preparing ‘card’:
+#>      checking DESCRIPTION meta-information ...  ✓  checking DESCRIPTION meta-information
+#>   ─  checking for LF line-endings in source and make files and shell scripts
+#>   ─  checking for empty or unneeded directories
+#>        NB: this package now depends on R (>= 3.5.0)
+#>        WARNING: Added dependency on R >= 3.5.0 because serialized objects in  serialize/load version 3 cannot be read in older versions of R.  File(s) containing such objects: ‘card/data/hrv.rda’
+#> ─  building ‘card_0.1.0.tar.gz’
+#>      
+#> 
 ```
 
 ## Usage

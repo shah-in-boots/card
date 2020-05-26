@@ -46,6 +46,7 @@ circ_sun <- function(date,
                      lon,
                      zenith = "official",
                      sunset = FALSE) {
+
   # Check to see if arguments are correct
   if (nargs() < 3) {
     stop("Missing arguments", call. = FALSE)
@@ -165,7 +166,6 @@ circ_sun <- function(date,
 
   # New sunrise time
   sun <- sun + offset
-
   return(sun)
 }
 
@@ -284,17 +284,6 @@ circ_center <- function(times, zeitgeiber) {
     # Catch error, unlikely to be possible
     stop("Cannot place Zeitgeiber close to time series.")
   )
-
-  # Check if roughly equally spaced NOT CURRENTLY USED
-  #obsBlocks <- int_length(int_diff(times)) # Measured time differences in seconds
-  #expBlocks <- int_length(t) / n # Expected time differences in seconds
-  #
-  #if(!force) {
-  #  if(sum(((obsBlocks - expBlocks) / expBlocks) >= 0.20)/n > 0.5) {
-  #    stop("More than half of the observed time blocks deviate > 20% than the expected time blocks. If this is acceptable, please run call with `force = TRUE`.",
-  #         call. = FALSE)
-  #  }
-  #}
 
 }
 # }}}

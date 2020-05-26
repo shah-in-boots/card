@@ -35,22 +35,3 @@ in a standardized pattern from the toolbox. It requires processing
 due to its large file sizes (e.g. 24 hours of data for a single
 patient can be up to 2 MB in size).
 }
-\examples{
-# Setup
-# library(data.table)
-# data(hrv)
-
-# Assuming in "root/code" folder, need to get to data in STUDY
-parent <- dirname(getwd())
-loc <- file.path(parent, "data", "proc_hrv", "STUDY")
-vars <- Hmisc::Cs(SDNN, RMSSD, pnn50, ulf, vlf, lf, hf, lfhf, ttlpwr, ac, dc, SampEn, ApEn)
-time <- 3600 # number of seconds in an hour
-names <- list.files(path = loc)
-
-# Create for loop to eventually make data frame (not currently working)
-# d <- list()
-# for(i in 1:length(names)) {
-#  d[[paste(names[i])]] <- proc_hrv_matlab(loc, names[i], vars, time)
-# }
-# df <- rbindlist(d) \%>\% as_tibble()
-}

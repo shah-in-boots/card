@@ -1,3 +1,95 @@
+# Goodness of Fit {{{ ====
+
+#' @title Goodness of Fit of Cosinor
+#'
+#' @description Goodness of fit of a cosinor from data that has multiple
+#'   collections at different timepoints or from multiple cycles. The RSS is
+#'   partitioned into pure error (SSPE) and lack of fit (SSLOF). An F-test
+#'   compares the SSPE and SSLOF to detect appropriateness of model.
+#'
+#'   \deqn{SSLOF = RSS - SSPE}
+#'
+#'   \deqn{SSPE = \sum_{i} \sum_{l} ( Y_{il} - \overline{Y}_{i} )^2}
+#'
+#'   The fitted values for each time point are:
+#'   \deqn{\overline{Y}_{i} = \frac{ \sum_{l} Y_{il} }{ n_{i}}}
+#'
+#' @param object requires cosinor model generated with [card::cosinor] to
+#'   calculate statistics.
+#'
+#' @param level confidence level desired
+#'
+#' @param ... additional parameters may be needed for extensibility
+#'
+#' @return f-statistic as result of goodness of fit
+#'
+#' @export
+test_goodness_of_fit <- function(object, level = 0.95, ...) {
+
+  # Model data
+	y <- object$model[,"y"]
+	t <- object$model[,"t"]
+	x <- object$model[,"x"]
+	z <- object$model[,"z"]
+	yhat <- object$fitted.values
+	n <- length(y)
+	names(object$coefficients) <- object$coef_names
+	mesor <- object$coefficients["mesor"]
+	amp <- object$coefficients["amp"]
+	phi <- object$coefficients["phi"]
+
+  # Goodness of fit
+  # lack of fit = sumsq(res) - sumsq(observed - local avg)
+  # SSLOF = RSS - SSPE
+    # SSLOF = sum of squares lack of fit
+    # RSS = residual sum of squares
+    # SSPE = pure error sum of squares
+
+  # SSPE = sumi(suml( (yil - yibar)^2 ))
+    # yibar = suml(yil)/ni
+    # ni = number of data collected at time t
+
+  yil <- stats::aggregate(y, by = list(t), sum)
+  names(yil) <- c("t", "yil")
+  ni <- stats::aggregate(y, by = list(t), length)
+  names(ni) <- c("t", "ni")
+  ybar <- merge(yil, ni, by = "t")
+  ybar$ybar <- ybar$yil / ybar$ni # Fitted average at each hour
+
+  # SSPE = sum(observed value at t - local average at t)^2
+  df <- data.frame(y, t)
+  SSPE <- vector()
+  for(l in seq_along(ybar$t)) {
+    yl <- df$y[df$t == ybar$t[l]]
+    ybarl <- ybar$ybar[ybar$t == ybar$t[l]]
+    SSPE[l] <- sum((yl - ybarl)^2)
+  }
+  SSPE <- sum(SSPE)
+
+  # Lack of fit
+  SSLOF <- RSS - SSPE
+
+  # Appropriateness of model...
+  # F = (SSLOF/(m-1-2p)) / (SSPE/(N-m))
+    # m = number of time points
+    # p = number of cosine components
+  m <- length(unique(t))
+  p <- 1 # Single cosinor... may need to adjust to count terms [TODO]
+
+  fstat <- (SSLOF/(m - 1 - 2*p)) / (SSPE/(n - m))
+  fdist <- stats::qf(1 - alpha/2, df1 = m - 1 - 2*p, n - m)
+
+  # Return
+  list(
+    fstat = fstat,
+    fdist = fdist
+  )
+
+}
+
+# }}}
+
+
 # Graphical Assessment of Amplitude and Acrophse {{{ ====
 
 #' @title Graphical Assessment of Amplitude and Acrophase
@@ -7,7 +99,7 @@
 #'   cosinor model to be fit with the model [card::cosinor]. This includes
 #'   the amplitude, acrophase,
 #'
-#' @param model Requires a cosinor model to extract the correct statistics to
+#' @param object Requires a cosinor model to extract the correct statistics to
 #'   generate the plot.
 #'
 #' @param level Confidence level for ellipse
@@ -21,13 +113,13 @@
 #' m <- cosinor(rDYX ~ hour, twins)
 #' ggcosinorfit(m)
 #' @export
-ggcosinorfit <- function(model, level = 0.95, ...) {
+ggcosinorfit <- function(object, level = 0.95, ...) {
 
   # Extract ellipse statistics
-  tmp <- stats::confint(model, level)
-  coefs <- stats::coef(model)
+  tmp <- stats::confint(object, level)
+  coefs <- stats::coef(object)
   area <- tmp$area
-  area <- model$area
+  area <- object$area
   gseq <- area[, "gseq"]
   bs1 <- area[, "bs1"]
   bs2 <- area[, "bs2"]

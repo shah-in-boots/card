@@ -29,24 +29,6 @@
 #'
 #' @importFrom data.table data.table .N .I .SD .BY fread :=
 #'
-#' @examples
-#' # Setup
-#' # library(data.table)
-#' # data(hrv)
-#'
-#' # Assuming in "root/code" folder, need to get to data in STUDY
-#' parent <- dirname(getwd())
-#' loc <- file.path(parent, "data", "proc_hrv", "STUDY")
-#' vars <- Hmisc::Cs(SDNN, RMSSD, pnn50, ulf, vlf, lf, hf, lfhf, ttlpwr, ac, dc, SampEn, ApEn)
-#' time <- 3600 # number of seconds in an hour
-#' names <- list.files(path = loc)
-#'
-#' # Create for loop to eventually make data frame (not currently working)
-#' # d <- list()
-#' # for(i in 1:length(names)) {
-#' #  d[[paste(names[i])]] <- proc_hrv_matlab(loc, names[i], vars, time)
-#' # }
-#' # df <- rbindlist(d) %>% as_tibble()
 #' @export
 proc_hrv_matlab <- function(loc, name, time = 3600) {
 

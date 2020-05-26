@@ -44,7 +44,6 @@
 #' @examples
 #' # Data
 #' data("mims")
-#' data <- mims
 #'
 #' # Parameters
 #' id <- "patid"
@@ -58,8 +57,10 @@
 #' tbl <- recur_survival_table(
 #'   mims, id, first, last, event.dates, model.type, death
 #' )
+#'
 #' @export
-recur_survival_table <- function(data, id, first, last, event.dates, model.type, death = NULL) {
+recur_survival_table <-
+  function(data, id, first, last, event.dates, model.type, death = NULL) {
 
   # Check for missing optional parameter of death
   # Creates minimally required table
@@ -332,6 +333,7 @@ recur_survival_table <- function(data, id, first, last, event.dates, model.type,
 #' tbl %>%
 #'   kable("latex", caption = "Title", booktabs = TRUE) %>%
 #'   kable_styling(font_size = 8)
+#'
 #' @export
 recur_summary <- function(data, covar) {
   # What is the ID for merging? Using example, should be likely called "ID"
@@ -389,11 +391,9 @@ recur_summary <- function(data, covar) {
 #'
 #' @return Returns a modified table from what was originally given with the new columns propensity scores. Essentially original df + 2 columns.
 #'
-#' @examples
-#' # ps <- recurrent_propensity(df, c("outcome", "exp1", "exp2"))
-#' # ps[c("patid", "PROP_SCORE", "PROP_WEIGHT")]
 #' @export
 recurrent_propensity <- function(data, vars) {
+
   # Most important columns
   id <- names(data)[1]
   outcome <- vars[1]
@@ -455,9 +455,6 @@ recurrent_propensity <- function(data, vars) {
 #'
 #' @return List of models in sequential order.
 #'
-#' @examples
-#' # recurrent_model_building(df, c("covar1", covar2"), "marginal", c("covar3"))
-#' # m[[1:3]] # Models using covar1, covar2, covar3 (propensity weighted)
 #' @export
 recurrent_model_building <-
   function(data, covar.builds, model.type, prop.scores = NULL) {
@@ -537,11 +534,6 @@ recurrent_model_building <-
 #'   keys as chosen (in case there are several merging variables, like keyid +
 #'   hour of day for circadian data).
 #'
-#' @examples
-#' # data("twins")
-#' # x <- recur_followup_table(dt, "patid", "vetrid", "date")
-#' # df_predict <- inner_join(x$initial, x$final, by = c("vetrid", "hour", suffix
-#' # = c("_0", "_1")))
 #' @importFrom magrittr %>%
 #'
 #' @export

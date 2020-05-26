@@ -36,9 +36,3 @@ visit and the most recent visit. Each row should have a KEY ID and a STUDY
 ID. The data is in a long format, such that the STUDY IDs are unique / not
 duplicated.
 }
-\examples{
-# data("twins")
-# x <- recur_followup_table(dt, "patid", "vetrid", "date")
-# df_predict <- inner_join(x$initial, x$final, by = c("vetrid", "hour", suffix
-# = c("_0", "_1")))
-}

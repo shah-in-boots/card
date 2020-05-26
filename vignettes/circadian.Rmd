@@ -7,8 +7,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-__This vignette is still under construction.__
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -38,11 +36,10 @@ df <-
 
 The research problem is that participants came from around the country for a study. Continuous, 24-hour measures were obtained. However, the patients came in from different time zones and on different dates over the course of 10 years. Findings could reflect perhaps jetlag instead of physiological disturbances. We could use sunrise and sunset times as natural _zeitgeibers_ to standardize the time series data.
 
-The first step is inclusion of geographical locations, along with study date, to calculate sunrise times. This dataset was recorded in Atlanta, GA, but the individuals flew from across the country. The zipcodes are available in the dataset. This can then be converted to latitude and longitude using the {zipcode} package (which is archived on CRAN).
+The first step is inclusion of geographical locations, along with study date, to calculate sunrise times. This dataset was recorded in Atlanta, GA, but the individuals flew from across the country. The zipcodes are available in the dataset. This can then be converted to latitude and longitude using the {zipcode} package (which is archived on CRAN) - the zipcode data was bundled in this package for simplicity.
 
 ```{r}
 # Zipcodes, contained as characters (because of leading 0)
-library(zipcode)
 data("zipcode")
 head(zipcode)
 
@@ -93,6 +90,7 @@ for(i in seq(x$patid)) {
 df <- tidyr::unnest(x)
 summary(df$zvec)
 
+# Pseudo-rose plot
 ggplot(df, aes(x = hour, y = rDYX, group = hour, fill = hour)) + 
   geom_boxplot() +   
   coord_polar(theta = "x", start = 0, direction = 1) + 

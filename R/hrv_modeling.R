@@ -18,7 +18,7 @@
 #' @param prop.weight This is a logical value if propensity weighting should be
 #'   done instead of traditional covariate adjustment. This calls for the
 #'   propensity weighting function defined by
-#'   \code{\link{recurrent_propensity}} that will generate both a PROP_SCORE
+#'   [card::recurrent_propensity] that will generate both a PROP_SCORE
 #'   column and PROP_WEIGHT column. Defaults to FALSE
 #'
 #' @return List of models with names
@@ -55,57 +55,6 @@ hrv_linear_model <-
 
 # }}}
 
-# HRV Model Building {{{ ====
-
-#' @title HRV Model Building
-#' @param data,covar.builds,model,prop.scores Still developing
-#' @description
-#' `hrv_model_building` creates a list of models using different builds of covariates.
-hrv_model_building <-
-  function(data, covar.builds, model, prop.scores = NULL) {
-    # Important variables / columns
-    n <- length(covar.builds)
-    names(data)[1:5] <- c("ID", "TSTART", "TSTOP", "STATUS", "EVENT")
-    m <- list()
-
-    # Create all the models in sequence
-    for (i in 1:n) {
-      # Create formulas
-      f <-
-        paste(get(covar.builds[i]), collapse = " + ") %>%
-        paste("Surv(TSTART, TSTOP, STATUS)", ., sep = " ~ ") %>%
-        # Different recurrent event models with cluster and strata
-        purrr::when(
-          model == "marginal" ~ paste(., "cluster(ID)", sep = " + "),
-          model == "pwptt" ~ paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
-          model == "pwpgt" ~ paste(., "cluster(ID)", "strata(EVENT)", sep = " + "),
-          ~ stats::as.formula()
-        ) %>%
-        stats::as.formula()
-
-      # Assess need for propensity weighting
-      # Dynamically save the models
-      if (covar.builds[i] %in% prop.scores) {
-        # Uses the recurrent_propensity function
-        x <- recurrent_propensity(data, get(covar.builds[i]))
-        m[[i]] <-
-          survival::coxph(
-            f,
-            method = "breslow",
-            data = x,
-            weights = x$PROP_WEIGHT
-          )
-      } else {
-        m[[i]] <- survival::coxph(f, method = "breslow", data = data)
-      }
-    }
-
-    # Return output
-    return(m)
-  }
-
-# }}}
-
 # Plotting Error of Models {{{ ====
 
 #' @title Plotting Error of Models
@@ -129,6 +78,7 @@ hrv_model_building <-
 #' data("twins")
 #' model <- lm(beck_total ~ HR, data = subset(twins, hour == 7))
 #' ggerror(model)
+#'
 #' @import ggplot2
 #'
 #' @export

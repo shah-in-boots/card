@@ -41,7 +41,6 @@ cosinor_impl <- function(predictors, outcomes) {
   # Return / save the model
   model <- cbind(y, t, x, z)
 
-
   # Matrices
   ymat <- as.matrix(cbind(y = c(sum(y), sum(y * x), sum(y * z))))
   mcol <- c(n, sum(x), sum(z)) # Mesor column
@@ -76,6 +75,8 @@ cosinor_impl <- function(predictors, outcomes) {
     phi <- theta - (2 * pi)
   }
 
+
+
   # }}}
 
   ## Model Fit {{{ ====
@@ -98,28 +99,77 @@ cosinor_impl <- function(predictors, outcomes) {
     paste0("The model fits. F = ", signif(fstat, 4))
   }
 
+  # Goodness of fit
+  # lack of fit = sumsq(res) - sumsq(observed - local avg)
+  # SSLOF = RSS - SSPE
+    # SSLOF = sum of squares lack of fit
+    # RSS = residual sum of squares
+    # SSPE = pure error sum of squares
+
+  # SSPE = sumi(suml( (yil - yibar)^2 ))
+    # yibar = suml(yil)/ni
+    # ni = number of data collected at time t
+
+  yil <- stats::aggregate(y, by = list(t), sum)
+  names(yil) <- c("t", "yil")
+  ni <- stats::aggregate(y, by = list(t), length)
+  names(ni) <- c("t", "ni")
+  ybar <- merge(yil, ni, by = "t")
+  ybar$ybar <- ybar$yil / ybar$ni # Fitted average at each hour
+
+  # SSPE = sum(observed value at t - local average at t)^2
+  df <- data.frame(y, t)
+  SSPE <- vector()
+  for(l in seq_along(ybar$t)) {
+    yl <- df$y[df$t == ybar$t[l]]
+    ybarl <- ybar$ybar[ybar$t == ybar$t[l]]
+    SSPE[l] <- sum((yl - ybarl)^2)
+  }
+  SSPE <- sum(SSPE)
+
+  # Lack of fit
+  SSLOF <- RSS - SSPE
+
+  # Appropriateness of model...
+  # F = (SSLOF/(m-1-2p)) / (SSPE/(N-m))
+    # m = number of time points
+    # p = number of cosine components
+  m <- length(unique(t))
+  p <- 1 # Single cosinor... may need to adjust to count terms [TODO]
+
+  fstat <- (SSLOF/(m - 1 - 2*p)) / (SSPE/(n - m))
+  stats::qf(1 - alpha/2, df1 = m - 1 - 2*p, n - m)
+
+
   # }}}
 
-  ## Confidence Intervals for the MESOR {{{ ====
+  ## Taylor Series for Standard Error {{{ ====
 
   # Matrix to get standard errors and confidence intervals
-  s <- 1 / xmat
-
-  # MESOR parameter estimates
-  sigma <- sqrt(RSS / (n - 3))
-  tdist <- stats::qt(1 - alpha / 2, df = n - 3)
-  mesorConf <- tdist * sigma * sqrt(1/n)
-  mesorUpper <- mesor + mesorConf
-  mesorLower <- mesor - mesorConf
-
-  # }}}
+  s <- solve(xmat)
 
 	# Residual sum of squared errors
   RSS <- sum((y - yhat)^2)
-
-  # Confidence interval for MESOR
   sigma <- sqrt(RSS / (n - 3))
-  tdist <- stats::qt(1 - alpha / 2, df = n - 3)
+
+  # Standard error for MESOR
+  mesorSE <- sigma * sqrt(s[1,1])
+
+  # Standard error for amplitude
+  ampSE <-
+  	sigma * sqrt(
+  		s[2,2]*cos(phi)^2 - 2*s[2,3]*sin(phi)*cos(phi) + s[3,3]*sin(phi)^2
+  	)
+
+  # Standard error for phi
+  phiSE <-
+  	1/amp * sigma * sqrt(
+  		s[2,2]*sin(phi)^2 - 2*s[2,3]*sin(phi)*cos(phi) + s[3,3]*cos(phi)^2
+  	)
+
+  # }}}
+
+  # Elliptical method for confidence intervals {{{ ====
 
   # Correction of sum of squares for each parameter
   xc <- 1 / n * sum((x - mean(x))^2)
@@ -208,13 +258,16 @@ cosinor_impl <- function(predictors, outcomes) {
   ## Model Output {{{ ====
 
   # Model coefficients
-  coefficients <- c(mesor, beta, gamma, amp, phi)
-  coef_names <- c("mesor", "beta", "gamma", "amp", "phi")
-  names(coefficients) <- coef_names
+  coefs <- unname(c(mesor, amp, phi, beta, gamma))
+  coef_names <- c("mesor", "amp", "phi", "beta", "gamma")
 
   # Fit and residuals
   fitted.values <- yhat
   residuals <- y - yhat
+
+  # Standard error
+  se <- unname(c(mesorSE, ampSE, phiSE))
+  se_names <- c("mesor", "amp", "phi")
 
   # Area of ellipse for circadian rhythmicity
   area <- cbind(gseq, bs1, bs2)
@@ -226,7 +279,7 @@ cosinor_impl <- function(predictors, outcomes) {
   list(
 
     # Raw coefficients
-    coefficients = coefficients,
+    coefficients = coefs,
     coef_names = coef_names,
 
     # Fitted and residual values
@@ -238,6 +291,10 @@ cosinor_impl <- function(predictors, outcomes) {
 
     # Overall model of cosinor
     model = model,
+
+    # Matrices used
+    xmat = xmat,
+    ymat = ymat,
 
     # Description of ellipse that generates CI
     area = area

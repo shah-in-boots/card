@@ -40,7 +40,10 @@
 
 
 <meta property="og:title" content="Read in VivaLNK Patch Data — proc_patch_vivalnk" />
-<meta property="og:description" content="proc_patch_vivalnk reads in VivaLNK log files and helps to organize the summary data. Does not obtain the ECG signal, just the summary data from the log file for diagnostic purposes. This is a slow function, and is best for troubleshooting." />
+<meta property="og:description" content="Reads in VivaLNK log files and helps to organize the summary
+data. Does not obtain the ECG signal, just the summary data from the log file
+for diagnostic purposes. This is a slow function, and is best for
+troubleshooting." />
 
 
 
@@ -120,7 +123,10 @@
     </div>
 
     <div class="ref-description">
-    <p><code>proc_patch_vivalnk</code> reads in VivaLNK log files and helps to organize the summary data. Does not obtain the ECG signal, just the summary data from the log file for diagnostic purposes. This is a slow function, and is best for troubleshooting.</p>
+    <p>Reads in VivaLNK log files and helps to organize the summary
+data. Does not obtain the ECG signal, just the summary data from the log file
+for diagnostic purposes. This is a slow function, and is best for
+troubleshooting.</p>
     </div>
 
     <pre class="usage"><span class='fu'>proc_patch_vivalnk</span>(<span class='no'>name</span>, <span class='no'>loc</span>)</pre>
@@ -130,40 +136,22 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>name</th>
-      <td><p>Name of the patient that the log file was created on. The variable does NOT have an extension.</p></td>
+      <td><p>Name of the patient that the log file was created on. The
+variable does NOT have an extension.</p></td>
     </tr>
     <tr>
       <th>loc</th>
-      <td><p>The raw, unprocessed data folder containing the log file (which is in a ".txt" format)</p></td>
+      <td><p>The raw, unprocessed data folder containing the log file (which is
+in a ".txt" format)</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Returns a simple data frame with the start and endtime of the ECG data. Has several additional markers available internally, but currently not called.</p>
+    <p>Returns a simple data frame with the start and endtime of the ECG
+data. Has several additional markers available internally, but currently
+not called.</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'># Apply fn to each element of vector
-# for(i in seq_along(patid)) {
-
-# 	# Print out line
-# 	print(patid[i])
-
-# 	# Extraction of data
-# 	x &lt;- read_patch_vivalnk(patid[i])
-
-# 	# Make data frame
-# 	df &lt;- data.frame(
-# 		'patid' = patid[i],
-# 		'Start' = x[[1]],
-# 		'End' = x[[2]],
-# 		'Duration' = x[[3]]
-# 	)
-
-# 	# Write this to a file, appending as we go
-# 	write_csv(df, file.path(proc_folder, 'vivalnk_data.csv'), append = TRUE)
-# }
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

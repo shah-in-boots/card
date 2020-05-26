@@ -46,7 +46,6 @@ events. Currently does marginal and conditional A and B models.
 \examples{
 # Data
 data("mims")
-data <- mims
 
 # Parameters
 id <- "patid"
@@ -60,4 +59,5 @@ death <- "DEATH_CV_YN"
 tbl <- recur_survival_table(
   mims, id, first, last, event.dates, model.type, death
 )
+
 }

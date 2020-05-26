@@ -19,7 +19,7 @@ be used. Can be generalized to any dependent variable set.}
 \item{prop.weight}{This is a logical value if propensity weighting should be
 done instead of traditional covariate adjustment. This calls for the
 propensity weighting function defined by
-\code{\link{recurrent_propensity}} that will generate both a PROP_SCORE
+\link[card:recurrent_propensity]{card::recurrent_propensity} that will generate both a PROP_SCORE
 column and PROP_WEIGHT column. Defaults to FALSE}
 }
 \value{

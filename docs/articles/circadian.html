@@ -83,7 +83,6 @@
 
     
     
-<p><strong>This vignette is still under construction.</strong></p>
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">card</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">magrittr</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
@@ -120,9 +119,8 @@
   <span class="no">twins</span> <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(<span class="no">patid</span> <span class="kw">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>:<span class="fl">30</span>))</pre></body></html></div>
 <p>The research problem is that participants came from around the country for a study. Continuous, 24-hour measures were obtained. However, the patients came in from different time zones and on different dates over the course of 10 years. Findings could reflect perhaps jetlag instead of physiological disturbances. We could use sunrise and sunset times as natural <em>zeitgeibers</em> to standardize the time series data.</p>
-<p>The first step is inclusion of geographical locations, along with study date, to calculate sunrise times. This dataset was recorded in Atlanta, GA, but the individuals flew from across the country. The zipcodes are available in the dataset. This can then be converted to latitude and longitude using the {zipcode} package (which is archived on CRAN).</p>
+<p>The first step is inclusion of geographical locations, along with study date, to calculate sunrise times. This dataset was recorded in Atlanta, GA, but the individuals flew from across the country. The zipcodes are available in the dataset. This can then be converted to latitude and longitude using the {zipcode} package (which is archived on CRAN) - the zipcode data was bundled in this package for simplicity.</p>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="co"># Zipcodes, contained as characters (because of leading 0)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">zipcode</span>)
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"zipcode"</span>)
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">zipcode</span>)
 <span class="co">#&gt;     zip       city state latitude longitude</span>
@@ -182,6 +180,7 @@
 <span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span>
 <span class="co">#&gt; -22.327 -10.938  -4.856  -4.563   1.629  17.664</span>
 
+<span class="co"># Pseudo-rose plot</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">hour</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">rDYX</span>, <span class="kw">group</span> <span class="kw">=</span> <span class="no">hour</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="no">hour</span>)) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_boxplot.html">geom_boxplot</a></span>() +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar</a></span>(<span class="kw">theta</span> <span class="kw">=</span> <span class="st">"x"</span>, <span class="kw">start</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">direction</span> <span class="kw">=</span> <span class="fl">1</span>) +

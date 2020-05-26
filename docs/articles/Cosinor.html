@@ -83,7 +83,6 @@
 
     
     
-<p><strong>This vignette is still under construction. The cosinor function is still being developed.</strong></p>
 <p>The function <code><a href="../reference/cosinor.html">cosinor()</a></code> is built off of literature supporting the analysis of circadian rhythms. There are two other packages on CRAN that provide cosinor analyses that are very good, <a href="https://CRAN.R-project.org/package=cosinor">cosinor</a> and <a href="https://CRAN.R-project.org/package=cosinor2">cosinor2</a>. This package was built for 1) learning about regression and model development, and 2) the raw material generated to allow for more expansive and experimental analysis of cosinor functions and circadian rhythms.</p>
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">card</span>)
 
@@ -109,14 +108,22 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">geom_smooth</a></span>(<span class="kw">method</span> <span class="kw">=</span> <span class="st">"gam"</span>)
 <span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></pre></body></html></div>
 <p><img src="Cosinor_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<p>The cosinor analysis is straightforward, although currently rudimentary. Confidence intervals of the amplitude and acrophase can be generated (but are currently internal only). It creates the model using the <a href="https://tidymodels.github.io/hardhat/index.html">hardhat</a> package from <em>tidymodels</em>.</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"># Model
-#m &lt;- cosinor(rDYX ~ hour, twins)
+<p>Cosinor analysis can be used to generate model statistics. Confidence intervals of the amplitude and acrophase can be generated. It creates the model using the <a href="https://tidymodels.github.io/hardhat/index.html">hardhat</a>.</p>
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="co"># Model</span>
+<span class="no">m</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cosinor.html">cosinor</a></span>(<span class="no">rDYX</span> ~ <span class="no">hour</span>, <span class="no">twins</span>)
 
-# Summary
-#summary(m)</pre></body></html></div>
-<p>Diagnostics can also be run. The most important is generating confidence intervals over the amplitude and acrophase. This is done through an elliptical method as described by Cornillessen (TODO).</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r">#ggcosinorfit(m)</pre></body></html></div>
+<span class="co"># Summary</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">m</span>)
+<span class="co">#&gt; Call: </span>
+<span class="co">#&gt; cosinor("rDYX ~ hour")</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Residuals: </span>
+<span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span>
+<span class="co">#&gt; -3.12633 -0.53228 -0.03597  0.00000  0.49132  4.82150 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Coefficients: </span>
+<span class="co">#&gt;      mesor        amp        phi       beta      gamma </span>
+<span class="co">#&gt;  2.8604855  0.2986101 -2.6687044 -0.2658396  0.1360048</span></pre></body></html></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

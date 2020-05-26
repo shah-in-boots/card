@@ -28,6 +28,7 @@
 #' @examples
 #' data("twins")
 #' circ_compare_groups(data = twins, x = "rDYX", y = "sad_cat", time = "hour")
+#'
 #' @importFrom data.table data.table .N .I .SD .BY fread :=
 #'
 #' @export
@@ -127,6 +128,7 @@ circ_compare_groups <- function(data, x, y, time) {
 #' ggcircadian(tbl, outcome = "sad_cat") +
 #'   labs(title = "Example") +
 #'   scale_color_viridis_d(option = "A", begin = 0.0, end = 0.75)
+#'
 #' @import ggplot2
 #'
 #' @export
@@ -227,8 +229,10 @@ ggcircadian <- function(data, outcome, time = "hour", mean = "mean", n = "n", sd
 #'
 #' # Create odds ratio tables by hour of day for covariate of interest
 #' ot <- circ_odds(twins, "hour", "sad_bin", "rDYX")
+#'
 #' @export
 circ_odds <- function(data, time, outcome, covar) {
+
   # Create formula
   f <-
     paste(outcome, paste(covar, collapse = " + "), sep = " ~ ") %>%
@@ -304,13 +308,15 @@ circ_odds <- function(data, time, outcome, covar) {
 #' ggforest(ot) +
 #'   labs(title = "Example") +
 #'   scale_color_viridis_c(option = "A")
+#'
 #' @return A ggplot of forest plot that can be extended. Default theme is
 #'   minimal and default color scheme is viridis.
 #'
 #' @import ggplot2
 #'
 #' @export
-ggforest <- function(ot, time = "time", or = "OR", lower = "Lower", upper = "Upper") {
+ggforest <-
+  function(ot, time = "time", or = "OR", lower = "Lower", upper = "Upper") {
 
   # Ggplot
   gg <- ggplot(data = ot, aes_string(x = time, y = or)) +

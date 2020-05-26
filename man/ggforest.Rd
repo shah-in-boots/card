@@ -43,4 +43,5 @@ library(ggplot2)
 ggforest(ot) +
   labs(title = "Example") +
   scale_color_viridis_c(option = "A")
+
 }

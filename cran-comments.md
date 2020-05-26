@@ -1,9 +1,14 @@
 ## Resubmission
 
-This is a resubmission. With this, I have corrected the following:
+This is a resubmission. I'm thankful for the comments by Jelena Saf <jelena.saf@jku.at>. With this, I have made the following corrections:
 
-* Updated the LICENSE file to comply with [CRAN requirements](https://cran.r-project.org/web/licenses/MIT)
-* Updated links to two related packages (cited in the vignettes) to the canonical CRAN URL form
+- Explained abbreviations/acronyms in DESCRIPTION 
+- Added copyright holder to authors
+- Add citations of theoretical literature supporting package methods in DESCRIPTION under "description" field with DOI linkage
+- Examples were fixed such that code was not commented out 
+- Vignettes were updated to reflect full functionality of software (instead of being "works-in-progress")
+- All functions were reviewed to make sure no changes were made to user options, including no writing to the user directory by `getwd()`, or user options. 
+- If this is found to be incorrect, please let me know and I will learn to improve the package / functions.
 
 ## Test environments
 

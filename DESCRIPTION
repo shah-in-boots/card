@@ -5,15 +5,18 @@ Version: 0.1.0
 Authors@R: c(
 			person("Anish S. Shah", 
 			email = "asshah4@emory.edu", 
-			role = c("aut", "cre"),
+			role = c("aut", "cre", "cph"),
 			comment = c(ORCID = "0000-0002-9729-1558"))
 		)
 Description: Tools that can aid in the assessment of the autonomic regulation 
 		of cardiovascular physiology. The aims of this package are to: 1) study 
-		ECG-based time signals (both RR intervals and morphology) as extensions 
+		electrocardiography (both intervals and morphology) as extensions 
 		of signal processing, 2) study circadian rhythms and how it effects 
 		autonomic physiology, 3) assess clinical risk of autonomic dysfunction on 
 		cardiovascular health through the perspective of epidemiology and causality.
+		The analysis of circadian rhythms through cosinor analysis are built upon 
+		the methods by Cornelissen (2014) <doi:10.1186/1742-4682-11-16> and 
+		Refinetti, Cornelissen, Halberg (2014) <doi:10.1080/09291010600903692>.
 License: MIT + file LICENSE
 URL: https://github.com/asshah4/card
 BugReports: https://github.com/asshah4/card/issues
@@ -49,6 +52,5 @@ Suggests:
     plyr,
     stargazer,
     knitr,
-    rmarkdown,
-    zipcode
+    rmarkdown
 VignetteBuilder: knitr

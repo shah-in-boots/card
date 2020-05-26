@@ -22,9 +22,6 @@ print.cosinor <- function(x, ...) {
 #' @export
 summary.cosinor <- function(object, ...) {
 
-	# Generic method
-	summary(object)
-
 	# Call
 	cat("Call: \n")
 	print(object$call)
@@ -37,9 +34,8 @@ summary.cosinor <- function(object, ...) {
 	# Coefficients
 	cat("\n")
 	cat("Coefficients: \n")
-	object$coefficients
-
-
+	names(object$coefficients) <- object$coef_names
+	print(object$coefficients)
 
 }
 
@@ -66,14 +62,37 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 	z <- object$model[,"z"]
 	yhat <- object$fitted.values
 	n <- length(y)
-	mesor <- object$coefficients["mesor"]
-	beta <- object$coefficients["beta"]
-	gamma <- object$coefficients["gamma"]
-	amp <- object$coefficients["amp"]
-	phi <- object$coefficients["phi"]
+	mesor <- object$coefficients[1]
+	amp <- object$coefficients[2]
+	phi <- object$coefficients[3]
+	beta <- object$coefficients[4]
+	gamma <- object$coefficients[5]
 
-	# Residual sum of squared errors
+	# Ellipse math
+	# Sum((x - xbar)^2(b - bhat)^2) + 2(sum((x - xbar)(z - zbar)(b - bhat)(g - ghat)) + sum((z - zbar)^2(z - zhat)^2) <= 2*sigma^2*fdist
+	# xbar = sum(x)/n
+	# zbar = sum(z)/n
+
+	# RHS of ellipse equation (with fdist)
+  fdist <- stats::qf(1 - alpha / 2, df1 = 2, df2 = n - 3)
   RSS <- sum((y - yhat)^2)
+  sigma <- sqrt(RSS / (n - 3))
+
+  # LHS variables
+  xbar <- sum(x)/n
+  zbar <- sum(z)/n
+  ghat <- seq(from = gamma - (amp * 2), to = gamma + (amp * 2), by = amp / 1000)
+  gseq <- ghat
+  bhat <- 0
+
+  # First term
+  sum((x - xbar)^2 * (beta - bhat)^2) +
+
+  # Middle term
+  2 * sum((x - xbar) * (z - zbar) * (beta - bhat) * (gamma - ghat)) +
+
+  # Last term
+  sum((z - zbar)^2 * (gamma - ghat)^2)
 
   # Confidence interval for MESOR
   sigma <- sqrt(RSS / (n - 3))
@@ -164,12 +183,41 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
     }
   }
 
-  # Output
+  # Matrix to get standard errors and confidence intervals
+  s <- solve(object$xmat)
+
+	# Residual sum of squared errors
+  RSS <- sum((y - yhat)^2)
+  sigma <- sqrt(RSS / (n - 3))
+
+  # Standard error for MESOR
+  mesorSE <- unname(sigma * sqrt(s[1,1]))
+
+  # Standard error for amplitude
+  ampSE <-
+  	unname(sigma * sqrt(
+  		s[2,2]*cos(phi)^2 - 2*s[2,3]*sin(phi)*cos(phi) + s[3,3]*sin(phi)^2
+  	))
+
+  # Standard error for phi
+  phiSE <-
+  	unname(1/amp * sigma * sqrt(
+  		s[2,2]*sin(phi)^2 - 2*s[2,3]*sin(phi)*cos(phi) + s[3,3]*cos(phi)^2
+  	))
+
+  # Confidence intervals
+  tdist <- stats::qt(1 - alpha/2, df = n - 3)
   confints <- matrix(
-  	c(mesorLower, ampLower, phiLower, mesorUpper, ampUpper, phiUpper),
-  	nrow = 3, ncol = 2,
-  	dimnames = list(c("mesor", "amp", "phi"),
-  									c(paste0(100*(alpha/2),"%"), paste0(100*(1-alpha/2), "%")))
+  	rbind(
+		  c(mesor - tdist * mesorSE, mesor + tdist * mesorSE),
+		  c(amp - tdist * ampSE, amp + tdist * ampSE),
+		  c(phi - tdist * phiSE, phi + tdist * phiSE)
+  	),
+  	ncol = 2, nrow = 3,
+  	dimnames = list(
+  		c("mesor", "amp", "phi"),
+  		c(paste0(100*(alpha/2),"%"), paste0(100*(1-alpha/2), "%"))
+  	)
   )
 
   # Print output

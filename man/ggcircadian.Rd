@@ -53,4 +53,5 @@ library(ggplot2)
 ggcircadian(tbl, outcome = "sad_cat") +
   labs(title = "Example") +
   scale_color_viridis_d(option = "A", begin = 0.0, end = 0.75)
+
 }

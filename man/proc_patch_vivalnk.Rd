@@ -7,35 +7,20 @@
 proc_patch_vivalnk(name, loc)
 }
 \arguments{
-\item{name}{Name of the patient that the log file was created on. The variable does NOT have an extension.}
+\item{name}{Name of the patient that the log file was created on. The
+variable does NOT have an extension.}
 
-\item{loc}{The raw, unprocessed data folder containing the log file (which is in a ".txt" format)}
+\item{loc}{The raw, unprocessed data folder containing the log file (which is
+in a ".txt" format)}
 }
 \value{
-Returns a simple data frame with the start and endtime of the ECG data. Has several additional markers available internally, but currently not called.
+Returns a simple data frame with the start and endtime of the ECG
+data. Has several additional markers available internally, but currently
+not called.
 }
 \description{
-\code{proc_patch_vivalnk} reads in VivaLNK log files and helps to organize the summary data. Does not obtain the ECG signal, just the summary data from the log file for diagnostic purposes. This is a slow function, and is best for troubleshooting.
-}
-\examples{
-# Apply fn to each element of vector
-# for(i in seq_along(patid)) {
-
-# 	# Print out line
-# 	print(patid[i])
-
-# 	# Extraction of data
-# 	x <- read_patch_vivalnk(patid[i])
-
-# 	# Make data frame
-# 	df <- data.frame(
-# 		'patid' = patid[i],
-# 		'Start' = x[[1]],
-# 		'End' = x[[2]],
-# 		'Duration' = x[[3]]
-# 	)
-
-# 	# Write this to a file, appending as we go
-# 	write_csv(df, file.path(proc_folder, 'vivalnk_data.csv'), append = TRUE)
-# }
+Reads in VivaLNK log files and helps to organize the summary
+data. Does not obtain the ECG signal, just the summary data from the log file
+for diagnostic purposes. This is a slow function, and is best for
+troubleshooting.
 }

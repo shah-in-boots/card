@@ -8,10 +8,13 @@
 \description{
 Tools that can aid in the assessment of the autonomic regulation 
 		of cardiovascular physiology. The aims of this package are to: 1) study 
-		ECG-based time signals (both RR intervals and morphology) as extensions 
+		electrocardiography (both intervals and morphology) as extensions 
 		of signal processing, 2) study circadian rhythms and how it effects 
 		autonomic physiology, 3) assess clinical risk of autonomic dysfunction on 
 		cardiovascular health through the perspective of epidemiology and causality.
+		The analysis of circadian rhythms through cosinor analysis are built upon 
+		the methods by Cornelissen (2014) <doi:10.1186/1742-4682-11-16> and 
+		Refinetti, Cornelissen, Halberg (2014) <doi:10.1080/09291010600903692>.
 }
 \seealso{
 Useful links:
@@ -22,7 +25,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Anish S. Shah \email{asshah4@emory.edu} (\href{https://orcid.org/0000-0002-9729-1558}{ORCID})
+\strong{Maintainer}: Anish S. Shah \email{asshah4@emory.edu} (\href{https://orcid.org/0000-0002-9729-1558}{ORCID}) [copyright holder]
 
 }
 \keyword{internal}

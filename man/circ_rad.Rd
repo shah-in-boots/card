@@ -4,7 +4,7 @@
 \alias{circ_rad}
 \title{Convert Time to Radians}
 \usage{
-circ_rad(t, period, ...)
+circ_rad(t, period)
 }
 \arguments{
 \item{t}{vector of time units}
