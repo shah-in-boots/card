@@ -52,5 +52,6 @@ Suggests:
     plyr,
     stargazer,
     knitr,
-    rmarkdown
+    rmarkdown,
+    covr
 VignetteBuilder: knitr

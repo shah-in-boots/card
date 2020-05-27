@@ -58,6 +58,7 @@ cosinor_zero_amplitude <- function(object, level = 0.95, ...) {
 }
 
 # }}}
+
 # Goodness of Fit {{{ ====
 
 #' @title Goodness of Fit of Cosinor
@@ -84,7 +85,7 @@ cosinor_zero_amplitude <- function(object, level = 0.95, ...) {
 #' @return f-statistic as result of goodness of fit
 #'
 #' @export
-test_goodness_of_fit <- function(object, level = 0.95, ...) {
+cosinor_goodness_of_fit <- function(object, level = 0.95, ...) {
 
   # Model data
 	y <- object$model[,"y"]
@@ -149,6 +150,127 @@ test_goodness_of_fit <- function(object, level = 0.95, ...) {
 
 # }}}
 
+# Area of Ellipse {{{ ====
+
+#' @title Area of Ellipse
+#'
+#' @description Formulas for creating the area of the ellipse to identify confidence intervals, directionality, and graphing purposes.
+#'
+#' @param object Model of class `cosinor`
+#'
+#' @param level Confidence level requested
+#'
+#' @param ... Not currently used, but required for extensibility.
+#'
+#' @export
+cosinor_area <- function(object, level = 0.95, ...) {
+
+	# Model objects needed
+	y <- object$model[, "y"]
+	x <- object$model[, "x"]
+	z <- object$model[, "z"]
+	t <- object$model[, "t"]
+	beta <- object$coefficients[object$coef_names == "beta"]
+	gamma <- object$coefficients[object$coef_names == "gamma"]
+	yhat <- object$fitted.values
+	alpha <- 1 - level
+
+  # Stats
+  RSS <- sum((y - yhat)^2)
+  sigma <- sqrt(RSS / (n - 3))
+  k <- 3 # number of parameters
+	n <- length(y)
+
+  # Correction of sum of squares for each parameter
+  xc <- 1 / n * sum((x - mean(x))^2)
+  zc <- 1 / n * sum((z - mean(z))^2)
+  tc <- 1 / n * sum((x - mean(x)) * (z - mean(z)))
+
+  # Find beta and gamma CI region
+  fdist <- stats::qf(1 - (alpha / 2), df1 = k - 1, df2 = n - k)
+
+  # Quadratic/ellipse formula setup
+  a <- xc
+  b <- 2 * tc
+  c <- zc
+  d <- -2 * xc * beta - 2 * tc * gamma
+  e <- -2 * tc * beta - 2 * zc * gamma
+  f <-
+  	xc * beta^2 +
+  	2 * tc * beta * gamma +
+  	zc * gamma^2 -
+  	(2 / n) * sigma^2 * fdist
+  gmax <- -(2 * a * e - d * b) / (4 * a * c - b^2)
+
+  # Identify parameters for ellipses
+  gseq <- seq(from = gmax - amp * 2, to = gmax + amp * 2, by = amp / 1000)
+  bs1 <- (-(b * gseq + d) + sqrt(
+    as.complex((b * gseq + d)^2 - 4 * a * (c * gseq^2 + e * gseq + f))
+  )) / (2 * a)
+  bs2 <- (-(b * gseq + d) - sqrt(
+    as.complex((b * gseq + d)^2 - 4 * a * (c * gseq^2 + e * gseq + f))
+  )) / (2 * a)
+
+  # Isolate the elliptical region (non imaginary)
+  index <- which(Re(bs1) != Re(bs2))
+  gseq <- gseq[index]
+  bs1 <- Re(bs1[index])
+  bs2 <- Re(bs2[index])
+
+  # Determine if ellipse regions overlap the pole (if overlap, cannot get CI)
+  if (
+    (diff(range(gseq)) >= max(gseq)) &
+      ((diff(range(bs1)) >= max(bs1)) | (diff(range(bs2)) >= max(bs2)))
+  ) {
+    print("Confidence regions overlap the poles. Confidence intervals for amplitude and acrophase cannot be determined.")
+  } else {
+
+    # CI for Amplitude
+    ampUpper <- max(c(sqrt(bs1^2 + gseq^2), sqrt(bs2^2 + gseq^2)))
+    ampLower <- min(c(sqrt(bs1^2 + gseq^2), sqrt(bs2^2 + gseq^2)))
+
+    # CI for Acrophase
+    theta <- c(atan(abs(gseq / bs1)), atan(abs(gseq / bs2)))
+    sa <- sign(c(bs1, bs2))
+    sb <- sign(c(gseq, gseq)) * 3
+    sc <- sa + sb
+    tmp <- sc
+    phiConf <- vector(mode = "double", length = length(theta))
+
+    # Place theta in correct quadrant for phi
+    for (i in 1:length(sc)) {
+      if (sc[i] == 4 | sc[i] == 3) {
+        phiConf[i] <- -theta[i]
+        sc[i] <- 1
+      } else if (sc[i] == 2 || sc[i] == -1) {
+        phiConf[i] <- -pi + theta[i]
+        sc[i] <- 2
+      } else if (sc[i] == -4 || sc[i] == -3) {
+        phiConf[i] <- -pi - theta[i]
+        sc[i] <- 3
+      } else if (sc[i] == -2 || sc[i] == -1) {
+        phiConf[i] <- -2 * pi + theta[i]
+        sc[i] <- 4
+      }
+    }
+
+    # Get max and min values for phi / acrophase
+    if (max(sc) - min(sc) == 3) {
+      phiUpper <- min(phiConf[sc == 1])
+      phiLower <- max(phiConf[sc == 4])
+    } else {
+      phiUpper <- max(phiConf)
+      phiLower <- min(phiConf)
+    }
+  }
+
+  # Return
+  list(
+  	area = cbind(gseq, bs1, bs2)
+  )
+
+}
+# }}}
 
 # Graphical Assessment of Amplitude and Acrophse {{{ ====
 
@@ -175,22 +297,18 @@ test_goodness_of_fit <- function(object, level = 0.95, ...) {
 #' @export
 ggcosinorfit <- function(object, level = 0.95, ...) {
 
-  # Extract ellipse statistics
-  tmp <- stats::confint(object, level)
-  coefs <- stats::coef(object)
-  area <- tmp$area
-  area <- object$area
+	# Area
+	area <- cosinor_area(object, level = level)$area
   gseq <- area[, "gseq"]
   bs1 <- area[, "bs1"]
   bs2 <- area[, "bs2"]
 
   # Model parameters
-  amp <- coefs["amp"]
-  phi <- coefs["phi"]
-  mesor <- coefs["mesor"]
-  beta <- coefs["beta"]
-  gamma <- coefs["gamma"]
-  period <- 24
+	mesor <- object$coefficients[object$coef_names == "mesor"]
+	amp <- object$coefficients[object$coef_names == "amp"]
+	phi <- object$coefficients[object$coef_names == "phi"]
+	beta <- object$coefficients[object$coef_names == "beta"]
+	gamma <- object$coefficients[object$coef_names == "gamma"]
 
   # Necessary values for the plot
   theta_clock <- seq(0, 2 * pi, length.out = 24^2)
@@ -227,7 +345,6 @@ ggcosinorfit <- function(object, level = 0.95, ...) {
     geom_line(aes(y = c(0, 0), x = c(-2 * amp, 2 * amp)), lty = 5, col = "grey") +
     # "Clock" shape to help show degrees on unit circle
     geom_path(aes(x = clock[, 1], y = clock[, 2]), col = "cornflowerblue") +
-    geom_path(aes(x = 1.2 * clock[, 1], y = 1.2 * clock[, 2]), col = "cornflowerblue") +
     annotate(
       geom = "text",
       x = rad_clock[, 1],

@@ -9,30 +9,41 @@
 \alias{cosinor.recipe}
 \title{Fit a \code{cosinor}}
 \usage{
-cosinor(x, ...)
+cosinor(t, tau, ...)
 
-\method{cosinor}{default}(x, ...)
+\method{cosinor}{default}(t, tau, ...)
 
-\method{cosinor}{data.frame}(x, y, ...)
+\method{cosinor}{data.frame}(t, y, tau, ...)
 
-\method{cosinor}{matrix}(x, y, ...)
+\method{cosinor}{matrix}(t, y, tau, ...)
 
-\method{cosinor}{formula}(formula, data, ...)
+\method{cosinor}{formula}(formula, data, tau, ...)
 
-\method{cosinor}{recipe}(x, data, ...)
+\method{cosinor}{recipe}(t, data, tau, ...)
 }
 \arguments{
-\item{x}{Depending on the context:
+\item{t}{Represents the time indices that provide the positions for the
+cosine wave. Depending on the context:
 \itemize{
-\item A \strong{data frame} of time-based predictors/indices.
-\item A \strong{matrix} of time-based predictors/indices.
+\item A \strong{data frame} of a time-based predictor/index.
+\item A \strong{matrix} of time-based predictor/index.
 \item A \strong{recipe} specifying a set of preprocessing steps
 created from \code{\link[recipes:recipe]{recipes::recipe()}}.
 }}
 
+\item{tau}{A vector that determines the periodicity of the time index. The
+number of elements in the vector determine the number of components (e.g.
+single versus multiple cosinor).
+\itemize{
+\item A \strong{vector} with a single element = single-component cosinor, e.g.
+period = c(24)
+\item A \strong{vector} with multiple elements = multiple-component
+cosinor, e.g. period = c(24, 12)
+}}
+
 \item{...}{Not currently used, but required for extensibility.}
 
-\item{y}{When \code{x} is a \strong{data frame} or \strong{matrix}, \code{y} is the outcome
+\item{y}{When \code{t} is a \strong{data frame} or \strong{matrix}, \code{y} is the outcome
 specified as:
 \itemize{
 \item A \strong{data frame} with 1 numeric column.
@@ -52,10 +63,10 @@ and the predictor terms on the right-hand side.}
 A \code{cosinor} object.
 }
 \description{
-\code{cosinor()} fits a regression model of a time variable to a continuous outcome use trigonometric features.
+\code{cosinor()} fits a regression model of a time variable to a
+continuous outcome use trigonometric features.
 }
 \examples{
-
 # Data setup
 data("twins")
 

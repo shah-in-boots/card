@@ -2,7 +2,7 @@
 
 #' @description Model fitting algorithm for cosinor. Results in output that define the new S3 class, as seen by the [hardhat::new_model], which generates the `new_cosinor` function.
 #' @noRd
-cosinor_impl <- function(predictors, outcomes) {
+cosinor_impl <- function(predictors, outcomes, tau) {
 
   ## Parameters for normal equations {{{ ====
 
@@ -10,7 +10,6 @@ cosinor_impl <- function(predictors, outcomes) {
   hardhat::validate_predictors_are_numeric(predictors)
 
   # Period of 24 hours in a day
-  period <- 24
   alpha <- 0.05
 
   # Formal equation
@@ -35,6 +34,7 @@ cosinor_impl <- function(predictors, outcomes) {
   y <- outcomes[[1]]
   t <- predictors[[1]]
   n <- length(t)
+  period <- tau
   x <- cos((2 * pi * t) / period)
   z <- sin((2 * pi * t) / period)
 

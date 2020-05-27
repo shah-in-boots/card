@@ -1,38 +1,46 @@
 # Cosinor Regression {{{ ====
 
-#' Fit a `cosinor`
+#' @title Fit a `cosinor`
 #'
-#' `cosinor()` fits a regression model of a time variable to a continuous outcome use trigonometric features.
+#' @description `cosinor()` fits a regression model of a time variable to a
+#' continuous outcome use trigonometric features.
 #'
-#' @param x Depending on the context:
+#' @param t Represents the time indices that provide the positions for the
+#'   cosine wave. Depending on the context:
 #'
-#'   * A __data frame__ of time-based predictors/indices.
-#'   * A __matrix__ of time-based predictors/indices.
-#'   * A __recipe__ specifying a set of preprocessing steps
+#'   - A __data frame__ of a time-based predictor/index.
+#'   - A __matrix__ of time-based predictor/index.
+#'   - A __recipe__ specifying a set of preprocessing steps
 #'     created from [recipes::recipe()].
 #'
-#' @param y When `x` is a __data frame__ or __matrix__, `y` is the outcome
+#' @param y When `t` is a __data frame__ or __matrix__, `y` is the outcome
 #' specified as:
 #'
-#'   * A __data frame__ with 1 numeric column.
-#'   * A __matrix__ with 1 numeric column.
-#'   * A numeric __vector__.
+#'   - A __data frame__ with 1 numeric column.
+#'   - A __matrix__ with 1 numeric column.
+#'   - A numeric __vector__.
 #'
 #' @param data When a __recipe__ or __formula__ is used, `data` is specified as:
 #'
-#'   * A __data frame__ containing both the predictors and the outcome.
+#'   - A __data frame__ containing both the predictors and the outcome.
 #'
 #' @param formula A formula specifying the outcome terms on the left-hand side,
 #' and the predictor terms on the right-hand side.
 #'
+#' @param tau A vector that determines the periodicity of the time index. The
+#'   number of elements in the vector determine the number of components (e.g.
+#'   single versus multiple cosinor).
+#'
+#'   - A __vector__ with a single element = single-component cosinor, e.g.
+#'   period = c(24)
+#'   - A __vector__ with multiple elements = multiple-component
+#'   cosinor, e.g. period = c(24, 12)
+#'
 #' @param ... Not currently used, but required for extensibility.
 #'
-#' @return
-#'
-#' A `cosinor` object.
+#' @return A `cosinor` object.
 #'
 #' @examples
-#'
 #' # Data setup
 #' data("twins")
 #'
@@ -40,7 +48,7 @@
 #' mod2 <- cosinor(rDYX ~ hour, twins)
 #'
 #' @export
-cosinor <- function(x, ...) {
+cosinor <- function(t, tau, ...) {
   UseMethod("cosinor")
 }
 
@@ -48,7 +56,7 @@ cosinor <- function(x, ...) {
 
 #' @export
 #' @rdname cosinor
-cosinor.default <- function(x, ...) {
+cosinor.default <- function(t, tau, ...) {
   stop("`cosinor()` is not defined for a '", class(t)[1], "'.", call. = FALSE)
 }
 
@@ -56,36 +64,36 @@ cosinor.default <- function(x, ...) {
 
 #' @export
 #' @rdname cosinor
-cosinor.data.frame <- function(x, y, ...) {
-  processed <- hardhat::mold(x, y)
-  cosinor_bridge(processed, ...)
+cosinor.data.frame <- function(t, y, tau, ...) {
+  processed <- hardhat::mold(t, y)
+  cosinor_bridge(processed, tau, ...)
 }
 
 # XY method - matrix
 
 #' @export
 #' @rdname cosinor
-cosinor.matrix <- function(x, y, ...) {
-  processed <- hardhat::mold(x, y)
-  cosinor_bridge(processed, ...)
+cosinor.matrix <- function(t, y, tau, ...) {
+  processed <- hardhat::mold(t, y)
+  cosinor_bridge(processed, tau, ...)
 }
 
 # Formula method - stable, works
 
 #' @export
 #' @rdname cosinor
-cosinor.formula <- function(formula, data, ...) {
+cosinor.formula <- function(formula, data, tau, ...) {
   processed <- hardhat::mold(formula, data)
-  cosinor_bridge(processed, ...)
+  cosinor_bridge(processed, tau, ...)
 }
 
 # Recipe method - unstable
 
 #' @export
 #' @rdname cosinor
-cosinor.recipe <- function(x, data, ...) {
-  processed <- hardhat::mold(x, data)
-  cosinor_bridge(processed, ...)
+cosinor.recipe <- function(t, data, tau, ...) {
+  processed <- hardhat::mold(t, data)
+  cosinor_bridge(processed, tau, ...)
 }
 
 # }}}
@@ -97,7 +105,7 @@ cosinor.recipe <- function(x, data, ...) {
 #'   fitting algorithm, and `new_cosinor`, the constructor for a new type of S3
 #'   class.
 #' @noRd
-cosinor_bridge <- function(processed, ...) {
+cosinor_bridge <- function(processed, tau, ...) {
 
   # Make sure input is appropriate format
   hardhat::validate_outcomes_are_univariate(processed$outcomes)
@@ -108,7 +116,7 @@ cosinor_bridge <- function(processed, ...) {
   outcomes <- processed$outcomes
 
   # Implempented function requires
-  fit <- cosinor_impl(predictors, outcomes)
+  fit <- cosinor_impl(predictors, outcomes, tau)
 
   # Constructor function recieves from implemented function
   new_cosinor(
@@ -146,7 +154,7 @@ new_cosinor <- function(
 
   # Can validate coefs here
   if (!is.numeric(coefficients)) {
-    stop("`coef` should be a numeric vector.",
+    stop("`coefficients` should be a numeric vector.",
       call. = FALSE
     )
   }
@@ -160,7 +168,7 @@ new_cosinor <- function(
 
   # Length check
   if (length(coefficients) != length(coef_names)) {
-    stop("`coefs` and `coef_names` must have same length.")
+    stop("`coefficients` and `coef_names` must have same length.")
   }
 
   # Fit outputs need to match here

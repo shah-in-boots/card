@@ -8,6 +8,8 @@ cosinor_zero_amplitude(object, level = 0.95, ...)
 }
 \arguments{
 \item{object}{model of class \code{cosinor}}
+
+\item{level}{confidence level}
 }
 \description{
 Zero amplitude test assesses how well the circadian pattern fits the data, essentially detecting the present of a rhythm to the data.
