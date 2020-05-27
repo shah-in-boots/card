@@ -1,3 +1,63 @@
+# Zero Amplitude Test {{{ ====
+
+#' @title Zero Amplitude Test
+#'
+#' @description Zero amplitude test assesses how well the circadian pattern fits the data, essentially detecting the present of a rhythm to the data.
+#'
+#' @param object model of class `cosinor`
+#'
+#' @param level confidence level
+#'
+#' @export
+cosinor_zero_amplitude <- function(object, level = 0.95, ...) {
+
+	### Confidence level of fstatistic
+
+	# Model objects
+	y <- object$model[, "y"]
+	yhat <- object$fitted.values
+	ybar <- mean(y)
+
+	# Confidence level
+	alpha <- 1 - level
+
+	# Degrees of freedom
+	n <- length(y)
+	k <- 3 # Number of parameters
+	fdist <- stats::qf(1 - alpha/2, df1 = k - 1, df2 = n - k)
+
+	### Total sum of squares = model sum of squares + residual sum of squares
+		# TSS = sum(y - ybar)^2
+		# MSS = sum(yhat - ybar)^2
+		# RSS = sum(y - yhat)^2
+	TSS <- sum((y - ybar)^2)
+	MSS <- sum((yhat - ybar)^2)
+	RSS <- sum((y - yhat)^2)
+
+	# Statistical significance by F test
+	fstat <- (MSS / 2) / (RSS / (n - 3))
+
+	# Output
+	cat("Zero Amplitude Test: \n\n")
+	cat(paste0("F-statistic: ", round(fstat, 3)))
+	cat("\n")
+	cat(paste0("F-level at ", level*100, "% confidence level: ", round(fdist, 3)))
+	cat("\n")
+	if(fstat > fdist) {
+		cat("Rhythm detected by F-test.\n\n")
+	} else {
+		cat("Rhythm not detected by F-test.\n\n")
+	}
+
+	# Return
+	list(
+		fstat = fstat,
+		fdist = fdist
+	)
+
+}
+
+# }}}
 # Goodness of Fit {{{ ====
 
 #' @title Goodness of Fit of Cosinor

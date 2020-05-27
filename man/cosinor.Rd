@@ -59,15 +59,7 @@ A \code{cosinor} object.
 # Data setup
 data("twins")
 
-# XY interface
-# mod1 <- cosinor(twins["hour"], twins$rDYX)
-
 # Formula interface
 mod2 <- cosinor(rDYX ~ hour, twins)
-
-# Recipes interface (still needs work)
-# rec <- recipes::recipe(rDYX ~ hour, twins)
-# rec <- recipes::step_log(rec, rDYX)
-# mod3 <- cosinor(rec, twins)
 
 }
