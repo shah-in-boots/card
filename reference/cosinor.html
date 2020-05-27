@@ -187,16 +187,8 @@ and the predictor terms on the right-hand side.</p></td>
 <span class='co'># Data setup</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"twins"</span>)
 
-<span class='co'># XY interface</span>
-<span class='co'># mod1 &lt;- cosinor(twins["hour"], twins$rDYX)</span>
-
 <span class='co'># Formula interface</span>
-<span class='no'>mod2</span> <span class='kw'>&lt;-</span> <span class='fu'>cosinor</span>(<span class='no'>rDYX</span> ~ <span class='no'>hour</span>, <span class='no'>twins</span>)
-
-<span class='co'># Recipes interface (still needs work)</span>
-<span class='co'># rec &lt;- recipes::recipe(rDYX ~ hour, twins)</span>
-<span class='co'># rec &lt;- recipes::step_log(rec, rDYX)</span>
-<span class='co'># mod3 &lt;- cosinor(rec, twins)</span></div></pre>
+<span class='no'>mod2</span> <span class='kw'>&lt;-</span> <span class='fu'>cosinor</span>(<span class='no'>rDYX</span> ~ <span class='no'>hour</span>, <span class='no'>twins</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
