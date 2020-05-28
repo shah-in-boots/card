@@ -53,5 +53,6 @@ Suggests:
     stargazer,
     knitr,
     rmarkdown,
-    covr
+    covr,
+    testthat
 VignetteBuilder: knitr
