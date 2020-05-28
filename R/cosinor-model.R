@@ -1,16 +1,10 @@
-# Cosinor Implementation {{{ ====
+# Single Cosinor Implementation {{{ ====
 
 #' @description Model fitting algorithm for cosinor. Results in output that define the new S3 class, as seen by the [hardhat::new_model], which generates the `new_cosinor` function.
 #' @noRd
 cosinor_impl <- function(predictors, outcomes, tau) {
 
   ## Parameters for normal equations {{{ ====
-
-  # Validate predictors
-  hardhat::validate_predictors_are_numeric(predictors)
-
-  # Period of 24 hours in a day
-  alpha <- 0.05
 
   # Formal equation
   # y(t) = M + A*cos(2*pi*t/period + phi)
@@ -31,8 +25,8 @@ cosinor_impl <- function(predictors, outcomes, tau) {
   # sum(y*z) = M*sum(z) + beta*sum(x*z) + gamma*sum(z^2)
 
   # Parameters using the predictors (time) and outcomes (y)
-  y <- outcomes[[1]]
-  t <- predictors[[1]]
+  y <- outcomes
+  t <- predictors
   n <- length(t)
   period <- tau
   x <- cos((2 * pi * t) / period)
@@ -52,7 +46,7 @@ cosinor_impl <- function(predictors, outcomes, tau) {
 
   ## Solve System of Equations {{{ ====
 
-  coefs <- solve(t(xmat) %*% xmat) %*% (t(xmat) %*% ymat)
+  coefs <- solve(t(xmat) %*% xmat, tol = 1e-21) %*% (t(xmat) %*% ymat)
   mesor <- coefs[1] # mesor
   beta <- coefs[2] # beta
   gamma <- coefs[3] # gamma
@@ -80,96 +74,6 @@ cosinor_impl <- function(predictors, outcomes, tau) {
 
   # }}}
 
-  # Elliptical method for confidence intervals {{{ ====
-
-  # Stats
-  RSS <- sum((y - yhat)^2)
-  sigma <- sqrt(RSS / (n - 3))
-
-  # Correction of sum of squares for each parameter
-  xc <- 1 / n * sum((x - mean(x))^2)
-  zc <- 1 / n * sum((z - mean(z))^2)
-  tc <- 1 / n * sum((x - mean(x)) * (z - mean(z)))
-
-  # Find beta and gamma CI region
-  fdist <- stats::qf(1 - alpha / 2, df1 = 2, df2 = n - 3)
-
-  # Quadratic/ellipse formula setup
-  a <- xc
-  b <- 2 * tc
-  c <- zc
-  d <- -2 * xc * beta - 2 * tc * gamma
-  e <- -2 * tc * beta - 2 * zc * gamma
-  f <-
-  	xc * beta^2 +
-  	2 * tc * beta * gamma +
-  	zc * gamma^2 -
-  	(2 / n) * sigma^2 * fdist
-  gmax <- -(2 * a * e - d * b) / (4 * a * c - b^2)
-
-  # Identify parameters for ellipses
-  gseq <- seq(from = gmax - amp * 2, to = gmax + amp * 2, by = amp / 1000)
-  bs1 <- (-(b * gseq + d) + sqrt(
-    as.complex((b * gseq + d)^2 - 4 * a * (c * gseq^2 + e * gseq + f))
-  )) / (2 * a)
-  bs2 <- (-(b * gseq + d) - sqrt(
-    as.complex((b * gseq + d)^2 - 4 * a * (c * gseq^2 + e * gseq + f))
-  )) / (2 * a)
-
-  # Isolate the elliptical region (non imaginary)
-  index <- which(Re(bs1) != Re(bs2))
-  gseq <- gseq[index]
-  bs1 <- Re(bs1[index])
-  bs2 <- Re(bs2[index])
-
-  # Determine if ellipse regions overlap the pole (if overlap, cannot get CI)
-  if (
-    (diff(range(gseq)) >= max(gseq)) &
-      ((diff(range(bs1)) >= max(bs1)) | (diff(range(bs2)) >= max(bs2)))
-  ) {
-    print("Confidence regions overlap the poles. Confidence intervals for amplitude and acrophase cannot be determined.")
-  } else {
-    # CI for Amplitude
-    ampUpper <- max(c(sqrt(bs1^2 + gseq^2), sqrt(bs2^2 + gseq^2)))
-    ampLower <- min(c(sqrt(bs1^2 + gseq^2), sqrt(bs2^2 + gseq^2)))
-
-    # CI for Acrophase
-    theta <- c(atan(abs(gseq / bs1)), atan(abs(gseq / bs2)))
-    sa <- sign(c(bs1, bs2))
-    sb <- sign(c(gseq, gseq)) * 3
-    sc <- sa + sb
-    tmp <- sc
-    phiConf <- vector(mode = "double", length = length(theta))
-
-    # Place theta in correct quadrant for phi
-    for (i in 1:length(sc)) {
-      if (sc[i] == 4 | sc[i] == 3) {
-        phiConf[i] <- -theta[i]
-        sc[i] <- 1
-      } else if (sc[i] == 2 || sc[i] == -1) {
-        phiConf[i] <- -pi + theta[i]
-        sc[i] <- 2
-      } else if (sc[i] == -4 || sc[i] == -3) {
-        phiConf[i] <- -pi - theta[i]
-        sc[i] <- 3
-      } else if (sc[i] == -2 || sc[i] == -1) {
-        phiConf[i] <- -2 * pi + theta[i]
-        sc[i] <- 4
-      }
-    }
-
-    # Get max and min values for phi / acrophase
-    if (max(sc) - min(sc) == 3) {
-      phiUpper <- min(phiConf[sc == 1])
-      phiLower <- max(phiConf[sc == 4])
-    } else {
-      phiUpper <- max(phiConf)
-      phiLower <- min(phiConf)
-    }
-  }
-
-  # }}}
-
   ## Model Output {{{ ====
 
   # Model coefficients
@@ -179,12 +83,6 @@ cosinor_impl <- function(predictors, outcomes, tau) {
   # Fit and residuals
   fitted.values <- yhat
   residuals <- y - yhat
-
-  # Area of ellipse for circadian rhythmicity
-  area <- cbind(gseq, bs1, bs2)
-
-  # Make call
-  call <- call("cosinor", paste0(names(outcomes), " ~ ", names(predictors)))
 
   # List to return
   list(
@@ -197,21 +95,154 @@ cosinor_impl <- function(predictors, outcomes, tau) {
     fitted.values = fitted.values,
     residuals = residuals,
 
-    # Function call
-    call = call,
-
     # Overall model of cosinor
     model = model,
 
     # Matrices used
-    xmat = xmat,
-    ymat = ymat,
+    xmat = xmat
 
-    # Description of ellipse that generates CI
-    area = area
   )
 
   # }}}
+}
+
+# }}}
+
+# Population Mean Cosinor Implementation {{{ ====
+
+#' @description Model fitting algorithm for population-mean cosinor. Uses the
+#'   `cosinor_impl()` algorithm to derive individual parameters.
+#' @noRd
+cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
+
+  ## Population cosinor parameter setup {{{ ====
+
+  # Create data frame for split/apply approach
+  df <- data.frame(predictors, outcomes, population)
+
+  # Remove patients with only 1 observation (will cause a det = 0 error)
+  counts <- by(df, df[, "population"], nrow)
+  lowCounts <- as.numeric(names(counts[counts <= 1]))
+  df <- subset(df, !(population %in% lowCounts))
+
+  # Message about population count removal
+  if(length(lowCounts) != 0) {
+    message(length(lowCounts), " subjects were removed due to only a single observation.")
+  }
+
+  # Full population parameters
+  period <- tau
+  k <- length(unique(df$population)) # Number of individuals
+  p <- 1 # Number of parameters such that 2p + 1 = 3 for single cosinor
+  y <- outcomes
+  t <- predictors
+  n <- length(t)
+  x <- cos((2 * pi * t) / period)
+  z <- sin((2 * pi * t) / period)
+
+  # Return / save the model
+  model <- cbind(y, t, x, z, population)
+
+  # Create matrix that we can apply cosinor to subgroups
+  popCosinors <- with(
+    df,
+    by(df, population, function(x) {
+      cosinor_impl(x$predictors, x$outcomes, tau)
+    })
+  )
+
+  ## }}}
+
+  ## Coefficients {{{ ====
+
+  # Matrix of coefficients
+  tbl <- sapply(popCosinors, stats::coef)
+  coef_names <- c("mesor", "amp", "phi", "beta", "gamma")
+  rownames(tbl) <- coef_names
+  xmat <- t(tbl)
+
+  # Get mean for each parameter (mesor, beta, gamma), ignoring averaged amp/phi
+  coefs <- apply(xmat, MARGIN = 2, function(x) {
+    sum(x) / k
+  })
+
+  mesor <- unname(coefs["mesor"])
+  beta <- unname(coefs["beta"])
+  gamma <- unname(coefs["gamma"])
+
+  # Get amplitude
+  amp <- sqrt(beta^2 + gamma^2)
+
+  # Acrophase (phi) must be in correct quadrant
+  sb <- sign(beta)
+  sg <- sign(gamma)
+  theta <- atan(abs(gamma / beta))
+
+  if ((sb == 1 | sb == 0) & sg == 1) {
+    phi <- -theta
+  } else if (sb == -1 & (sg == 1 | sg == 0)) {
+    phi <- theta - pi
+  } else if ((sb == -1 | sb == 0) & sg == -1) {
+    phi <- -theta - pi
+  } else if (sb == 1 & (sg == -1 | sg == 0)) {
+    phi <- theta - (2 * pi)
+  }
+
+  # Final coefficients
+  coefs["amp"] <- amp
+  coefs["phi"] <- phi
+
+  ## }}}
+
+  ## Model diagnostics / fit {{{ ====
+
+  # Sigma / variances
+  sMesor <- sqrt(sum((xmat[, "mesor"] - mesor)^2) / (k-1))
+  sBeta <- sqrt(sum((xmat[, "beta"] - beta)^2) / (k-1))
+  sGamma <- sqrt(sum((xmat[, "gamma"] - beta)^2) / (k-1))
+
+  # Confidence intervals
+  alpha <- 0.05
+  tdist <- stats::qt(1 - alpha/2, df = k - 1)
+  mesorSE <- tdist * sMesor / sqrt(k)
+
+  # Zero amplitude test
+  sBetaGamma <- sqrt(sum((xmat[,"beta"] - beta) * (xmat[,"gamma"] - gamma)))
+  r <- sBetaGamma / (sBeta * sGamma)
+  fdist <- stats::qf(1 - alpha, df1 = 2, df2 = k - 2)
+  fstat <- abs(((k * (k - 2)) / (2 * (k - 1)))) *
+    abs((1 / (1 - r^2))) *
+    abs(((beta^2 / sBeta^2) - ((2 * r * beta * gamma) / (sBeta * sGamma)) + (gamma^2 / sGamma^2)))
+
+  ## }}}
+
+  ## Model output {{{ ====
+
+  # Fitted values
+  # y(t) = M + A*cos(2*pi*t/period + phi)
+  yhat <- mesor + amp * cos(2*pi*t/period + phi)
+
+  # List of values to return (must be same as cosinor_impl)
+  list(
+
+    # Raw coefficients
+    coefficients = unname(coefs),
+    coef_names = coef_names,
+
+    # Fitted and residual values
+    fitted.values = yhat,
+    residuals = y - yhat,
+
+    # Overall population cosinor data set, including subject names
+    model = model,
+
+    # Matrices used (for population cosinor, is the coefficient matrix)
+    xmat = xmat
+
+  )
+  ## }}}
+
+
 }
 
 # }}}

@@ -9,26 +9,36 @@
 \alias{cosinor.recipe}
 \title{Fit a \code{cosinor}}
 \usage{
-cosinor(t, tau, ...)
+cosinor(t, ...)
 
-\method{cosinor}{default}(t, tau, ...)
+\method{cosinor}{default}(t, ...)
 
-\method{cosinor}{data.frame}(t, y, tau, ...)
+\method{cosinor}{data.frame}(t, y, tau, population = NULL, ...)
 
-\method{cosinor}{matrix}(t, y, tau, ...)
+\method{cosinor}{matrix}(t, y, tau, population = NULL, ...)
 
-\method{cosinor}{formula}(formula, data, tau, ...)
+\method{cosinor}{formula}(formula, data, tau, population = NULL, ...)
 
-\method{cosinor}{recipe}(t, data, tau, ...)
+\method{cosinor}{recipe}(t, data, tau, population = NULL, ...)
 }
 \arguments{
-\item{t}{Represents the time indices that provide the positions for the
+\item{t}{Represents the \emph{ordered} time indices that provide the positions for the
 cosine wave. Depending on the context:
 \itemize{
 \item A \strong{data frame} of a time-based predictor/index.
 \item A \strong{matrix} of time-based predictor/index.
 \item A \strong{recipe} specifying a set of preprocessing steps
 created from \code{\link[recipes:recipe]{recipes::recipe()}}.
+}}
+
+\item{...}{Not currently used, but required for extensibility.}
+
+\item{y}{When \code{t} is a \strong{data frame} or \strong{matrix}, \code{y} is the outcome
+specified as:
+\itemize{
+\item A \strong{data frame} with 1 numeric column.
+\item A \strong{matrix} with 1 numeric column.
+\item A numeric \strong{vector}.
 }}
 
 \item{tau}{A vector that determines the periodicity of the time index. The
@@ -41,14 +51,20 @@ period = c(24)
 cosinor, e.g. period = c(24, 12)
 }}
 
-\item{...}{Not currently used, but required for extensibility.}
-
-\item{y}{When \code{t} is a \strong{data frame} or \strong{matrix}, \code{y} is the outcome
+\item{population}{Represents the population to be analyzed with a
+population-mean cosinor. Defaults to NULL, assuming individual cosinors are
+being generated. When a \strong{recipe} or \strong{formula} is used, \code{population} is
 specified as:
 \itemize{
-\item A \strong{data frame} with 1 numeric column.
-\item A \strong{matrix} with 1 numeric column.
-\item A numeric \strong{vector}.
+\item A \strong{character} name of the column contained in \code{data} that contains
+identifiers for each subject. Every row will have a subject name which
+should be duplicated for each time index given.
+}
+
+When a \strong{data frame} or \strong{matrix} is used, \code{population} is specified as:
+\itemize{
+\item A \strong{vector} of the same length as \code{t}, with values representing each
+subject at the correct indices.
 }}
 
 \item{formula}{A formula specifying the outcome terms on the left-hand side,
@@ -71,6 +87,6 @@ continuous outcome use trigonometric features.
 data("twins")
 
 # Formula interface
-mod2 <- cosinor(rDYX ~ hour, twins)
+model <- cosinor(rDYX ~ hour, twins, tau = 24)
 
 }

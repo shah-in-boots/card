@@ -36,7 +36,7 @@ Cosinor analysis can be used to generate model statistics. Confidence intervals 
 
 ```{r}
 # Model
-m <- cosinor(rDYX ~ hour, twins)
+m <- cosinor(rDYX ~ hour, twins, tau = 24)
 
 # Summary
 summary(m)

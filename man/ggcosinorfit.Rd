@@ -25,6 +25,6 @@ the amplitude, acrophase,
 }
 \examples{
 data("twins")
-m <- cosinor(rDYX ~ hour, twins)
+m <- cosinor(rDYX ~ hour, twins, tau = 24)
 ggcosinorfit(m)
 }

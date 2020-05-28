@@ -9,7 +9,11 @@
 #' @param level confidence level
 #'
 #' @export
-cosinor_zero_amplitude <- function(object, level = 0.95, ...) {
+cosinor_zero_amplitude <- function(object, level = 0.95) {
+
+	if(object$type == "Population") {
+		message("Zero amplitude test may not be accurate for population-mean cosinor method.")
+	}
 
 	### Confidence level of fstatistic
 
@@ -24,7 +28,7 @@ cosinor_zero_amplitude <- function(object, level = 0.95, ...) {
 	# Degrees of freedom
 	n <- length(y)
 	k <- 3 # Number of parameters
-	fdist <- stats::qf(1 - alpha/2, df1 = k - 1, df2 = n - k)
+	fdist <- stats::qf(1 - alpha, df1 = k - 1, df2 = n - k)
 
 	### Total sum of squares = model sum of squares + residual sum of squares
 		# TSS = sum(y - ybar)^2
@@ -87,6 +91,13 @@ cosinor_zero_amplitude <- function(object, level = 0.95, ...) {
 #' @export
 cosinor_goodness_of_fit <- function(object, level = 0.95, ...) {
 
+	if(object$type == "Population") {
+		message("Goodness of fit may not be accurate for population-mean cosinor method.")
+	}
+
+	# Confidence level
+	alpha <- 1 - level
+
   # Model data
 	y <- object$model[,"y"]
 	t <- object$model[,"t"]
@@ -105,6 +116,9 @@ cosinor_goodness_of_fit <- function(object, level = 0.95, ...) {
     # SSLOF = sum of squares lack of fit
     # RSS = residual sum of squares
     # SSPE = pure error sum of squares
+
+	# RSS
+	RSS <- sum((y - yhat)^2)
 
   # SSPE = sumi(suml( (yil - yibar)^2 ))
     # yibar = suml(yil)/ni
@@ -138,7 +152,7 @@ cosinor_goodness_of_fit <- function(object, level = 0.95, ...) {
   p <- 1 # Single cosinor... may need to adjust to count terms [TODO]
 
   fstat <- (SSLOF/(m - 1 - 2*p)) / (SSPE/(n - m))
-  fdist <- stats::qf(1 - alpha/2, df1 = m - 1 - 2*p, n - m)
+  fdist <- stats::qf(1 - alpha, df1 = m - 1 - 2*p, n - m)
 
   # Return
   list(
@@ -165,21 +179,29 @@ cosinor_goodness_of_fit <- function(object, level = 0.95, ...) {
 #' @export
 cosinor_area <- function(object, level = 0.95, ...) {
 
+	if(object$type == "Population") {
+		message("Area calculations may not be accurate for population-mean cosinor method.")
+	}
+
 	# Model objects needed
 	y <- object$model[, "y"]
 	x <- object$model[, "x"]
 	z <- object$model[, "z"]
 	t <- object$model[, "t"]
+	yhat <- object$fitted.values
+	mesor <- object$coefficients[object$coef_names == "mesor"]
+	amp <- object$coefficients[object$coef_names == "amp"]
+	phi <- object$coefficients[object$coef_names == "phi"]
 	beta <- object$coefficients[object$coef_names == "beta"]
 	gamma <- object$coefficients[object$coef_names == "gamma"]
-	yhat <- object$fitted.values
-	alpha <- 1 - level
 
   # Stats
-  RSS <- sum((y - yhat)^2)
-  sigma <- sqrt(RSS / (n - 3))
-  k <- 3 # number of parameters
+	alpha <- 1 - level
 	n <- length(y)
+  k <- 3 # number of parameters
+  RSS <- sum((y - yhat)^2)
+  sigma <- sqrt(RSS / (n - k))
+  fdist <- stats::qf(1 - alpha, df1 = k - 1, df2 = n - k)
 
   # Correction of sum of squares for each parameter
   xc <- 1 / n * sum((x - mean(x))^2)
@@ -187,7 +209,6 @@ cosinor_area <- function(object, level = 0.95, ...) {
   tc <- 1 / n * sum((x - mean(x)) * (z - mean(z)))
 
   # Find beta and gamma CI region
-  fdist <- stats::qf(1 - (alpha / 2), df1 = k - 1, df2 = n - k)
 
   # Quadratic/ellipse formula setup
   a <- xc
@@ -292,10 +313,14 @@ cosinor_area <- function(object, level = 0.95, ...) {
 #'
 #' @examples
 #' data("twins")
-#' m <- cosinor(rDYX ~ hour, twins)
+#' m <- cosinor(rDYX ~ hour, twins, tau = 24)
 #' ggcosinorfit(m)
 #' @export
 ggcosinorfit <- function(object, level = 0.95, ...) {
+
+	if(object$type == "Population") {
+		message("Ellipse may not be accurate for population-mean cosinor method.")
+	}
 
 	# Area
 	area <- cosinor_area(object, level = level)$area
@@ -318,45 +343,43 @@ ggcosinorfit <- function(object, level = 0.95, ...) {
 
   # GGplot the values
   ggplot() +
-    # Ellipse
-    geom_line(aes(x = gseq, y = bs1), col = "goldenrod", size = 1) +
-    geom_line(aes(x = gseq, y = bs2), col = "goldenrod", size = 1) +
-    # Line from origin to ellipse
-    geom_line(aes(
-      x = c(0, gamma),
-      y = c(0, beta)
-    ),
-    lty = 1,
-    size = 1,
-    col = "black"
-    ) +
-    # Line from ellipse to circumference
-    geom_line(aes(
-      x = c(gamma, -2 * amp * sin(phi)),
-      y = c(beta, 2 * amp * cos(phi)),
-      group = 0
-    ),
-    size = 1,
-    col = "black",
-    lty = 3
-    ) +
-    # Axes
-    geom_line(aes(x = c(0, 0), y = c(-2 * amp, 2 * amp)), lty = 5, col = "grey") +
-    geom_line(aes(y = c(0, 0), x = c(-2 * amp, 2 * amp)), lty = 5, col = "grey") +
-    # "Clock" shape to help show degrees on unit circle
-    geom_path(aes(x = clock[, 1], y = clock[, 2]), col = "cornflowerblue") +
-    annotate(
-      geom = "text",
-      x = rad_clock[, 1],
-      y = rad_clock[, 2],
-      label = paste(rad * 180 / pi, "\u00B0")
-    ) +
-    # Labels
-    xlab(expression(paste(gamma))) +
-    ylab(expression(paste(beta))) +
-    xlim(-2.5 * amp, 2.5 * amp) +
-    ylim(-2.5 * amp, 2.5 * amp) +
-    theme_minimal()
+  	# Ellipse
+  	geom_line(aes(x = gseq, y = bs1), col = "goldenrod", size = 1) +
+  	geom_line(aes(x = gseq, y = bs2), col = "goldenrod", size = 1) +
+  	# Line from origin to ellipse
+  	geom_line(aes(x = c(0, gamma),
+  								y = c(0, beta)),
+  						lty = 1,
+  						size = 1,
+  						col = "black") +
+  	# Line from ellipse to circumference
+  	geom_line(aes(
+  		x = c(gamma, -2 * amp * sin(phi)),
+  		y = c(beta, 2 * amp * cos(phi)),
+  		group = 0
+  	),
+  	size = 1,
+  	col = "black",
+  	lty = 3) +
+  	# Axes
+  	geom_line(aes(x = c(0, 0), y = c(-2 * amp, 2 * amp)),
+  						lty = 5, col = "grey") +
+  	geom_line(aes(y = c(0, 0), x = c(-2 * amp, 2 * amp)),
+  						lty = 5, col = "grey") +
+  	# "Clock" shape to help show degrees on unit circle
+  	geom_path(aes(x = clock[, 1], y = clock[, 2]), col = "cornflowerblue") +
+  	annotate(
+  		geom = "text",
+  		x = rad_clock[, 1],
+  		y = rad_clock[, 2],
+  		label = paste(rad * 180 / pi, "\u00B0")
+  	) +
+  	# Labels
+  	xlab(expression(paste(gamma))) +
+  	ylab(expression(paste(beta))) +
+  	xlim(-2.5 * amp, 2.5 * amp) +
+  	ylim(-2.5 * amp, 2.5 * amp) +
+  	theme_minimal()
 }
 
 # }}}

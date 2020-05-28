@@ -22,6 +22,11 @@ print.cosinor <- function(x, ...) {
 #' @export
 summary.cosinor <- function(object, ...) {
 
+	# Summary
+	cat(paste0(object$type, " Cosinor Model \n"))
+	cat(strrep("-", 42))
+	cat("\n")
+
 	# Call
 	cat("Call: \n")
 	print(object$call)
@@ -52,6 +57,8 @@ summary.cosinor <- function(object, ...) {
 #' @export
 confint.cosinor <- function(object, parm, level = 0.95, ...) {
 
+	### Taylor Series Approach
+
 	# Confidence level
 	alpha <- 1 - level
 
@@ -60,21 +67,119 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 	t <- object$model[,"t"]
 	x <- object$model[,"x"]
 	z <- object$model[,"z"]
+	xmat <- object$xmat
 	yhat <- object$fitted.values
-	n <- length(y)
-	mesor <- object$coefficients[1]
-	amp <- object$coefficients[2]
-	phi <- object$coefficients[3]
-	beta <- object$coefficients[4]
-	gamma <- object$coefficients[5]
+	mesor <- object$coefficients[object$coef_names == "mesor"]
+	amp <- object$coefficients[object$coef_names == "amp"]
+	phi <- object$coefficients[object$coef_names == "phi"]
+	beta <- object$coefficients[object$coef_names == "beta"]
+	gamma <- object$coefficients[object$coef_names == "gamma"]
 
-	# Ellipse math
+	# Parameters / degrees of freedom
+	n <- length(y)
+
+	if(object$type == "Population") {
+
+		### Population confidence intervals
+
+		# Message
+		message("Confidence intervals for amplitude and acrophase are not currently returned for population-mean cosinor.")
+
+		# Parameters
+		k <- nrow(xmat)
+
+	  # Sigma / variances
+	  sMesor <- sqrt(sum((xmat[, "mesor"] - mesor)^2) / (k-1))
+	  sBeta <- sqrt(sum((xmat[, "beta"] - beta)^2) / (k-1))
+	  sGamma <- sqrt(sum((xmat[, "gamma"] - beta)^2) / (k-1))
+
+	  # Standard error
+	  mesorSE <- tdist * sMesor / sqrt(k)
+
+	  # Confidence intervals
+	  tdist <- stats::qt(1 - alpha/2, df = k - 1)
+
+	  confints <- matrix(
+	  	rbind(
+			  c(mesor - tdist * mesorSE, mesor + tdist * mesorSE),
+			  c(NA, NA),
+			  c(NA, NA)
+	  	),
+	  	ncol = 2, nrow = 3,
+	  	dimnames = list(
+	  		c("mesor", "amp", "phi"),
+	  		c(paste0(100*(alpha/2),"%"), paste0(100*(1-alpha/2), "%"))
+	  	)
+	  )
+
+	  # Returned
+	  return(confints)
+
+	} else {
+
+	  ### Individual Cosinor Taylor Series
+
+		# Nummber of parameters
+		k <- 3
+
+	  # Matrix to get standard errors and confidence intervals
+	  s <- solve(xmat)
+
+		# Residual sum of squared errors
+	  RSS <- sum((y - yhat)^2)
+	  sigma <- sqrt(RSS / (n - k))
+
+	  # Standard error for MESOR
+	  mesorSE <- unname(sigma * sqrt(s[1,1]))
+
+	  # Standard error for amplitude
+	  ampSE <-
+	  	unname(sigma * sqrt(
+	  		s[2,2]*cos(phi)^2 -
+	  			2*s[2,3]*sin(phi)*cos(phi) +
+	  			s[3,3]*sin(phi)^2
+	  	))
+
+	  # Standard error for phi
+	  phiSE <-
+	  	unname(1/amp * sigma * sqrt(
+	  		s[2,2]*sin(phi)^2 -
+	  			2*s[2,3]*sin(phi)*cos(phi) +
+	  			s[3,3]*cos(phi)^2
+	  	))
+
+	  # Confidence intervals
+	  tdist <- stats::qt(1 - alpha/2, df = n - k)
+
+	  confints <- matrix(
+	  	rbind(
+			  c(mesor - tdist * mesorSE, mesor + tdist * mesorSE),
+			  c(amp - tdist * ampSE, amp + tdist * ampSE),
+			  c(phi - tdist * phiSE, phi + tdist * phiSE)
+	  	),
+	  	ncol = 2, nrow = 3,
+	  	dimnames = list(
+	  		c("mesor", "amp", "phi"),
+	  		c(paste0(100*(alpha/2),"%"), paste0(100*(1-alpha/2), "%"))
+	  	)
+	  )
+
+	  # Returned
+	  return(confints)
+
+	  ## }}}
+
+	}
+
+
+	### Ellipse Approach
+
 	# Sum((x - xbar)^2(b - bhat)^2) + 2(sum((x - xbar)(z - zbar)(b - bhat)(g - ghat)) + sum((z - zbar)^2(z - zhat)^2) <= 2*sigma^2*fdist
 	# xbar = sum(x)/n
 	# zbar = sum(z)/n
 
 	# RHS of ellipse equation (with fdist)
-  fdist <- stats::qf(1 - alpha / 2, df1 = 2, df2 = n - 3)
+  fdist <- stats::qf(1 - alpha, df1 = 2, df2 = n - 3)
   RSS <- sum((y - yhat)^2)
   sigma <- sqrt(RSS / (n - 3))
 
@@ -100,139 +205,6 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
   mesorConf <- tdist * sigma * sqrt(1/n)
   mesorUpper <- mesor + mesorConf
   mesorLower <- mesor - mesorConf
-
-  # Correction of sum of squares for each parameter
-  xc <- 1 / n * sum((x - mean(x))^2)
-  zc <- 1 / n * sum((z - mean(z))^2)
-  tc <- 1 / n * sum((x - mean(x)) * (z - mean(z)))
-
-  # Find beta and gamma CI region
-  fdist <- stats::qf(1 - alpha / 2, df1 = 2, df2 = n - 3)
-
-  # Quadratic/ellipse formula setup
-  a <- xc
-  b <- 2 * tc
-  c <- zc
-  d <- -2 * xc * beta - 2 * tc * gamma
-  e <- -2 * tc * beta - 2 * zc * gamma
-  f <-
-  	xc * beta^2 +
-  	2 * tc * beta * gamma +
-  	zc * gamma^2 -
-  	(2 / n) * sigma^2 * fdist
-  gmax <- -(2 * a * e - d * b) / (4 * a * c - b^2)
-
-  # Identify parameters for ellipses
-  gseq <- seq(from = gmax - amp * 2, to = gmax + amp * 2, by = amp / 1000)
-  bs1 <- (-(b * gseq + d) + sqrt(
-    as.complex((b * gseq + d)^2 - 4 * a * (c * gseq^2 + e * gseq + f))
-  )) / (2 * a)
-  bs2 <- (-(b * gseq + d) - sqrt(
-    as.complex((b * gseq + d)^2 - 4 * a * (c * gseq^2 + e * gseq + f))
-  )) / (2 * a)
-
-  # Isolate the elliptical region (non imaginary)
-  index <- which(Re(bs1) != Re(bs2))
-  gseq <- gseq[index]
-  bs1 <- Re(bs1[index])
-  bs2 <- Re(bs2[index])
-
-  # Determine if ellipse regions overlap the pole (if overlap, cannot get CI)
-  if (
-    (diff(range(gseq)) >= max(gseq)) &
-      ((diff(range(bs1)) >= max(bs1)) | (diff(range(bs2)) >= max(bs2)))
-  ) {
-    print("Confidence regions overlap the poles. Confidence intervals for amplitude and acrophase cannot be determined.")
-  } else {
-    # CI for Amplitude
-    ampUpper <- max(c(sqrt(bs1^2 + gseq^2), sqrt(bs2^2 + gseq^2)))
-    ampLower <- min(c(sqrt(bs1^2 + gseq^2), sqrt(bs2^2 + gseq^2)))
-
-    # CI for Acrophase
-    theta <- c(atan(abs(gseq / bs1)), atan(abs(gseq / bs2)))
-    sa <- sign(c(bs1, bs2))
-    sb <- sign(c(gseq, gseq)) * 3
-    sc <- sa + sb
-    tmp <- sc
-    phiConf <- vector(mode = "double", length = length(theta))
-
-    # Place theta in correct quadrant for phi
-    for (i in 1:length(sc)) {
-      if (sc[i] == 4 | sc[i] == 3) {
-        phiConf[i] <- -theta[i]
-        sc[i] <- 1
-      } else if (sc[i] == 2 || sc[i] == -1) {
-        phiConf[i] <- -pi + theta[i]
-        sc[i] <- 2
-      } else if (sc[i] == -4 || sc[i] == -3) {
-        phiConf[i] <- -pi - theta[i]
-        sc[i] <- 3
-      } else if (sc[i] == -2 || sc[i] == -1) {
-        phiConf[i] <- -2 * pi + theta[i]
-        sc[i] <- 4
-      }
-    }
-
-    # Get max and min values for phi / acrophase
-    if (max(sc) - min(sc) == 3) {
-      phiUpper <- min(phiConf[sc == 1])
-      phiLower <- max(phiConf[sc == 4])
-    } else {
-      phiUpper <- max(phiConf)
-      phiLower <- min(phiConf)
-    }
-  }
-
-  # Matrix to get standard errors and confidence intervals
-  s <- solve(object$xmat)
-
-	# Residual sum of squared errors
-  RSS <- sum((y - yhat)^2)
-  sigma <- sqrt(RSS / (n - 3))
-
-  # Standard error for MESOR
-  mesorSE <- unname(sigma * sqrt(s[1,1]))
-
-  # Standard error for amplitude
-  ampSE <-
-  	unname(sigma * sqrt(
-  		s[2,2]*cos(phi)^2 - 2*s[2,3]*sin(phi)*cos(phi) + s[3,3]*sin(phi)^2
-  	))
-
-  # Standard error for phi
-  phiSE <-
-  	unname(1/amp * sigma * sqrt(
-  		s[2,2]*sin(phi)^2 - 2*s[2,3]*sin(phi)*cos(phi) + s[3,3]*cos(phi)^2
-  	))
-
-  # Confidence intervals
-  tdist <- stats::qt(1 - alpha/2, df = n - 3)
-  confints <- matrix(
-  	rbind(
-		  c(mesor - tdist * mesorSE, mesor + tdist * mesorSE),
-		  c(amp - tdist * ampSE, amp + tdist * ampSE),
-		  c(phi - tdist * phiSE, phi + tdist * phiSE)
-  	),
-  	ncol = 2, nrow = 3,
-  	dimnames = list(
-  		c("mesor", "amp", "phi"),
-  		c(paste0(100*(alpha/2),"%"), paste0(100*(1-alpha/2), "%"))
-  	)
-  )
-
-  # Print output
-  print(confints)
-
-  # Returned
-  list(
-  	# Confidence intervals
-  	confint = confints,
-
-	  # Area of ellipse for circadian rhythmicity
-  	area = cbind(gseq, bs1, bs2)
-
-  )
-
 
 }
 

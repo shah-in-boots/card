@@ -5,7 +5,7 @@
 #' @description `cosinor()` fits a regression model of a time variable to a
 #' continuous outcome use trigonometric features.
 #'
-#' @param t Represents the time indices that provide the positions for the
+#' @param t Represents the _ordered_ time indices that provide the positions for the
 #'   cosine wave. Depending on the context:
 #'
 #'   - A __data frame__ of a time-based predictor/index.
@@ -36,6 +36,20 @@
 #'   - A __vector__ with multiple elements = multiple-component
 #'   cosinor, e.g. period = c(24, 12)
 #'
+#' @param population Represents the population to be analyzed with a
+#'   population-mean cosinor. Defaults to NULL, assuming individual cosinors are
+#'   being generated. When a __recipe__ or __formula__ is used, `population` is
+#'   specified as:
+#'
+#'   - A __character__ name of the column contained in `data` that contains
+#'   identifiers for each subject. Every row will have a subject name which
+#'   should be duplicated for each time index given.
+#'
+#'   When a __data frame__ or __matrix__ is used, `population` is specified as:
+#'
+#'   - A __vector__ of the same length as `t`, with values representing each
+#'   subject at the correct indices.
+#'
 #' @param ... Not currently used, but required for extensibility.
 #'
 #' @return A `cosinor` object.
@@ -45,10 +59,10 @@
 #' data("twins")
 #'
 #' # Formula interface
-#' mod2 <- cosinor(rDYX ~ hour, twins)
+#' model <- cosinor(rDYX ~ hour, twins, tau = 24)
 #'
 #' @export
-cosinor <- function(t, tau, ...) {
+cosinor <- function(t, ...) {
   UseMethod("cosinor")
 }
 
@@ -56,7 +70,7 @@ cosinor <- function(t, tau, ...) {
 
 #' @export
 #' @rdname cosinor
-cosinor.default <- function(t, tau, ...) {
+cosinor.default <- function(t, ...) {
   stop("`cosinor()` is not defined for a '", class(t)[1], "'.", call. = FALSE)
 }
 
@@ -64,36 +78,42 @@ cosinor.default <- function(t, tau, ...) {
 
 #' @export
 #' @rdname cosinor
-cosinor.data.frame <- function(t, y, tau, ...) {
+cosinor.data.frame <- function(t, y, tau, population = NULL, ...) {
   processed <- hardhat::mold(t, y)
-  cosinor_bridge(processed, tau, ...)
+  cosinor_bridge(processed, tau, population, ...)
 }
 
 # XY method - matrix
 
 #' @export
 #' @rdname cosinor
-cosinor.matrix <- function(t, y, tau, ...) {
+cosinor.matrix <- function(t, y, tau, population = NULL, ...) {
   processed <- hardhat::mold(t, y)
-  cosinor_bridge(processed, tau, ...)
+  cosinor_bridge(processed, tau, population, ...)
 }
 
 # Formula method - stable, works
 
 #' @export
 #' @rdname cosinor
-cosinor.formula <- function(formula, data, tau, ...) {
+cosinor.formula <- function(formula, data, tau, population = NULL, ...) {
   processed <- hardhat::mold(formula, data)
-  cosinor_bridge(processed, tau, ...)
+  if(is.character(population)) {
+    population <- data[[population]]
+  }
+  cosinor_bridge(processed, tau, population, ...)
 }
 
 # Recipe method - unstable
 
 #' @export
 #' @rdname cosinor
-cosinor.recipe <- function(t, data, tau, ...) {
+cosinor.recipe <- function(t, data, tau, population = NULL, ...) {
   processed <- hardhat::mold(t, data)
-  cosinor_bridge(processed, tau, ...)
+  if(is.character(population)) {
+    population <- data[[population]]
+  }
+  cosinor_bridge(processed, tau, population, ...)
 }
 
 # }}}
@@ -103,32 +123,58 @@ cosinor.recipe <- function(t, data, tau, ...) {
 #' @description Bridging function takes user-facing call, after it is processed,
 #'   and moves it to `cosinor_bridge`, which then calls both `cosinor_impl`, the
 #'   fitting algorithm, and `new_cosinor`, the constructor for a new type of S3
-#'   class.
+#'   class. This also bridges to population-mean cosinor implementation if
+#'   needed.
 #' @noRd
-cosinor_bridge <- function(processed, tau, ...) {
+cosinor_bridge <- function(processed, tau, population, ...) {
 
-  # Make sure input is appropriate format
+  # Make call
+  call <- call(
+    "cosinor",
+    paste0(names(processed$outcomes),
+           " ~ ",
+           names(processed$predictors))
+  )
+
+  # Check and format predictors
+  hardhat::validate_predictors_are_numeric(processed$predictors)
+  predictors <- processed$predictors[[1]]
+
+  # Check and format outcomes
   hardhat::validate_outcomes_are_univariate(processed$outcomes)
   hardhat::validate_outcomes_are_numeric(processed$outcomes)
+  outcomes <- processed$outcomes[[1]]
 
-  # Outcomes and predictors converted to vectors to process in fit
-  predictors <- processed$predictors
-  outcomes <- processed$outcomes
+  # If population value is NULL, then perform individual cosinor
+  if(is.null(population)) {
 
-  # Implempented function requires
-  fit <- cosinor_impl(predictors, outcomes, tau)
+    # Implemented function
+    fit <- cosinor_impl(predictors, outcomes, tau)
+    type <- "Individual"
 
-  # Constructor function recieves from implemented function
+  } else if(length(population) == length(predictors)) {
+
+    # Modified function, usings cosinor_impl internally
+    fit <- cosinor_pop_impl(predictors, outcomes, tau, population)
+    type <- "Population"
+
+  } else {
+
+    # Error if population cosinor cannot be run either
+    stop("Population-mean cosinor error: `population` does not match size of time indices", call. = FALSE)
+
+  }
+
+  # Constructor function receives from implemented function
   new_cosinor(
     coefficients = fit$coefficients,
     coef_names = fit$coef_names,
     fitted.values = fit$fitted.values,
     residuals = fit$residuals,
-    call = fit$call,
+    call = call, # Made with bridge data
     model = fit$model,
     xmat = fit$xmat,
-    ymat = fit$ymat,
-    area = fit$area,
+    type = type, # Made at bridge, labels type of cosinor object
     blueprint = processed$blueprint # Made from hardhat, not from fit
   )
 }
@@ -147,8 +193,7 @@ new_cosinor <- function(
   call,
   model,
   xmat,
-  ymat,
-  area,
+  type,
   blueprint
 ) {
 
@@ -180,8 +225,7 @@ new_cosinor <- function(
     call = call,
     model = model,
     xmat = xmat,
-    ymat = ymat,
-    area = area,
+    type = type,
     blueprint = blueprint,
     class = "cosinor"
   )

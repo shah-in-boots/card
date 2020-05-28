@@ -26,13 +26,3 @@ to be the same as the number of rows in \code{new_data}.
 \description{
 Predict from a \code{cosinor}
 }
-\examples{
-train <- mtcars[1:20, ]
-test <- mtcars[21:32, -1]
-
-# Fit
-mod <- cosinor(mpg ~ cyl + log(drat), train)
-
-# Predict, with preprocessing
-predict(mod, test)
-}

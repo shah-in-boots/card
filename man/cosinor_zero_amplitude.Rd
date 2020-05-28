@@ -4,7 +4,7 @@
 \alias{cosinor_zero_amplitude}
 \title{Zero Amplitude Test}
 \usage{
-cosinor_zero_amplitude(object, level = 0.95, ...)
+cosinor_zero_amplitude(object, level = 0.95)
 }
 \arguments{
 \item{object}{model of class \code{cosinor}}
