@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Fit a <code>cosinor</code> — cosinor" />
-<meta property="og:description" content="cosinor() fits a regression model of a time variable to a continuous outcome use trigonometric features." />
+<meta property="og:description" content="cosinor() fits a regression model of a time variable to a
+continuous outcome use trigonometric features." />
 
 
 
@@ -120,34 +121,36 @@
     </div>
 
     <div class="ref-description">
-    <p><code>cosinor()</code> fits a regression model of a time variable to a continuous outcome use trigonometric features.</p>
+    <p><code>cosinor()</code> fits a regression model of a time variable to a
+continuous outcome use trigonometric features.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>cosinor</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>cosinor</span>(<span class='no'>t</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for default</span>
-<span class='fu'>cosinor</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'>cosinor</span>(<span class='no'>t</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for data.frame</span>
-<span class='fu'>cosinor</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='no'>...</span>)
+<span class='fu'>cosinor</span>(<span class='no'>t</span>, <span class='no'>y</span>, <span class='no'>tau</span>, <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for matrix</span>
-<span class='fu'>cosinor</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='no'>...</span>)
+<span class='fu'>cosinor</span>(<span class='no'>t</span>, <span class='no'>y</span>, <span class='no'>tau</span>, <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for formula</span>
-<span class='fu'>cosinor</span>(<span class='no'>formula</span>, <span class='no'>data</span>, <span class='no'>...</span>)
+<span class='fu'>cosinor</span>(<span class='no'>formula</span>, <span class='no'>data</span>, <span class='no'>tau</span>, <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for recipe</span>
-<span class='fu'>cosinor</span>(<span class='no'>x</span>, <span class='no'>data</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>cosinor</span>(<span class='no'>t</span>, <span class='no'>data</span>, <span class='no'>tau</span>, <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>Depending on the context:</p><ul>
-<li><p>A <strong>data frame</strong> of time-based predictors/indices.</p></li>
-<li><p>A <strong>matrix</strong> of time-based predictors/indices.</p></li>
+      <th>t</th>
+      <td><p>Represents the <em>ordered</em> time indices that provide the positions for the
+cosine wave. Depending on the context:</p><ul>
+<li><p>A <strong>data frame</strong> of a time-based predictor/index.</p></li>
+<li><p>A <strong>matrix</strong> of time-based predictor/index.</p></li>
 <li><p>A <strong>recipe</strong> specifying a set of preprocessing steps
 created from <code><a href='https://rdrr.io/pkg/recipes/man/recipe.html'>recipes::recipe()</a></code>.</p></li>
 </ul></td>
@@ -158,11 +161,38 @@ created from <code><a href='https://rdrr.io/pkg/recipes/man/recipe.html'>recipes
     </tr>
     <tr>
       <th>y</th>
-      <td><p>When <code>x</code> is a <strong>data frame</strong> or <strong>matrix</strong>, <code>y</code> is the outcome
+      <td><p>When <code>t</code> is a <strong>data frame</strong> or <strong>matrix</strong>, <code>y</code> is the outcome
 specified as:</p><ul>
 <li><p>A <strong>data frame</strong> with 1 numeric column.</p></li>
 <li><p>A <strong>matrix</strong> with 1 numeric column.</p></li>
 <li><p>A numeric <strong>vector</strong>.</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>tau</th>
+      <td><p>A vector that determines the periodicity of the time index. The
+number of elements in the vector determine the number of components (e.g.
+single versus multiple cosinor).</p><ul>
+<li><p>A <strong>vector</strong> with a single element = single-component cosinor, e.g.
+period = c(24)</p></li>
+<li><p>A <strong>vector</strong> with multiple elements = multiple-component
+cosinor, e.g. period = c(24, 12)</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>population</th>
+      <td><p>Represents the population to be analyzed with a
+population-mean cosinor. Defaults to NULL, assuming individual cosinors are
+being generated. When a <strong>recipe</strong> or <strong>formula</strong> is used, <code>population</code> is
+specified as:</p><ul>
+<li><p>A <strong>character</strong> name of the column contained in <code>data</code> that contains
+identifiers for each subject. Every row will have a subject name which
+should be duplicated for each time index given.</p></li>
+</ul>
+
+<p>When a <strong>data frame</strong> or <strong>matrix</strong> is used, <code>population</code> is specified as:</p><ul>
+<li><p>A <strong>vector</strong> of the same length as <code>t</code>, with values representing each
+subject at the correct indices.</p></li>
 </ul></td>
     </tr>
     <tr>
@@ -183,20 +213,11 @@ and the predictor terms on the right-hand side.</p></td>
     <p>A <code>cosinor</code> object.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='co'># Data setup</span>
+    <pre class="examples"><div class='input'><span class='co'># Data setup</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"twins"</span>)
 
-<span class='co'># XY interface</span>
-<span class='co'># mod1 &lt;- cosinor(twins["hour"], twins$rDYX)</span>
-
 <span class='co'># Formula interface</span>
-<span class='no'>mod2</span> <span class='kw'>&lt;-</span> <span class='fu'>cosinor</span>(<span class='no'>rDYX</span> ~ <span class='no'>hour</span>, <span class='no'>twins</span>)
-
-<span class='co'># Recipes interface (still needs work)</span>
-<span class='co'># rec &lt;- recipes::recipe(rDYX ~ hour, twins)</span>
-<span class='co'># rec &lt;- recipes::step_log(rec, rDYX)</span>
-<span class='co'># mod3 &lt;- cosinor(rec, twins)</span></div></pre>
+<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>cosinor</span>(<span class='no'>rDYX</span> ~ <span class='no'>hour</span>, <span class='no'>twins</span>, <span class='kw'>tau</span> <span class='kw'>=</span> <span class='fl'>24</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

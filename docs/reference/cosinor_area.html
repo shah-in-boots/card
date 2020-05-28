@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Predict from a <code>cosinor</code> — predict.cosinor • card</title>
+<title>Area of Ellipse — cosinor_area • card</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Predict from a <code>cosinor</code> — predict.cosinor" />
-<meta property="og:description" content="Predict from a cosinor" />
+<meta property="og:title" content="Area of Ellipse — cosinor_area" />
+<meta property="og:description" content="Formulas for creating the area of the ellipse to identify confidence intervals, directionality, and graphing purposes." />
 
 
 
@@ -114,46 +114,34 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Predict from a <code>cosinor</code></h1>
-    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/cosinor-predict.R'><code>R/cosinor-predict.R</code></a></small>
-    <div class="hidden name"><code>predict.cosinor.Rd</code></div>
+    <h1>Area of Ellipse</h1>
+    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/cosinor-diagnostics.R'><code>R/cosinor-diagnostics.R</code></a></small>
+    <div class="hidden name"><code>cosinor_area.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Predict from a <code>cosinor</code></p>
+    <p>Formulas for creating the area of the ellipse to identify confidence intervals, directionality, and graphing purposes.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for cosinor</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span>(<span class='no'>object</span>, <span class='no'>new_data</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"numeric"</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>cosinor_area</span>(<span class='no'>object</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>object</th>
-      <td><p>A <code>cosinor</code> object.</p></td>
+      <td><p>Model of class <code>cosinor</code></p></td>
     </tr>
     <tr>
-      <th>new_data</th>
-      <td><p>A data frame or matrix of new predictors.</p></td>
-    </tr>
-    <tr>
-      <th>type</th>
-      <td><p>A single character. The type of predictions to generate.
-Valid options are:</p><ul>
-<li><p><code>"numeric"</code> for numeric predictions.</p></li>
-</ul></td>
+      <th>level</th>
+      <td><p>Confidence level requested</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Not used, but required for extensibility.</p></td>
+      <td><p>Not currently used, but required for extensibility.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A tibble of predictions. The number of rows in the tibble is guaranteed
-to be the same as the number of rows in <code>new_data</code>.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
