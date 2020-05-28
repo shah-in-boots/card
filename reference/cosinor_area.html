@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Zero Amplitude Test — cosinor_zero_amplitude • card</title>
+<title>Area of Ellipse — cosinor_area • card</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Zero Amplitude Test — cosinor_zero_amplitude" />
-<meta property="og:description" content="Zero amplitude test assesses how well the circadian pattern fits the data, essentially detecting the present of a rhythm to the data." />
+<meta property="og:title" content="Area of Ellipse — cosinor_area" />
+<meta property="og:description" content="Formulas for creating the area of the ellipse to identify confidence intervals, directionality, and graphing purposes." />
 
 
 
@@ -114,27 +114,31 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Zero Amplitude Test</h1>
+    <h1>Area of Ellipse</h1>
     <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/cosinor-diagnostics.R'><code>R/cosinor-diagnostics.R</code></a></small>
-    <div class="hidden name"><code>cosinor_zero_amplitude.Rd</code></div>
+    <div class="hidden name"><code>cosinor_area.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Zero amplitude test assesses how well the circadian pattern fits the data, essentially detecting the present of a rhythm to the data.</p>
+    <p>Formulas for creating the area of the ellipse to identify confidence intervals, directionality, and graphing purposes.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>cosinor_zero_amplitude</span>(<span class='no'>object</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>)</pre>
+    <pre class="usage"><span class='fu'>cosinor_area</span>(<span class='no'>object</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>object</th>
-      <td><p>model of class <code>cosinor</code></p></td>
+      <td><p>Model of class <code>cosinor</code></p></td>
     </tr>
     <tr>
       <th>level</th>
-      <td><p>confidence level</p></td>
+      <td><p>Confidence level requested</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Not currently used, but required for extensibility.</p></td>
     </tr>
     </table>
 

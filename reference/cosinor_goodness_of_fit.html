@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Zero Amplitude Test — cosinor_zero_amplitude • card</title>
+<title>Goodness of Fit of Cosinor — cosinor_goodness_of_fit • card</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,15 @@
 
 
 
-<meta property="og:title" content="Zero Amplitude Test — cosinor_zero_amplitude" />
-<meta property="og:description" content="Zero amplitude test assesses how well the circadian pattern fits the data, essentially detecting the present of a rhythm to the data." />
+<meta property="og:title" content="Goodness of Fit of Cosinor — cosinor_goodness_of_fit" />
+<meta property="og:description" content="Goodness of fit of a cosinor from data that has multiple
+collections at different timepoints or from multiple cycles. The RSS is
+partitioned into pure error (SSPE) and lack of fit (SSLOF). An F-test
+compares the SSPE and SSLOF to detect appropriateness of model.
+$$SSLOF = RSS - SSPE$$
+$$SSPE = \sum_{i} \sum_{l} ( Y_{il} - \overline{Y}_{i} )^2$$
+The fitted values for each time point are:
+$$\overline{Y}_{i} = \frac{ \sum_{l} Y_{il} }{ n_{i}}$$" />
 
 
 
@@ -114,30 +121,45 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Zero Amplitude Test</h1>
+    <h1>Goodness of Fit of Cosinor</h1>
     <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/cosinor-diagnostics.R'><code>R/cosinor-diagnostics.R</code></a></small>
-    <div class="hidden name"><code>cosinor_zero_amplitude.Rd</code></div>
+    <div class="hidden name"><code>cosinor_goodness_of_fit.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Zero amplitude test assesses how well the circadian pattern fits the data, essentially detecting the present of a rhythm to the data.</p>
+    <p>Goodness of fit of a cosinor from data that has multiple
+collections at different timepoints or from multiple cycles. The RSS is
+partitioned into pure error (SSPE) and lack of fit (SSLOF). An F-test
+compares the SSPE and SSLOF to detect appropriateness of model.</p>
+<p>$$SSLOF = RSS - SSPE$$</p>
+<p>$$SSPE = \sum_{i} \sum_{l} ( Y_{il} - \overline{Y}_{i} )^2$$</p>
+<p>The fitted values for each time point are:
+$$\overline{Y}_{i} = \frac{ \sum_{l} Y_{il} }{ n_{i}}$$</p>
     </div>
 
-    <pre class="usage"><span class='fu'>cosinor_zero_amplitude</span>(<span class='no'>object</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>)</pre>
+    <pre class="usage"><span class='fu'>cosinor_goodness_of_fit</span>(<span class='no'>object</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>object</th>
-      <td><p>model of class <code>cosinor</code></p></td>
+      <td><p>requires cosinor model generated with <a href='cosinor.html'>card::cosinor</a> to
+calculate statistics.</p></td>
     </tr>
     <tr>
       <th>level</th>
-      <td><p>confidence level</p></td>
+      <td><p>confidence level desired</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>additional parameters may be needed for extensibility</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>f-statistic as result of goodness of fit</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
