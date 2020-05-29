@@ -4,6 +4,7 @@
 
 # card (development version)
 
+* `print.cosinor()` and `plot.cosinor()` functions added
 * `cosinor_zero_amplitude()` test added, works for individual cosinor.
 * Population-mean cosinor analysis is added. `cosinor()` now takes the argument
 of for individuals. The individual cosinor methods generally work, but may not

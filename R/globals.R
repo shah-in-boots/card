@@ -27,5 +27,8 @@ utils::globalVariables(c(
 	"sd",
 	"se",
 	"n",
-	"RSS"
+	"RSS",
+	"yhat",
+	"y",
+	"res"
 	))

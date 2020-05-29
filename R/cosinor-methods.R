@@ -9,8 +9,11 @@ print.cosinor <- function(x, ...) {
 
 	cat("Call: \n")
 	print(x$call)
+
+	# Coefficients
 	cat("\n")
 	cat("Coefficients: \n")
+	names(x$coefficients) <- x$coef_names
 	print(x$coefficients)
 
 }
@@ -42,6 +45,22 @@ summary.cosinor <- function(object, ...) {
 	names(object$coefficients) <- object$coef_names
 	print(object$coefficients)
 
+}
+
+#' @description Generic plot method
+#' @param x `cosinor` object
+#' @param ... For extensibility
+#' @noRd
+#' @export
+plot.cosinor <- function(x, ...) {
+
+	# Model data
+	model <- as.data.frame(x$model)
+	model$yhat <- x$fitted.values
+	model$res <- x$residuals
+
+	# Plotting function
+	plot(model$t, model$yhat)
 }
 
 # }}}

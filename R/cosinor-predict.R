@@ -18,7 +18,6 @@
 #' A tibble of predictions. The number of rows in the tibble is guaranteed
 #' to be the same as the number of rows in `new_data`.
 #'
-#' @examples
 #' @export
 predict.cosinor <- function(object, new_data, type = "numeric", ...) {
   forged <- hardhat::forge(new_data, object$blueprint)
