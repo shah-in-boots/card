@@ -132,7 +132,7 @@
 <span class="co">#&gt; 6 00215 Portsmouth    NH  43.0059  -71.0132</span>
 
 <span class="co"># Get the zipcodes merged into to get latitude and longitude</span>
-<span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join.html">left_join</a></span>(<span class="no">df</span>, <span class="no">zipcode</span>[<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"zip"</span>, <span class="st">"latitude"</span>, <span class="st">"longitude"</span>)], <span class="kw">by</span> <span class="kw">=</span> <span class="st">"zip"</span>)
+<span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span>(<span class="no">df</span>, <span class="no">zipcode</span>[<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"zip"</span>, <span class="st">"latitude"</span>, <span class="st">"longitude"</span>)], <span class="kw">by</span> <span class="kw">=</span> <span class="st">"zip"</span>)
 
 <span class="co"># Sunrise is dependent on location and date</span>
 <span class="no">df</span>$<span class="no">sunrise</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/circ_sun.html">circ_sun</a></span>(<span class="kw">date</span> <span class="kw">=</span> <span class="no">df</span>$<span class="no">date</span>, <span class="kw">lat</span> <span class="kw">=</span> <span class="no">df</span>$<span class="no">latitude</span>, <span class="kw">lon</span> <span class="kw">=</span> <span class="no">df</span>$<span class="no">longitude</span>)</pre></body></html></div>
@@ -153,12 +153,12 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">patid</span>, <span class="no">sunrise</span>) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>() <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="no">patid</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice</a></span>(<span class="fu"><a href="https://dplyr.tidyverse.org/reference/n.html">n</a></span>()) <span class="co"># Sunrise time during study</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice</a></span>(<span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span>()) <span class="co"># Sunrise time during study</span>
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">zeit</span>)[<span class="fl">2</span>] <span class="kw">&lt;-</span> <span class="st">"zeit"</span>
 
 
 <span class="co"># Add surnsie zeitgeiber back in</span>
-<span class="no">df</span> <span class="kw">%&lt;&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join.html">left_join</a></span>(<span class="no">.</span>, <span class="no">zeit</span>, <span class="kw">by</span> <span class="kw">=</span> <span class="st">"patid"</span>)
+<span class="no">df</span> <span class="kw">%&lt;&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span>(<span class="no">.</span>, <span class="no">zeit</span>, <span class="kw">by</span> <span class="kw">=</span> <span class="st">"patid"</span>)
 
 <span class="no">x</span> <span class="kw">&lt;-</span> <span class="no">df</span> <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="no">patid</span>) <span class="kw">%&gt;%</span>
