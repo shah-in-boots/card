@@ -81,7 +81,7 @@
 <div id="cardiovascular-and-autonomic-research-design" class="section level2">
 <h2 class="hasAnchor">
 <a href="#cardiovascular-and-autonomic-research-design" class="anchor"></a>Cardiovascular and Autonomic Research Design</h2>
-<p>The goal of <strong>card</strong> is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools. Its being developed to fit the <em>tidy</em> approach to statistical analysis.</p>
+<p>The goal of <strong>card</strong> is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools. Its being developed to fit a <em>tidy</em> approach to statistical analysis.</p>
 <p>The areas of focus of this package are the following:</p>
 <ul>
 <li>cardiovascular disease</li>
@@ -98,34 +98,33 @@
 <p>And the development version from <a href="https://github.com/">GitHub</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="r"><span class="co"># install.packages("devtools")</span>
 <span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu">install_github</span>(<span class="st">"asshah4/card"</span>)
-<span class="co">#&gt; Downloading GitHub repo asshah4/card@master</span>
-<span class="co">#&gt; broom (5fc28ca50... -&gt; a56ab063d...) [GitHub]</span>
-<span class="co">#&gt; Downloading GitHub repo tidymodels/broom@master</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;      checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpwfflM5/remotes16b382a33e418/tidymodels-broom-a56ab06/DESCRIPTION’ ...  ✓  checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpwfflM5/remotes16b382a33e418/tidymodels-broom-a56ab06/DESCRIPTION’</span>
-<span class="co">#&gt;   ─  preparing ‘broom’:</span>
-<span class="co">#&gt;      checking DESCRIPTION meta-information ...  ✓  checking DESCRIPTION meta-information</span>
-<span class="co">#&gt;   ─  checking for LF line-endings in source and make files and shell scripts (387ms)</span>
-<span class="co">#&gt;   ─  checking for empty or unneeded directories</span>
-<span class="co">#&gt;   ─  building ‘broom_0.7.0.9000.tar.gz’</span>
-<span class="co">#&gt;      </span>
-<span class="co">#&gt;      checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpwfflM5/remotes16b387d8cee7a/asshah4-card-eb6cd17/DESCRIPTION’ ...  ✓  checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpwfflM5/remotes16b387d8cee7a/asshah4-card-eb6cd17/DESCRIPTION’</span>
-<span class="co">#&gt;   ─  preparing ‘card’:</span>
-<span class="co">#&gt;      checking DESCRIPTION meta-information ...  ✓  checking DESCRIPTION meta-information</span>
-<span class="co">#&gt;   ─  checking for LF line-endings in source and make files and shell scripts</span>
-<span class="co">#&gt;   ─  checking for empty or unneeded directories</span>
-<span class="co">#&gt;        NB: this package now depends on R (&gt;= 3.5.0)</span>
-<span class="co">#&gt;        WARNING: Added dependency on R &gt;= 3.5.0 because serialized objects in  serialize/load version 3 cannot be read in older versions of R.  File(s) containing such objects: ‘card/data/hrv.rda’</span>
-<span class="co">#&gt; ─  building ‘card_0.1.0.tar.gz’</span>
-<span class="co">#&gt;      </span>
-<span class="co">#&gt; </span></pre></div>
+<span class="co">#&gt; Skipping install of 'card' from a github remote, the SHA1 (e0fc471e) has not changed since last install.</span>
+<span class="co">#&gt;   Use `force = TRUE` to force installation</span></pre></div>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
 <p>This package is intended for analyzing cardiovascular signals and autonomic physiology. Here is an example of the process of fitting a cosinor model to time-series data.</p>
-<div class="sourceCode" id="cb3"><pre class="r"><span class="kw pkg">knitr</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html">include_graphics</a></span>(<span class="st">"man/figures/cosinor-building-curves.jpeg"</span>)</pre></div>
-<p><img src="reference/figures/cosinor-building-curves.jpeg" width="100%"></p>
+<div class="sourceCode" id="cb3"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">card</span>)
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="no">twins</span>)
+<span class="no">m</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/cosinor.html">cosinor</a></span>(<span class="no">rDYX</span> ~ <span class="no">hour</span>, <span class="no">twins</span>, <span class="kw">tau</span> <span class="kw">=</span> <span class="fl">24</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">m</span>)
+<span class="co">#&gt; Individual Cosinor Model </span>
+<span class="co">#&gt; ------------------------------------------</span>
+<span class="co">#&gt; Call: </span>
+<span class="co">#&gt; cosinor("rDYX ~ hour")</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Residuals: </span>
+<span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span>
+<span class="co">#&gt; -3.12633 -0.53228 -0.03597  0.00000  0.49132  4.82150 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Coefficients: </span>
+<span class="co">#&gt;      mesor        amp        phi       beta      gamma </span>
+<span class="co">#&gt;  2.8604855  0.2986101 -2.6687044 -0.2658396  0.1360048</span></pre></div>
+<p>The data can also be easily plotted for diagnostic purposes.</p>
+<div class="sourceCode" id="cb4"><pre class="r"><span class="fu"><a href="reference/ggcosinor.html">ggcosinor</a></span>(<span class="no">m</span>)
+<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></pre></div>
+<p><img src="reference/figures/unnamed-chunk-5-1.png" width="100%"></p>
 </div>
 </div>
 
@@ -162,6 +161,7 @@
 <li><a href="https://github.com/asshah4/card/actions"><img src="https://github.com/asshah4/card/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
 <li><a href="https://travis-ci.com/asshah4/card"><img src="https://travis-ci.com/asshah4/card.svg?branch=master" alt="Travis build status"></a></li>
 <li><a href="https://github.com/asshah4/card/graphs/commit-activity"><img src="https://img.shields.io/github/commit-activity/w/asshah4/card" alt="Github commit frequency"></a></li>
+<li><a href="https://codecov.io/gh/asshah4/card?branch=master"><img src="https://codecov.io/gh/asshah4/card/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
 </ul>
 </div>
 </div>
