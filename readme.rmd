@@ -64,6 +64,5 @@ The data can also be easily plotted for diagnostic purposes.
 
 ```{r}
 ggcosinor(m)
-ggellipse(m)
 ```
 

@@ -172,14 +172,23 @@ strata/event.</p>
   <span class='fu'><a href='recur_survival_table.html'>recur_survival_table</a></span>(
     <span class='no'>mims</span>, <span class='st'>"patid"</span>, <span class='st'>"first_visit_date_bl"</span>, <span class='st'>"ldka"</span>,
     <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"mi_date_1"</span>, <span class='st'>"mi_date_2"</span>, <span class='st'>"mi_date_3"</span>), <span class='st'>"marginal"</span>, <span class='st'>"DEATH_CV_YN"</span>
-  )</div><div class='output co'>#&gt; <span class='warning'>Warning: `cols` is now required when using unnest().</span>
+  )</div><div class='output co'>#&gt; <span class='warning'>Warning: `group_by_()` is deprecated as of dplyr 0.7.0.</span>
+#&gt; <span class='warning'>Please use `group_by()` instead.</span>
+#&gt; <span class='warning'>See vignette('programming') for more help</span>
+#&gt; <span class='warning'><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
+#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; <span class='warning'>Warning: `arrange_()` is deprecated as of dplyr 0.7.0.</span>
+#&gt; <span class='warning'>Please use `arrange()` instead.</span>
+#&gt; <span class='warning'>See vignette('programming') for more help</span>
+#&gt; <span class='warning'></span><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
+#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; <span class='warning'>Warning: `cols` is now required when using unnest().</span>
 #&gt; <span class='warning'>Please use `cols = c(data)`</span></div><div class='input'>
 <span class='co'># Grouping variable</span>
 <span class='no'>covar</span> <span class='kw'>&lt;-</span> <span class='st'>"RDR_ISCHEMIA_M_YN_bl"</span>
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>left_join</a></span>(<span class='no'>marg</span>, <span class='no'>mims</span>[<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"patid"</span>, <span class='no'>covar</span>)], <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"ID"</span> <span class='kw'>=</span> <span class='st'>"patid"</span>))
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span>(<span class='no'>marg</span>, <span class='no'>mims</span>[<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"patid"</span>, <span class='no'>covar</span>)], <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"ID"</span> <span class='kw'>=</span> <span class='st'>"patid"</span>))
 
 <span class='co'># Make summary table</span>
-<span class='no'>tbl</span> <span class='kw'>&lt;-</span> <span class='fu'>recur_summary</span>(<span class='no'>df</span>, <span class='no'>covar</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Factor `RDR_ISCHEMIA_M_YN_bl` contains implicit NA, consider using `forcats::fct_explicit_na`</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Factor `RDR_ISCHEMIA_M_YN_bl` contains implicit NA, consider using `forcats::fct_explicit_na`</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Factor `RDR_ISCHEMIA_M_YN_bl` contains implicit NA, consider using `forcats::fct_explicit_na`</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Factor `RDR_ISCHEMIA_M_YN_bl` contains implicit NA, consider using `forcats::fct_explicit_na`</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Factor `RDR_ISCHEMIA_M_YN_bl` contains implicit NA, consider using `forcats::fct_explicit_na`</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Factor `RDR_ISCHEMIA_M_YN_bl` contains implicit NA, consider using `forcats::fct_explicit_na`</span></div><div class='input'><span class='no'>tbl</span> <span class='kw'>%&gt;%</span>
+<span class='no'>tbl</span> <span class='kw'>&lt;-</span> <span class='fu'>recur_summary</span>(<span class='no'>df</span>, <span class='no'>covar</span>)
+<span class='no'>tbl</span> <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/reexports.html'>kable</a></span>(<span class='st'>"latex"</span>, <span class='kw'>caption</span> <span class='kw'>=</span> <span class='st'>"Title"</span>, <span class='kw'>booktabs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/kable_styling.html'>kable_styling</a></span>(<span class='kw'>font_size</span> <span class='kw'>=</span> <span class='fl'>8</span>)</div><div class='output co'>#&gt; \begin{table}
 #&gt; 
@@ -198,7 +207,7 @@ strata/event.</p>
 #&gt; \bottomrule
 #&gt; \end{tabular}
 #&gt; \end{table}</div><div class='input'>
-</div></pre>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

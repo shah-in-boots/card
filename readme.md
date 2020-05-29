@@ -11,6 +11,8 @@ status](https://github.com/asshah4/card/workflows/R-CMD-check/badge.svg)](https:
 status](https://travis-ci.com/asshah4/card.svg?branch=master)](https://travis-ci.com/asshah4/card)
 [![Github commit
 frequency](https://img.shields.io/github/commit-activity/w/asshah4/card)](https://github.com/asshah4/card/graphs/commit-activity)
+[![Codecov test
+coverage](https://codecov.io/gh/asshah4/card/branch/master/graph/badge.svg)](https://codecov.io/gh/asshah4/card?branch=master)
 <!-- badges: end -->
 
 # **card**
@@ -20,7 +22,7 @@ frequency](https://img.shields.io/github/commit-activity/w/asshah4/card)](https:
 The goal of **card** is to create functions and analytical approaches in
 neurocardiology, with a focus on electrocardiogram data and
 epidemiological concepts. An important engine within this ecosystem are
-the circadian analysis tools. Its being developed to fit the *tidy*
+the circadian analysis tools. Its being developed to fit a *tidy*
 approach to statistical analysis.
 
 The areas of focus of this package are the following:
@@ -44,27 +46,8 @@ And the development version from [GitHub](https://github.com/) with:
 ``` r
 # install.packages("devtools")
 devtools::install_github("asshah4/card")
-#> Downloading GitHub repo asshah4/card@master
-#> broom (5fc28ca50... -> a56ab063d...) [GitHub]
-#> Downloading GitHub repo tidymodels/broom@master
-#> 
-#>      checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpwfflM5/remotes16b382a33e418/tidymodels-broom-a56ab06/DESCRIPTION’ ...  ✓  checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpwfflM5/remotes16b382a33e418/tidymodels-broom-a56ab06/DESCRIPTION’
-#>   ─  preparing ‘broom’:
-#>      checking DESCRIPTION meta-information ...  ✓  checking DESCRIPTION meta-information
-#>   ─  checking for LF line-endings in source and make files and shell scripts (387ms)
-#>   ─  checking for empty or unneeded directories
-#>   ─  building ‘broom_0.7.0.9000.tar.gz’
-#>      
-#>      checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpwfflM5/remotes16b387d8cee7a/asshah4-card-eb6cd17/DESCRIPTION’ ...  ✓  checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpwfflM5/remotes16b387d8cee7a/asshah4-card-eb6cd17/DESCRIPTION’
-#>   ─  preparing ‘card’:
-#>      checking DESCRIPTION meta-information ...  ✓  checking DESCRIPTION meta-information
-#>   ─  checking for LF line-endings in source and make files and shell scripts
-#>   ─  checking for empty or unneeded directories
-#>        NB: this package now depends on R (>= 3.5.0)
-#>        WARNING: Added dependency on R >= 3.5.0 because serialized objects in  serialize/load version 3 cannot be read in older versions of R.  File(s) containing such objects: ‘card/data/hrv.rda’
-#> ─  building ‘card_0.1.0.tar.gz’
-#>      
-#> 
+#> Skipping install of 'card' from a github remote, the SHA1 (e0fc471e) has not changed since last install.
+#>   Use `force = TRUE` to force installation
 ```
 
 ## Usage
@@ -74,7 +57,29 @@ autonomic physiology. Here is an example of the process of fitting a
 cosinor model to time-series data.
 
 ``` r
-knitr::include_graphics("man/figures/cosinor-building-curves.jpeg")
+library(card)
+data(twins)
+m <- cosinor(rDYX ~ hour, twins, tau = 24)
+summary(m)
+#> Individual Cosinor Model 
+#> ------------------------------------------
+#> Call: 
+#> cosinor("rDYX ~ hour")
+#> 
+#> Residuals: 
+#>     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+#> -3.12633 -0.53228 -0.03597  0.00000  0.49132  4.82150 
+#> 
+#> Coefficients: 
+#>      mesor        amp        phi       beta      gamma 
+#>  2.8604855  0.2986101 -2.6687044 -0.2658396  0.1360048
 ```
 
-<img src="man/figures/cosinor-building-curves.jpeg" width="100%" />
+The data can also be easily plotted for diagnostic purposes.
+
+``` r
+ggcosinor(m)
+#> `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'
+```
+
+<img src="man/figures/unnamed-chunk-5-1.png" width="100%" />
