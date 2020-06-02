@@ -172,6 +172,7 @@ cosinor_bridge <- function(processed, tau, population, ...) {
     fitted.values = fit$fitted.values,
     residuals = fit$residuals,
     call = call, # Made with bridge data
+    tau = tau,
     model = fit$model,
     xmat = fit$xmat,
     type = type, # Made at bridge, labels type of cosinor object
@@ -191,6 +192,7 @@ new_cosinor <- function(
   fitted.values,
   residuals,
   call,
+  tau,
   model,
   xmat,
   type,
@@ -223,6 +225,7 @@ new_cosinor <- function(
     fitted.values = fitted.values,
     residuals = residuals,
     call = call,
+    tau = tau,
     model = model,
     xmat = xmat,
     type = type,

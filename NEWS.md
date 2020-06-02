@@ -4,6 +4,7 @@
 
 # card (development version)
 
+* `ggcosinor()` accepts single models
 * `print.cosinor()` and `plot.cosinor()` functions added
 * `cosinor_zero_amplitude()` test added, works for individual cosinor.
 * Population-mean cosinor analysis is added. `cosinor()` now takes the argument

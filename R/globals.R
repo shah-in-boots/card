@@ -30,5 +30,6 @@ utils::globalVariables(c(
 	"RSS",
 	"yhat",
 	"y",
-	"res"
+	"res",
+	".id"
 	))

@@ -4,13 +4,15 @@
 \alias{ggcosinor}
 \title{ggplot of cosinor model}
 \usage{
-ggcosinor(object, ...)
+ggcosinor(object, residuals = TRUE, ...)
 }
 \arguments{
-\item{object}{Model of class \code{cosinor}c("#FFFFFF", "#FFFFFF", "#FFFFFF")}
+\item{object}{Model of class \code{cosinor}.}
+
+\item{residuals}{If residuals should be added. Colors can be overwritten with additional arguments (e.g. "+ scale_color_grey()")}
 
 \item{...}{For extensibility}
 }
 \description{
-ggplot of cosinor model
+ggplot of single cosinor model, options include to ability to add diagnostic/fit parameters such as residuals.
 }

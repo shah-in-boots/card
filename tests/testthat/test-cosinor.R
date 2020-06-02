@@ -1,5 +1,3 @@
-context("cosinor")
-
 # Cosinor objects are of S3 class
 test_that("cosinor objects are of class cosinor", {
 

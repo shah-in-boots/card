@@ -365,17 +365,319 @@ ggellipse <- function(object, level = 0.95, ...) {
 }
 
 #' @title ggplot of cosinor model
-#' @description ggplot of cosinor model
-#' @param object Model of class `cosinor`c("#FFFFFF", "#FFFFFF", "#FFFFFF")
+#' @description ggplot of single cosinor model, options include to ability to add diagnostic/fit parameters such as residuals.
+#' @param object Model of class `cosinor`.
+#' @param residuals If residuals should be added. Colors can be overwritten with additional arguments (e.g. "+ scale_color_grey()")
 #' @param ... For extensibility
 #' @import ggplot2
 #' @export
-ggcosinor <- function(object, ...) {
+ggcosinor <- function(object, residuals = TRUE, ...) {
+
+	# Decide what type of plot
+	type <- object$type
 
 	# Model
 	model <- tidyr::tibble(as.data.frame((object$model)))
 	model$yhat <- object$fitted.values
 	model$res <- object$residuals
+	period <- object$tau
+
+	# Coefficients
+	coefs <- object$coefficients
+	mesor <- coefs[object$coef_names == "mesor"]
+	amp <- coefs[object$coef_names == "amp"]
+	phi <- coefs[object$coef_names == "phi"]
+
+	# Summary per hour
+	aug <-
+		model %>%
+		dplyr::group_by(t) %>%
+		dplyr::summarise_all(mean, na.rm = TRUE)
+
+	### Conditional graphing positions
+
+	# Acrophase in hours
+	acro <- abs((phi * period) / (2 * pi)) # location of peak
+
+	# Period label
+	perly <- mesor - 13/12*amp
+	perlx <- period/2
+
+	# Obtain approximate points of intersection of MESOR and curve
+	f <- stats::approxfun(x = aug$t, y = aug$yhat, rule = 2)
+	xs <- seq(min(aug$t), max(aug$t), length.out = 100)
+	ys <- f(xs)
+	equivalent <- function(x, y, tol = 0.01) { abs(x - y) < tol }
+	pos <- xs[which(equivalent(ys, mesor))]
+
+	if(length(pos) == 1) {
+		peak <- dplyr::case_when(
+			pos < acro ~ "early",
+			pos > acro ~ "late"
+		)
+	} else if(length(pos) >= 2) {
+		peak <- dplyr::case_when(
+			pos[1] < acro & pos[length(pos)] > acro ~ "mid"
+		)
+	}
+
+	# Identify where to position acrophase/amplitude and its label
+	switch(
+		peak,
+		early = {
+			# Amplitude
+			ampx <- pos
+			amplx <- (pos + period/2)/2
+			amply <- (2*mesor + amp)/2
+			# Acrophase
+			acrox <- min(aug$t)
+			acroy <- aug$yhat[aug$t == min(aug$t)]
+			acrox <- min(aug$t)
+			acroy <- max(aug$yhat)
+			acrolx <- (acrox + acro) / 2
+			acroly <- mesor + 11/12 * amp
+			# Mesor
+			mesx <- (acro + pos)/2
+			mesy <- mesor - 1/12*amp
+		},
+		mid = {
+			# Amplitude
+			ampx <- acro
+			amplx <- period/2
+			amply <- (2*mesor + amp)/2
+			# Acrophase
+			acrox <- min(aug$t)
+			acroy <- max(aug$yhat)
+			acrolx <- (acrox + acro) / 2
+			acroly <- mesor + 11/12 * amp
+			# Mesor
+			mesx <- dplyr::case_when(
+				acro < period/2 ~ (acro + pos[1])/2,
+				acro > period/2 ~ (acro + pos[length(pos)])/2
+			)
+			mesy <- mesor - 1/12*amp
+		},
+		late = {
+			# Amplitude
+			ampx <- pos
+			amplx <- (pos + period/2)/2
+			amply <- (2*mesor + amp)/2
+			# Acrophase
+			acrox <- min(aug$t)
+			acroy <- aug$yhat[aug$t == min(aug$t)]
+			acrox <- min(aug$t)
+			acroy <- max(aug$yhat)
+			acrolx <- (acrox + acro) / 2
+			acroly <- mesor + 11/12 * amp
+			# Mesor
+			mesx <- (acro + pos)/2
+			mesy <- mesor - 1/12*amp
+		}
+	)
+
+	# Parts of ggplot
+	g <- ggplot(aug) +
+		# Fit
+		stat_smooth(
+			aes(x = t, y = yhat), method = "gam",
+			color = "black", size = 1.1
+		) +
+		geom_hline(yintercept = mesor, color = "gray") +
+		geom_vline(xintercept = ampx, color = "gray") +
+		theme_minimal() +
+		theme(
+			legend.position = "none",
+			panel.grid.major = element_blank(),
+			panel.grid.minor = element_blank()
+		) +
+		xlim(min(aug$t), period)
+
+	glabs <- list(
+		# Mesor
+		geom_label(
+			aes(x = mesx, y = mesy, label = paste0("MESOR = ", round(mesor, 2))),
+			fill = "white"
+		),
+		# Amplitude
+		geom_segment(
+			aes(x = ampx, xend = ampx, y = mesor, yend = mesor + amp),
+			linetype = "dashed", lineend = "butt", linejoin = "mitre",
+		),
+		geom_label(
+			aes(x = amplx, y = amply, label = paste0("A = ", round(amp, 2))),
+			fill = "white"
+		),
+		# Acrophase
+		geom_segment(
+			aes(x = acro, xend = acrox, y = acroy, yend = acroy),
+			linetype = "dashed", lineend = "butt", linejoin = "mitre",
+		),
+		geom_label(
+			aes(x = acrolx, y = acroly, label = paste0("Phi = ", round(acro, 2))),
+			fill = "white",
+		),
+		# Period
+		geom_segment(
+			aes(x = min(t), xend = period, y = min(yhat), yend = min(yhat)),
+			linetype = "dashed", lineend = "butt", linejoin = "mitre",
+		),
+		geom_label(
+			aes(x = perlx, y = perly, label = paste0("Period = ", period)),
+			fill = "white"
+		)
+	)
+
+	if(residuals) {
+		gg <-
+			g +
+			geom_segment(aes(x = t, xend = t, y = y, yend = yhat), alpha = 0.3) +
+			geom_point(aes(x = t, y = y, colour = abs(res), size = abs(res))) +
+			scale_color_viridis_c(option = "magma") +
+			glabs
+	} else {
+		gg <-
+			g +
+			glabs
+	}
+
+	# Return
+	return(gg)
+
+}
+
+#' @title ggplot of multiple cosinor models
+#' @description ggplot of multiple cosinor objects for comparison purposes. Appearance of plot will be greatly enhanced if objects share a similar y-axis scale.
+#' @param objects List of `cosinor` objects
+#' @param ... For extensibility
+#' @import ggplot2
+#' @export
+ggmulticosinor <- function(objects, ...) {
+
+	# Are there multiple objects? Returns TRUE if vector (thus list of models)
+	if(!is.vector(objects)) {
+		stop("Requires list of cosinor objects.", call. = FALSE)
+	}
+
+	# We need multiple dataframes to plot this effectively
+	augdf <- list()
+	coefs <- list()
+	for(i in seq_along(objects)) {
+		print(i)
+		object <- objects[[i]]
+
+		model <- tidyr::tibble(as.data.frame((object$model)))
+		model$yhat <- object$fitted.values
+		model$res <- object$residuals
+
+		# Coefficients
+		coef <- object$coefficients
+		mesor <- coef[object$coef_names == "mesor"]
+		amp <- coef[object$coef_names == "amp"]
+		phi <- coef[object$coef_names == "phi"]
+
+		# Phi in hours
+		acro <- abs((phi * 24) / (2 * pi))
+
+		# Save output
+		coefs[[i]] <- list(
+			mesor = mesor,
+			amp = amp,
+			phi = phi,
+			acro = acro
+		)
+
+		# Summary per hour
+		aug <-
+			model %>%
+			dplyr::group_by(t) %>%
+			dplyr::summarise_all(mean, na.rm = TRUE)
+
+		augdf[[i]] <- aug
+	}
+
+	# Combine into 1 table with grouping variable as .id
+	aug <- dplyr::tibble(data.table::rbindlist(augdf, idcol = TRUE))
+	aug$.id <- factor(aug$.id)
+	vars <- dplyr::tibble(data.table::rbindlist(coefs, idcol = TRUE))
+	vars$.id <- factor(vars$.id)
+
+	# Overall plot
+	g <- ggplot(aug) +
+		stat_smooth(
+			aes(x = t, y = yhat, group = .id),
+			method = "gam", size = 1.1, colour = "black"
+		) +
+		theme_minimal() +
+		theme(
+			legend.position = "none",
+			panel.grid.major = element_blank(),
+			panel.grid.minor = element_blank()
+		) +
+		coord_cartesian(xlim = c(min(aug$t), max(aug$t)))
+
+	# Annotations
+	glabs <- list(
+		geom_hline(aes(yintercept = mesor, colour = .id), vars),
+		geom_vline(aes(xintercept = acro, colour = .id), vars),
+		geom_label(
+			aes(
+				x = 1/3*acro, y = mesor + 1/3*amp,
+				label = paste0("Group = ", .id,
+											 "\nMesor = ", round(mesor, 2),
+											 "\nAmp = ", round(amp, 2),
+											 "\nPhi = ", round(phi, 2))
+				),
+			data = vars
+		)
+	)
+
+	# Residuals
+	gres <- list(
+		geom_point(
+			aes(x = t, y = y, group = .id, colour = .id)
+		),
+		geom_segment(
+			aes(x = t, xend = t, y = y, yend = yhat, group = .id, colour = .id),
+			alpha = 0.3
+		),
+		scale_color_viridis_d(option = "plasma", end = 0.8)
+	)
+
+	# Return
+	gg <- g + gres + glabs
+	return(gg)
+
+}
+
+#' @title ggplot of population cosinor model
+#' @description ggplot of a population cosinor model
+#' @param object A `cosinor` object of the population type, called when the population is specified in [card::cosinor()]
+#' @param ... For extensibility
+#' @import ggplot2
+#' @export
+ggpopcosinor <- function(object, ...) {
+
+	# Confirm if type is population
+	if(object$type != "Population") {
+		stop("This object is not a `cosinor` model of type `Population`.", call. = FALSE)
+	}
+
+	model <- tidyr::tibble(as.data.frame((object$model)))
+	model$yhat <- object$fitted.values
+	model$res <- object$residuals
+
+	# Remove anyone with too few points to plot
+	lowCounts <- model$pop[which(table(model$pop) <= 5)]
+	lowCounts <- which(table(model$pop) < 5)
+	model <- subset(model, !(pop %in% lowCount))
+
+  # Remove patients with only 1 observation (will cause a det = 0 error)
+  counts <- by(model, model[, "population"], nrow)
+  lowCounts <- as.numeric(names(counts[counts <= 5]))
+  model <- subset(model, !(population %in% lowCounts))
+
+	# Subset for testing
+	#model <- subset(model, pop %in% c(1:100))
 
 	# Coefficients
 	coefs <- object$coefficients
@@ -386,64 +688,46 @@ ggcosinor <- function(object, ...) {
 	# Phi in hours
 	acro <- abs((phi * 24) / (2 * pi))
 
+	# Predicted values
+	model$pred <- mesor + amp*cos((2*pi*model$t / object$tau) + phi)
+
 	# Summary per hour
 	aug <-
 		model %>%
 		dplyr::group_by(t) %>%
 		dplyr::summarise_all(mean, na.rm = TRUE)
 
-	# Plot
-	gg <- ggplot(aug) +
-		geom_vline(xintercept = acro, color = "gray") +
+	ggplot(model) +
+		geom_line(
+			aes(x = t, y = yhat, group = population, colour = "Individual"),
+			size = 0.5, alpha = 0.5
+		) +
+		# Average
 		stat_smooth(
-			aes(x = t, y = yhat), method = "gam",
-			color = "black", size = 1.1
+			aes(x = t, y = yhat, colour = "Mean"), data = aug, size = 1.5
 		) +
-		geom_point(aes(x = t, y = y, colour = abs(res), size = abs(res))) +
-		scale_color_viridis_c(option = "magma") +
-		geom_segment(aes(x = t, xend = t, y = y, yend = yhat), alpha = 0.3) +
-		# Mesor
-		geom_hline(yintercept = mesor, color = "gray") +
-		annotate(
-			"text", x = 0.75*acro, y = 0.99*mesor,
-			label = paste0("MESOR = ", round(mesor, 2))
+		# Predicted
+		stat_smooth(
+			aes(x = t, y = pred, colour = "Predicted"), size = 1.5
 		) +
-		# Amplitude
-		geom_errorbar(
-			aes(x = 0.3*acro, ymin = mesor, ymax = mesor + amp),
-			linetype = "dashed",
-		) +
-		annotate(
-			"text", x = 0.15*acro, y = 1.05*mesor,
-			label = paste0("A = ", round(amp, 2))
-		) +
-		# Acrophase
-		geom_errorbarh(
-			aes(xmin = 1, xmax = acro, y = 1.0*min(y)),
-			linetype = "dashed", height = 0.02
-		) +
-		annotate(
-			"text", x = 0.5*acro, y = 0.99*(min(aug$y)),
-			label = paste0("Phi = ", round(acro, 2))
-		) +
-		# Period
-		geom_errorbarh(
-			aes(xmin = 1, xmax = 24, y = 1.01*max(y)),
-			linetype = "dashed", alpha = 0.5, height = 0.02
-		) +
-		annotate(
-			"text", x = 1.2*acro, y = 1.02*max(aug$y),
-			label = paste0("Period = ", range(aug$t)[2])
+		scale_colour_manual(
+			name = "",
+			values = c(
+				"Individual" = "darkslategrey",
+				"Mean" = "cornflowerblue",
+				"Predicted" = "indianred"
+				)
 		) +
 		theme_minimal() +
 		theme(
-			legend.position = "none",
+			legend.position = "bottom",
+			legend.background = element_rect(color = NA),
 			panel.grid.major = element_blank(),
 			panel.grid.minor = element_blank()
 		)
 
-	# Return
-	return(gg)
+
+
 }
 
 # }}}

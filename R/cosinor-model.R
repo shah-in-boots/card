@@ -130,13 +130,14 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
     message(length(lowCounts), " subjects were removed due to only a single observation.")
   }
 
-  # Full population parameters
+  # Population parameters
   period <- tau
   k <- length(unique(df$population)) # Number of individuals
   p <- 1 # Number of parameters such that 2p + 1 = 3 for single cosinor
-  y <- outcomes
-  t <- predictors
+  y <- df$outcomes
+  t <- df$predictors
   n <- length(t)
+  population <- df$population
   x <- cos((2 * pi * t) / period)
   z <- sin((2 * pi * t) / period)
 
@@ -154,6 +155,13 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   ## }}}
 
   ## Coefficients {{{ ====
+
+  # Fits of individual cosinors
+  tmp <- sapply(popCosinors, stats::fitted)
+  fits <- data.frame(
+    population = rep(names(tmp), sapply(tmp, length)),
+    yhat = unlist(tmp)
+  )
 
   # Matrix of coefficients
   tbl <- sapply(popCosinors, stats::coef)
@@ -220,7 +228,12 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
 
   # Fitted values
   # y(t) = M + A*cos(2*pi*t/period + phi)
+
+  # Individual fits
+
+  # Overall model
   yhat <- mesor + amp * cos(2*pi*t/period + phi)
+  yhat <- fits$yhat
 
   # List of values to return (must be same as cosinor_impl)
   list(
