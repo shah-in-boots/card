@@ -31,5 +31,7 @@ utils::globalVariables(c(
 	"yhat",
 	"y",
 	"res",
-	".id"
+	".id",
+	"population",
+	"pred"
 	))

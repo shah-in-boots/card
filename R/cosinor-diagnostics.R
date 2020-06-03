@@ -407,8 +407,7 @@ ggcosinor <- function(object, residuals = TRUE, ...) {
 	f <- stats::approxfun(x = aug$t, y = aug$yhat, rule = 2)
 	xs <- seq(min(aug$t), max(aug$t), length.out = 100)
 	ys <- f(xs)
-	equivalent <- function(x, y, tol = 0.01) { abs(x - y) < tol }
-	pos <- xs[which(equivalent(ys, mesor))]
+	pos <- xs[which(abs(ys - mesor) < 0.01)]
 
 	if(length(pos) == 1) {
 		peak <- dplyr::case_when(
@@ -666,11 +665,6 @@ ggpopcosinor <- function(object, ...) {
 	model$yhat <- object$fitted.values
 	model$res <- object$residuals
 
-	# Remove anyone with too few points to plot
-	lowCounts <- model$pop[which(table(model$pop) <= 5)]
-	lowCounts <- which(table(model$pop) < 5)
-	model <- subset(model, !(pop %in% lowCount))
-
   # Remove patients with only 1 observation (will cause a det = 0 error)
   counts <- by(model, model[, "population"], nrow)
   lowCounts <- as.numeric(names(counts[counts <= 5]))
@@ -697,7 +691,8 @@ ggpopcosinor <- function(object, ...) {
 		dplyr::group_by(t) %>%
 		dplyr::summarise_all(mean, na.rm = TRUE)
 
-	ggplot(model) +
+	# General ggplot
+	g <- ggplot(model) +
 		geom_line(
 			aes(x = t, y = yhat, group = population, colour = "Individual"),
 			size = 0.5, alpha = 0.5
@@ -726,7 +721,13 @@ ggpopcosinor <- function(object, ...) {
 			panel.grid.minor = element_blank()
 		)
 
+	# Mean line
 
+	# Predicted
+
+	# Return
+	gg <- g
+	return(g)
 
 }
 

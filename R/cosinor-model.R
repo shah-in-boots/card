@@ -232,7 +232,6 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   # Individual fits
 
   # Overall model
-  yhat <- mesor + amp * cos(2*pi*t/period + phi)
   yhat <- fits$yhat
 
   # List of values to return (must be same as cosinor_impl)

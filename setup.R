@@ -4,6 +4,7 @@
 library(devtools)
 library(hardhat)
 library(pkgdown)
+library(testthat)
 
 # For exploring
 library(tidyverse)

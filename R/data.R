@@ -27,6 +27,19 @@
 
 # }}}
 
+# Clinical Variables and Dyx Hourly Data {{{ ====
+
+#' Hourly time series data with clinical covariates
+#'
+#' Clinical data is also available for visualization and comparison. Other HRV measures are used here for comparison and testing out functions.
+#'
+#' @docType data
+#' @format An tibble data frame
+#' @keywords datasets
+"triplets"
+
+# }}}
+
 # Output from MATLAB HRV Toolbox {{{ ====
 
 #' Output from MATLAB HRV Toolbox
