@@ -1,8 +1,7 @@
-
 # ggcosinor
 test_that("cosinor objects are appropriate for plotting", {
 	# Data
-	data(twins)
+	data("twins")
 	sad <- cosinor(rDYX ~ hour, twins[twins$sad_bin == 1,], tau = 24)
 	happy <- cosinor(rDYX ~ hour, twins[twins$sad_bin == 0, ], tau = 24)
 	pop <- cosinor(rDYX ~ hour, twins, tau = 24, population = "patid")
@@ -23,4 +22,6 @@ test_that("cosinor objects are appropriate for plotting", {
 	# Population type
 	expect_match(sad$type, "Individual")
 	expect_match(pop$type, "Population")
+
 })
+

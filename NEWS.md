@@ -1,9 +1,18 @@
 # card v0.1.0
 
-(Pending CRAN submssion)
+- Pending CRAN submission
 
 # card (development version)
 
+## Bugs
+
+* `cosinor()` unable to run on certain models based on y values
+* `ggcosinor()` cannot set amplitude/peak positions for certain cases
+* `ggpopcosinor()` is not sure how many observations are needed to graph 
+
+## Features
+
+* `ggpopcosinor()` can show the cosinors for individuals across a population, along with mean and predicted cosinor
 * `ggcosinor()` accepts single models
 * `print.cosinor()` and `plot.cosinor()` functions added
 * `cosinor_zero_amplitude()` test added, works for individual cosinor.

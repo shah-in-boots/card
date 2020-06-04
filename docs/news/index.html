@@ -120,12 +120,33 @@
     <div id="card-v010" class="section level1">
 <h1 class="page-header" data-toc-text="0.1.0">
 <a href="#card-v010" class="anchor"></a>card v0.1.0</h1>
-<p>(Pending CRAN submssion)</p>
+<ul>
+<li>Pending CRAN submission</li>
+</ul>
 </div>
     <div id="card-development-version" class="section level1">
 <h1 class="page-header" data-toc-text="development version">
 <a href="#card-development-version" class="anchor"></a>card (development version)</h1>
+<div id="bugs" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bugs" class="anchor"></a>Bugs</h2>
 <ul>
+<li>
+<code><a href="../reference/cosinor.html">cosinor()</a></code> unable to run on certain models based on y values</li>
+<li>
+<code><a href="../reference/ggcosinor.html">ggcosinor()</a></code> cannot set amplitude/peak positions for certain cases</li>
+<li>
+<code><a href="../reference/ggpopcosinor.html">ggpopcosinor()</a></code> is not sure how many observations are needed to graph</li>
+</ul>
+</div>
+<div id="features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#features" class="anchor"></a>Features</h2>
+<ul>
+<li>
+<code><a href="../reference/ggpopcosinor.html">ggpopcosinor()</a></code> can show the cosinors for individuals across a population, along with mean and predicted cosinor</li>
+<li>
+<code><a href="../reference/ggcosinor.html">ggcosinor()</a></code> accepts single models</li>
 <li>
 <code>print.cosinor()</code> and <code>plot.cosinor()</code> functions added</li>
 <li>
@@ -136,6 +157,7 @@
 <li>Recurrent events can now be analyzed using a powerful function called <code><a href="../reference/recur_survival_table.html">recur_survival_table()</a></code>, which allows for redesigning longitudinal data tables into a model appropriate for analysis. It is built to extend survival analyses. The <code>recur_summary_table()</code> function allows for reviewing the findings from recurrent events by category to help understand event strata.</li>
 <li>The <code><a href="../reference/circ_sun.html">circ_sun()</a></code> function allows for identifying the sunrise and sunset times based on geographical location. This is intended to couple with the <code><a href="../reference/circ_center.html">circ_center()</a></code> function to center a time series around an event, such as sunrise. A vignette has been added to review this data.</li>
 </ul>
+</div>
 </div>
   </div>
 

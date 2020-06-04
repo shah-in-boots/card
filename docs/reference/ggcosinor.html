@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="ggplot of cosinor model — ggcosinor" />
-<meta property="og:description" content="ggplot of cosinor model" />
+<meta property="og:description" content="ggplot of single cosinor model, options include to ability to add diagnostic/fit parameters such as residuals." />
 
 
 
@@ -120,17 +120,21 @@
     </div>
 
     <div class="ref-description">
-    <p>ggplot of cosinor model</p>
+    <p>ggplot of single cosinor model, options include to ability to add diagnostic/fit parameters such as residuals.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ggcosinor</span>(<span class='no'>object</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>ggcosinor</span>(<span class='no'>object</span>, <span class='kw'>residuals</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>object</th>
-      <td><p>Model of class <code>cosinor</code>c("#FFFFFF", "#FFFFFF", "#FFFFFF")</p></td>
+      <td><p>Model of class <code>cosinor</code>.</p></td>
+    </tr>
+    <tr>
+      <th>residuals</th>
+      <td><p>If residuals should be added. Colors can be overwritten with additional arguments (e.g. "+ scale_color_grey()")</p></td>
     </tr>
     <tr>
       <th>...</th>

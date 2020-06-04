@@ -309,31 +309,6 @@ recur_survival_table <-
 #'   environment with kableExtra. Assumes that death events may be
 #'   present when most recent non-EVENT has status 1.
 #'
-#' @examples
-#' # setup
-#' library(magrittr)
-#' library(dplyr)
-#' library(kableExtra)
-#'
-#' data("mims")
-#'
-#' # Marginal data (as above)
-#' marg <-
-#'   recur_survival_table(
-#'     mims, "patid", "first_visit_date_bl", "ldka",
-#'     c("mi_date_1", "mi_date_2", "mi_date_3"), "marginal", "DEATH_CV_YN"
-#'   )
-#'
-#' # Grouping variable
-#' covar <- "RDR_ISCHEMIA_M_YN_bl"
-#' df <- left_join(marg, mims[c("patid", covar)], by = c("ID" = "patid"))
-#'
-#' # Make summary table
-#' tbl <- recur_summary(df, covar)
-#' tbl %>%
-#'   kable("latex", caption = "Title", booktabs = TRUE) %>%
-#'   kable_styling(font_size = 8)
-#'
 #' @export
 recur_summary <- function(data, covar) {
   # What is the ID for merging? Using example, should be likely called "ID"

@@ -117,21 +117,23 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
 
   ## Population cosinor parameter setup {{{ ====
 
+  # Period
+  period <- tau
+
   # Create data frame for split/apply approach
   df <- data.frame(predictors, outcomes, population)
 
   # Remove patients with only 1 observation (will cause a det = 0 error)
   counts <- by(df, df[, "population"], nrow)
-  lowCounts <- as.numeric(names(counts[counts <= 1]))
+  lowCounts <- as.numeric(names(counts[counts <= ceiling(0.1 * period)]))
   df <- subset(df, !(population %in% lowCounts))
 
   # Message about population count removal
   if(length(lowCounts) != 0) {
-    message(length(lowCounts), " subjects were removed due to only a single observation.")
+    message(length(lowCounts), " subjects were removed due to having less than ", ceiling(0.1 * period), " observations (requires >10% observations over period.")
   }
 
   # Population parameters
-  period <- tau
   k <- length(unique(df$population)) # Number of individuals
   p <- 1 # Number of parameters such that 2p + 1 = 3 for single cosinor
   y <- df$outcomes
@@ -148,7 +150,7 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   popCosinors <- with(
     df,
     by(df, population, function(x) {
-      cosinor_impl(x$predictors, x$outcomes, tau)
+      cosinor_impl(x$predictors, x$outcomes, period)
     })
   )
 
@@ -164,10 +166,16 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   )
 
   # Matrix of coefficients
-  tbl <- sapply(popCosinors, stats::coef)
+  tbl <- sapply(popCosinors, stats::coef, USE.NAMES = TRUE)
   coef_names <- c("mesor", "amp", "phi", "beta", "gamma")
   rownames(tbl) <- coef_names
+
+  class(tmp)
+  class(tbl)
+
+
   xmat <- t(tbl)
+
 
   # Get mean for each parameter (mesor, beta, gamma), ignoring averaged amp/phi
   coefs <- apply(xmat, MARGIN = 2, function(x) {

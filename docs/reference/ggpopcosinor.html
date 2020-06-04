@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Process Toolbox HRV — proc_hrv_matlab • card</title>
+<title>ggplot of population cosinor model — ggpopcosinor • card</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,8 @@
 
 
 
-<meta property="og:title" content="Process Toolbox HRV — proc_hrv_matlab" />
-<meta property="og:description" content="Takes the output from HRV Toolbox and converts it for analysis.
-Uses the package data.table::fread() for reading in data due to
-size/speed." />
+<meta property="og:title" content="ggplot of population cosinor model — ggpopcosinor" />
+<meta property="og:description" content="ggplot of a population cosinor model" />
 
 
 
@@ -116,53 +114,30 @@ size/speed." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Process Toolbox HRV</h1>
-    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/matlab-toolbox.R'><code>R/matlab-toolbox.R</code></a></small>
-    <div class="hidden name"><code>proc_hrv_matlab.Rd</code></div>
+    <h1>ggplot of population cosinor model</h1>
+    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/cosinor-diagnostics.R'><code>R/cosinor-diagnostics.R</code></a></small>
+    <div class="hidden name"><code>ggpopcosinor.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Takes the output from HRV Toolbox and converts it for analysis.
-Uses the package <code><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>data.table::fread()</a></code> for reading in data due to
-size/speed.</p>
+    <p>ggplot of a population cosinor model</p>
     </div>
 
-    <pre class="usage"><span class='fu'>proc_hrv_matlab</span>(<span class='no'>loc</span>, <span class='no'>name</span>, <span class='kw'>time</span> <span class='kw'>=</span> <span class='fl'>3600</span>)</pre>
+    <pre class="usage"><span class='fu'>ggpopcosinor</span>(<span class='no'>object</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>loc</th>
-      <td><p>Location of the folder that contains all of the patients
-that were analyzed by the Main_HRV_Analysis.m function from the
-Toolbox.</p></td>
+      <th>object</th>
+      <td><p>A <code>cosinor</code> object of the population type, called when the population is specified in <code><a href='cosinor.html'>card::cosinor()</a></code></p></td>
     </tr>
     <tr>
-      <th>name</th>
-      <td><p>Name of the patient/ID. There should exist a folder with
-the name inside the <code>loc</code> folder. Inside this folder are all the
-Toolbox parameters and HRV results in CSV format.</p></td>
-    </tr>
-    <tr>
-      <th>time</th>
-      <td><p>Number of seconds to group the HRV data by. Defaults to
-3600 seconds (which is 1 hour)</p></td>
+      <th>...</th>
+      <td><p>For extensibility</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>Data frame of HRV summarized by the grouping variable (e.g.
-3600 seconds = 1 hour). Also returns an additional column of
-percent missing (e.g. 20.0% missing data) by time group.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>The data is taken sequentially (sliding windows), and
-summarized over the course of certain time lengths. The data comes
-in a standardized pattern from the toolbox. It requires processing
-due to its large file sizes (e.g. 24 hours of data for a single
-patient can be up to 2 MB in size).</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

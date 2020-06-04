@@ -1,13 +1,8 @@
 ## Resubmission
 
-This is a resubmission. I'm thankful for the comments by Jelena Saf <jelena.saf@jku.at>. With this, I have made the following corrections:
+This is a resubmission. I'm thankful for the comments by Jelena Saf <jelena.saf@jku.at> and Swetlana Herbrandt <herbrandt@statistik.tu-dortmund.de>. In this resubmission, the following changes were made:
 
-- Explained abbreviations/acronyms in DESCRIPTION 
-- Added copyright holder to authors
-- Add citations of theoretical literature supporting package methods in DESCRIPTION under "description" field with DOI linkage
-- Examples were fixed such that code was not commented out 
-- Vignettes were updated to reflect full functionality of software (instead of being "works-in-progress")
-- All functions were reviewed to make sure no changes were made to user options, including no writing to the user directory by `getwd()`, or user options. 
+- Examples were fixed such that code was not commented out and/or instead wrapped in {donttest} as needed
 - If this is found to be incorrect, please let me know and I will learn to improve the package / functions.
 
 ## Test environments
