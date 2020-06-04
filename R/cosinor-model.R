@@ -125,12 +125,12 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
 
   # Remove patients with only 1 observation (will cause a det = 0 error)
   counts <- by(df, df[, "population"], nrow)
-  lowCounts <- as.numeric(names(counts[counts <= ceiling(0.1 * period)]))
+  lowCounts <- as.numeric(names(counts[counts <= 1]))
   df <- subset(df, !(population %in% lowCounts))
 
   # Message about population count removal
   if(length(lowCounts) != 0) {
-    message(length(lowCounts), " subjects were removed due to having less than ", ceiling(0.1 * period), " observations (requires >10% observations over period.")
+    message(length(lowCounts), " subjects were removed due to having only a single observation.")
   }
 
   # Population parameters
