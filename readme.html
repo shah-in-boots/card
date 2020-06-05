@@ -140,13 +140,36 @@
 <p>And the development version from <a href="https://github.com/">GitHub</a> with:</p>
 <div class="sourceCode" id="cb2"><html><pre class="r"><span class="co"># install.packages("devtools")</span>
 <span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu">install_github</span>(<span class="st">"asshah4/card"</span>)
-<span class="co">#&gt; Skipping install of 'card' from a github remote, the SHA1 (e0fc471e) has not changed since last install.</span>
-<span class="co">#&gt;   Use `force = TRUE` to force installation</span></pre></html></div>
+<span class="co">#&gt; Downloading GitHub repo asshah4/card@master</span>
+<span class="co">#&gt; broom (e43db853a... -&gt; 13ad2d321...) [GitHub]</span>
+<span class="co">#&gt; Downloading GitHub repo tidymodels/broom@master</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;      checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpSGXs0v/remotesb7dc43b3ad34/tidymodels-broom-13ad2d3/DESCRIPTION’ ...  ✓  checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpSGXs0v/remotesb7dc43b3ad34/tidymodels-broom-13ad2d3/DESCRIPTION’</span>
+<span class="co">#&gt;   ─  preparing ‘broom’:</span>
+<span class="co">#&gt;      checking DESCRIPTION meta-information ...  ✓  checking DESCRIPTION meta-information</span>
+<span class="co">#&gt;   ─  checking for LF line-endings in source and make files and shell scripts (435ms)</span>
+<span class="co">#&gt;   ─  checking for empty or unneeded directories</span>
+<span class="co">#&gt;   ─  building ‘broom_0.7.0.9000.tar.gz’</span>
+<span class="co">#&gt;      </span>
+<span class="co">#&gt;      checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpSGXs0v/remotesb7dcffbdb3e/asshah4-card-1dfad4b/DESCRIPTION’ ...  ✓  checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpSGXs0v/remotesb7dcffbdb3e/asshah4-card-1dfad4b/DESCRIPTION’</span>
+<span class="co">#&gt;   ─  preparing ‘card’:</span>
+<span class="co">#&gt;      checking DESCRIPTION meta-information ...  ✓  checking DESCRIPTION meta-information</span>
+<span class="co">#&gt;   ─  checking for LF line-endings in source and make files and shell scripts</span>
+<span class="co">#&gt;   ─  checking for empty or unneeded directories</span>
+<span class="co">#&gt;        NB: this package now depends on R (&gt;= 3.5.0)</span>
+<span class="co">#&gt;        WARNING: Added dependency on R &gt;= 3.5.0 because serialized objects in  serialize/load version 3 cannot be read in older versions of R.  File(s) containing such objects: ‘card/data/hrv.rda’</span>
+<span class="co">#&gt; ─  building ‘card_0.1.0.tar.gz’</span>
+<span class="co">#&gt;      </span>
+<span class="co">#&gt; </span></pre></html></div>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
-<p>This package is intended for analyzing cardiovascular signals and autonomic physiology. Here is an example of the process of fitting a cosinor model to time-series data.</p>
+<p>This package is intended for analyzing cardiovascular signals and autonomic physiology. The current collection of functions are built practically around this paradigm. The current focus, in <code>card v0.1.0</code> is the development of a flexible and tidy analytical approach to circadian rhythms.</p>
+<div id="cosinor-analysis" class="section level3">
+<h3 class="hasAnchor">
+<a href="#cosinor-analysis" class="anchor"></a>Cosinor Analysis</h3>
+<p>Here is an example of the process of fitting a cosinor model to time-series data.</p>
 <div class="sourceCode" id="cb3"><html><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">card</span>)
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="no">twins</span>)
 <span class="no">m</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/cosinor.html">cosinor</a></span>(<span class="no">rDYX</span> ~ <span class="no">hour</span>, <span class="no">twins</span>, <span class="kw">tau</span> <span class="kw">=</span> <span class="fl">24</span>)
@@ -167,6 +190,7 @@
 <div class="sourceCode" id="cb4"><html><pre class="r"><span class="fu"><a href="reference/ggcosinor.html">ggcosinor</a></span>(<span class="no">m</span>)
 <span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></pre></html></div>
 <p><img src="man/figures/unnamed-chunk-5-1.png" width="100%"></p>
+</div>
 </div>
 </div>
 

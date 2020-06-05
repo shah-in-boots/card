@@ -153,61 +153,6 @@ present when most recent non-EVENT has status 1.</p>
 and creates a summary table that describes the number of events by
 strata/event.</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># setup</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>magrittr</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>dplyr</span>)</div><div class='output co'>#&gt; <span class='message'></span>
-#&gt; <span class='message'>Attaching package: ‘dplyr’</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:stats’:</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    filter, lag</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:base’:</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    intersect, setdiff, setequal, union</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>kableExtra</span>)</div><div class='output co'>#&gt; <span class='message'></span>
-#&gt; <span class='message'>Attaching package: ‘kableExtra’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:dplyr’:</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    group_rows</span></div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"mims"</span>)
-
-<span class='co'># Marginal data (as above)</span>
-<span class='no'>marg</span> <span class='kw'>&lt;-</span>
-  <span class='fu'><a href='recur_survival_table.html'>recur_survival_table</a></span>(
-    <span class='no'>mims</span>, <span class='st'>"patid"</span>, <span class='st'>"first_visit_date_bl"</span>, <span class='st'>"ldka"</span>,
-    <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"mi_date_1"</span>, <span class='st'>"mi_date_2"</span>, <span class='st'>"mi_date_3"</span>), <span class='st'>"marginal"</span>, <span class='st'>"DEATH_CV_YN"</span>
-  )</div><div class='output co'>#&gt; <span class='warning'>Warning: `group_by_()` is deprecated as of dplyr 0.7.0.</span>
-#&gt; <span class='warning'>Please use `group_by()` instead.</span>
-#&gt; <span class='warning'>See vignette('programming') for more help</span>
-#&gt; <span class='warning'><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
-#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; <span class='warning'>Warning: `arrange_()` is deprecated as of dplyr 0.7.0.</span>
-#&gt; <span class='warning'>Please use `arrange()` instead.</span>
-#&gt; <span class='warning'>See vignette('programming') for more help</span>
-#&gt; <span class='warning'></span><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
-#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; <span class='warning'>Warning: `cols` is now required when using unnest().</span>
-#&gt; <span class='warning'>Please use `cols = c(data)`</span></div><div class='input'>
-<span class='co'># Grouping variable</span>
-<span class='no'>covar</span> <span class='kw'>&lt;-</span> <span class='st'>"RDR_ISCHEMIA_M_YN_bl"</span>
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span>(<span class='no'>marg</span>, <span class='no'>mims</span>[<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"patid"</span>, <span class='no'>covar</span>)], <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"ID"</span> <span class='kw'>=</span> <span class='st'>"patid"</span>))
-
-<span class='co'># Make summary table</span>
-<span class='no'>tbl</span> <span class='kw'>&lt;-</span> <span class='fu'>recur_summary</span>(<span class='no'>df</span>, <span class='no'>covar</span>)
-<span class='no'>tbl</span> <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/reexports.html'>kable</a></span>(<span class='st'>"latex"</span>, <span class='kw'>caption</span> <span class='kw'>=</span> <span class='st'>"Title"</span>, <span class='kw'>booktabs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://rdrr.io/pkg/kableExtra/man/kable_styling.html'>kable_styling</a></span>(<span class='kw'>font_size</span> <span class='kw'>=</span> <span class='fl'>8</span>)</div><div class='output co'>#&gt; \begin{table}
-#&gt; 
-#&gt; \caption{\label{tab:}Title}
-#&gt; \centering
-#&gt; \fontsize{8}{10}\selectfont
-#&gt; \begin{tabular}[t]{lrrrrrr}
-#&gt; \toprule
-#&gt; EVENT &amp; Count\_RDR\_ISCHEMIA\_M\_YN\_bl\_0 &amp; Count\_RDR\_ISCHEMIA\_M\_YN\_bl\_1 &amp; Count\_RDR\_ISCHEMIA\_M\_YN\_bl\_NA &amp; Time\_RDR\_ISCHEMIA\_M\_YN\_bl\_0 &amp; Time\_RDR\_ISCHEMIA\_M\_YN\_bl\_1 &amp; Time\_RDR\_ISCHEMIA\_M\_YN\_bl\_NA\\
-#&gt; \midrule
-#&gt; EVENT\_DATE\_0 &amp; 250 &amp; 50 &amp; 7 &amp; 1065.5320 &amp; 1141.0600 &amp; 1009.286\\
-#&gt; EVENT\_DATE\_1 &amp; 26 &amp; 10 &amp; 2 &amp; 669.3077 &amp; 531.1000 &amp; 337.500\\
-#&gt; EVENT\_DATE\_2 &amp; 5 &amp; 4 &amp; 1 &amp; 790.0000 &amp; 536.2500 &amp; 904.000\\
-#&gt; EVENT\_DATE\_3 &amp; 1 &amp; 1 &amp; 1 &amp; 281.0000 &amp; 365.0000 &amp; 986.000\\
-#&gt; EVENT\_DATE\_DEATH &amp; 3 &amp; 3 &amp; NA &amp; 598.0000 &amp; 500.3333 &amp; NA\\
-#&gt; \bottomrule
-#&gt; \end{tabular}
-#&gt; \end{table}</div><div class='input'>
-</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
