@@ -1,5 +1,6 @@
 # ggcosinor
 test_that("cosinor objects are appropriate for plotting", {
+
 	# Data
 	data("twins")
 	sad <- cosinor(rDYX ~ hour, twins[twins$sad_bin == 1,], tau = 24)

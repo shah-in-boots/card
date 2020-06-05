@@ -180,7 +180,8 @@ of recurrent event tables. It orders the data chronologically for repeat
 events. Currently does marginal and conditional A and B models.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Data</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='co'># Data</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"mims"</span>)
 
 <span class='co'># Parameters</span>
@@ -194,9 +195,18 @@ events. Currently does marginal and conditional A and B models.</p>
 <span class='co'># Run analysis</span>
 <span class='no'>tbl</span> <span class='kw'>&lt;-</span> <span class='fu'>recur_survival_table</span>(
   <span class='no'>mims</span>, <span class='no'>id</span>, <span class='no'>first</span>, <span class='no'>last</span>, <span class='no'>event.dates</span>, <span class='no'>model.type</span>, <span class='no'>death</span>
-)</div><div class='output co'>#&gt; <span class='warning'>Warning: `cols` is now required when using unnest().</span>
-#&gt; <span class='warning'>Please use `cols = c(data)`</span></div><div class='input'>
-</div></pre>
+)</div><div class='output co'>#&gt; <span class='warning'>Warning: `group_by_()` is deprecated as of dplyr 0.7.0.</span>
+#&gt; <span class='warning'>Please use `group_by()` instead.</span>
+#&gt; <span class='warning'>See vignette('programming') for more help</span>
+#&gt; <span class='warning'><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
+#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; <span class='warning'>Warning: `arrange_()` is deprecated as of dplyr 0.7.0.</span>
+#&gt; <span class='warning'>Please use `arrange()` instead.</span>
+#&gt; <span class='warning'>See vignette('programming') for more help</span>
+#&gt; <span class='warning'></span><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
+#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; <span class='warning'>Warning: `cols` is now required when using unnest().</span>
+#&gt; <span class='warning'>Please use `cols = c(data)`</span></div><div class='input'># }
+
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

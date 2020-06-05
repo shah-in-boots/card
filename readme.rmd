@@ -7,6 +7,7 @@ output: github_document
 ```{r, include = FALSE, echo = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
+  cache = TRUE,
   comment = "#>",
   fig.path = "man/figures/",
   out.width = "100%"
@@ -51,7 +52,11 @@ devtools::install_github("asshah4/card")
 
 ## Usage
 
-This package is intended for analyzing cardiovascular signals and autonomic physiology. Here is an example of the process of fitting a cosinor model to time-series data.
+This package is intended for analyzing cardiovascular signals and autonomic physiology. The current collection of functions are built practically around this paradigm. The current focus, in `card v0.1.0` is the development of a flexible and tidy analytical approach to circadian rhythms. 
+
+### Cosinor Analysis
+
+Here is an example of the process of fitting a cosinor model to time-series data.
 
 ```{r}
 library(card)

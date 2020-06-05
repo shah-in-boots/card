@@ -44,6 +44,7 @@ of recurrent event tables. It orders the data chronologically for repeat
 events. Currently does marginal and conditional A and B models.
 }
 \examples{
+\donttest{
 # Data
 data("mims")
 
@@ -59,5 +60,6 @@ death <- "DEATH_CV_YN"
 tbl <- recur_survival_table(
   mims, id, first, last, event.dates, model.type, death
 )
+}
 
 }

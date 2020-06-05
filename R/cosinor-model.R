@@ -123,14 +123,14 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   # Create data frame for split/apply approach
   df <- data.frame(predictors, outcomes, population)
 
-  # Remove patients with only 1 observation (will cause a det = 0 error)
+  # Remove patients with only 2 observations (will cause a det ~ 0 error)
   counts <- by(df, df[, "population"], nrow)
-  lowCounts <- as.numeric(names(counts[counts <= 1]))
+  lowCounts <- as.numeric(names(counts[counts <= 2]))
   df <- subset(df, !(population %in% lowCounts))
 
   # Message about population count removal
   if(length(lowCounts) != 0) {
-    message(length(lowCounts), " subjects were removed due to having only a single observation.")
+    message(length(lowCounts), " subjects were removed due to having insufficient observations.")
   }
 
   # Population parameters
@@ -147,7 +147,7 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   model <- cbind(y, t, x, z, population)
 
   # Create matrix that we can apply cosinor to subgroups
-  popCosinors <- with(
+  kCosinors <- with(
     df,
     by(df, population, function(x) {
       cosinor_impl(x$predictors, x$outcomes, period)
@@ -159,14 +159,14 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   ## Coefficients {{{ ====
 
   # Fits of individual cosinors
-  tmp <- sapply(popCosinors, stats::fitted)
+  tmp <- sapply(kCosinors, stats::fitted)
   fits <- data.frame(
     population = rep(names(tmp), sapply(tmp, length)),
     yhat = unlist(tmp)
   )
 
   # Matrix of coefficients
-  tbl <- sapply(popCosinors, stats::coef, USE.NAMES = TRUE)
+  tbl <- sapply(kCosinors, stats::coef, USE.NAMES = TRUE)
   coef_names <- c("mesor", "amp", "phi", "beta", "gamma")
   rownames(tbl) <- coef_names
 

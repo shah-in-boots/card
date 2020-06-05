@@ -42,6 +42,7 @@
 #' @return A data frame organized into a survival table format
 #'
 #' @examples
+#' \donttest{
 #' # Data
 #' data("mims")
 #'
@@ -57,6 +58,7 @@
 #' tbl <- recur_survival_table(
 #'   mims, id, first, last, event.dates, model.type, death
 #' )
+#' }
 #'
 #' @export
 recur_survival_table <-
