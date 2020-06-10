@@ -1,10 +1,10 @@
 pandoc: 2.7.3
 pkgdown: 1.5.1.9000
-pkgdown_sha: aeb1cfb080f566b32da6613b6e12c13eb743daff
+pkgdown_sha: ee70a69b5de661b82b6dd086f4e97b2d3d7fd4ab
 articles:
   Cosinor: Cosinor.html
   circadian: circadian.html
-last_built: 2020-06-05T00:58Z
+last_built: 2020-06-10T23:42Z
 urls:
   reference: https://asshah4.github.io/card//reference
   article: https://asshah4.github.io/card//articles
