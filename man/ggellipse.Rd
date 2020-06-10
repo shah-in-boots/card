@@ -15,7 +15,7 @@ generate the plot.}
 \item{...}{Additional parameters may be needed for extensibility}
 }
 \value{
-ggplot object that has has multiple components
+Object of class \code{ggplot} to help identify confidence intervals
 }
 \description{
 This is a ggplot-styled graphical representation of the ellipse

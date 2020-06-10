@@ -17,13 +17,17 @@ coverage](https://codecov.io/gh/asshah4/card/branch/master/graph/badge.svg)](htt
 
 # **card**
 
+When conducting research, its invaluable to have readily used functions
+and patterns at hand, forcing you to format and manage a data workflow
+similarly. Thus, all that is needed is a `library(card)`.
+
 ## Cardiovascular and Autonomic Research Design
 
-The goal of **card** is to create functions and analytical approaches in
+The goal of `card` is to create functions and analytical approaches in
 neurocardiology, with a focus on electrocardiogram data and
 epidemiological concepts. An important engine within this ecosystem are
-the circadian analysis tools. Its being developed to fit a *tidy*
-approach to statistical analysis.
+the circadian analysis tools. Its developed to fit a *tidy* approach to
+statistical analysis.
 
 The areas of focus of this package are the following:
 
@@ -46,27 +50,6 @@ And the development version from [GitHub](https://github.com/) with:
 ``` r
 # install.packages("devtools")
 devtools::install_github("asshah4/card")
-#> Downloading GitHub repo asshah4/card@master
-#> broom (e43db853a... -> 13ad2d321...) [GitHub]
-#> Downloading GitHub repo tidymodels/broom@master
-#> 
-#>      checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpSGXs0v/remotesb7dc43b3ad34/tidymodels-broom-13ad2d3/DESCRIPTION’ ...  ✓  checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpSGXs0v/remotesb7dc43b3ad34/tidymodels-broom-13ad2d3/DESCRIPTION’
-#>   ─  preparing ‘broom’:
-#>      checking DESCRIPTION meta-information ...  ✓  checking DESCRIPTION meta-information
-#>   ─  checking for LF line-endings in source and make files and shell scripts (435ms)
-#>   ─  checking for empty or unneeded directories
-#>   ─  building ‘broom_0.7.0.9000.tar.gz’
-#>      
-#>      checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpSGXs0v/remotesb7dcffbdb3e/asshah4-card-1dfad4b/DESCRIPTION’ ...  ✓  checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpSGXs0v/remotesb7dcffbdb3e/asshah4-card-1dfad4b/DESCRIPTION’
-#>   ─  preparing ‘card’:
-#>      checking DESCRIPTION meta-information ...  ✓  checking DESCRIPTION meta-information
-#>   ─  checking for LF line-endings in source and make files and shell scripts
-#>   ─  checking for empty or unneeded directories
-#>        NB: this package now depends on R (>= 3.5.0)
-#>        WARNING: Added dependency on R >= 3.5.0 because serialized objects in  serialize/load version 3 cannot be read in older versions of R.  File(s) containing such objects: ‘card/data/hrv.rda’
-#> ─  building ‘card_0.1.0.tar.gz’
-#>      
-#> 
 ```
 
 ## Usage
@@ -99,13 +82,8 @@ summary(m)
 #> Coefficients: 
 #>      mesor        amp        phi       beta      gamma 
 #>  2.8604855  0.2986101 -2.6687044 -0.2658396  0.1360048
-```
-
-The data can also be easily plotted for diagnostic purposes.
-
-``` r
 ggcosinor(m)
 #> `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'
 ```
 
-<img src="man/figures/unnamed-chunk-5-1.png" width="100%" />
+<img src="man/figures/unnamed-chunk-4-1.png" width="100%" />

@@ -11,6 +11,9 @@ ggpopcosinor(object, ...)
 
 \item{...}{For extensibility}
 }
+\value{
+Returns object of class \code{ggplot} that can be layered
+}
 \description{
 ggplot of a population cosinor model
 }

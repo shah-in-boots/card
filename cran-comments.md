@@ -2,8 +2,8 @@
 
 This is a resubmission. I'm thankful for the comments by Jelena Saf <jelena.saf@jku.at> and Swetlana Herbrandt <herbrandt@statistik.tu-dortmund.de>. In this resubmission, the following changes were made:
 
-- Examples were fixed such that code was not commented out and/or instead wrapped in {donttest} as needed
-- If this is found to be incorrect, please let me know and I will learn to improve the package / functions.
+- The \values were added to .Rd files for all exported methods/functions.
+- The options parameter in ecg_patches.R was amended with an on.exit() call to restore previously established options (to not change user working environment).
 
 ## Test environments
 

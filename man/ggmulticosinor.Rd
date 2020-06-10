@@ -11,6 +11,9 @@ ggmulticosinor(objects, ...)
 
 \item{...}{For extensibility}
 }
+\value{
+Object of class \code{ggplot} that can be layered
+}
 \description{
 ggplot of multiple cosinor objects for comparison purposes. Appearance of plot will be greatly enhanced if objects share a similar y-axis scale.
 }

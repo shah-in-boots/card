@@ -169,13 +169,7 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   tbl <- sapply(kCosinors, stats::coef, USE.NAMES = TRUE)
   coef_names <- c("mesor", "amp", "phi", "beta", "gamma")
   rownames(tbl) <- coef_names
-
-  class(tmp)
-  class(tbl)
-
-
   xmat <- t(tbl)
-
 
   # Get mean for each parameter (mesor, beta, gamma), ignoring averaged amp/phi
   coefs <- apply(xmat, MARGIN = 2, function(x) {
@@ -218,14 +212,14 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   sGamma <- sqrt(sum((xmat[, "gamma"] - beta)^2) / (k-1))
 
   # Confidence intervals
-  alpha <- 0.05
-  tdist <- stats::qt(1 - alpha/2, df = k - 1)
+  a <- 0.05
+  tdist <- stats::qt(1 - a/2, df = k - 1)
   mesorSE <- tdist * sMesor / sqrt(k)
 
   # Zero amplitude test
   sBetaGamma <- sqrt(sum((xmat[,"beta"] - beta) * (xmat[,"gamma"] - gamma)))
   r <- sBetaGamma / (sBeta * sGamma)
-  fdist <- stats::qf(1 - alpha, df1 = 2, df2 = k - 2)
+  fdist <- stats::qf(1 - a, df1 = 2, df2 = k - 2)
   fstat <- abs(((k * (k - 2)) / (2 * (k - 1)))) *
     abs((1 / (1 - r^2))) *
     abs(((beta^2 / sBeta^2) - ((2 * r * beta * gamma) / (sBeta * sGamma)) + (gamma^2 / sGamma^2)))

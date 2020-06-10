@@ -13,6 +13,11 @@ cosinor_area(object, level = 0.95, ...)
 
 \item{...}{Not currently used, but required for extensibility.}
 }
+\value{
+Area of potential cosinor for graphical analysis as matrix stored in
+a list.
+}
 \description{
-Formulas for creating the area of the ellipse to identify confidence intervals, directionality, and graphing purposes.
+Formulas for creating the area of the ellipse to identify
+confidence intervals, direction, and graphing purposes.
 }

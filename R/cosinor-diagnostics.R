@@ -1,13 +1,12 @@
 # Diagnostic Testing {{{ ====
 
 #' @title Zero Amplitude Test
-#'
-#' @description Zero amplitude test assesses how well the circadian pattern fits the data, essentially detecting the present of a rhythm to the data.
-#'
+#' @description Zero amplitude test assesses how well the circadian pattern fits
+#'   the data, essentially detecting the present of a rhythm to the data.
 #' @param object model of class `cosinor`
-#'
 #' @param level confidence level
-#'
+#' @return Returns a list of test statistics, as well prints out a report of
+#'   analysis.
 #' @export
 cosinor_zero_amplitude <- function(object, level = 0.95) {
 
@@ -62,7 +61,6 @@ cosinor_zero_amplitude <- function(object, level = 0.95) {
 }
 
 #' @title Goodness of Fit of Cosinor
-#'
 #' @description Goodness of fit of a cosinor from data that has multiple
 #'   collections at different timepoints or from multiple cycles. The RSS is
 #'   partitioned into pure error (SSPE) and lack of fit (SSLOF). An F-test
@@ -77,13 +75,9 @@ cosinor_zero_amplitude <- function(object, level = 0.95) {
 #'
 #' @param object requires cosinor model generated with [card::cosinor] to
 #'   calculate statistics.
-#'
 #' @param level confidence level desired
-#'
 #' @param ... additional parameters may be needed for extensibility
-#'
 #' @return f-statistic as result of goodness of fit
-#'
 #' @export
 cosinor_goodness_of_fit <- function(object, level = 0.95, ...) {
 
@@ -163,10 +157,13 @@ cosinor_goodness_of_fit <- function(object, level = 0.95, ...) {
 # Graphical Assessment {{{ ====
 
 #' @title Area of Ellipse
-#' @description Formulas for creating the area of the ellipse to identify confidence intervals, directionality, and graphing purposes.
+#' @description Formulas for creating the area of the ellipse to identify
+#'   confidence intervals, direction, and graphing purposes.
 #' @param object Model of class `cosinor`
 #' @param level Confidence level requested
 #' @param ... Not currently used, but required for extensibility.
+#' @return Area of potential cosinor for graphical analysis as matrix stored in
+#'   a list.
 #' @export
 cosinor_area <- function(object, level = 0.95, ...) {
 
@@ -292,11 +289,12 @@ cosinor_area <- function(object, level = 0.95, ...) {
 #'   generate the plot.
 #' @param level Confidence level for ellipse
 #' @param ... Additional parameters may be needed for extensibility
-#' @return ggplot object that has has multiple components
 #' @examples
 #' data("twins")
 #' m <- cosinor(rDYX ~ hour, twins, tau = 24)
 #' ggellipse(m)
+#' @return Object of class `ggplot` to help identify confidence intervals
+#' @import ggplot2
 #' @export
 ggellipse <- function(object, level = 0.95, ...) {
 
@@ -369,6 +367,7 @@ ggellipse <- function(object, level = 0.95, ...) {
 #' @param object Model of class `cosinor`.
 #' @param residuals If residuals should be added. Colors can be overwritten with additional arguments (e.g. "+ scale_color_grey()")
 #' @param ... For extensibility
+#' @return Object of class `ggplot` that can be layered
 #' @import ggplot2
 #' @export
 ggcosinor <- function(object, residuals = TRUE, ...) {
@@ -548,6 +547,7 @@ ggcosinor <- function(object, residuals = TRUE, ...) {
 #' @description ggplot of multiple cosinor objects for comparison purposes. Appearance of plot will be greatly enhanced if objects share a similar y-axis scale.
 #' @param objects List of `cosinor` objects
 #' @param ... For extensibility
+#' @return Object of class `ggplot` that can be layered
 #' @import ggplot2
 #' @export
 ggmulticosinor <- function(objects, ...) {
@@ -652,6 +652,7 @@ ggmulticosinor <- function(objects, ...) {
 #' @description ggplot of a population cosinor model
 #' @param object A `cosinor` object of the population type, called when the population is specified in [card::cosinor()]
 #' @param ... For extensibility
+#' @return Returns object of class `ggplot` that can be layered
 #' @import ggplot2
 #' @export
 ggpopcosinor <- function(object, ...) {

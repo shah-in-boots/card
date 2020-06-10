@@ -24,9 +24,11 @@ knitr::opts_chunk$set(
 
 # __card__
 
+When conducting research, its invaluable to have readily used functions and patterns at hand, forcing you to format and manage a data workflow similarly. Thus, all that is needed is a `library(card)`.  
+
 ## Cardiovascular and Autonomic Research Design
 
-The goal of __card__ is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools. Its being developed to fit a _tidy_ approach to statistical analysis.
+The goal of `card` is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools. Its developed to fit a _tidy_ approach to statistical analysis.
 
 The areas of focus of this package are the following:
 
@@ -45,7 +47,7 @@ Once published, you can install the released version of __card__ from [CRAN](htt
 
 And the development version from [GitHub](https://github.com/) with:
 
-```{r}
+```{r, eval=FALSE}
 # install.packages("devtools")
 devtools::install_github("asshah4/card")
 ```
@@ -63,11 +65,6 @@ library(card)
 data(twins)
 m <- cosinor(rDYX ~ hour, twins, tau = 24)
 summary(m)
-```
-
-The data can also be easily plotted for diagnostic purposes.
-
-```{r}
 ggcosinor(m)
 ```
 

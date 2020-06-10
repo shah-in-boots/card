@@ -1,8 +1,8 @@
-# card v0.1.0
-
-- Pending CRAN submission
-
 # card (development version)
+
+## Next Steps
+
+* Implementation of a multiple-component cosinor
 
 ## Bugs
 
@@ -12,6 +12,7 @@
 
 ## Features
 
+* Confidence interval methods now work for population-mean cosinor 
 * `ggpopcosinor()` can show the cosinors for individuals across a population, along with mean and predicted cosinor
 * `ggcosinor()` accepts single models
 * `print.cosinor()` and `plot.cosinor()` functions added

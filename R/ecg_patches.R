@@ -19,6 +19,10 @@
 #'
 #' @export
 proc_patch_vivalnk <- function(name, loc) {
+  # On exit options parameters
+  oldopts <- options()
+  on.exit(oldopts)
+
   # Read in file name
   tmp <- readr::read_delim(file.path(loc, paste0(name, ".txt")), delim = "\n", col_names = FALSE)
 

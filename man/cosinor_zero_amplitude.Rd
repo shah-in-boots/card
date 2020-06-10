@@ -11,6 +11,11 @@ cosinor_zero_amplitude(object, level = 0.95)
 
 \item{level}{confidence level}
 }
+\value{
+Returns a list of test statistics, as well prints out a report of
+analysis.
+}
 \description{
-Zero amplitude test assesses how well the circadian pattern fits the data, essentially detecting the present of a rhythm to the data.
+Zero amplitude test assesses how well the circadian pattern fits
+the data, essentially detecting the present of a rhythm to the data.
 }

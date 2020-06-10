@@ -13,6 +13,9 @@ ggcosinor(object, residuals = TRUE, ...)
 
 \item{...}{For extensibility}
 }
+\value{
+Object of class \code{ggplot} that can be layered
+}
 \description{
 ggplot of single cosinor model, options include to ability to add diagnostic/fit parameters such as residuals.
 }

@@ -28,9 +28,9 @@ summary.cosinor <- function(object, ...) {
 	# Summary
 	cat(paste0(object$type, " Cosinor Model \n"))
 	cat(strrep("-", 42))
-	cat("\n")
 
 	# Call
+	cat("\n")
 	cat("Call: \n")
 	print(object$call)
 
@@ -44,6 +44,11 @@ summary.cosinor <- function(object, ...) {
 	cat("Coefficients: \n")
 	names(object$coefficients) <- object$coef_names
 	print(object$coefficients)
+
+	# Confidence Intervals
+	cat("\n")
+	cat("Confidence Intervals: \n")
+	print(confint(object))
 
 }
 
@@ -79,7 +84,7 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 	### Taylor Series Approach
 
 	# Confidence level
-	alpha <- 1 - level
+	a <- 1 - level
 
   # Matrix data
 	y <- object$model[,"y"]
@@ -102,7 +107,7 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 		### Population confidence intervals
 
 		# Message
-		message("Confidence intervals for amplitude and acrophase are not currently returned for population-mean cosinor.")
+		message("Confidence intervals for amplitude and acrophase for population-mean cosinor use the methods described by Fernando et al 2004, which may not be applicable to multiple-components.")
 
 		# Parameters
 		k <- nrow(xmat)
@@ -110,24 +115,28 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 	  # Sigma / variances
 	  sMesor <- sqrt(sum((xmat[, "mesor"] - mesor)^2) / (k-1))
 	  sBeta <- sqrt(sum((xmat[, "beta"] - beta)^2) / (k-1))
-	  sGamma <- sqrt(sum((xmat[, "gamma"] - beta)^2) / (k-1))
-
-	  # Standard error
-	  mesorSE <- tdist * sMesor / sqrt(k)
+	  sGamma <- sqrt(sum((xmat[, "gamma"] - gamma)^2) / (k-1))
+	  sAmp <- sqrt(sum((xmat[, "amp"] - amp)^2) / (k-1))
+	  sPhi <- sqrt(sum((xmat[, "phi"] - phi)^2) / (k-1))
 
 	  # Confidence intervals
-	  tdist <- stats::qt(1 - alpha/2, df = k - 1)
+	  tdist <- stats::qt(1 - a/2, df = k - 1)
+	  mesorCI <- tdist * sMesor / sqrt(k)
+	  betaCI <- tdist * sBeta / sqrt(k)
+	  gammaCI <- tdist * sGamma / sqrt(k)
+	  ampCI <- tdist * sAmp / sqrt(k)
+	  phiCI <- tdist * sPhi / sqrt(k)
 
 	  confints <- matrix(
 	  	rbind(
-			  c(mesor - tdist * mesorSE, mesor + tdist * mesorSE),
-			  c(NA, NA),
-			  c(NA, NA)
+			  c(mesor - mesorCI, mesor + mesorCI),
+			  c(amp - ampCI, amp + ampCI),
+			  c(phi - phiCI, phi + phiCI)
 	  	),
 	  	ncol = 2, nrow = 3,
 	  	dimnames = list(
 	  		c("mesor", "amp", "phi"),
-	  		c(paste0(100*(alpha/2),"%"), paste0(100*(1-alpha/2), "%"))
+	  		c(paste0(100*(a/2),"%"), paste0(100*(1-a/2), "%"))
 	  	)
 	  )
 
@@ -168,7 +177,7 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 	  	))
 
 	  # Confidence intervals
-	  tdist <- stats::qt(1 - alpha/2, df = n - k)
+	  tdist <- stats::qt(1 - a/2, df = n - k)
 
 	  confints <- matrix(
 	  	rbind(
@@ -179,7 +188,7 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 	  	ncol = 2, nrow = 3,
 	  	dimnames = list(
 	  		c("mesor", "amp", "phi"),
-	  		c(paste0(100*(alpha/2),"%"), paste0(100*(1-alpha/2), "%"))
+	  		c(paste0(100*(a/2),"%"), paste0(100*(1-a/2), "%"))
 	  	)
 	  )
 
@@ -198,7 +207,7 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 	# zbar = sum(z)/n
 
 	# RHS of ellipse equation (with fdist)
-  fdist <- stats::qf(1 - alpha, df1 = 2, df2 = n - 3)
+  fdist <- stats::qf(1 - a, df1 = 2, df2 = n - 3)
   RSS <- sum((y - yhat)^2)
   sigma <- sqrt(RSS / (n - 3))
 
@@ -220,7 +229,7 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 
   # Confidence interval for MESOR
   sigma <- sqrt(RSS / (n - 3))
-  tdist <- stats::qt(1 - alpha / 2, df = n - 3)
+  tdist <- stats::qt(1 - a / 2, df = n - 3)
   mesorConf <- tdist * sigma * sqrt(1/n)
   mesorUpper <- mesor + mesorConf
   mesorLower <- mesor - mesorConf
