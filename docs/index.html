@@ -78,10 +78,11 @@
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#card" class="anchor"></a><strong>card</strong>
 </h1></div>
+<p>When conducting research, its invaluable to have readily used functions and patterns at hand, forcing you to format and manage a data workflow similarly. Thus, all that is needed is a <code><a href="https://rdrr.io/pkg/card/man">library(card)</a></code>.</p>
 <div id="cardiovascular-and-autonomic-research-design" class="section level2">
 <h2 class="hasAnchor">
 <a href="#cardiovascular-and-autonomic-research-design" class="anchor"></a>Cardiovascular and Autonomic Research Design</h2>
-<p>The goal of <strong>card</strong> is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools. Its being developed to fit a <em>tidy</em> approach to statistical analysis.</p>
+<p>The goal of <code>card</code> is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools. Its developed to fit a <em>tidy</em> approach to statistical analysis.</p>
 <p>The areas of focus of this package are the following:</p>
 <ul>
 <li>cardiovascular disease</li>
@@ -97,28 +98,7 @@
 <div class="sourceCode" id="cb1"><pre class="r">#install.packages("card")</pre></div>
 <p>And the development version from <a href="https://github.com/">GitHub</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="r"><span class="co"># install.packages("devtools")</span>
-<span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="st">"asshah4/card"</span>)
-<span class="co">#&gt; Downloading GitHub repo asshah4/card@master</span>
-<span class="co">#&gt; broom (e43db853a... -&gt; 13ad2d321...) [GitHub]</span>
-<span class="co">#&gt; Downloading GitHub repo tidymodels/broom@master</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;      checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpSGXs0v/remotesb7dc43b3ad34/tidymodels-broom-13ad2d3/DESCRIPTION’ ...  ✓  checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpSGXs0v/remotesb7dc43b3ad34/tidymodels-broom-13ad2d3/DESCRIPTION’</span>
-<span class="co">#&gt;   ─  preparing ‘broom’:</span>
-<span class="co">#&gt;      checking DESCRIPTION meta-information ...  ✓  checking DESCRIPTION meta-information</span>
-<span class="co">#&gt;   ─  checking for LF line-endings in source and make files and shell scripts (435ms)</span>
-<span class="co">#&gt;   ─  checking for empty or unneeded directories</span>
-<span class="co">#&gt;   ─  building ‘broom_0.7.0.9000.tar.gz’</span>
-<span class="co">#&gt;      </span>
-<span class="co">#&gt;      checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpSGXs0v/remotesb7dcffbdb3e/asshah4-card-1dfad4b/DESCRIPTION’ ...  ✓  checking for file ‘/private/var/folders/_6/4nlf2_lj735c3cxjs7_chblr0000gr/T/RtmpSGXs0v/remotesb7dcffbdb3e/asshah4-card-1dfad4b/DESCRIPTION’</span>
-<span class="co">#&gt;   ─  preparing ‘card’:</span>
-<span class="co">#&gt;      checking DESCRIPTION meta-information ...  ✓  checking DESCRIPTION meta-information</span>
-<span class="co">#&gt;   ─  checking for LF line-endings in source and make files and shell scripts</span>
-<span class="co">#&gt;   ─  checking for empty or unneeded directories</span>
-<span class="co">#&gt;        NB: this package now depends on R (&gt;= 3.5.0)</span>
-<span class="co">#&gt;        WARNING: Added dependency on R &gt;= 3.5.0 because serialized objects in  serialize/load version 3 cannot be read in older versions of R.  File(s) containing such objects: ‘card/data/hrv.rda’</span>
-<span class="co">#&gt; ─  building ‘card_0.1.0.tar.gz’</span>
-<span class="co">#&gt;      </span>
-<span class="co">#&gt; </span></pre></div>
+<span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="st">"asshah4/card"</span>)</pre></div>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
@@ -143,11 +123,10 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Coefficients: </span>
 <span class="co">#&gt;      mesor        amp        phi       beta      gamma </span>
-<span class="co">#&gt;  2.8604855  0.2986101 -2.6687044 -0.2658396  0.1360048</span></pre></div>
-<p>The data can also be easily plotted for diagnostic purposes.</p>
-<div class="sourceCode" id="cb4"><pre class="r"><span class="fu"><a href="reference/ggcosinor.html">ggcosinor</a></span>(<span class="no">m</span>)
+<span class="co">#&gt;  2.8604855  0.2986101 -2.6687044 -0.2658396  0.1360048</span>
+<span class="fu"><a href="reference/ggcosinor.html">ggcosinor</a></span>(<span class="no">m</span>)
 <span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></pre></div>
-<p><img src="reference/figures/unnamed-chunk-5-1.png" width="100%"></p>
+<p><img src="reference/figures/unnamed-chunk-4-1.png" width="100%"></p>
 </div>
 </div>
 </div>
