@@ -5,24 +5,18 @@
 #' @details Linear models built with dependent variable being the HRV measures
 #'   (e.g. HF, LF, SDNN, etc). Allows for covariates to be included as
 #'   available.
-#'
 #' @param data Data frame that contains all covariates and outcomes. First
 #'   column should be ID
-#'
 #' @param covar Vector names of the covariates, with first covariate being the
 #'   primary exposure variable for linear regression
-#'
 #' @param hrv Vector names of the HRV measures, contained in `data`, that should
 #'   be used. Can be generalized to any dependent variable set.
-#'
 #' @param prop.weight This is a logical value if propensity weighting should be
 #'   done instead of traditional covariate adjustment. This calls for the
 #'   propensity weighting function defined by
 #'   [card::recurrent_propensity] that will generate both a PROP_SCORE
 #'   column and PROP_WEIGHT column. Defaults to FALSE
-#'
 #' @return List of models with names
-#'
 #' @export
 hrv_linear_model <-
   function(data, covar, hrv, prop.weight = FALSE) {
@@ -52,6 +46,69 @@ hrv_linear_model <-
     # Return models
     return(m)
   }
+
+# }}}
+
+# Model Building {{{ ====
+
+#' @title Model Building
+#' @description Simplify the process of building multiple models in a sequential order. This is particularly helpful in epidemiological cases of testing effect of additional parameters. Every parameter should be theoretically a part of the causal model for the exposure-outcome relationship.
+#' @details This is considering what is available with the `modelr` package and the `tidymodels` approach, and finding an in-between for the causality / epidemiology approach of building intentional, sequentional models. Expect changes in the process, and potential future dependencies on the `tidymodels` appraoches.
+#' @param formula an object of class `formula` that shows the names of the outcomes (can be more than 1) and the names of the predictors (which should contain the `exposure` variable).
+#' @param data data frame or data table (or tibble) that contains the named variables
+#' @param exposure Variable that is forced to be maintained in every model as a predictor.
+#' @param engine Set the "engine" or the regression tool that will be used
+#' @return A list of models. Each outcome will be the name of a list. Each list will have an additional list of tidy model data (if available), with sequentially added covariates to the exposure.
+#' @examples
+#' data(geh)
+#' f <- svg_mag + qrs_tang ~ lab_hba1c + bmi
+#' models <- build_sequential_models(f, data = geh)
+#' @importFrom magrittr %>%
+#' @export
+build_sequential_models <- function(formula, data, exposure = NULL, engine = "lm") {
+
+  # Type of model
+  type <- engine
+  modelCall <- match.call()
+
+  # Breakdown of formula
+  nf <- length(formula)
+  o <- all.vars(formula[[2]]) # Outcomes
+  p <- all.vars(formula[[3]]) # Predictors
+  no <- length(o)
+  np <- length(p)
+
+  # Exposure is assumed to be first variable
+  if(!is.null(exposure)) {
+    p <- p[-(which(p == exposure))]
+    p <- c(exposure, p)
+  }
+
+  # Loop through to make regressions
+  l <- list()
+  for(i in 1:no) {
+    for(j in 1:np) {
+      predictors <- paste0(p[1:j], collapse = " + ")
+      f <- stats::formula(paste0(o[[i]], " ~ ", predictors))
+      m <- stats::lm(formula = f, data = data)
+      l[[o[[i]]]][[j]] <- broom::tidy(m)
+    }
+  }
+
+  # Tidy it if possible
+  m <-
+    dplyr::as_tibble(l) %>%
+    tidyr::pivot_longer(
+      cols = tidyr::everything(),
+      names_to = "outcomes",
+      values_to = "models"
+    ) %>%
+    tidyr::unnest(cols = "models")
+
+  # Return
+  return(m)
+
+}
 
 # }}}
 

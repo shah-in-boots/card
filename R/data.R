@@ -40,6 +40,19 @@
 
 # }}}
 
+# Global Electrical Heterogeneity Data {{{ ====
+
+#' GEH parameters in a large clinical cohort
+#'
+#' Used in the model-building examples for repeat testing.
+#'
+#' @docType data
+#' @format A tibble
+#' @keywords datasets
+"geh"
+
+# }}}
+
 # Output from MATLAB HRV Toolbox {{{ ====
 
 #' Output from MATLAB HRV Toolbox

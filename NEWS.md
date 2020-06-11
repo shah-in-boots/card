@@ -12,7 +12,8 @@
 
 ## Features
 
-* Confidence interval methods now work for population-mean cosinor 
+* Sequential model building can be performed with `build_sequential_models()`, however it is in a list format and will likely be updated to be more "tidy" in the future
+* Confidence interval methods now work for population-mean cosinor, including summary function
 * `ggpopcosinor()` can show the cosinors for individuals across a population, along with mean and predicted cosinor
 * `ggcosinor()` accepts single models
 * `print.cosinor()` and `plot.cosinor()` functions added

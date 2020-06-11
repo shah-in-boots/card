@@ -48,7 +48,7 @@ summary.cosinor <- function(object, ...) {
 	# Confidence Intervals
 	cat("\n")
 	cat("Confidence Intervals: \n")
-	print(confint(object))
+	print(stats::confint(object))
 
 }
 
