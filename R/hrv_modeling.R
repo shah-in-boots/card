@@ -52,17 +52,41 @@ hrv_linear_model <-
 # Model Building {{{ ====
 
 #' @title Model Building
-#' @description Simplify the process of building multiple models in a sequential order. This is particularly helpful in epidemiological cases of testing effect of additional parameters. Every parameter should be theoretically a part of the causal model for the exposure-outcome relationship.
-#' @details This is considering what is available with the `modelr` package and the `tidymodels` approach, and finding an in-between for the causality / epidemiology approach of building intentional, sequentional models. Expect changes in the process, and potential future dependencies on the `tidymodels` appraoches.
-#' @param formula an object of class `formula` that shows the names of the outcomes (can be more than 1) and the names of the predictors (which should contain the `exposure` variable).
-#' @param data data frame or data table (or tibble) that contains the named variables
-#' @param exposure Variable that is forced to be maintained in every model as a predictor.
+#'
+#' @description Simplify the process of building multiple models in a sequential
+#'   order. This is particularly helpful in epidemiological cases of testing
+#'   effect of additional parameters. Every parameter should be theoretically a
+#'   part of the causal model for the exposure-outcome relationship.
+#'
+#' @details This is considering what is available with the `modelr` package and
+#'   the `tidymodels` approach, and finding an in-between for the causality /
+#'   epidemiology approach of building intentional, sequentional models. Expect
+#'   changes in the process, and potential future dependencies on the
+#'   `tidymodels` appraoches.
+#'
+#' @param formula an object of class `formula` that shows the names of the
+#'   outcomes (can be more than 1) and the names of the predictors (which should
+#'   contain the `exposure` variable).
+#' @param data data frame or data table (or tibble) that contains the named
+#'   variables
+#' @param exposure Variable that is forced to be maintained in every model as a
+#'   predictor.
 #' @param engine Set the "engine" or the regression tool that will be used
-#' @return A list of models. Each outcome will be the name of a list. Each list will have an additional list of tidy model data (if available), with sequentially added covariates to the exposure.
+#'
+#' @return A tidy tibble of models. Each one will likely be grouped by its
+#'   outcome, and then with sequential columns using increased/additive models.
+#'   Each model, in a [broom::tidy] format, will have two additional columns.
+#'
+#'   * `outcomes` identifies which outcome was used for the specific regression
+#'
+#'   * `covar` number of covariates used in sequence of predictors given, with
+#'   exposure always being placed in position 1
+#'
 #' @examples
 #' data(geh)
 #' f <- svg_mag + qrs_tang ~ lab_hba1c + bmi
-#' models <- build_sequential_models(f, data = geh)
+#' build_sequential_models(f, data = geh)
+#'
 #' @importFrom magrittr %>%
 #' @export
 build_sequential_models <- function(formula, data, exposure = NULL, engine = "lm") {
@@ -91,7 +115,7 @@ build_sequential_models <- function(formula, data, exposure = NULL, engine = "lm
       predictors <- paste0(p[1:j], collapse = " + ")
       f <- stats::formula(paste0(o[[i]], " ~ ", predictors))
       m <- stats::lm(formula = f, data = data)
-      l[[o[[i]]]][[j]] <- broom::tidy(m)
+      l[[o[[i]]]][[j]] <- broom::tidy(m, conf.int = TRUE)
     }
   }
 
@@ -103,6 +127,7 @@ build_sequential_models <- function(formula, data, exposure = NULL, engine = "lm
       names_to = "outcomes",
       values_to = "models"
     ) %>%
+    dplyr::mutate(covar = purrr::map_dbl(models, nrow) - 1) %>%
     tidyr::unnest(cols = "models")
 
   # Return

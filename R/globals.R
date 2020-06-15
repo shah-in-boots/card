@@ -33,5 +33,6 @@ utils::globalVariables(c(
 	"res",
 	".id",
 	"population",
-	"pred"
+	"pred",
+	"models"
 	))

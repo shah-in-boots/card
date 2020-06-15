@@ -30,8 +30,7 @@ navbar:
 reference:
 - title: Cosinor Analysis
 - contents:
-  - cosinor
-  - ggcosinorfit
+  - contains("cosinor")
 - title: Circadian Rhythm
 - contents:
   - starts_with("circ_")
@@ -46,7 +45,7 @@ reference:
   - proc_hrv_matlab
   - proc_patch_vivalnk
   - hrv_linear_model
-  - hrv_model_building
+  - build_sequential_models
   - ggerror
   - geom_residuals
 

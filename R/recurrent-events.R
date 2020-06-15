@@ -1,25 +1,16 @@
 # Recurrent Survival Table {{{ ====
-# Script to define function for recurrent survival events
-# Will require dates of events, types of recurrent table, etc
-
-# Input
-# patient ID column
-# enrollment date (first date available on left)
-# last known date of follow up
-# dates of events
-# type of survival table to create (marginal, conditional, etc)
-# Optional = death parameter
-# Output
-# Survival table
 
 #' @title Recurrent Survival Data Format
 #'
-#' @description `recur_survival_table` Reformat recurrent event data (wide)
-#' into different models for survival analysis
+#' @description Reformats recurrent event data (wide) into different models for survival analysis, but can also be used for simple survival analysis tables as well. Importantly, for large datasets, this function will show significant slow-down since it uses an intuitive approach on defining the datasets. Future iterations will create a vectorized approach that should provide performance speed-ups.
+#'
+#'   * For recurrent events, the final censoring event can include death, or can be ignored if its not considered a failure event.
+#'
+#'   * For simple survival analysis, death censoring should be left as NULL, and the event (e.g. "date_of_death"), should be used as a single `event.dates` parameter. The function will do the rest.
 #'
 #' @details This function takes every data event date, and creates several types
 #' of recurrent event tables. It orders the data chronologically for repeat
-#' events. Currently does marginal and conditional A and B models.
+#' events. Currently does marginal and conditional A and B models. The large
 #'
 #' @param data A dataframe containing the subsequent parameters
 #'
@@ -103,7 +94,7 @@ recur_survival_table <-
 
   # Make table wide again and add back other columns
   df <-
-    tidyr::unnest(x) %>%
+    tidyr::unnest(x, cols = data) %>%
     tidyr::pivot_wider(names_from = "EVENT", values_from = "DATE") %>%
     dplyr::inner_join(df[c(id, first, last, death)], ., by = id)
 
