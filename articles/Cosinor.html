@@ -70,7 +70,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="Cosinor_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>cosinor</h1>
@@ -84,11 +84,12 @@
     
     
 <p>The function <code><a href="../reference/cosinor.html">cosinor()</a></code> is built off of literature supporting the analysis of circadian rhythms. There are two other packages on CRAN that provide cosinor analyses that are very good, <a href="https://CRAN.R-project.org/package=cosinor">cosinor</a> and <a href="https://CRAN.R-project.org/package=cosinor2">cosinor2</a>. This package was built for 1) learning about regression and model development, and 2) the raw material generated to allow for more expansive and experimental analysis of cosinor functions and circadian rhythms.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">card</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://github.com/asshah4/card">card</a></span>)
 
 <span class="co"># Using the provide dataset</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"twins"</span>)
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">twins</span>)
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="kw">twins</span>)
 <span class="co">#&gt; # A tibble: 6 x 23</span>
 <span class="co">#&gt; # Groups:   patid, hour [6]</span>
 <span class="co">#&gt;   patid   age   bmi race  smoking hptn  dm    chf   prevchd med_beta_blocke…</span>
@@ -101,43 +102,93 @@
 <span class="co">#&gt; 6     1    49  27.4 0     1       1     0     0     0       0               </span>
 <span class="co">#&gt; # … with 13 more variables: med_antidepr &lt;fct&gt;, beck_total &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   sad_bin &lt;fct&gt;, sad_cat &lt;fct&gt;, PETdiff_2 &lt;fct&gt;, dyxtime &lt;dttm&gt;, date &lt;date&gt;,</span>
-<span class="co">#&gt; #   hour &lt;dbl&gt;, rDYX &lt;dbl&gt;, sDYX &lt;dbl&gt;, HR &lt;dbl&gt;, CP &lt;dbl&gt;, zip &lt;chr&gt;</span></pre></body></html></div>
+<span class="co">#&gt; #   hour &lt;dbl&gt;, rDYX &lt;dbl&gt;, sDYX &lt;dbl&gt;, HR &lt;dbl&gt;, CP &lt;dbl&gt;, zip &lt;chr&gt;</span>
+</pre></div>
 <p>The <code>twins</code> dataset contains clinical covariates and continuous time measures, such as heart rate variability at each hour of the day. These continuous measures follow a circadian pattern.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">twins</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">hour</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">rDYX</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">geom_smooth</a></span>(<span class="kw">method</span> <span class="kw">=</span> <span class="st">"gam"</span>)
-<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></pre></body></html></div>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span>)
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="kw">twins</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(x = <span class="kw">hour</span>, y = <span class="kw">rDYX</span>)) <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">geom_smooth</a></span>(method = <span class="st">"gam"</span>)
+<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span>
+</pre></div>
 <p><img src="Cosinor_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 <p>Cosinor analysis can be used to generate model statistics. Confidence intervals of the amplitude and acrophase can be generated. It creates the model using the <a href="https://tidymodels.github.io/hardhat/index.html">hardhat</a>.</p>
 <p>The model can return information about an individual cosinor. The model statistics can be extracted, as well as visualized.</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="co"># Model</span>
-<span class="no">m</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cosinor.html">cosinor</a></span>(<span class="no">rDYX</span> ~ <span class="no">hour</span>, <span class="no">twins</span>, <span class="kw">tau</span> <span class="kw">=</span> <span class="fl">24</span>)
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="co"># Model</span>
+<span class="kw">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cosinor.html">cosinor</a></span>(<span class="kw">rDYX</span> <span class="op">~</span> <span class="kw">hour</span>, data = <span class="kw">twins</span>, tau = <span class="fl">24</span>)
 
 <span class="co"># Summary</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">m</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="kw">m</span>)
 <span class="co">#&gt; Individual Cosinor Model </span>
 <span class="co">#&gt; ------------------------------------------</span>
 <span class="co">#&gt; Call: </span>
-<span class="co">#&gt; cosinor("rDYX ~ hour")</span>
+<span class="co">#&gt; cosinor(formula = rDYX ~ M + A1 * cos(2*pi*hour/24 + phi1) </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Period(s): 24 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Residuals: </span>
 <span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span>
 <span class="co">#&gt; -3.12633 -0.53228 -0.03597  0.00000  0.49132  4.82150 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Coefficients: </span>
-<span class="co">#&gt;      mesor        amp        phi       beta      gamma </span>
-<span class="co">#&gt;  2.8604855  0.2986101 -2.6687044 -0.2658396  0.1360048 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Confidence Intervals: </span>
-<span class="co">#&gt;             2.5%      97.5%</span>
-<span class="co">#&gt; mesor  2.8485315  2.8724394</span>
-<span class="co">#&gt; amp    0.2814656  0.3157546</span>
-<span class="co">#&gt; phi   -2.7252732 -2.6121357</span>
+<span class="co">#&gt;         Estimate  Std. Error</span>
+<span class="co">#&gt; mesor  2.8604855 0.006098624</span>
+<span class="co">#&gt; amp1   0.2986101 0.008746706</span>
+<span class="co">#&gt; phi1  -2.6687044 0.028860014</span>
+</pre></div>
+<p>More complex models can also be made using multiple components, which is represented by additional, user-defined periods.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="co"># Model</span>
+<span class="kw">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cosinor.html">cosinor</a></span>(<span class="kw">rDYX</span> <span class="op">~</span> <span class="kw">hour</span>, data = <span class="kw">twins</span>, tau = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">24</span>, <span class="fl">12</span>))
 
-<span class="co"># Ggplot</span>
-<span class="fu"><a href="../reference/ggcosinor.html">ggcosinor</a></span>(<span class="no">m</span>)
-<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></pre></body></html></div>
-<p><img src="Cosinor_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<span class="co"># Summary</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="kw">m</span>)
+<span class="co">#&gt; Individual Cosinor Model </span>
+<span class="co">#&gt; ------------------------------------------</span>
+<span class="co">#&gt; Call: </span>
+<span class="co">#&gt; cosinor(formula = rDYX ~ M + A1 * cos(2*pi*hour/24 + phi1) + A2 * cos(2*pi*hour/12 + phi2) </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Period(s): 24, 12 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Residuals: </span>
+<span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span>
+<span class="co">#&gt; -3.00770 -0.52024 -0.03247  0.00000  0.48753  4.88552 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Coefficients: </span>
+<span class="co">#&gt;         Estimate  Std. Error</span>
+<span class="co">#&gt; mesor  2.8586510 0.006062639</span>
+<span class="co">#&gt; amp1   0.2964114 0.008702368</span>
+<span class="co">#&gt; amp2   0.1302012 0.008542526</span>
+<span class="co">#&gt; phi1  -2.6542757 0.028911445</span>
+<span class="co">#&gt; phi2  -3.6636921 0.065235427</span>
+</pre></div>
+<p>And, these models can be repeated for an entire population if warranted.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit">
+<span class="co"># Model</span>
+<span class="kw">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cosinor.html">cosinor</a></span>(<span class="kw">rDYX</span> <span class="op">~</span> <span class="kw">hour</span>, data = <span class="kw">twins</span>, tau = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">24</span>), population = <span class="st">"patid"</span>)
+<span class="co">#&gt; 18 subjects were removed due to having insufficient observations.</span>
+
+<span class="co"># Summary</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="kw">m</span>)
+<span class="co">#&gt; Population Cosinor Model </span>
+<span class="co">#&gt; ------------------------------------------</span>
+<span class="co">#&gt; Call: </span>
+<span class="co">#&gt; cosinor(formula = rDYX ~ M + A1 * cos(2*pi*hour/24 + phi1) </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Period(s): 24 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Residuals: </span>
+<span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span>
+<span class="co">#&gt; -2.27890 -0.31508 -0.02126  0.00000  0.29324  3.93566 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Coefficients:</span>
+<span class="co">#&gt; Confidence intervals for amplitude and acrophase for population-mean cosinor use the methods described by Fernando et al 2004, which may not be applicable to multiple-components.</span>
+<span class="co">#&gt;         Estimate Std. Error</span>
+<span class="co">#&gt; mesor  2.8248529 0.02497310</span>
+<span class="co">#&gt; amp1   0.2880224 0.01661657</span>
+<span class="co">#&gt; phi1  -2.7924872 0.04034663</span>
+</pre></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

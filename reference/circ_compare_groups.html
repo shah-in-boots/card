@@ -127,7 +127,7 @@ variable based on a categorical variable. This summary is repeat by
 time groups to help describe a circadian pattern.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>circ_compare_groups</span>(<span class='no'>data</span>, <span class='no'>x</span>, <span class='no'>y</span>, <span class='no'>time</span>)</pre>
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/card/man/circ_compare_groups.html'>circ_compare_groups</a></span>(<span class='kw'>data</span>, <span class='kw'>x</span>, <span class='kw'>y</span>, <span class='kw'>time</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -162,11 +162,11 @@ continuous variable</p>
 statistics of the data frame by the stated variables. Results in a
 mean, standard deviation, and standard error term. This data is
 also used for making a t-test based table, which can then also be
-graphed in <a href='ggcircadian.html'>card::ggcircadian</a>.</p>
+graphed in <a href='https://rdrr.io/pkg/card/man/ggcircadian.html'>card::ggcircadian</a>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"twins"</span>)
-<span class='fu'>circ_compare_groups</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>twins</span>, <span class='kw'>x</span> <span class='kw'>=</span> <span class='st'>"rDYX"</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='st'>"sad_cat"</span>, <span class='kw'>time</span> <span class='kw'>=</span> <span class='st'>"hour"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 120 x 6</span><span>
+<span class='fu'><a href='https://rdrr.io/pkg/card/man/circ_compare_groups.html'>circ_compare_groups</a></span>(data = <span class='kw'>twins</span>, x = <span class='st'>"rDYX"</span>, y = <span class='st'>"sad_cat"</span>, time = <span class='st'>"hour"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 120 x 6</span><span>
 #&gt;    hour  sad_cat  mean     n    sd     se
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'> 1</span><span> 8     bdi_I    3.22   426 0.780 0.037</span><span style='text-decoration: underline;'>8</span><span>
@@ -179,8 +179,7 @@ graphed in <a href='ggcircadian.html'>card::ggcircadian</a>.</p>
 #&gt; </span><span style='color: #555555;'> 8</span><span> 15    bdi_I    3.05   459 0.749 0.035</span><span style='text-decoration: underline;'>0</span><span>
 #&gt; </span><span style='color: #555555;'> 9</span><span> 16    bdi_I    3.02   469 0.730 0.033</span><span style='text-decoration: underline;'>7</span><span>
 #&gt; </span><span style='color: #555555;'>10</span><span> 17    bdi_I    2.85   469 0.724 0.033</span><span style='text-decoration: underline;'>4</span><span>
-#&gt; </span><span style='color: #555555;'># … with 110 more rows</span><span></div><div class='input'>
-</div></span></pre>
+#&gt; </span><span style='color: #555555;'># … with 110 more rows</span><span></div><div class='input'></div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

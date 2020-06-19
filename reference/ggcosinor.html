@@ -40,7 +40,9 @@
 
 
 <meta property="og:title" content="ggplot of cosinor model — ggcosinor" />
-<meta property="og:description" content="ggplot of single cosinor model, options include to ability to add diagnostic/fit parameters such as residuals." />
+<meta property="og:description" content="ggplot of cosinor model that can visualize a variety of cosinor
+model subtypes, including single-component, multiple-component, individual,
+and population cosinor models, built using card::cosinor." />
 
 
 
@@ -115,15 +117,17 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>ggplot of cosinor model</h1>
-    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/cosinor-diagnostics.R'><code>R/cosinor-diagnostics.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/cosinor-constructor.R'><code>R/cosinor-constructor.R</code></a></small>
     <div class="hidden name"><code>ggcosinor.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>ggplot of single cosinor model, options include to ability to add diagnostic/fit parameters such as residuals.</p>
+    <p>ggplot of cosinor model that can visualize a variety of cosinor
+model subtypes, including single-component, multiple-component, individual,
+and population cosinor models, built using <a href='https://rdrr.io/pkg/card/man/cosinor.html'>card::cosinor</a>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ggcosinor</span>(<span class='no'>object</span>, <span class='kw'>residuals</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/card/man/ggcosinor.html'>ggcosinor</a></span>(<span class='kw'>object</span>, labels = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -133,12 +137,20 @@
       <td><p>Model of class <code>cosinor</code>.</p></td>
     </tr>
     <tr>
-      <th>residuals</th>
-      <td><p>If residuals should be added. Colors can be overwritten with additional arguments (e.g. "+ scale_color_grey()")</p></td>
+      <th>labels</th>
+      <td><p>Logical value if annotations should be placed on plot, default
+= TRUE. If using a multiple cosinor, the terms are different and will not
+be plotted.</p><ul>
+<li><p>M = midline estimating statistic of rhythm</p></li>
+<li><p>A = amplitude</p></li>
+<li><p>P = phi or acrophase (shift from 0 to crest)</p></li>
+</ul></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>For extensibility</p></td>
+      <td><p>For extensibility. This function will use different
+implementations based on the type of model (single or multiple component).
+Attributes of the object will be passed down, or calculated on the fly.</p></td>
     </tr>
     </table>
 

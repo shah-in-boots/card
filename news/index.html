@@ -123,41 +123,38 @@
 <div id="next-steps" class="section level2">
 <h2 class="hasAnchor">
 <a href="#next-steps" class="anchor"></a>Next Steps</h2>
-<ul>
-<li>Implementation of a multiple-component cosinor</li>
-</ul>
 </div>
 <div id="bugs" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bugs" class="anchor"></a>Bugs</h2>
 <ul>
 <li>
-<code><a href="../reference/cosinor.html">cosinor()</a></code> unable to run on certain models based on y values</li>
-<li>
-<code><a href="../reference/ggcosinor.html">ggcosinor()</a></code> cannot set amplitude/peak positions for certain cases</li>
-<li>
-<code><a href="../reference/ggpopcosinor.html">ggpopcosinor()</a></code> is not sure how many observations are needed to graph</li>
+<code><a href="https://rdrr.io/pkg/card/man/cosinor.html">cosinor()</a></code> unable to run on certain models based on y values</li>
 </ul>
 </div>
 <div id="features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#features" class="anchor"></a>Features</h2>
 <ul>
-<li>Sequential model building can be performed with <code><a href="../reference/build_sequential_models.html">build_sequential_models()</a></code>, however it is in a list format and will likely be updated to be more “tidy” in the future</li>
+<li>
+<code><a href="https://rdrr.io/pkg/card/man/cosinor_features.html">cosinor_features()</a></code> allows for assessing global/special attributes of multiple component cosinor analysis</li>
+<li>
+<code><a href="https://rdrr.io/pkg/card/man/ggcosinor.html">ggcosinor()</a></code> is now functional for single and multiple component analysis</li>
+<li>Sequential model building can be performed with <code><a href="https://rdrr.io/pkg/card/man/build_sequential_models.html">build_sequential_models()</a></code>, however it is in a list format and will likely be updated to be more “tidy” in the future</li>
 <li>Confidence interval methods now work for population-mean cosinor, including summary function</li>
 <li>
-<code><a href="../reference/ggpopcosinor.html">ggpopcosinor()</a></code> can show the cosinors for individuals across a population, along with mean and predicted cosinor</li>
+<code>ggpopcosinor()</code> can show the cosinors for individuals across a population, along with mean and predicted cosinor</li>
 <li>
-<code><a href="../reference/ggcosinor.html">ggcosinor()</a></code> accepts single models</li>
+<code><a href="https://rdrr.io/pkg/card/man/ggcosinor.html">ggcosinor()</a></code> accepts single models</li>
 <li>
 <code>print.cosinor()</code> and <code>plot.cosinor()</code> functions added</li>
 <li>
-<code><a href="../reference/cosinor_zero_amplitude.html">cosinor_zero_amplitude()</a></code> test added, works for individual cosinor.</li>
-<li>Population-mean cosinor analysis is added. <code><a href="../reference/cosinor.html">cosinor()</a></code> now takes the argument of for individuals. The individual cosinor methods generally work, but may not yet be accurate.</li>
-<li>Circadian rhythm analysis has also created an initial family of functions that will work to simplify the process of analyzing 24-hour data. The <code><a href="../reference/circ_compare_groups.html">circ_compare_groups()</a></code> helps to summarize circadian data by an covariate and time. This is visualized using <code><a href="../reference/ggcircadian.html">ggcircadian()</a></code>. Also includes the <code><a href="../reference/ggforest.html">ggforest()</a></code> to create forest plots of odds ratios. This is dependent on the <code><a href="../reference/circ_odds.html">circ_odds()</a></code> function to generate odds ratios by time.</li>
-<li>An important regression function, built with the <em>tidymodels</em> <a href="https://tidymodels.github.io/hardhat/">hardhat</a> package, <code><a href="../reference/cosinor.html">cosinor()</a></code> introduced as a new function to allow for diagnostic analysis of circadian patterns. Although the algorithm is well known, having an implementation in R allows potential diagnostics. This includes the <code>ggcosinorfit()</code> allows for assessing rhythmicity and confidence intervals of amplitude and acrophase of cosinor model. Basic methods for assessing the model, such as <code>print</code>, <code>summary</code>, <code>coef</code>, and <code>confint</code> currently function.</li>
-<li>Recurrent events can now be analyzed using a powerful function called <code><a href="../reference/recur_survival_table.html">recur_survival_table()</a></code>, which allows for redesigning longitudinal data tables into a model appropriate for analysis. It is built to extend survival analyses. The <code>recur_summary_table()</code> function allows for reviewing the findings from recurrent events by category to help understand event strata.</li>
-<li>The <code><a href="../reference/circ_sun.html">circ_sun()</a></code> function allows for identifying the sunrise and sunset times based on geographical location. This is intended to couple with the <code><a href="../reference/circ_center.html">circ_center()</a></code> function to center a time series around an event, such as sunrise. A vignette has been added to review this data.</li>
+<code><a href="https://rdrr.io/pkg/card/man/cosinor_zero_amplitude.html">cosinor_zero_amplitude()</a></code> test added, works for individual cosinor.</li>
+<li>Population-mean cosinor analysis is added. <code><a href="https://rdrr.io/pkg/card/man/cosinor.html">cosinor()</a></code> now takes the argument of for individuals. The individual cosinor methods generally work, but may not yet be accurate.</li>
+<li>Circadian rhythm analysis has also created an initial family of functions that will work to simplify the process of analyzing 24-hour data. The <code><a href="https://rdrr.io/pkg/card/man/circ_compare_groups.html">circ_compare_groups()</a></code> helps to summarize circadian data by an covariate and time. This is visualized using <code><a href="https://rdrr.io/pkg/card/man/ggcircadian.html">ggcircadian()</a></code>. Also includes the <code><a href="https://rdrr.io/pkg/card/man/ggforest.html">ggforest()</a></code> to create forest plots of odds ratios. This is dependent on the <code><a href="https://rdrr.io/pkg/card/man/circ_odds.html">circ_odds()</a></code> function to generate odds ratios by time.</li>
+<li>An important regression function, built with the <em>tidymodels</em> <a href="https://tidymodels.github.io/hardhat/">hardhat</a> package, <code><a href="https://rdrr.io/pkg/card/man/cosinor.html">cosinor()</a></code> introduced as a new function to allow for diagnostic analysis of circadian patterns. Although the algorithm is well known, having an implementation in R allows potential diagnostics. This includes the <code>ggcosinorfit()</code> allows for assessing rhythmicity and confidence intervals of amplitude and acrophase of cosinor model. Basic methods for assessing the model, such as <code>print</code>, <code>summary</code>, <code>coef</code>, and <code>confint</code> currently function.</li>
+<li>Recurrent events can now be analyzed using a powerful function called <code><a href="https://rdrr.io/pkg/card/man/recur_survival_table.html">recur_survival_table()</a></code>, which allows for redesigning longitudinal data tables into a model appropriate for analysis. It is built to extend survival analyses. The <code>recur_summary_table()</code> function allows for reviewing the findings from recurrent events by category to help understand event strata.</li>
+<li>The <code><a href="https://rdrr.io/pkg/card/man/circ_sun.html">circ_sun()</a></code> function allows for identifying the sunrise and sunset times based on geographical location. This is intended to couple with the <code><a href="https://rdrr.io/pkg/card/man/circ_center.html">circ_center()</a></code> function to center a time series around an event, such as sunrise. A vignette has been added to review this data.</li>
 </ul>
 </div>
 </div>

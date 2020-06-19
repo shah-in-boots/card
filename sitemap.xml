@@ -4,6 +4,9 @@
     <loc>https://asshah4.github.io/card//index.html</loc>
   </url>
   <url>
+    <loc>https://asshah4.github.io/card//reference/augment.cosinor.html</loc>
+  </url>
+  <url>
     <loc>https://asshah4.github.io/card//reference/build_sequential_models.html</loc>
   </url>
   <url>
@@ -29,6 +32,9 @@
   </url>
   <url>
     <loc>https://asshah4.github.io/card//reference/cosinor_area.html</loc>
+  </url>
+  <url>
+    <loc>https://asshah4.github.io/card//reference/cosinor_features.html</loc>
   </url>
   <url>
     <loc>https://asshah4.github.io/card//reference/cosinor_goodness_of_fit.html</loc>
@@ -58,10 +64,7 @@
     <loc>https://asshah4.github.io/card//reference/ggforest.html</loc>
   </url>
   <url>
-    <loc>https://asshah4.github.io/card//reference/ggmulticosinor.html</loc>
-  </url>
-  <url>
-    <loc>https://asshah4.github.io/card//reference/ggpopcosinor.html</loc>
+    <loc>https://asshah4.github.io/card//reference/heart-class.html</loc>
   </url>
   <url>
     <loc>https://asshah4.github.io/card//reference/hrv.html</loc>
@@ -98,6 +101,12 @@
   </url>
   <url>
     <loc>https://asshah4.github.io/card//reference/recurrent_propensity.html</loc>
+  </url>
+  <url>
+    <loc>https://asshah4.github.io/card//reference/reexports.html</loc>
+  </url>
+  <url>
+    <loc>https://asshah4.github.io/card//reference/tidy.cosinor.html</loc>
   </url>
   <url>
     <loc>https://asshah4.github.io/card//reference/triplets.html</loc>

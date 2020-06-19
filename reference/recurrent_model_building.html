@@ -125,7 +125,7 @@ for recurrent event survival analyses." />
 for recurrent event survival analyses.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>recurrent_model_building</span>(<span class='no'>data</span>, <span class='no'>covar.builds</span>, <span class='no'>model.type</span>, <span class='kw'>prop.scores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/card/man/recurrent_model_building.html'>recurrent_model_building</a></span>(<span class='kw'>data</span>, <span class='kw'>covar.builds</span>, <span class='kw'>model.type</span>, prop.scores = <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -133,7 +133,7 @@ for recurrent event survival analyses.</p>
     <tr>
       <th>data</th>
       <td><p>Data frame that is the survival format, potentially made by the
-<a href='recur_survival_table.html'>card::recur_survival_table</a>. Has to be merged with the superset of
+<a href='https://rdrr.io/pkg/card/man/recur_survival_table.html'>card::recur_survival_table</a>. Has to be merged with the superset of
 covariates that are being tested.</p></td>
     </tr>
     <tr>
@@ -151,7 +151,7 @@ the names of the columns in the data frame that will generate regressions.</p></
       <th>prop.scores</th>
       <td><p>This is a vector of the names of which <code>covar.builds</code>
 should be performed with propensity weighting. This will call a separate
-function <a href='recurrent_propensity.html'>card::recurrent_propensity</a> that will generate both a PROP_SCORE
+function <a href='https://rdrr.io/pkg/card/man/recurrent_propensity.html'>card::recurrent_propensity</a> that will generate both a PROP_SCORE
 column and PROP_WEIGHT column. Optional parameter, defaults to NULL.</p></td>
     </tr>
     </table>

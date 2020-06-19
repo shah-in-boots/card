@@ -41,7 +41,9 @@
 
 <meta property="og:title" content="Fit a <code>cosinor</code> — cosinor" />
 <meta property="og:description" content="cosinor() fits a regression model of a time variable to a
-continuous outcome use trigonometric features." />
+continuous outcome use trigonometric features. This approaches uses the
+linearization of the parameters to assess their statistics and
+distribution." />
 
 
 
@@ -116,31 +118,33 @@ continuous outcome use trigonometric features." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Fit a <code>cosinor</code></h1>
-    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/cosinor-construction.R'><code>R/cosinor-construction.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/asshah4/card/blob/master/R/cosinor-constructor.R'><code>R/cosinor-constructor.R</code></a></small>
     <div class="hidden name"><code>cosinor.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>cosinor()</code> fits a regression model of a time variable to a
-continuous outcome use trigonometric features.</p>
+    <p><code><a href='https://rdrr.io/pkg/card/man/cosinor.html'>cosinor()</a></code> fits a regression model of a time variable to a
+continuous outcome use trigonometric features. This approaches uses the
+linearization of the parameters to assess their statistics and
+distribution.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>cosinor</span>(<span class='no'>t</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/card/man/cosinor.html'>cosinor</a></span>(<span class='kw'>t</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for default</span>
-<span class='fu'>cosinor</span>(<span class='no'>t</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/pkg/card/man/cosinor.html'>cosinor</a></span>(<span class='kw'>t</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for data.frame</span>
-<span class='fu'>cosinor</span>(<span class='no'>t</span>, <span class='no'>y</span>, <span class='no'>tau</span>, <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/pkg/card/man/cosinor.html'>cosinor</a></span>(<span class='kw'>t</span>, <span class='kw'>y</span>, <span class='kw'>tau</span>, population = <span class='kw'>NULL</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for matrix</span>
-<span class='fu'>cosinor</span>(<span class='no'>t</span>, <span class='no'>y</span>, <span class='no'>tau</span>, <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/pkg/card/man/cosinor.html'>cosinor</a></span>(<span class='kw'>t</span>, <span class='kw'>y</span>, <span class='kw'>tau</span>, population = <span class='kw'>NULL</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for formula</span>
-<span class='fu'>cosinor</span>(<span class='no'>formula</span>, <span class='no'>data</span>, <span class='no'>tau</span>, <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/pkg/card/man/cosinor.html'>cosinor</a></span>(<span class='kw'>formula</span>, <span class='kw'>data</span>, <span class='kw'>tau</span>, population = <span class='kw'>NULL</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for recipe</span>
-<span class='fu'>cosinor</span>(<span class='no'>t</span>, <span class='no'>data</span>, <span class='no'>tau</span>, <span class='kw'>population</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
+<span class='fu'><a href='https://rdrr.io/pkg/card/man/cosinor.html'>cosinor</a></span>(<span class='kw'>t</span>, <span class='kw'>data</span>, <span class='kw'>tau</span>, population = <span class='kw'>NULL</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -217,7 +221,8 @@ and the predictor terms on the right-hand side.</p></td>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"twins"</span>)
 
 <span class='co'># Formula interface</span>
-<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>cosinor</span>(<span class='no'>rDYX</span> ~ <span class='no'>hour</span>, <span class='no'>twins</span>, <span class='kw'>tau</span> <span class='kw'>=</span> <span class='fl'>24</span>)</div></pre>
+<span class='kw'>model</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/card/man/cosinor.html'>cosinor</a></span>(<span class='kw'>rDYX</span> <span class='op'>~</span> <span class='kw'>hour</span>, <span class='kw'>twins</span>, tau = <span class='fl'>24</span>)
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
