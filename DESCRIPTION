@@ -27,26 +27,28 @@ Roxygen: list(markdown = TRUE)
 Depends:
 		R (>= 3.1)
 Imports:
-	  utils,
-	  stats,
-	  sf,
-	  lutz,
-	  magrittr,
-	  ggplot2,
-	  tidyr,
-	  dplyr,
-	  purrr,
-	  tibble,
-	  readr,
-	  lubridate,
-	  stringr,
-	  rlang,
-	  survival,
-	  broom,
-	  hardhat,
-	  recipes,
-	  data.table,
-	  Hmisc
+    utils,
+    stats,
+    sf,
+    lutz,
+    magrittr,
+    ggplot2,
+    tidyr,
+    dplyr,
+    purrr,
+    tibble,
+    readr,
+    lubridate,
+    stringr,
+    rlang,
+    survival,
+    broom,
+    hardhat,
+    recipes,
+    data.table,
+    Hmisc,
+    generics,
+    methods
 Suggests:
     kableExtra,
     plyr,
@@ -54,5 +56,6 @@ Suggests:
     knitr,
     rmarkdown,
     covr,
-    testthat
+    testthat,
+    ggrepel
 VignetteBuilder: knitr

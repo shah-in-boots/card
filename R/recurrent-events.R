@@ -71,10 +71,10 @@ recur_survival_table <-
 
   # Event dates need to be organized by actual values
   x <- df[c(id, event.dates)] %>%
-    tidyr::pivot_longer(-c(id), names_to = "EVENT", values_to = "DATE") %>%
-    dplyr::group_by_(id) %>%
+    tidyr::pivot_longer(-c(dplyr::all_of(id)), names_to = "EVENT", values_to = "DATE") %>%
+    dplyr::group_by_(dplyr::all_of(id)) %>%
     dplyr::arrange(DATE) %>%
-    dplyr::arrange_(id) %>%
+    dplyr::arrange_(dplyr::all_of(id)) %>%
     tidyr::nest()
 
   # Unique and sorted events and correct event numbering

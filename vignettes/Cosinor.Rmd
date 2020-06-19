@@ -38,11 +38,29 @@ The model can return information about an individual cosinor. The model statisti
 
 ```{r}
 # Model
-m <- cosinor(rDYX ~ hour, twins, tau = 24)
+m <- cosinor(rDYX ~ hour, data = twins, tau = 24)
 
 # Summary
 summary(m)
-
-# Ggplot
-ggcosinor(m)
 ```
+
+More complex models can also be made using multiple components, which is represented by additional, user-defined periods.
+
+```{r}
+# Model
+m <- cosinor(rDYX ~ hour, data = twins, tau = c(24, 12))
+
+# Summary
+summary(m)
+```
+
+And, these models can be repeated for an entire population if warranted.
+
+```{r}
+# Model
+m <- cosinor(rDYX ~ hour, data = twins, tau = c(24), population = "patid")
+
+# Summary
+summary(m)
+```
+

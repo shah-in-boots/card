@@ -35,13 +35,16 @@ intermediate calculations otherwise.}
 A data frame organized into a survival table format
 }
 \description{
-\code{recur_survival_table} Reformat recurrent event data (wide)
-into different models for survival analysis
+Reformats recurrent event data (wide) into different models for survival analysis, but can also be used for simple survival analysis tables as well. Importantly, for large datasets, this function will show significant slow-down since it uses an intuitive approach on defining the datasets. Future iterations will create a vectorized approach that should provide performance speed-ups.
+\itemize{
+\item For recurrent events, the final censoring event can include death, or can be ignored if its not considered a failure event.
+\item For simple survival analysis, death censoring should be left as NULL, and the event (e.g. "date_of_death"), should be used as a single \code{event.dates} parameter. The function will do the rest.
+}
 }
 \details{
 This function takes every data event date, and creates several types
 of recurrent event tables. It orders the data chronologically for repeat
-events. Currently does marginal and conditional A and B models.
+events. Currently does marginal and conditional A and B models. The large
 }
 \examples{
 \donttest{

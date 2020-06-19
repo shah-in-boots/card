@@ -11,3 +11,4 @@
 ^\.github$
 ^LICENSE\.md$
 ^codecov\.yml$
+^R/*-dev\.R$

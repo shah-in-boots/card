@@ -40,8 +40,11 @@
 
 
 <meta property="og:title" content="Recurrent Survival Data Format — recur_survival_table" />
-<meta property="og:description" content="recur_survival_table Reformat recurrent event data (wide)
-into different models for survival analysis" />
+<meta property="og:description" content="Reformats recurrent event data (wide) into different models for survival analysis, but can also be used for simple survival analysis tables as well. Importantly, for large datasets, this function will show significant slow-down since it uses an intuitive approach on defining the datasets. Future iterations will create a vectorized approach that should provide performance speed-ups.
+For recurrent events, the final censoring event can include death, or can be ignored if its not considered a failure event.
+For simple survival analysis, death censoring should be left as NULL, and the event (e.g. &quot;date_of_death&quot;), should be used as a single event.dates parameter. The function will do the rest.
+
+" />
 
 
 
@@ -121,8 +124,11 @@ into different models for survival analysis" />
     </div>
 
     <div class="ref-description">
-    <p><code>recur_survival_table</code> Reformat recurrent event data (wide)
-into different models for survival analysis</p>
+    <p>Reformats recurrent event data (wide) into different models for survival analysis, but can also be used for simple survival analysis tables as well. Importantly, for large datasets, this function will show significant slow-down since it uses an intuitive approach on defining the datasets. Future iterations will create a vectorized approach that should provide performance speed-ups.</p><ul>
+<li><p>For recurrent events, the final censoring event can include death, or can be ignored if its not considered a failure event.</p></li>
+<li><p>For simple survival analysis, death censoring should be left as NULL, and the event (e.g. "date_of_death"), should be used as a single <code>event.dates</code> parameter. The function will do the rest.</p></li>
+</ul>
+
     </div>
 
     <pre class="usage"><span class='fu'>recur_survival_table</span>(
@@ -177,7 +183,7 @@ intermediate calculations otherwise.</p></td>
 
     <p>This function takes every data event date, and creates several types
 of recurrent event tables. It orders the data chronologically for repeat
-events. Currently does marginal and conditional A and B models.</p>
+events. Currently does marginal and conditional A and B models. The large</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
@@ -203,8 +209,7 @@ events. Currently does marginal and conditional A and B models.</p>
 #&gt; <span class='warning'>Please use `arrange()` instead.</span>
 #&gt; <span class='warning'>See vignette('programming') for more help</span>
 #&gt; <span class='warning'></span><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
-#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; <span class='warning'>Warning: `cols` is now required when using unnest().</span>
-#&gt; <span class='warning'>Please use `cols = c(data)`</span></div><div class='input'># }
+#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='input'># }
 
 </div></span></pre>
   </div>

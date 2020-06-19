@@ -24,8 +24,6 @@ knitr::opts_chunk$set(
 
 # __card__
 
-When conducting research, its invaluable to have readily used functions and patterns at hand, forcing you to format and manage a data workflow similarly. Thus, all that is needed is a `library(card)`.  
-
 ## Cardiovascular and Autonomic Research Design
 
 The goal of `card` is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools. Its developed to fit a _tidy_ approach to statistical analysis.
@@ -56,14 +54,39 @@ devtools::install_github("asshah4/card")
 
 This package is intended for analyzing cardiovascular signals and autonomic physiology. The current collection of functions are built practically around this paradigm. The current focus, in `card v0.1.0` is the development of a flexible and tidy analytical approach to circadian rhythms. 
 
-### Cosinor Analysis
-
-Here is an example of the process of fitting a cosinor model to time-series data.
-
 ```{r}
 library(card)
-data(twins)
-m <- cosinor(rDYX ~ hour, twins, tau = 24)
+```
+
+
+### Datasets
+
+It comes with several useful datasets:
+
+* Cardiovascular disease outcomes with recurrent events
+* Vectorcardiography data in a high-risk cohort
+* Continuous electrocardiography recordings in a clinical cohort with quantitative stress data
+
+```{r}
+# ECG data
+data("twins")
+head(twins)
+
+# Outcomes data
+data("mims")
+head(mims)
+
+# VCG data
+data("geh")
+head(geh)
+```
+
+### Cosinor Analysis
+
+This modeling algorithm requires only base `R`, which allows internal flexibility for modeling heuristics and improved efficiency. For the user, it also allows standard modeling tools/approachs, and a flexible user interface that accounts for individual/population analysis and single/multiple component analysis.
+
+```{r}
+m <- cosinor(rDYX ~ hour, twins, tau = c(24, 12))
 summary(m)
 ggcosinor(m)
 ```

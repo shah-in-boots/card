@@ -2,16 +2,14 @@
 
 ## Next Steps
 
-* Implementation of a multiple-component cosinor
-
 ## Bugs
 
 * `cosinor()` unable to run on certain models based on y values
-* `ggcosinor()` cannot set amplitude/peak positions for certain cases
-* `ggpopcosinor()` is not sure how many observations are needed to graph 
 
 ## Features
 
+* `cosinor_features()` allows for assessing global/special attributes of multiple component cosinor analysis
+* `ggcosinor()` is now functional for single and multiple component analysis
 * Sequential model building can be performed with `build_sequential_models()`, however it is in a list format and will likely be updated to be more "tidy" in the future
 * Confidence interval methods now work for population-mean cosinor, including summary function
 * `ggpopcosinor()` can show the cosinors for individuals across a population, along with mean and predicted cosinor

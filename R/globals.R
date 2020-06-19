@@ -34,5 +34,20 @@ utils::globalVariables(c(
 	".id",
 	"population",
 	"pred",
-	"models"
-	))
+	"models",
+	"mesor",
+	"x",
+	paste0("x", 1:3),
+	paste0("z", 1:3),
+	paste0("beta", 1:3),
+	paste0("gamma", 1:3),
+	paste0("amp", 1:3),
+	paste0("phi", 1:3),
+	paste0("acro", 1:3),
+	"glabs",
+	"term",
+	"p",
+	"value",
+	"peak",
+	"trough"
+))
