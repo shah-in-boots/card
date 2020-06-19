@@ -526,37 +526,76 @@ ggellipse <- function(object, level = 0.95, ...) {
 #' @title ggplot of cosinor model
 #' @description ggplot of cosinor model that can visualize a variety of cosinor
 #'   model subtypes, including single-component, multiple-component, individual,
-#'   and population cosinor models, built using [card::cosinor].
-#' @param object Model of class `cosinor`.
-#' @param labels Logical value if annotations should be placed on plot, default
-#'   = TRUE. If using a multiple cosinor, the terms are different and will not
-#'   be plotted.
+#'   and population cosinor models, built using [card::cosinor]. For single
+#'   component cosinor, the following values are plotted:
 #'
 #'   * M = midline estimating statistic of rhythm
 #'
 #'   * A = amplitude
 #'
-#'   * P = phi or acrophase (shift from 0 to crest)
+#'   * P = phi or acrophase (shift from 0 to peak)
 #'
+#'   If using a multiple-component cosinor, the terms are different. If the
+#'   periods or frequencies resonate or are harmonic, then the following are
+#'   calculated. If the periods are not harmonic, the values are just
+#'   descriptors of the curve.
+#'
+#'   * M = midline estimating statistic of rhythm
+#'
+#'   * Ag = global amplitude, which is the distance between peak and trough
+#'   (this is the same value as the amplitude from single component)
+#'
+#'   * Po = orthophase (the equivalent of the acrophase in a single component),
+#'   the lag time to peak value
+#'
+#'   * Pb = bathyphase, the lag time to trough value
+#'
+#' @param object Model of class `cosinor`. If instead of a single cosinor model,
+#'   multiple objects are to be plotted, can provide a list of cosinor models.
+#'   Plotting multiple models simultaneously is preferred if the outcome
+#'   variable is similar in scale.
+#' @param labels Logical value if annotations should be placed on plot, default
+#'   = TRUE. The labels depend on the type of plot. The labels are attempted to
+#'   be placed "smartly" using the [ggrepel::geom_label_repel()] function.
 #' @param ... For extensibility. This function will use different
 #'   implementations based on the type of model (single or multiple component).
 #'   Attributes of the object will be passed down, or calculated on the fly.
 #' @return Object of class `ggplot` that can be layered
+#' @examples
+#' \donttest{
+#' data(triplets)
+#' m1 <- cosinor(rDYX ~ hour, twins, tau = 24)
+#' m2 <- cosinor(rDYX ~ hour, twins, tau = c(24, 12))
+#' ggcosinor(m1, labels = FALSE)
+#' ggcosinor(m2)
+#' ggcosinor(list(single = m1, multiple = m2))
+#' }
 #' @import ggplot2
 #' @export
 ggcosinor <- function(object, labels = TRUE, ...) {
 
-	# Model basic data
-	tau <- object$tau
-	p <- length(tau) # Single or multicomponent
-	type <-
-		if(p == 1 & object$type == "Individual") {
-			"single"
-		} else if(p > 1 & object$type == "Individual") {
-			"multiple"
-		} else if(object$type == "Population") {
-			stop("`ggcosinor` does not currently support plotting population cosinor models.", call. = FALSE)
-		}
+	# Check to make sure just single object
+	if("cosinor" %in% class(object)) {
+		# Model basic data
+		tau <- object$tau
+		p <- length(tau) # Single or multicomponent
+		type <- dplyr::case_when(
+			p == 1 & object$type == "Individual" ~ "scomp",
+			p > 1 & object$type == "Individual" ~ "mcomp",
+		)
+			if(p == 1 & object$type == "Individual") {
+				"single"
+			} else if(p > 1 & object$type == "Individual") {
+				"multiple"
+			} else if(object$type == "Population") {
+				stop("`ggcosinor` does not currently support plotting population cosinor models.", call. = FALSE)
+			}
+	} else if(is.vector(object) & "cosinor" %in% class(object[[1]])) {
+		gg <- ggmulticosinor(object, labels)
+		return(gg)
+	} else {
+		stop("Cannot determine if model is cosinor object.", call. = FALSE)
+	}
 
 	# Identify which function to call
 	aug <- augment(object)
@@ -608,7 +647,12 @@ ggcosinor <- function(object, labels = TRUE, ...) {
 
 	# Features that may be needed
 	features <- cosinor_features(object)
+	orthophase <- features$orthophase
+	bathyphase <- features$bathyphase
+	peak <- features$peak
+	trough <- features$trough
 	zero <- min(aug$t)
+	mid <- mean(aug$t)
 
 	glabs <-
 		dplyr::bind_cols(
@@ -617,22 +661,22 @@ ggcosinor <- function(object, labels = TRUE, ...) {
 			mesor,
 			unlist(mget(paste0("amp", 1:p))),
 			unlist(mget(paste0("acro", 1:p))),
-			features$orthophase,
-			features$bathyphase
+			orthophase,
+			bathyphase
 		),
 		x = c(
 			zero,
 			unlist(mget(paste0("acro", 1:p))),
 			(zero + unlist(mget(paste0("acro", 1:p))))/2,
-			features$orthophase,
-			features$bathyphase
+			orthophase,
+			bathyphase
 		),
 		y = c(
 			mesor,
 			mesor + unlist(mget(paste0("amp", 1:p)))/2,
 			unlist(mget(paste0("amp", 1:p))) + mesor,
-			features$peak,
-			features$trough
+			peak,
+			trough
 		)
 	)
 
@@ -647,30 +691,36 @@ ggcosinor <- function(object, labels = TRUE, ...) {
 			color = "grey"
 		) +
 		geom_vline(
-			xintercept = features$orthophase,
+			xintercept = orthophase,
 			color = "grey"
 		)
 
 
 	# Eventually add in residuals
 	gres <- list(
-		geom_segment(aes(x = t, xend = t, y = y, yend = .fitted), alpha = 0.3),
-		geom_point(aes(x = t, y = y, colour = abs(.resid), size = abs(.resid))),
+		geom_segment(
+			aes(x = t, xend = t, y = y, yend = .fitted), data = aug,
+			alpha = 0.3
+		),
+		geom_point(
+			aes(x = t, y = y, colour = abs(.resid), size = abs(.resid)), data = aug
+		),
 		scale_color_viridis_c(option = "magma")
 	)
+
 	# Switch to correct function
 	switch(
 		type,
-		single = {
+		scomp = {
 
 			# For single component, just peak and trough values
 			glabs$term[glabs$term == "Po"] <- "Peak"
 			glabs$term[glabs$term == "Pb"] <- "Trough"
+			glabs$value[glabs$term == "Peak"] <- glabs$y[glabs$term == "Peak"]
+			glabs$value[glabs$term == "Trough"] <- glabs$y[glabs$term == "Trough"]
 
 			# Labels if needed
 			gl <- unlist(list(
-				# All labeling points from "glabs" created above
-				geom_point(aes(x = x, y = y), glabs, alpha = 0),
 
 				# Amplitude and Acrophase
 				amp,
@@ -678,39 +728,43 @@ ggcosinor <- function(object, labels = TRUE, ...) {
 
 				# Peak and trough
 				geom_point(
-					aes(x = features$orthophase, y = features$peak),
+					aes(x = orthophase, y = peak),
 					shape = 18, size = 5
 				),
 				geom_point(
-					aes(x = features$bathyphase, y = features$trough),
+					aes(x = bathyphase, y = trough),
 					shape = 18, size = 5
 				),
 
+				# All labeling points from "glabs" created above
+				geom_point(aes(x = x, y = y), glabs, alpha = 0),
+
 				# Repelling labels
-				ggrepel::geom_text_repel(
+				ggrepel::geom_label_repel(
 					aes(
-						x = x,
-						y = y,
-						label = paste0(term, " = ", round(value, 3)),
+						x = x, y = y, label = paste0(term, " = ", round(value, 3))
 					),
 					data = glabs,
+					label.size = NA, label.r = 0.25, label.padding = 0.25,
+					force = 20,
 					nudge_y =
 						ifelse(
-							glabs$term %in% c("M","P1","Peak"), 0.01*mesor, -0.01*mesor),
+							glabs$term == "P1", 0.01 * mesor,
+							ifelse(glabs$term %in% c("M", "Trough"), -0.01 * mesor, 0)
+						),
 					nudge_x =
-						ifelse(glabs$term %in% c("M", "A1"), 0.2 * acro1, 0),
+						ifelse(
+							glabs$term %in% c("M", "A1"), 0.10 * mid,
+							ifelse(glabs$term == "Peak", 0.20 * mid, 0)
+						),
 					segment.color = "transparent"
 				)
 			))
 
 			if(labels) {g <- g + gl} else {g <- g}
 		},
-		multiple = {
 
-			orthophase <- features$orthophase
-			bathyphase <- features$bathyphase
-			peak <- features$peak
-			trough <- features$trough
+		mcomp = {
 
 			gl <- list(
 
@@ -731,6 +785,7 @@ ggcosinor <- function(object, labels = TRUE, ...) {
 				),
 
 				# Bathyphase
+				geom_vline(xintercept = bathyphase, color = "grey"),
 				geom_segment(
 					aes(x = zero, xend = bathyphase, y = trough, yend = trough),
 					linetype = "dotted", size = 0.5
@@ -794,6 +849,126 @@ ggcosinor <- function(object, labels = TRUE, ...) {
 
 	# Return
 	return(gg)
+
+}
+
+#' @export
+#' @rdname ggcosinor
+ggmulticosinor <- function(object, labels, ...) {
+
+	# Number of cosinor objects
+	n <- length(object)
+	# Can be character vector or NULL
+	objNames <- if(is.null(names(object))) {
+		c(1:n)
+	} else {
+		names(object)
+	}
+
+	# Augmented data of all types
+	aug <- list()
+	features <- list()
+	mesor <- list()
+	for(i in 1:n) {
+		aug[[i]] <-
+			augment(object[[i]])[c("y", "t", ".fitted", ".resid")]
+		features[[i]] <- cosinor_features(object[[i]])
+		mesor[[i]] <- object[[i]]$coefficients[1]
+	}
+
+	# Merge together
+	aug <- dplyr::bind_rows(aug, .id = ".id")
+	features <-
+		dplyr::bind_rows(features, .id = ".id") %>%
+		tibble::add_column(mesor = unlist(mesor))
+
+	# Plot
+	g <- ggplot() +
+		stat_smooth(
+			aes(x = t, y = .fitted, colour = .id), data = aug,
+			method = "gam", size = 1.2
+		) +
+		geom_hline(
+			aes(yintercept = mesor, colour = .id), data = features, alpha = 0.5
+		) +
+		geom_vline(
+			aes(xintercept = orthophase, colour = .id), data = features, alpha = 0.5
+		) +
+		geom_vline(
+			aes(xintercept = bathyphase, colour = .id), data = features, alpha = 0.5
+		) +
+		scale_color_viridis_d(
+			option = "plasma", end = 0.8,
+			name = "Objects",
+			labels = objNames
+		) +
+		theme_minimal()
+
+	# Labels
+	gl <- list(
+
+		# Mesor
+		ggrepel::geom_label_repel(
+			aes(
+				x = min(aug$t), y = mesor, colour = .id,
+				label = paste0("MESOR = ", round(mesor, 2))
+			),
+			data = features,
+			show.legend = FALSE,
+			label.size = NA, label.r = 0.25, label.padding = 0.25,
+			force = 10,
+			segment.color = "transparent"
+		),
+
+		# Peaks
+		geom_point(
+			aes(x = orthophase, y = peak, colour = .id), data = features,
+			shape = 19, alpha = 0
+		),
+		ggrepel::geom_label_repel(
+			aes(
+				x = orthophase, y = peak, colour = .id,
+				label = paste0("Peak = ", round(peak, 2))
+			),
+			data = features,
+			show.legend = FALSE,
+			label.size = NA, label.r = 0.25, label.padding = 0.25,
+			force = 50,
+			segment.color = "transparent"
+		),
+
+		# Troughs
+		geom_point(
+			aes(x = bathyphase, y = trough, colour = .id), data = features,
+			shape = 19, alpha = 0
+		),
+		ggrepel::geom_label_repel(
+			aes(
+				x = bathyphase, y = trough, colour = .id,
+				label = paste0("Trough = ", round(trough, 2))
+			),
+			data = features,
+			show.legend = FALSE,
+			label.size = NA, label.r = 0.25, label.padding = 0.25,
+			force = 50,
+			segment.color = "transparent"
+		),
+
+		# Amplitude
+		ggrepel::geom_label_repel(
+			aes(
+				x = (orthophase + bathyphase) / 2, y = mesor + ampGlobal/2, colour = .id,
+				label = paste0("Amplitude = ", round(ampGlobal, 2))
+			),
+			data = features,
+			show.legend = FALSE,
+			label.size = NA, label.r = 0.25, label.padding = 0.25,
+			force = 1,
+			segment.color = "transparent"
+		)
+	)
+
+	if(labels) return(g + gl) else return(g)
 
 }
 

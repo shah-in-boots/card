@@ -49,5 +49,8 @@ utils::globalVariables(c(
 	"p",
 	"value",
 	"peak",
-	"trough"
+	"trough",
+	"bathyphase",
+	"orthophase",
+	"ampGlobal"
 ))

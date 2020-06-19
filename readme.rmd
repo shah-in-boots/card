@@ -89,5 +89,7 @@ This modeling algorithm requires only base `R`, which allows internal flexibilit
 m <- cosinor(rDYX ~ hour, twins, tau = c(24, 12))
 summary(m)
 ggcosinor(m)
+
+head(augment(m))
 ```
 

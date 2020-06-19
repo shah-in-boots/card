@@ -825,7 +825,7 @@ cosinor_features <- function(object, ...) {
 	trough <- min(fit$y)
 
 	# Global Amplitude
-	ampGlobal <- (peak + trough)/2
+	ampGlobal <- (peak - trough)/2
 
 	list(
 		harmonic = harmonic,

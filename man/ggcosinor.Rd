@@ -2,21 +2,22 @@
 % Please edit documentation in R/cosinor-constructor.R
 \name{ggcosinor}
 \alias{ggcosinor}
+\alias{ggmulticosinor}
 \title{ggplot of cosinor model}
 \usage{
 ggcosinor(object, labels = TRUE, ...)
+
+ggmulticosinor(object, labels, ...)
 }
 \arguments{
-\item{object}{Model of class \code{cosinor}.}
+\item{object}{Model of class \code{cosinor}. If instead of a single cosinor model,
+multiple objects are to be plotted, can provide a list of cosinor models.
+Plotting multiple models simultaneously is preferred if the outcome
+variable is similar in scale.}
 
 \item{labels}{Logical value if annotations should be placed on plot, default
-= TRUE. If using a multiple cosinor, the terms are different and will not
-be plotted.
-\itemize{
-\item M = midline estimating statistic of rhythm
-\item A = amplitude
-\item P = phi or acrophase (shift from 0 to crest)
-}}
+= TRUE. The labels depend on the type of plot. The labels are attempted to
+be placed "smartly" using the \code{\link[ggrepel:geom_label_repel]{ggrepel::geom_label_repel()}} function.}
 
 \item{...}{For extensibility. This function will use different
 implementations based on the type of model (single or multiple component).
@@ -28,5 +29,34 @@ Object of class \code{ggplot} that can be layered
 \description{
 ggplot of cosinor model that can visualize a variety of cosinor
 model subtypes, including single-component, multiple-component, individual,
-and population cosinor models, built using \link[card:cosinor]{card::cosinor}.
+and population cosinor models, built using \link[card:cosinor]{card::cosinor}. For single
+component cosinor, the following values are plotted:
+\itemize{
+\item M = midline estimating statistic of rhythm
+\item A = amplitude
+\item P = phi or acrophase (shift from 0 to peak)
+}
+
+If using a multiple-component cosinor, the terms are different. If the
+periods or frequencies resonate or are harmonic, then the following are
+calculated. If the periods are not harmonic, the values are just
+descriptors of the curve.
+\itemize{
+\item M = midline estimating statistic of rhythm
+\item Ag = global amplitude, which is the distance between peak and trough
+(this is the same value as the amplitude from single component)
+\item Po = orthophase (the equivalent of the acrophase in a single component),
+the lag time to peak value
+\item Pb = bathyphase, the lag time to trough value
+}
+}
+\examples{
+\donttest{
+data(triplets)
+m1 <- cosinor(rDYX ~ hour, twins, tau = 24)
+m2 <- cosinor(rDYX ~ hour, twins, tau = c(24, 12))
+ggcosinor(m1, labels = FALSE)
+ggcosinor(m2)
+ggcosinor(list(single = m1, multiple = m2))
+}
 }
