@@ -1,5 +1,3 @@
-# HRV Linear Modeling {{{ ====
-
 #' @title HRV Linear Modeling
 #' @description `hrv_linear_model` Linear models for each HRV measure.
 #' @details Linear models built with dependent variable being the HRV measures
@@ -46,10 +44,6 @@ hrv_linear_model <-
     # Return models
     return(m)
   }
-
-# }}}
-
-# Model Building {{{ ====
 
 #' @title Model Building
 #'
@@ -135,34 +129,23 @@ build_sequential_models <- function(formula, data, exposure = NULL, engine = "lm
 
 }
 
-# }}}
-
-# Plotting Error of Models {{{ ====
-
 #' @title Plotting Error of Models
-#'
-#' @description Creates a ggplot geom that can be extended
-#' and accept other ggplot layers. Shows residual error from the regression mean
-#' for different types of regression models.
-#'
+#' @description Creates a ggplot geom that can be extended and accept other
+#'   ggplot layers. Shows residual error from the regression mean for different
+#'   types of regression models.
 #' @details Generate residuals for models. Currently accepts only linear models.
 #'   Does not account for covariates yet, although may be able to do this in the
 #'   future.
-#'
 #' @param model Model to be analyzed. The function will detect what type of
 #'   family the model is (e.g. linear = "gaussian", logistic = "binomial") and
 #'   plot the appropriate type of model.
-#'
 #' @return Returns a ggplot object of geom type, other layers can be added on as
 #'   seen in example.
-#'
 #' @examples
 #' data("twins")
 #' model <- lm(beck_total ~ HR, data = subset(twins, hour == 7))
 #' ggerror(model)
-#'
 #' @import ggplot2
-#'
 #' @export
 ggerror <- function(model) {
 
@@ -206,23 +189,16 @@ ggerror <- function(model) {
   return(gg)
 }
 
-# }}}
-
-# Plotting Residual of a Model {{{ ====
-
 #' @title Plotting Residual of a Model
-#'
-#' @description
-#' `geom_residuals` makes a diagnostic plot of residuals versus fitted data for linear models. Does not yet accept logistic models
-#'
-#' @details Generate residuals versus fitted plot. Functions as an additional geom layer on ggplot. Models must be linear/gaussian in nature. Covariates can be included in the model.
-#'
+#' @description `geom_residuals` makes a diagnostic plot of residuals versus
+#' fitted data for linear models. Does not yet accept logistic models
+#' @details Generate residuals versus fitted plot. Functions as an additional
+#'   geom layer on ggplot. Models must be linear/gaussian in nature. Covariates
+#'   can be included in the model.
 #' @param model Model to be analyzed, currently only accepts linear models.
-#'
-#' @return Returns a ggplot object of geom type, other layers can be added on as seen in example.
-#'
+#' @return Returns a ggplot object of geom type, other layers can be added on as
+#'   seen in example.
 #' @import ggplot2
-#'
 #' @export
 geom_residuals <- function(model) {
   # Augment model
@@ -251,5 +227,3 @@ geom_residuals <- function(model) {
     theme_minimal()
   )
 }
-
-# }}}

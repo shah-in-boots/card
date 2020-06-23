@@ -1,5 +1,3 @@
-# Compare Repeated Measurements by Group {{{ ====
-
 #' @title Compare Repeated Measurements by Group
 #'
 #' @description Takes data and returns a summary table of continuous

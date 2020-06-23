@@ -1,5 +1,3 @@
-# Process Toolbox HRV {{{ ====
-
 #' @title Process Toolbox HRV
 #'
 #' @description Takes the output from HRV Toolbox and converts it for analysis.
@@ -28,8 +26,6 @@
 #'   percent missing (e.g. 20.0% missing data) by time group.
 #'
 #' @importFrom data.table data.table .N .I .SD .BY fread :=
-#'
-#' @export
 proc_hrv_matlab <- function(loc, name, time = 3600) {
 
   # Selected variables from HRV analysis
@@ -65,10 +61,6 @@ proc_hrv_matlab <- function(loc, name, time = 3600) {
   return(z)
 }
 
-# }}}
-
-# Read in Toolbox HRV {{{ ====
-
 #' @title Read in Toolbox HRV
 #'
 #' @description Takes the output from HRV Toolbox and reads it in for an
@@ -92,8 +84,6 @@ proc_hrv_matlab <- function(loc, name, time = 3600) {
 #'   percent missing (e.g. 20.0% missing data) by time group.
 #'
 #' @importFrom data.table data.table .N .I .SD .BY fread :=
-#'
-#' @export
 read_hrv_matlab <- function(loc, name) {
 
   # Selected variables from HRV analysis
@@ -111,6 +101,3 @@ read_hrv_matlab <- function(loc, name) {
   # Return data table
   return(x)
 }
-
-
-# }}}

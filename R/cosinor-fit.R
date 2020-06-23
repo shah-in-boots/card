@@ -6,7 +6,7 @@
 #' @noRd
 cosinor_impl <- function(predictors, outcomes, tau) {
 
-  ### Parameters for normal equations {{{ ====
+  ### Parameters for normal equations
 
   # Formal equation
   # y(t) = M + A*cos(2*pi*t/tau + phi)
@@ -71,9 +71,7 @@ cosinor_impl <- function(predictors, outcomes, tau) {
   xmat <- stats::model.matrix(f, m)
   ymat <- as.matrix(y)
 
-  # }}}
-
-  ### Solving for coefficients {{{ ====
+  ### Solving for coefficients
 
   # Solve for coefficients, including amplitude and acrophase
   coefs <- solve(t(xmat) %*% xmat) %*% t(xmat) %*% ymat
@@ -119,9 +117,7 @@ cosinor_impl <- function(predictors, outcomes, tau) {
   df <- data.frame(mesor = mesor, matrix(unlist(pars), ncol = length(pars), byrow = FALSE))
   yhat <- rowSums(df)
 
-  # }}}
-
-  ### Model Output {{{ ====
+  ### Model Output
 
   # Model coefficients
   coef_names <- names(coefs)
@@ -150,7 +146,6 @@ cosinor_impl <- function(predictors, outcomes, tau) {
 
   )
 
-  # }}}
 }
 
 ## Population Mean Cosinor Implementation
@@ -160,7 +155,7 @@ cosinor_impl <- function(predictors, outcomes, tau) {
 #' @noRd
 cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
 
-  ### Population cosinor parameter setup {{{ ====
+  ### Population cosinor parameter setup
 
   # Period
   p <- length(tau) # Number of parameters ... single cosinor ~ 2p + 1 = 3
@@ -203,9 +198,7 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
     })
   )
 
-  ## }}}
-
-  ### Coefficients {{{ ====
+  ### Coefficients
 
   # Fits of individual cosinors
   kfits <- sapply(kCosinors, stats::fitted)
@@ -255,10 +248,7 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
 
   }
 
-
-  ## }}}
-
-  ### Model output {{{ ====
+  ### Model output
 
   # Fitted values
   # y(t) = M + A*cos(2*pi*t/tau + phi)
@@ -286,8 +276,6 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
     xmat = xmat
 
   )
-  ## }}}
-
 
 }
 
@@ -793,48 +781,105 @@ cosinor_area <- function(object, level = 0.95, ...) {
 #'
 #' @details These calculations can only occur if the periods of the cosinor are harmonic - as in, the longest period is a integer multiple of the smallest period (known as the fundamental frequency). Otherwise, these statistics are not accurate or interpretable.
 #' @param object Model of class `cosinor` with multiple periods
+#' @param population If the object is a population cosinor, should the features be calculated for the individual cosinors or for the population-cosinors. Default is TRUE. This has no effect on "Individual" cosinor objects.
+#'
+#'    * If TRUE, then will calculate features for entire population.
+#'
+#'    * If FALSE, then will calculate features for every individual cosinor in the population.
 #' @param ... For extensibility
-#' @return List of features
+#' @return When returning the cosinor features for a single model, will return an object of class `list`. When returning the cosinor features for every individual in a population cosinor, will return an object of class `tibble`.
+#' @examples
+#' data(twins)
+#' model <- cosinor(rDYX ~ hour, twins, c(24, 8), "patid")
+#' results <- cosinor_features(model, population = FALSE)
+#' head(results)
 #' @export
-cosinor_features <- function(object, ...) {
+cosinor_features <- function(object, population = TRUE, ...) {
 
 	# Is multiple component and harmonic?
 	tau <- object$tau
+	p <- length(tau)
 	harmonic <- ifelse(length(tau) > 1 & max(tau) %% min(tau) == 0, TRUE, FALSE)
 	if(harmonic) {
 		message("This is a harmonic multiple-component cosinor object. The orthophase, bathyphase, and global amplitude were calculated.")
 	}
 
-	# Object model
-	aug <- augment(object)
-	n <- nrow(aug)
+	# Function to repeat internally
+	features <- function(z) {
 
-	# Create a spline to find vallues
-	f <- stats::splinefun(x = unique(aug$t), y = unique(aug$.fitted), method = "natural")
-	xs <- seq(min(aug$t), max(aug$t), length.out = n)
-	ys <- f(xs)
-	fit <- tibble::tibble(x = xs, y = ys)
-	orthophase <- fit$x[which.max(fit$y)]
+			f <- stats::splinefun(
+				x = z$t, y = z$.fitted, method = "natural"
+			)
+			n <- nrow(z)
+			xs <- seq(min(z$t), max(z$t), length.out = n)
+			ys <- f(xs)
+			fit <- tibble::tibble(x = xs, y = ys)
 
-	# Orthophase
-	orthophase <- fit$x[which.max(fit$y)]
-	peak <- max(fit$y)
+			# Return
+			res <- list(
+				harmonic = harmonic,
+				peak = max(fit$y),
+				trough = min(fit$y),
+				ampGlobal = (max(fit$y) - min(fit$y))/2,
+				orthophase = fit$x[which.max(fit$y)],
+				bathyphase = fit$x[which.min(fit$y)]
+			)
 
-	# Bathyphase
-	bathyphase <- fit$x[which.min(fit$y)]
-	trough <- min(fit$y)
+			return(res)
+	}
 
-	# Global Amplitude
-	ampGlobal <- (peak - trough)/2
+	# Get features for each type
+	if(object$type == "Individual") {
+		# Object model
+		aug <- augment(object)
 
-	list(
-		harmonic = harmonic,
-		ampGlobal = ampGlobal,
-		peak = peak,
-		trough = trough,
-		orthophase = orthophase,
-		bathyphase = bathyphase
-	)
+		results <- features(aug)
+
+	} else if(object$type == "Population" & population) {
+		# Object
+		aug <- augment(object)
+
+		# Overall fit based on coefficients
+			# y = M + amp * cos(2*pi*t / period + phi)
+		names(object$coefficients) <- object$coef_names
+		coefs <- object$coefficients
+
+	  pars <- list()
+	  for(i in 1:p) {
+			pars[[i]] <-
+				coefs[paste0("amp", i)] *
+				cos(2*pi*aug$t / tau[i] + coefs[paste0("phi", i)])
+	  }
+
+	  df <- if(p == 1) {
+		  data.frame(cbind(mesor = coefs["mesor"], pars = unlist(pars)))
+	  } else if(p > 1) {
+	  	data.frame(
+	  		mesor = coefs["mesor"],
+	  		matrix(unlist(pars), ncol = length(pars), byrow = TRUE)
+	  	)
+	  }
+	  yhat <- rowSums(df)
+	  aug$.fitted <- yhat
+
+	  results <- features(aug)
+
+	} else if(!(object$type == "Population" & population)) {
+
+		# Object
+		aug <- augment(object)
+
+		# Fits are based on individuals, already made from original pop-cosinor
+		results <-
+			aug %>%
+			tidyr::nest(models = -population) %>%
+			dplyr::mutate(purrr::map_df(models, features)) %>%
+			dplyr::select(-models)
+
+	}
+
+	# Return
+	return(results)
 
 }
 

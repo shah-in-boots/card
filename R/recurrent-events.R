@@ -2,15 +2,23 @@
 
 #' @title Recurrent Survival Data Format
 #'
-#' @description Reformats recurrent event data (wide) into different models for survival analysis, but can also be used for simple survival analysis tables as well. Importantly, for large datasets, this function will show significant slow-down since it uses an intuitive approach on defining the datasets. Future iterations will create a vectorized approach that should provide performance speed-ups.
+#' @description Reformats recurrent event data (wide) into different models for
+#'   survival analysis, but can also be used for simple survival analysis tables
+#'   as well. Importantly, for large datasets, this function will show
+#'   significant slow-down since it uses an intuitive approach on defining the
+#'   datasets. Future iterations will create a vectorized approach that should
+#'   provide performance speed-ups.
 #'
-#'   * For recurrent events, the final censoring event can include death, or can be ignored if its not considered a failure event.
+#'   * For recurrent events, the final censoring event can include death, or can
+#'   be ignored if its not considered a failure event.
 #'
-#'   * For simple survival analysis, death censoring should be left as NULL, and the event (e.g. "date_of_death"), should be used as a single `event.dates` parameter. The function will do the rest.
+#'   * For simple survival analysis, death censoring should be left as NULL, and
+#'   the event (e.g. "date_of_death"), should be used as a single `event.dates`
+#'   parameter. The function will do the rest.
 #'
 #' @details This function takes every data event date, and creates several types
-#' of recurrent event tables. It orders the data chronologically for repeat
-#' events. Currently does marginal and conditional A and B models. The large
+#'   of recurrent event tables. It orders the data chronologically for repeat
+#'   events. Currently does marginal and conditional A and B models. The large
 #'
 #' @param data A dataframe containing the subsequent parameters
 #'

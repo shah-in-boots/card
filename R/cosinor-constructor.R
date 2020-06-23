@@ -63,6 +63,7 @@
 #' # Formula interface
 #' model <- cosinor(rDYX ~ hour, twins, tau = 24)
 #'
+#' @family cosinor
 #' @export
 cosinor <- function(t, ...) {
   UseMethod("cosinor")
@@ -404,6 +405,7 @@ generics::augment
 #' @param ... For extensibility
 #' @return a `tibble` object
 #' @export
+#' @family cosinor
 augment.cosinor <- function(x, ...) {
 
   # Add fitted and residual values
@@ -571,6 +573,7 @@ ggellipse <- function(object, level = 0.95, ...) {
 #' ggcosinor(list(single = m1, multiple = m2))
 #' }
 #' @import ggplot2
+#' @family cosinor
 #' @export
 ggcosinor <- function(object, labels = TRUE, ...) {
 
@@ -852,8 +855,8 @@ ggcosinor <- function(object, labels = TRUE, ...) {
 
 }
 
-#' @export
-#' @rdname ggcosinor
+#' @noRd
+#' @family cosinor
 ggmulticosinor <- function(object, labels, ...) {
 
 	# Number of cosinor objects

@@ -1,5 +1,3 @@
-# Read in VivaLNK Patch Data {{{ ====
-
 #' @title Read in VivaLNK Patch Data
 #'
 #' @description Reads in VivaLNK log files and helps to organize the summary
@@ -16,8 +14,6 @@
 #' @return Returns a simple data frame with the start and endtime of the ECG
 #'   data. Has several additional markers available internally, but currently
 #'   not called.
-#'
-#' @export
 proc_patch_vivalnk <- function(name, loc) {
   # On exit options parameters
   oldopts <- options()
@@ -72,7 +68,3 @@ proc_patch_vivalnk <- function(name, loc) {
   x <- list(startTime, endTime, lengthECG)
   return(x)
 }
-
-# }}}
-
-# }}}
