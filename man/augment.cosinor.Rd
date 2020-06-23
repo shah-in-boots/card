@@ -17,3 +17,9 @@ a \code{tibble} object
 \description{
 Augment accepts a \code{cosinor} model object and adds information about each observation in the dataset. This includes the predicted values in the \code{.fitted} column and the residuals in the \code{.resid} column. New columns always begin with a \code{.} prefix to avoid overwriting columns in original dataset.
 }
+\seealso{
+Other cosinor: 
+\code{\link{cosinor}()},
+\code{\link{ggcosinor}()}
+}
+\concept{cosinor}

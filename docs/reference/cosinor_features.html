@@ -133,7 +133,7 @@ Bathyphase (Pb) =  the lag until the trough time
 
     </div>
 
-    <pre class="usage"><span class='fu'>cosinor_features</span>(<span class='no'>object</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>cosinor_features</span>(<span class='no'>object</span>, <span class='kw'>population</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -143,6 +143,13 @@ Bathyphase (Pb) =  the lag until the trough time
       <td><p>Model of class <code>cosinor</code> with multiple periods</p></td>
     </tr>
     <tr>
+      <th>population</th>
+      <td><p>If the object is a population cosinor, should the features be calculated for the individual cosinors or for the population-cosinors. Default is TRUE. This has no effect on "Individual" cosinor objects.</p><ul>
+<li><p>If TRUE, then will calculate features for entire population.</p></li>
+<li><p>If FALSE, then will calculate features for every individual cosinor in the population.</p></li>
+</ul></td>
+    </tr>
+    <tr>
       <th>...</th>
       <td><p>For extensibility</p></td>
     </tr>
@@ -150,11 +157,22 @@ Bathyphase (Pb) =  the lag until the trough time
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>List of features</p>
+    <p>When returning the cosinor features for a single model, will return an object of class <code>list</code>. When returning the cosinor features for every individual in a population cosinor, will return an object of class <code>tibble</code>.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>These calculations can only occur if the periods of the cosinor are harmonic - as in, the longest period is a integer multiple of the smallest period (known as the fundamental frequency). Otherwise, these statistics are not accurate or interpretable.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>twins</span>)
+<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cosinor.html'>cosinor</a></span>(<span class='no'>rDYX</span> ~ <span class='no'>hour</span>, <span class='no'>twins</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>24</span>, <span class='fl'>8</span>), <span class='st'>"patid"</span>)</div><div class='output co'>#&gt; <span class='message'>23 subjects were removed due to having insufficient observations.</span></div><div class='input'><span class='no'>results</span> <span class='kw'>&lt;-</span> <span class='fu'>cosinor_features</span>(<span class='no'>model</span>, <span class='kw'>population</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='message'>This is a harmonic multiple-component cosinor object. The orthophase, bathyphase, and global amplitude were calculated.</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>results</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 6 x 6</span><span>
+#&gt;   harmonic  peak trough ampGlobal orthophase bathyphase
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> TRUE      3.35   1.81     0.768      23          12  
+#&gt; </span><span style='color: #555555;'>2</span><span> TRUE      3.05   2.25     0.398       3.71       15.9
+#&gt; </span><span style='color: #555555;'>3</span><span> TRUE      2.96   2.30     0.330      10.4        23.0
+#&gt; </span><span style='color: #555555;'>4</span><span> TRUE      4.23   2.41     0.909      13           1  
+#&gt; </span><span style='color: #555555;'>5</span><span> TRUE      2.64   2.19     0.222       9          21  
+#&gt; </span><span style='color: #555555;'>6</span><span> TRUE      3.85   2.50     0.671      14           2  </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

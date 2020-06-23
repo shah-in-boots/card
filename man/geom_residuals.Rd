@@ -10,11 +10,15 @@ geom_residuals(model)
 \item{model}{Model to be analyzed, currently only accepts linear models.}
 }
 \value{
-Returns a ggplot object of geom type, other layers can be added on as seen in example.
+Returns a ggplot object of geom type, other layers can be added on as
+seen in example.
 }
 \description{
-\code{geom_residuals} makes a diagnostic plot of residuals versus fitted data for linear models. Does not yet accept logistic models
+\code{geom_residuals} makes a diagnostic plot of residuals versus
+fitted data for linear models. Does not yet accept logistic models
 }
 \details{
-Generate residuals versus fitted plot. Functions as an additional geom layer on ggplot. Models must be linear/gaussian in nature. Covariates can be included in the model.
+Generate residuals versus fitted plot. Functions as an additional
+geom layer on ggplot. Models must be linear/gaussian in nature. Covariates
+can be included in the model.
 }

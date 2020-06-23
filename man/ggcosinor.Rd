@@ -2,12 +2,9 @@
 % Please edit documentation in R/cosinor-constructor.R
 \name{ggcosinor}
 \alias{ggcosinor}
-\alias{ggmulticosinor}
 \title{ggplot of cosinor model}
 \usage{
 ggcosinor(object, labels = TRUE, ...)
-
-ggmulticosinor(object, labels, ...)
 }
 \arguments{
 \item{object}{Model of class \code{cosinor}. If instead of a single cosinor model,
@@ -60,3 +57,9 @@ ggcosinor(m2)
 ggcosinor(list(single = m1, multiple = m2))
 }
 }
+\seealso{
+Other cosinor: 
+\code{\link{augment.cosinor}()},
+\code{\link{cosinor}()}
+}
+\concept{cosinor}

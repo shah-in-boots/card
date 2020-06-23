@@ -33,17 +33,13 @@ reference:
   - contains("cosinor")
 - title: Circadian Rhythm
 - contents:
-  - starts_with("circ_")
-  - ggcircadian
+  - contains("circ_")
   - ggforest
 - title: Recurrent Events
 - contents:
   - starts_with("recur_")
 - title: Electrocardiography
 - contents:
-  - read_hrv_matlab
-  - proc_hrv_matlab
-  - proc_patch_vivalnk
   - hrv_linear_model
   - build_sequential_models
   - ggerror

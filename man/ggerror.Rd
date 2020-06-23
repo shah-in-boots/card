@@ -16,9 +16,9 @@ Returns a ggplot object of geom type, other layers can be added on as
 seen in example.
 }
 \description{
-Creates a ggplot geom that can be extended
-and accept other ggplot layers. Shows residual error from the regression mean
-for different types of regression models.
+Creates a ggplot geom that can be extended and accept other
+ggplot layers. Shows residual error from the regression mean for different
+types of regression models.
 }
 \details{
 Generate residuals for models. Currently accepts only linear models.
@@ -29,5 +29,4 @@ future.
 data("twins")
 model <- lm(beck_total ~ HR, data = subset(twins, hour == 7))
 ggerror(model)
-
 }
