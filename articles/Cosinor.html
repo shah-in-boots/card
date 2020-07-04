@@ -136,7 +136,14 @@
 <span class="co">#&gt; mesor  2.8604855 0.006098624</span>
 <span class="co">#&gt; amp1   0.2986101 0.008746706</span>
 <span class="co">#&gt; phi1  -2.6687044 0.028860014</span>
+
+<span class="co"># Plot</span>
+<span class="fu"><a href="../reference/ggcosinor.html">ggcosinor</a></span>(<span class="kw">m</span>, labels = <span class="fl">TRUE</span>)
+<span class="co">#&gt; Warning in regularize.values(x, y, ties, missing(ties)): collapsing to unique</span>
+<span class="co">#&gt; 'x' values</span>
+<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span>
 </pre></div>
+<p><img src="Cosinor_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 <p>More complex models can also be made using multiple components, which is represented by additional, user-defined periods.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit">
 <span class="co"># Model</span>
@@ -162,7 +169,15 @@
 <span class="co">#&gt; amp2   0.1302012 0.008542526</span>
 <span class="co">#&gt; phi1  -2.6542757 0.028911445</span>
 <span class="co">#&gt; phi2  -3.6636921 0.065235427</span>
+
+<span class="co"># Plot</span>
+<span class="fu"><a href="../reference/ggcosinor.html">ggcosinor</a></span>(<span class="kw">m</span>, labels = <span class="fl">TRUE</span>)
+<span class="co">#&gt; This is a harmonic multiple-component cosinor object. The orthophase, bathyphase, and global amplitude were calculated.</span>
+<span class="co">#&gt; Warning in regularize.values(x, y, ties, missing(ties)): collapsing to unique</span>
+<span class="co">#&gt; 'x' values</span>
+<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span>
 </pre></div>
+<p><img src="Cosinor_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <p>And, these models can be repeated for an entire population if warranted.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit">
 <span class="co"># Model</span>
