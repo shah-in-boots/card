@@ -126,7 +126,7 @@
 <p>The goal of <code>card</code> is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools. Its developed to fit a <em>tidy</em> approach to statistical analysis.</p>
 <p>The areas of focus of this package are the following:</p>
 <ul>
-<li>cardiovascular disease</li>
+<li>cardiovascular hemodynamics</li>
 <li>circadian rhythms</li>
 <li>electrocardiography (heart rate variability and morphology)</li>
 <li>signal processing</li>
@@ -253,9 +253,24 @@
 <span class="co">#&gt; phi2  -3.6636921 0.065235427</span>
 <span class="fu"><a href="https://rdrr.io/pkg/card/man/ggcosinor.html">ggcosinor</a></span>(<span class="kw">m</span>)
 <span class="co">#&gt; This is a harmonic multiple-component cosinor object. The orthophase, bathyphase, and global amplitude were calculated.</span>
+<span class="co">#&gt; Warning in regularize.values(x, y, ties, missing(ties)): collapsing to unique</span>
+<span class="co">#&gt; 'x' values</span>
 <span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span>
 </pre></div>
 <p><img src="man/figures/unnamed-chunk-6-1.png" width="100%"></p>
+<div class="sourceCode" id="cb6"><pre class="downlit">
+
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span>(<span class="kw">m</span>))
+<span class="co">#&gt; # A tibble: 6 x 8</span>
+<span class="co">#&gt;       y     t     x1        x2        z1        z2 .fitted .resid</span>
+<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt; 1  2.63     8 -0.500 -5.00e- 1  8.66e- 1 -8.66e- 1    3.22 -0.592</span>
+<span class="co">#&gt; 2  2.42     9 -0.707 -1.84e-16  7.07e- 1 -1.00e+ 0    3.21 -0.787</span>
+<span class="co">#&gt; 3  1.81    10 -0.866  5.00e- 1  5.00e- 1 -8.66e- 1    3.15 -1.34 </span>
+<span class="co">#&gt; 4  2.01    11 -0.966  8.66e- 1  2.59e- 1 -5.00e- 1    3.08 -1.07 </span>
+<span class="co">#&gt; 5  1.63    12 -1      1.00e+ 0  1.22e-16 -2.45e-16    3.01 -1.38 </span>
+<span class="co">#&gt; 6  1.95    13 -0.966  8.66e- 1 -2.59e- 1  5.00e- 1    2.95 -0.996</span>
+</pre></div>
 </div>
 </div>
 </div>

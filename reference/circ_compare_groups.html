@@ -166,7 +166,13 @@ graphed in <a href='https://rdrr.io/pkg/card/man/ggcircadian.html'>card::ggcirca
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"twins"</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/card/man/circ_compare_groups.html'>circ_compare_groups</a></span>(data = <span class='kw'>twins</span>, x = <span class='st'>"rDYX"</span>, y = <span class='st'>"sad_cat"</span>, time = <span class='st'>"hour"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 120 x 6</span><span>
+<span class='fu'><a href='https://rdrr.io/pkg/card/man/circ_compare_groups.html'>circ_compare_groups</a></span>(data = <span class='kw'>twins</span>, x = <span class='st'>"rDYX"</span>, y = <span class='st'>"sad_cat"</span>, time = <span class='st'>"hour"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: `...` is not empty.</span>
+#&gt; <span class='warning'></span>
+#&gt; <span class='warning'>We detected these problematic arguments:</span>
+#&gt; <span class='warning'>* `needs_dots`</span>
+#&gt; <span class='warning'></span>
+#&gt; <span class='warning'>These dots only exist to allow future extensions and should be empty.</span>
+#&gt; <span class='warning'>Did you misspecify an argument?</span></div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 120 x 6</span><span>
 #&gt;    hour  sad_cat  mean     n    sd     se
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'> 1</span><span> 8     bdi_I    3.22   426 0.780 0.037</span><span style='text-decoration: underline;'>8</span><span>

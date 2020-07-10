@@ -160,7 +160,7 @@ predictor.</p></td>
 
     <p>A tidy tibble of models. Each one will likely be grouped by its
 outcome, and then with sequential columns using increased/additive models.
-Each model, in a <a href='https://rdrr.io/pkg/generics/man/tidy.html'>broom::tidy</a> format, will have two additional columns.</p><ul>
+Each model, in a tidy format, will have two additional columns.</p><ul>
 <li><p><code>outcomes</code> identifies which outcome was used for the specific regression</p></li>
 <li><p><code>covar</code> number of covariates used in sequence of predictors given, with
 exposure always being placed in position 1</p></li>
@@ -177,7 +177,13 @@ changes in the process, and potential future dependencies on the
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>geh</span>)
 <span class='kw'>f</span> <span class='op'>&lt;-</span> <span class='kw'>svg_mag</span> <span class='op'>+</span> <span class='kw'>qrs_tang</span> <span class='op'>~</span> <span class='kw'>lab_hba1c</span> <span class='op'>+</span> <span class='kw'>bmi</span>
-<span class='fu'><a href='https://rdrr.io/pkg/card/man/build_sequential_models.html'>build_sequential_models</a></span>(<span class='kw'>f</span>, data = <span class='kw'>geh</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 10 x 9</span><span>
+<span class='fu'><a href='https://rdrr.io/pkg/card/man/build_sequential_models.html'>build_sequential_models</a></span>(<span class='kw'>f</span>, data = <span class='kw'>geh</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: `...` is not empty.</span>
+#&gt; <span class='warning'></span>
+#&gt; <span class='warning'>We detected these problematic arguments:</span>
+#&gt; <span class='warning'>* `needs_dots`</span>
+#&gt; <span class='warning'></span>
+#&gt; <span class='warning'>These dots only exist to allow future extensions and should be empty.</span>
+#&gt; <span class='warning'>Did you misspecify an argument?</span></div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 10 x 9</span><span>
 #&gt;    outcomes term  estimate std.error statistic  p.value conf.low conf.high covar
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'> 1</span><span> svg_mag  (Int…  4.20</span><span style='color: #555555;'>e</span><span>+3   243.      17.3    1.89</span><span style='color: #555555;'>e</span><span style='color: #BB0000;'>-52</span><span> </span><span style='text-decoration: underline;'>3</span><span>724.     </span><span style='text-decoration: underline;'>4</span><span>678.        1
