@@ -22,7 +22,7 @@ predictor.}
 \value{
 A tidy tibble of models. Each one will likely be grouped by its
 outcome, and then with sequential columns using increased/additive models.
-Each model, in a \link[broom:tidy]{broom::tidy} format, will have two additional columns.
+Each model, in a tidy format, will have two additional columns.
 \itemize{
 \item \code{outcomes} identifies which outcome was used for the specific regression
 \item \code{covar} number of covariates used in sequence of predictors given, with

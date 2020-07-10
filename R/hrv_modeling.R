@@ -69,7 +69,7 @@ hrv_linear_model <-
 #'
 #' @return A tidy tibble of models. Each one will likely be grouped by its
 #'   outcome, and then with sequential columns using increased/additive models.
-#'   Each model, in a [broom::tidy] format, will have two additional columns.
+#'   Each model, in a tidy format, will have two additional columns.
 #'
 #'   * `outcomes` identifies which outcome was used for the specific regression
 #'

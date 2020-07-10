@@ -27,7 +27,7 @@ statistical analysis.
 
 The areas of focus of this package are the following:
 
-  - cardiovascular disease
+  - cardiovascular hemodynamics
   - circadian rhythms
   - electrocardiography (heart rate variability and morphology)
   - signal processing
@@ -167,7 +167,23 @@ summary(m)
 #> phi2  -3.6636921 0.065235427
 ggcosinor(m)
 #> This is a harmonic multiple-component cosinor object. The orthophase, bathyphase, and global amplitude were calculated.
+#> Warning in regularize.values(x, y, ties, missing(ties)): collapsing to unique
+#> 'x' values
 #> `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'
 ```
 
 <img src="man/figures/unnamed-chunk-6-1.png" width="100%" />
+
+``` r
+
+head(augment(m))
+#> # A tibble: 6 x 8
+#>       y     t     x1        x2        z1        z2 .fitted .resid
+#>   <dbl> <dbl>  <dbl>     <dbl>     <dbl>     <dbl>   <dbl>  <dbl>
+#> 1  2.63     8 -0.500 -5.00e- 1  8.66e- 1 -8.66e- 1    3.22 -0.592
+#> 2  2.42     9 -0.707 -1.84e-16  7.07e- 1 -1.00e+ 0    3.21 -0.787
+#> 3  1.81    10 -0.866  5.00e- 1  5.00e- 1 -8.66e- 1    3.15 -1.34 
+#> 4  2.01    11 -0.966  8.66e- 1  2.59e- 1 -5.00e- 1    3.08 -1.07 
+#> 5  1.63    12 -1      1.00e+ 0  1.22e-16 -2.45e-16    3.01 -1.38 
+#> 6  1.95    13 -0.966  8.66e- 1 -2.59e- 1  5.00e- 1    2.95 -0.996
+```

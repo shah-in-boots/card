@@ -48,7 +48,8 @@ Imports:
     data.table,
     Hmisc,
     generics,
-    methods
+    methods,
+    ggrepel
 Suggests:
     kableExtra,
     plyr,
@@ -56,6 +57,5 @@ Suggests:
     knitr,
     rmarkdown,
     covr,
-    testthat,
-    ggrepel
+    testthat
 VignetteBuilder: knitr

@@ -30,7 +30,7 @@ The goal of `card` is to create functions and analytical approaches in neurocard
 
 The areas of focus of this package are the following:
 
-- cardiovascular disease
+- cardiovascular hemodynamics
 - circadian rhythms
 - electrocardiography (heart rate variability and morphology)
 - signal processing
