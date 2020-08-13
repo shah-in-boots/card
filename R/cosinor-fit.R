@@ -511,18 +511,6 @@ cosinor_zero_amplitude <- function(object, level = 0.95) {
 	# Statistical significance by F test
 	fstat <- (MSS / 2) / (RSS / (n - 3))
 
-	# Output
-	cat("Zero Amplitude Test: \n\n")
-	cat(paste0("F-statistic: ", round(fstat, 3)))
-	cat("\n")
-	cat(paste0("F-level at ", level*100, "% confidence level: ", round(fdist, 3)))
-	cat("\n")
-	if(fstat > fdist) {
-		cat("Rhythm detected by F-test.\n\n")
-	} else {
-		cat("Rhythm not detected by F-test.\n\n")
-	}
-
 	# Return
 	list(
 		fstat = fstat,
@@ -719,7 +707,7 @@ cosinor_area <- function(object, level = 0.95, ...) {
     (diff(range(gseq)) >= max(gseq)) &
       ((diff(range(bs1)) >= max(bs1)) | (diff(range(bs2)) >= max(bs2)))
   ) {
-    print("Confidence regions overlap the poles. Confidence intervals for amplitude and acrophase cannot be determined.")
+    message("Confidence regions overlap the poles. Confidence intervals for amplitude and acrophase cannot be determined.")
   } else {
 
     # CI for Amplitude
