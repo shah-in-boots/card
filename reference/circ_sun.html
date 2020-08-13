@@ -133,7 +133,7 @@ calculations. Requires geographic position in latitude and longitude to
 calculate sunrise or sunset. Uses the function <a href='https://andyteucher.ca/lutz/reference/tz_lookup_coords.html'>lutz::tz_lookup_coords</a>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/card/man/circ_sun.html'>circ_sun</a></span>(<span class='kw'>date</span>, <span class='kw'>lat</span>, <span class='kw'>lon</span>, zenith = <span class='st'>"official"</span>, sunset = <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>circ_sun</span>(<span class='kw'>date</span>, <span class='kw'>lat</span>, <span class='kw'>lon</span>, zenith = <span class='st'>"official"</span>, sunset = <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -181,7 +181,7 @@ strip the time zone away.</p>
 <span class='kw'>twins</span><span class='op'>$</span><span class='kw'>lon</span> <span class='op'>&lt;-</span> <span class='op'>-</span><span class='fl'>84.388</span>
 
 <span class='co'># Using latitude/longitude from Atlanta, GA, USA</span>
-<span class='kw'>twins</span><span class='op'>$</span><span class='kw'>sunrise</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/card/man/circ_sun.html'>circ_sun</a></span>(<span class='kw'>twins</span><span class='op'>$</span><span class='kw'>date</span>, <span class='kw'>twins</span><span class='op'>$</span><span class='kw'>lat</span>, <span class='kw'>twins</span><span class='op'>$</span><span class='kw'>lon</span>)
+<span class='kw'>twins</span><span class='op'>$</span><span class='kw'>sunrise</span> <span class='op'>&lt;-</span> <span class='fu'>circ_sun</span>(<span class='kw'>twins</span><span class='op'>$</span><span class='kw'>date</span>, <span class='kw'>twins</span><span class='op'>$</span><span class='kw'>lat</span>, <span class='kw'>twins</span><span class='op'>$</span><span class='kw'>lon</span>)
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

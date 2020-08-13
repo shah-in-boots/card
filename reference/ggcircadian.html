@@ -124,12 +124,12 @@ variable). Each hour is then separated by the grouping variable." />
 
     <div class="ref-description">
     <p>Converts the output of
-<a href='https://rdrr.io/pkg/card/man/circ_compare_groups.html'>card::circ_compare_groups</a> into a complex geom
+<a href='circ_compare_groups.html'>card::circ_compare_groups</a> into a complex geom
 that is broken down by time/hour and HRV (or any other continuous
 variable). Each hour is then separated by the grouping variable.</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/card/man/ggcircadian.html'>ggcircadian</a></span>(
+    <pre class="usage"><span class='fu'>ggcircadian</span>(
   <span class='kw'>data</span>,
   <span class='kw'>outcome</span>,
   time = <span class='st'>"hour"</span>,
@@ -178,11 +178,11 @@ significance.</p>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Data</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>twins</span>)
-<span class='kw'>tbl</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/card/man/circ_compare_groups.html'>circ_compare_groups</a></span>(<span class='kw'>twins</span>, <span class='st'>"rDYX"</span>, <span class='st'>"sad_cat"</span>, <span class='st'>"hour"</span>)
+<span class='kw'>tbl</span> <span class='op'>&lt;-</span> <span class='fu'><a href='circ_compare_groups.html'>circ_compare_groups</a></span>(<span class='kw'>twins</span>, <span class='st'>"rDYX"</span>, <span class='st'>"sad_cat"</span>, <span class='st'>"hour"</span>)
 
 <span class='co'># Plot</span>
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://ggplot2.tidyverse.org'>ggplot2</a></span>)
-<span class='fu'><a href='https://rdrr.io/pkg/card/man/ggcircadian.html'>ggcircadian</a></span>(<span class='kw'>tbl</span>, outcome = <span class='st'>"sad_cat"</span>) <span class='op'>+</span>
+<span class='fu'>ggcircadian</span>(<span class='kw'>tbl</span>, outcome = <span class='st'>"sad_cat"</span>) <span class='op'>+</span>
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span>(title = <span class='st'>"Example"</span>) <span class='op'>+</span>
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_viridis.html'>scale_color_viridis_d</a></span>(option = <span class='st'>"A"</span>, begin = <span class='fl'>0.0</span>, end = <span class='fl'>0.75</span>)</div><div class='output co'>#&gt; <span class='message'>Scale for 'colour' is already present. Adding another scale for 'colour',</span>
 #&gt; <span class='message'>which will replace the existing scale.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 24 rows containing missing values (geom_point).</span></div><div class='img'><img src='ggcircadian-1.png' alt='' width='700' height='433' /></div><div class='input'></div></pre>

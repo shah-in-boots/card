@@ -231,7 +231,7 @@
 <a href="#cosinor-analysis" class="anchor"></a>Cosinor Analysis</h3>
 <p>This modeling algorithm requires only base <code>R</code>, which allows internal flexibility for modeling heuristics and improved efficiency. For the user, it also allows standard modeling tools/approachs, and a flexible user interface that accounts for individual/population analysis and single/multiple component analysis.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="kw">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/card/man/cosinor.html">cosinor</a></span>(<span class="kw">rDYX</span> <span class="op">~</span> <span class="kw">hour</span>, <span class="kw">twins</span>, tau = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">24</span>, <span class="fl">12</span>))
+<span class="kw">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/cosinor.html">cosinor</a></span>(<span class="kw">rDYX</span> <span class="op">~</span> <span class="kw">hour</span>, <span class="kw">twins</span>, tau = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">24</span>, <span class="fl">12</span>))
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="kw">m</span>)
 <span class="co">#&gt; Individual Cosinor Model </span>
 <span class="co">#&gt; ------------------------------------------</span>
@@ -251,7 +251,7 @@
 <span class="co">#&gt; amp2   0.1302012 0.008542526</span>
 <span class="co">#&gt; phi1  -2.6542757 0.028911445</span>
 <span class="co">#&gt; phi2  -3.6636921 0.065235427</span>
-<span class="fu"><a href="https://rdrr.io/pkg/card/man/ggcosinor.html">ggcosinor</a></span>(<span class="kw">m</span>)
+<span class="fu"><a href="reference/ggcosinor.html">ggcosinor</a></span>(<span class="kw">m</span>)
 <span class="co">#&gt; This is a harmonic multiple-component cosinor object. The orthophase, bathyphase, and global amplitude were calculated.</span>
 <span class="co">#&gt; Warning in regularize.values(x, y, ties, missing(ties)): collapsing to unique</span>
 <span class="co">#&gt; 'x' values</span>

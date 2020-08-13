@@ -133,7 +133,7 @@ Bathyphase (Pb) =  the lag until the trough time
 
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/card/man/cosinor_features.html'>cosinor_features</a></span>(<span class='kw'>object</span>, population = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>cosinor_features</span>(<span class='kw'>object</span>, population = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -164,13 +164,7 @@ Bathyphase (Pb) =  the lag until the trough time
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>twins</span>)
-<span class='kw'>model</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/card/man/cosinor.html'>cosinor</a></span>(<span class='kw'>rDYX</span> <span class='op'>~</span> <span class='kw'>hour</span>, <span class='kw'>twins</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>24</span>, <span class='fl'>8</span>), <span class='st'>"patid"</span>)</div><div class='output co'>#&gt; <span class='message'>23 subjects were removed due to having insufficient observations.</span></div><div class='input'><span class='kw'>results</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/card/man/cosinor_features.html'>cosinor_features</a></span>(<span class='kw'>model</span>, population = <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='message'>This is a harmonic multiple-component cosinor object. The orthophase, bathyphase, and global amplitude were calculated.</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='kw'>results</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: `...` is not empty.</span>
-#&gt; <span class='warning'></span>
-#&gt; <span class='warning'>We detected these problematic arguments:</span>
-#&gt; <span class='warning'>* `needs_dots`</span>
-#&gt; <span class='warning'></span>
-#&gt; <span class='warning'>These dots only exist to allow future extensions and should be empty.</span>
-#&gt; <span class='warning'>Did you misspecify an argument?</span></div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 6 x 7</span><span>
+<span class='kw'>model</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cosinor.html'>cosinor</a></span>(<span class='kw'>rDYX</span> <span class='op'>~</span> <span class='kw'>hour</span>, <span class='kw'>twins</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>24</span>, <span class='fl'>8</span>), <span class='st'>"patid"</span>)</div><div class='output co'>#&gt; <span class='message'>23 subjects were removed due to having insufficient observations.</span></div><div class='input'><span class='kw'>results</span> <span class='op'>&lt;-</span> <span class='fu'>cosinor_features</span>(<span class='kw'>model</span>, population = <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='message'>This is a harmonic multiple-component cosinor object. The orthophase, bathyphase, and global amplitude were calculated.</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='kw'>results</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 6 x 7</span><span>
 #&gt;   population harmonic  peak trough ampGlobal orthophase bathyphase
 #&gt;        </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span>          1 TRUE      3.35   1.81     0.768      23          12  

@@ -128,10 +128,10 @@ to expand upon the card::circ_sun function." />
 and "after" system to help align multiple individuals to a universal time,
 like the sunrise or any other appropriate
 <a href='https://en.wikipedia.org/wiki/Zeitgeber'>zeitgeiber</a>. Originally intended
-to expand upon the <a href='https://rdrr.io/pkg/card/man/circ_sun.html'>card::circ_sun</a> function.</p>
+to expand upon the <a href='circ_sun.html'>card::circ_sun</a> function.</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/card/man/circ_center.html'>circ_center</a></span>(<span class='kw'>times</span>, <span class='kw'>zeitgeiber</span>)</pre>
+    <pre class="usage"><span class='fu'>circ_center</span>(<span class='kw'>times</span>, <span class='kw'>zeitgeiber</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -164,7 +164,7 @@ allows centering around the zeitgeiber (Z=0).</p>
 <span class='kw'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span>(<span class='kw'>twins</span>, <span class='kw'>patid</span> <span class='op'>==</span> <span class='fl'>7</span>) <span class='co'># Single patient</span>
 <span class='kw'>times</span> <span class='op'>&lt;-</span> <span class='kw'>df</span><span class='op'>$</span><span class='kw'>dyxtime</span>
 <span class='kw'>zeitgeiber</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span>(<span class='st'>"2002-03-22 06:40:18"</span>, tz = <span class='st'>"UTC"</span>)
-<span class='kw'>df</span><span class='op'>$</span><span class='kw'>zeit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/card/man/circ_center.html'>circ_center</a></span>(<span class='kw'>times</span>, <span class='kw'>zeitgeiber</span>)
+<span class='kw'>df</span><span class='op'>$</span><span class='kw'>zeit</span> <span class='op'>&lt;-</span> <span class='fu'>circ_center</span>(<span class='kw'>times</span>, <span class='kw'>zeitgeiber</span>)
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
