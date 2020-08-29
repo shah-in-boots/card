@@ -32,7 +32,7 @@ ggplot(twins, aes(x = hour, y = rDYX)) +
   geom_smooth(method = "gam")
 ```
 
-Cosinor analysis can be used to generate model statistics. Confidence intervals of the amplitude and acrophase can be generated. It creates the model using the [hardhat](https://tidymodels.github.io/hardhat/index.html).
+Cosinor analysis can be used to generate model statistics. Confidence intervals of the amplitude and acrophase can be generated. It is based of the `hardhat` package. 
 
 The model can return information about an individual cosinor. The model statistics can be extracted, as well as visualized.
 

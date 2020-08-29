@@ -5,6 +5,7 @@
 ## Bugs
 
 * `cosinor()` unable to run on certain models based on y values
+* `ggcosinor
 
 ## Features
 
@@ -25,8 +26,7 @@ will work to simplify the process of analyzing 24-hour data. The
 time. This is visualized using `ggcircadian()`. Also includes the `ggforest()`
 to create forest plots of odds ratios. This is dependent on the `circ_odds()`
 function to generate odds ratios by time.
-* An important regression function, built with the _tidymodels_
-[hardhat](https://tidymodels.github.io/hardhat/) package, `cosinor()` introduced
+* An important regression function, built with the `hardhat` package from _tidymodels_, `cosinor()` introduced
 as a new function to allow for diagnostic analysis of circadian patterns.
 Although the algorithm is well known, having an implementation in R allows
 potential diagnostics. This includes the `ggcosinorfit()` allows for assessing
