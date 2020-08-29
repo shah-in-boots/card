@@ -108,7 +108,7 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">geom_smooth</a></span>(<span class="kw">method</span> <span class="kw">=</span> <span class="st">"gam"</span>)
 <span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></pre></body></html></div>
 <p><img src="Cosinor_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<p>Cosinor analysis can be used to generate model statistics. Confidence intervals of the amplitude and acrophase can be generated. It creates the model using the <a href="https://tidymodels.github.io/hardhat/index.html">hardhat</a>.</p>
+<p>Cosinor analysis can be used to generate model statistics. Confidence intervals of the amplitude and acrophase can be generated. It is based of the <code>hardhat</code> package.</p>
 <p>The model can return information about an individual cosinor. The model statistics can be extracted, as well as visualized.</p>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="co"># Model</span>
 <span class="no">m</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cosinor.html">cosinor</a></span>(<span class="no">rDYX</span> ~ <span class="no">hour</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">twins</span>, <span class="kw">tau</span> <span class="kw">=</span> <span class="fl">24</span>)
