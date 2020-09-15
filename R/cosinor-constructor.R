@@ -150,7 +150,6 @@ cosinor_bridge <- function(processed, tau, population, data, ...) {
   f <- paste0(y, " ~ M + ", paste0(ls, collapse = " + "))
   call <- paste0("cosinor(formula = ", f)
 
-
   ### Model fit ====
 
   # Check and format predictors
