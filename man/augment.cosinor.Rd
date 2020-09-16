@@ -7,7 +7,7 @@
 \method{augment}{cosinor}(x, ...)
 }
 \arguments{
-\item{x}{A \code{cosinor} object created by \code{\link[card:cosinor]{card::cosinor()}}}
+\item{x}{A \code{cosinor} object created by \code{\link[=cosinor]{cosinor()}}}
 
 \item{...}{For extensibility}
 }

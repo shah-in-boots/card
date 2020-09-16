@@ -250,6 +250,136 @@ new_cosinor <- function(
   )
 }
 
+# }}}
+
+# Cosinor Parsnip Methods {{{ ====
+
+# Wrapper function to load parsnip model
+make_cosinor_reg <- function() {
+
+	# Check to see if already loaded
+	current <- parsnip::get_model_env()
+	if(!any(current$models == "cosinor_reg")) {
+		parsnip::set_new_model("cosinor_reg")
+	}
+
+	# Add parsnip models to another package
+	parsnip::set_model_mode(model = "cosinor_reg", mode = "regression")
+	parsnip::set_model_engine("cosinor_reg", mode = "regression", eng = "card")
+	parsnip::set_dependency("cosinor_reg", eng = "card", pkg = "card")
+
+	# Arguments
+	parsnip::set_model_arg(
+		model = "cosinor_reg",
+		eng = "card",
+		parsnip = "period",
+		original = "tau",
+		func = list(pkg = "card", fun = "cosinor"),
+		has_submodel = FALSE
+	)
+
+	# Model fit and predictions are conditionally loaded
+	if(!any(current$models == "cosinor_reg")) {
+
+		# Fit
+		parsnip::set_fit(
+			model = "cosinor_reg",
+			eng = "card",
+			mode = "regression",
+			value = list(
+				interface = "formula",
+				protect = c("formula", "data"),
+				func = c(pkg = "card", fun = "cosinor"),
+				defaults = list()
+			)
+		)
+
+		# Prediction
+		parsnip::set_pred(
+			model = "cosinor_reg",
+			eng = "card",
+			mode = "regression",
+			type = "numeric",
+			value = list(
+				pre = NULL,
+				post = NULL,
+				func = c(fun = "predict"),
+				args = list(
+					object = quote(object$fit),
+					new_data = quote(new_data),
+					type = "numeric"
+				)
+			)
+		)
+	}
+
+}
+
+.onLoad <- function(libname, pkgname) {
+	# Loads cosinor_reg in the model database
+	make_cosinor_reg()
+}
+
+#' @title General Interface for Cosinor Regression Models
+#' @description `cosinor_reg()` is a _parsnip_ friendly method for specification of cosinor regression model before fitting.
+#' @param mode A character string that describes the type of model. In this case, it only supports type of "regression".
+#' @param period A non-negative number or vector of numbers that represent hte expected periodicity of hte data to be analyzed.
+#' @export
+cosinor_reg <- function(mode = "regression", period = NULL) {
+
+	# Check correct mode
+	if(mode != "regression") {
+		stop("`mode` should be 'regression'", call. = FALSE)
+	}
+
+	# Capture arguments
+	args <- list(period = rlang::enquo(period))
+
+	# Model specs / slots
+	parsnip::new_model_spec(
+		"cosinor_reg",
+		args = args,
+		mode = mode,
+		eng_args = NULL,
+		method = NULL,
+		engine = NULL
+	)
+}
+
+#' @param object Cosinor model specification
+#' @param ... Not used for `update()`
+#' @param fresh A logical for whether the arguments should be modified in place or replaced altogether
+#' @method update cosinor_reg
+#' @rdname cosinor_reg
+#' @export
+update.cosinor_reg <- function(object, period = NULL, fresh = FALSE, ...) {
+	parsnip::update_dot_check(...)
+
+	# Updated arguments
+	args <- list(
+		period = rlang::enquo(period)
+	)
+
+	if (fresh) {
+		object$args <- args
+	} else {
+		null_args <- purrr::map_lgl(args, parsnip::null_value)
+		if (any(null_args))
+			args <- args[!null_args]
+		if (length(args) > 0)
+			object$args[names(args)] <- args
+	}
+
+	# Model specs / slots
+	parsnip::new_model_spec(
+		"cosinor_reg",
+		args = object$args,
+		eng_args = object$eng_args,
+		mode = object$mode,
+		method = NULL,
+		engine = object$engine
+	)
+}
 
 # }}}
 

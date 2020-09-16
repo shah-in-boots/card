@@ -7,7 +7,7 @@
 cosinor_goodness_of_fit(object, level = 0.95, ...)
 }
 \arguments{
-\item{object}{requires cosinor model generated with \link[card:cosinor]{card::cosinor} to
+\item{object}{requires cosinor model generated with \link{cosinor} to
 calculate statistics.}
 
 \item{level}{confidence level desired}

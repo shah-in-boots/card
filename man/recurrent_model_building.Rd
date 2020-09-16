@@ -8,7 +8,7 @@ recurrent_model_building(data, covar.builds, model.type, prop.scores = NULL)
 }
 \arguments{
 \item{data}{Data frame that is the survival format, potentially made by the
-\link[card:recur_survival_table]{card::recur_survival_table}. Has to be merged with the superset of
+\link{recur_survival_table}. Has to be merged with the superset of
 covariates that are being tested.}
 
 \item{covar.builds}{This is a vector that names the individual vectors for
@@ -20,7 +20,7 @@ the names of the columns in the data frame that will generate regressions.}
 
 \item{prop.scores}{This is a vector of the names of which \code{covar.builds}
 should be performed with propensity weighting. This will call a separate
-function \link[card:recurrent_propensity]{card::recurrent_propensity} that will generate both a PROP_SCORE
+function \link{recurrent_propensity} that will generate both a PROP_SCORE
 column and PROP_WEIGHT column. Optional parameter, defaults to NULL.}
 }
 \value{

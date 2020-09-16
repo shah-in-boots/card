@@ -23,7 +23,7 @@ percent missing (e.g. 20.0\% missing data) by time group.
 }
 \description{
 Takes the output from HRV Toolbox and reads it in for an
-individual patient. Unlike \link[card:proc_hrv_matlab]{card::proc_hrv_matlab}, this does not process
+individual patient. Unlike \link{proc_hrv_matlab}, this does not process
 or summarize the data, it just reads it the raw analysis. Uses the package
 \code{\link[data.table:fread]{data.table::fread()}} for reading in data due to size/speed.
 }

@@ -93,3 +93,4 @@ predict_cosinor_numeric <- function(object, predictors) {
 }
 
 # }}}
+

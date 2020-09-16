@@ -7,7 +7,7 @@
 \method{tidy}{cosinor}(x, conf.int = FALSE, conf.level = 0.95, ...)
 }
 \arguments{
-\item{x}{A \code{cosinor} object created by \code{\link[card:cosinor]{card::cosinor()}}}
+\item{x}{A \code{cosinor} object created by \code{\link[=cosinor]{cosinor()}}}
 
 \item{conf.int}{Logical indicating whether or not to include confidence
 interval in tidied output}

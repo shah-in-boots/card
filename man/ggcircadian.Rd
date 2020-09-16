@@ -33,7 +33,7 @@ added on as seen in example.
 }
 \description{
 Converts the output of
-\link[card:circ_compare_groups]{card::circ_compare_groups} into a complex geom
+\link{circ_compare_groups} into a complex geom
 that is broken down by time/hour and HRV (or any other continuous
 variable). Each hour is then separated by the grouping variable.
 }

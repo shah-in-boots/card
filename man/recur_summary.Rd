@@ -23,7 +23,7 @@ recurrent events
 }
 \details{
 This function allows for taking the output of
-\link[card:recur_survival_table]{card::recur_survival_table} marginal format repeat event data,
+\link{recur_survival_table} marginal format repeat event data,
 and creates a summary table that describes the number of events by
 strata/event.
 }

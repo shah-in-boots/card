@@ -14,7 +14,7 @@ variable is similar in scale.}
 
 \item{labels}{Logical value if annotations should be placed on plot, default
 = TRUE. The labels depend on the type of plot. The labels are attempted to
-be placed "smartly" using the \code{\link[ggrepel:geom_label_repel]{ggrepel::geom_label_repel()}} function.}
+be placed "smartly" using the \code{\link[ggrepel:geom_text_repel]{ggrepel::geom_label_repel()}} function.}
 
 \item{...}{For extensibility. This function will use different
 implementations based on the type of model (single or multiple component).
@@ -26,7 +26,7 @@ Object of class \code{ggplot} that can be layered
 \description{
 ggplot of cosinor model that can visualize a variety of cosinor
 model subtypes, including single-component, multiple-component, individual,
-and population cosinor models, built using \link[card:cosinor]{card::cosinor}. For single
+and population cosinor models, built using \link{cosinor}. For single
 component cosinor, the following values are plotted:
 \itemize{
 \item M = midline estimating statistic of rhythm

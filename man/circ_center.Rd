@@ -28,7 +28,7 @@ Based on a centering time point, shifts a vector to a "before"
 and "after" system to help align multiple individuals to a universal time,
 like the sunrise or any other appropriate
 \href{https://en.wikipedia.org/wiki/Zeitgeber}{zeitgeiber}. Originally intended
-to expand upon the \link[card:circ_sun]{card::circ_sun} function.
+to expand upon the \link{circ_sun} function.
 }
 \examples{
 data("twins")

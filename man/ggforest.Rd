@@ -27,7 +27,7 @@ ggplot format so additional variables, like titles, can be added in.
 }
 \details{
 This function creates a forest plot using the OR developed
-by the \link[card:circ_odds]{card::circ_odds} function in this package. By default, it
+by the \link{circ_odds} function in this package. By default, it
 takes the output, which is a tibble named "ot",
 and will generate a forest plot based on the grouping variable
 (default is time of day). Original data can be restricted or the
