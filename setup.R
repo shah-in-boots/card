@@ -9,7 +9,6 @@ library(testthat)
 # For exploring
 library(tidyverse)
 library(tidymodels)
-library(data.table)
 
 # Test out parsnip
 data(twins)
