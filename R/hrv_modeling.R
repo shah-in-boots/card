@@ -47,25 +47,39 @@ hrv_linear_model <-
 
 #' @title Model Building
 #'
-#' @description Simplify the process of building multiple models in a sequential
-#'   order. This is particularly helpful in epidemiological cases of testing
-#'   effect of additional parameters. Every parameter should be theoretically a
-#'   part of the causal model for the exposure-outcome relationship.
+#' @description Simplify the process of building multiple models. Models are
+#'   usually built in sequential order, or in parallel when testing multiple
+#'   potential patterns. This is particularly helpful in epidemiological cases
+#'   of testing effect of additional parameters. Every parameter should be
+#'   theoretically a part of the causal model for the exposure-outcome
+#'   relationship.
 #'
 #' @details This is considering what is available with the `modelr` package and
 #'   the `tidymodels` approach, and finding an in-between for the causality /
 #'   epidemiology approach of building intentional, sequentional models. Expect
-#'   changes in the process, and potential future dependencies on the
-#'   `tidymodels` appraoches.
+#'   changes in the process.
 #'
 #' @param formula an object of class `formula` that shows the names of the
 #'   outcomes (can be more than 1) and the names of the predictors (which should
-#'   contain the `exposure` variable).
+#'   contain the `exposure` variable). This formula can include mixed effects if
+#'   needed.
+#'
 #' @param data data frame or data table (or tibble) that contains the named
 #'   variables
+#' @param type Type of model that will be used. The options are:
+#'
+#'   * `sequential` will build y ~ x1, y ~ x1 + x2 models
+#'
+#'   * `parallel` will build y ~ x1, y ~ x2 models
+#'
 #' @param exposure Variable that is forced to be maintained in every model as a
-#'   predictor.
-#' @param engine Set the "engine" or the regression tool that will be used
+#'   predictor. This is currently used only for `sequential` type models
+#' @param engine Set the "engine" or the regression tool that will be used. One
+#'   day this may be a useful addition to the `tidymodels` approach, which is
+#'   the inspiration for the terminology. Currently limited to the following:
+#'
+#'   * `linear` uses the stats::lm() for linear regression, and lme4::lmer() for
+#'   mixed effect models
 #'
 #' @return A tidy tibble of models. Each one will likely be grouped by its
 #'   outcome, and then with sequential columns using increased/additive models.
@@ -79,45 +93,87 @@ hrv_linear_model <-
 #' @examples
 #' data(geh)
 #' f <- svg_mag + qrs_tang ~ lab_hba1c + bmi
-#' build_sequential_models(f, data = geh)
 #'
 #' @importFrom magrittr %>%
 #' @export
-build_sequential_models <- function(formula, data, exposure = NULL, engine = "lm") {
+build_models <- function(formula, data, type, engine = "linear", exposure = NULL) {
 
-  # Type of model
-  type <- engine
-  modelCall <- match.call()
-
-  # Breakdown of formula
-  nf <- length(formula)
-  o <- all.vars(formula[[2]]) # Outcomes
-  p <- all.vars(formula[[3]]) # Predictors
+  # Get terms
+  o <- all.vars(lme4::nobars(formula)[[2]])
+  p <- all.vars(lme4::nobars(formula)[[3]])
+  m <- lme4::findbars(formula) # This finds if there is a mixed effect model or note
   no <- length(o)
   np <- length(p)
+  nm <- length(m)
+  if(nm >= 1) {mixed <- TRUE}
 
-  # Exposure is assumed to be first variable
-  if(!is.null(exposure)) {
-    p <- p[-(which(p == exposure))]
-    p <- c(exposure, p)
-  }
+  # Type of model to build
+  switch(
+    type,
+    parallel = {
+      l <- list()
+      for(i in 1:no) {
+        for(j in 1:np) {
+          # Add mixed effects here
+          if(mixed) {
+            mix <- paste0("(", m, ")", collapse = " + ")
+            predictors <- paste0(p[j], " + ", mix)
+          } else {
+            predictors <- p[j]
+          }
 
-  # Loop through to make regressions
-  l <- list()
+          # Create formulas
+          f <- stats::formula(paste0(o[[i]], " ~ ", predictors))
+          l[[o[[i]]]][[j]] <- f
+        }
+      }
+    },
+    sequential = {
+      # Ensure exposure is maintained if sequential
+      if(!is.null(exposure)) {
+        p <- p[-(which(p == exposure))]
+        p <- c(exposure, p)
+      }
+
+      # Creating formulas
+      l <- list()
+      for(i in 1:no) {
+        for(j in 1:np) {
+          # Add mixed effects here if needed
+          predictors <- paste0(p[1:j], collapse = " + ")
+          if(mixed) {
+            mix <- paste0("(", m, ")", collapse = " + ")
+            f <- stats::formula(paste0(o[[i]], " ~ ", predictors, " + ", mix))
+          } else {
+            f <- stats::formula(paste0(o[[i]], " ~ ", predictors))
+          }
+
+          # Save them
+          l[[o[[i]]]][[j]] <- f
+        }
+      }
+    }
+  )
+
+  # Create the models using hte formulas in `l`
+  models <- list()
   for(i in 1:no) {
     for(j in 1:np) {
-      predictors <- paste0(p[1:j], collapse = " + ")
-      f <- stats::formula(paste0(o[[i]], " ~ ", predictors))
-      m <- stats::lm(formula = f, data = data)
-      l[[o[[i]]]][[j]] <- broom::tidy(m, conf.int = TRUE)
+      if(mixed) {
+        m <- lme4::lmer(formula = l[[i]][[j]], data = data)
+        models[[o[[i]]]][[j]] <- broom.mixed::tidy(m, conf.int = TRUE)
+      } else {
+        m <- stats::lm(formula = f, data = data)
+        models[[o[[i]]]][[j]] <- broom::tidy(m, conf.int = TRUE)
+      }
     }
   }
 
-  # Tidy it if possible
-  m <-
-    dplyr::as_tibble(l) %>%
+  # Tidy it up
+  res <-
+    dplyr::as_tibble(models) %>%
     tidyr::pivot_longer(
-      cols = tidyr::everything(),
+      col = tidyr::everything(),
       names_to = "outcomes",
       values_to = "models"
     ) %>%
@@ -125,8 +181,7 @@ build_sequential_models <- function(formula, data, exposure = NULL, engine = "lm
     tidyr::unnest(cols = "models")
 
   # Return
-  return(m)
-
+  return(res)
 }
 
 #' @title Plotting Error of Models

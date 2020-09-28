@@ -324,24 +324,6 @@ make_cosinor_reg <- function() {
 #' @description `cosinor_reg()` is a _parsnip_ friendly method for specification of cosinor regression model before fitting.
 #' @param mode A character string that describes the type of model. In this case, it only supports type of "regression".
 #' @param period A non-negative number or vector of numbers that represent hte expected periodicity of the data to be analyzed.
-#' @examples
-#'
-#' data(twins)
-#' split <- initial_split(twins, prop = 3/4)
-#' train <- training(split)
-#' test <- testing(split)
-#'
-#' cosinor_mod <-
-#'   cosinor_reg(period = 24) %>%
-#' 	 set_engine("card") %>%
-#' 	 set_mode("regression")
-#'
-#' cosinor_fit <-
-#'   cosinor_mod %>%
-#'   fit(rDYX ~ hour, data = train)
-#'
-#' ggcosinor(cosinor_fit$fit)
-#'
 #' @export
 cosinor_reg <- function(mode = "regression", period = NULL) {
 
@@ -401,17 +383,19 @@ update.cosinor_reg <- function(object, period = NULL, fresh = FALSE, ...) {
 
 #' @method print cosinor_reg
 #' @rdname cosinor_reg
+#' @param object Cosinor model specification
+#' @param ... Extensible
 #' @export
-print.cosinor_reg <- function(x, ...) {
-	cat("Cosinor Model Specification (", x$mode, ")\n\n", sep = "")
-	parsnip::model_printer(x, ...)
+print.cosinor_reg <- function(object, ...) {
+	cat("Cosinor Model Specification (", object$mode, ")\n\n", sep = "")
+	parsnip::model_printer(object, ...)
 
-	if (!is.null(x$method$fit$args)) {
+	if (!is.null(object$method$fit$args)) {
 		cat("Model fit template:\n")
-		print(parsnip::show_call(x))
+		print(parsnip::show_call(object))
 	}
 
-	invisible(x)
+	invisible(object)
 }
 
 # }}}

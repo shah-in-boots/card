@@ -3,22 +3,25 @@
 \name{cosinor_reg}
 \alias{cosinor_reg}
 \alias{update.cosinor_reg}
+\alias{print.cosinor_reg}
 \title{General Interface for Cosinor Regression Models}
 \usage{
 cosinor_reg(mode = "regression", period = NULL)
 
 \method{update}{cosinor_reg}(object, period = NULL, fresh = FALSE, ...)
+
+\method{print}{cosinor_reg}(object, ...)
 }
 \arguments{
 \item{mode}{A character string that describes the type of model. In this case, it only supports type of "regression".}
 
-\item{period}{A non-negative number or vector of numbers that represent hte expected periodicity of hte data to be analyzed.}
+\item{period}{A non-negative number or vector of numbers that represent hte expected periodicity of the data to be analyzed.}
 
 \item{object}{Cosinor model specification}
 
 \item{fresh}{A logical for whether the arguments should be modified in place or replaced altogether}
 
-\item{...}{Not used for \code{update()}}
+\item{...}{Extensible}
 }
 \description{
 \code{cosinor_reg()} is a \emph{parsnip} friendly method for specification of cosinor regression model before fitting.
