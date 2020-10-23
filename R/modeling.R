@@ -74,12 +74,16 @@ hrv_linear_model <-
 #'
 #' @param exposure Variable that is forced to be maintained in every model as a
 #'   predictor. This is currently used only for `sequential` type models
+#'
 #' @param engine Set the "engine" or the regression tool that will be used. One
 #'   day this may be a useful addition to the `tidymodels` approach, which is
 #'   the inspiration for the terminology. Currently limited to the following:
 #'
 #'   * `linear` uses the stats::lm() for linear regression, and lme4::lmer() for
 #'   mixed effect models
+#'
+#'   * `circular` uses the circular::lm.circular() for circular outcomes with
+#'   linear predictors
 #'
 #' @return A tidy tibble of models. Each one will likely be grouped by its
 #'   outcome, and then with sequential columns using increased/additive models.
@@ -105,13 +109,13 @@ build_models <- function(formula, data, type, engine = "linear", exposure = NULL
   no <- length(o)
   np <- length(p)
   nm <- length(m)
-  if(nm >= 1) {mixed <- TRUE}
+  mixed <- ifelse(nm >= 1, TRUE, FALSE)
 
   # Type of model to build
+  l <- list()
   switch(
     type,
     parallel = {
-      l <- list()
       for(i in 1:no) {
         for(j in 1:np) {
           # Add mixed effects here
@@ -136,7 +140,6 @@ build_models <- function(formula, data, type, engine = "linear", exposure = NULL
       }
 
       # Creating formulas
-      l <- list()
       for(i in 1:no) {
         for(j in 1:np) {
           # Add mixed effects here if needed
@@ -155,19 +158,40 @@ build_models <- function(formula, data, type, engine = "linear", exposure = NULL
     }
   )
 
-  # Create the models using hte formulas in `l`
   models <- list()
-  for(i in 1:no) {
-    for(j in 1:np) {
-      if(mixed) {
-        m <- lme4::lmer(formula = l[[i]][[j]], data = data)
-        models[[o[[i]]]][[j]] <- broom.mixed::tidy(m, conf.int = TRUE)
-      } else {
-        m <- stats::lm(formula = f, data = data)
-        models[[o[[i]]]][[j]] <- broom::tidy(m, conf.int = TRUE)
+  switch(
+    engine,
+    linear = {
+      for(i in 1:no) {
+        for(j in 1:np) {
+          if(mixed) {
+            m <- lme4::lmer(formula = l[[i]][[j]], data = data)
+            models[[o[[i]]]][[j]] <- broom.mixed::tidy(m, conf.int = TRUE)
+          } else {
+            m <- stats::lm(formula = l[[i]][[j]], data = data)
+            models[[o[[i]]]][[j]] <- broom::tidy(m, conf.int = TRUE)
+          }
+        }
+      }
+    },
+    circular = {
+      for(i in 1:no) {
+        for(j in 1:np) {
+          # Generate data
+          f <- l[[i]][[j]]
+          mat <- stats::model.frame(f, data = data)
+          x <- stats::model.matrix(f, data = mat)
+          y <- mat[[sym(o[[i]])]]
+          m <- circular::lm.circular(y = y, x = x, type = "c-l", init = rep(0, ncol(x)), tol = 1e-3, verbose = FALSE)
+
+          # Tidy it (assuming intercept is first)
+          models[[o[[i]]]][[j]] <- tidy.circular(m, conf.int = TRUE)
+
+        }
       }
     }
-  }
+  )
+  # Create the models using hte formulas in `l`
 
   # Tidy it up
   res <-
