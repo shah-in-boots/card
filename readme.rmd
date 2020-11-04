@@ -26,21 +26,19 @@ knitr::opts_chunk$set(
 
 ## Cardiovascular and Autonomic Research Design
 
-The goal of `card` is to create functions and analytical approaches in neurocardiology, with a focus on electrocardiogram data and epidemiological concepts. An important engine within this ecosystem are the circadian analysis tools. Its developed to fit a _tidy_ approach to statistical analysis.
+The inspiration for `card` was to create useful functions and analytical approaches in computational neurocardiology, with a on electrocardiography and epidemiology. 
 
 The areas of focus of this package are the following:
 
-- cardiovascular hemodynamics
-- circadian rhythms
-- electrocardiography (heart rate variability and morphology)
-- signal processing
+- handling of recurrent and circadian events
+- epidemiological focus on effective model building
 
 ## Installation
 
-Once published, you can install the released version of __card__ from [CRAN](https://CRAN.R-project.org) with:
+You can install the released version of __card__ from [CRAN](https://CRAN.R-project.org) with:
 
 ```{r}
-#install.packages("card")
+install.packages("card")
 ```
 
 And the development version from [GitHub](https://github.com/) with:
@@ -52,16 +50,20 @@ devtools::install_github("asshah4/card")
 
 ## Usage
 
-This package is intended for analyzing cardiovascular signals and autonomic physiology. The current collection of functions are built practically around this paradigm. The current focus, in `card v0.1.0` is the development of a flexible and tidy analytical approach to circadian rhythms. 
+The intent for this `card` is to develop several key functions for the analysis of recurrent or cyclical data, and assistance with epidemiological approaches to regression modeling.
+
+The key features are:
+
+1. Sample datasets
+2. Cosinor analysis 
+3. Recurrent events
+4. Model building
 
 ```{r}
 library(card)
 ```
 
-
 ### Datasets
-
-It comes with several useful datasets:
 
 * Cardiovascular disease outcomes with recurrent events
 * Vectorcardiography data in a high-risk cohort
@@ -83,7 +85,9 @@ head(geh)
 
 ### Cosinor Analysis
 
-This modeling algorithm requires only base `R`, which allows internal flexibility for modeling heuristics and improved efficiency. For the user, it also allows standard modeling tools/approachs, and a flexible user interface that accounts for individual/population analysis and single/multiple component analysis.
+This modeling algorithm requires only base `R`, which allows internal flexibility for modeling heuristics and improved efficiency. For the user, it also allows standard modeling tools/approaches, and a flexible user interface that accounts for individual/population analysis and single/multiple component analysis.
+
+There are other cosinor models available in `R`, however they do not allow for simple multiple-component or individual/population analysis in a method that is tidy (for both `tidyverse` and `tidymodels` approaches).
 
 ```{r}
 m <- cosinor(rDYX ~ hour, twins, tau = c(24, 12))
@@ -93,3 +97,6 @@ ggcosinor(m)
 head(augment(m))
 ```
 
+### Recurrent Events
+
+### Model Building

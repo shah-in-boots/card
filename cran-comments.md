@@ -2,7 +2,7 @@
 
 This is a resubmission. I'm thankful for the comments by Jelena Saf <jelena.saf@jku.at>, Swetlana Herbrandt <herbrandt@statistik.tu-dortmund.de>, Martina Schmirl <martina.schmirl@jku.at>, and Uwe Ligges <ligges@statistik.tu-dortmund.de>. In this resubmission, the following changes were made:
 
-- The incorrect hyperlinks were removed
+- The incorrect hyperlinks were removde
 
 ## Test environments
 
