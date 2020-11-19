@@ -11,9 +11,9 @@
 #'   be used. Can be generalized to any dependent variable set.
 #' @param prop.weight This is a logical value if propensity weighting should be
 #'   done instead of traditional covariate adjustment. This calls for the
-#'   propensity weighting function defined by
-#'   [card::recurrent_propensity] that will generate both a PROP_SCORE
-#'   column and PROP_WEIGHT column. Defaults to FALSE
+#'   propensity weighting function defined by [card::recurrent_propensity] that
+#'   will generate both a PROP_SCORE column and PROP_WEIGHT column. Defaults to
+#'   FALSE
 #' @return List of models with names
 #' @export
 hrv_linear_model <-
@@ -306,3 +306,5 @@ geom_residuals <- function(model) {
     theme_minimal()
   )
 }
+
+
