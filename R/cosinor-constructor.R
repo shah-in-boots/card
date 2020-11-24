@@ -11,7 +11,9 @@
 #'   cosine wave. Depending on the context:
 #'
 #'   - A __data frame__ of a time-based predictor/index.
+#'
 #'   - A __matrix__ of time-based predictor/index.
+#'
 #'   - A __recipe__ specifying a set of preprocessing steps
 #'     created from [recipes::recipe()].
 #'
@@ -19,7 +21,9 @@
 #' specified as:
 #'
 #'   - A __data frame__ with 1 numeric column.
+#'
 #'   - A __matrix__ with 1 numeric column.
+#'
 #'   - A numeric __vector__.
 #'
 #' @param data When a __recipe__ or __formula__ is used, `data` is specified as:
@@ -318,12 +322,18 @@ make_cosinor_reg <- function() {
 .onLoad <- function(libname, pkgname) {
 	# Loads cosinor_reg in the model database
 	make_cosinor_reg()
+	make_circular_reg()
 }
 
 #' @title General Interface for Cosinor Regression Models
 #' @description `cosinor_reg()` is a _parsnip_ friendly method for specification of cosinor regression model before fitting.
 #' @param mode A character string that describes the type of model. In this case, it only supports type of "regression".
-#' @param period A non-negative number or vector of numbers that represent hte expected periodicity of the data to be analyzed.
+#' @param period A non-negative number or vector of numbers that represent the expected periodicity of the data to be analyzed.
+#' @examples
+#' data(twins)
+#' cosinor_reg(period = 24) %>%
+#'   parsnip::set_engine("card") %>%
+#'   parsnip::fit(rDYX ~ hour, data = twins)
 #' @export
 cosinor_reg <- function(mode = "regression", period = NULL) {
 

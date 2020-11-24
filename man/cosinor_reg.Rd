@@ -26,3 +26,9 @@ cosinor_reg(mode = "regression", period = NULL)
 \description{
 \code{cosinor_reg()} is a \emph{parsnip} friendly method for specification of cosinor regression model before fitting.
 }
+\examples{
+data(twins)
+cosinor_reg(period = 24) \%>\%
+  parsnip::set_engine("card") \%>\%
+  parsnip::fit(rDYX ~ hour, data = twins)
+}

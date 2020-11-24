@@ -1,0 +1,27 @@
+---
+title: "A Marksmen's Approach to Specific Aims"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{A Marksmen's Approach to Specific Aims}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+In both epidemiology and clinical research, particularly for grants and major projects, specific aims are created. Each aim has hypotheses associated with it that are eventually tested. These are all pre-specified, which gives weight/importance to negative findings at times.
+
+In the `card` package, there is a series of functions to help simplify the research process. It's based on the `tidymodels` approach, using the multiple pre-specified models from `parsnip` to create effective workflows. 
+
+```{r setup}
+library(card)
+data(geh)
+
+# Formula
+f <- svg_mag + qrs_tang ~ lab_hba1c + age + sex + bmi + cad + htn
+```
