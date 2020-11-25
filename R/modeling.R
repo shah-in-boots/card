@@ -185,7 +185,7 @@ build_models <- function(formula, data, type, engine = "linear", exposure = NULL
           m <- circular::lm.circular(y = y, x = x, type = "c-l", init = rep(0, ncol(x)), tol = 1e-3, verbose = FALSE)
 
           # Tidy it (assuming intercept is first)
-          models[[o[[i]]]][[j]] <- tidy.circular(m, conf.int = TRUE)
+          models[[o[[i]]]][[j]] <- tidy.lm.circular.lm(m, conf.int = TRUE)
 
         }
       }

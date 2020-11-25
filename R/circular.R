@@ -1,4 +1,5 @@
 # Tidy Methods ====
+
 #' @title Tidy a(n) circular object
 #' @description Tidy summarizes information about the components of a `circular`
 #'   model.
@@ -11,7 +12,7 @@
 #' @param ... For extensibility
 #' @return a `tibble` object
 #' @export
-tidy.circular <- function(x, conf.int = FALSE, conf.level = 0.95, ...) {
+tidy.lm.circular.cl <- function(x, conf.int = FALSE, conf.level = 0.95, ...) {
 
   # Get base data
   names(x$coefficients) <- colnames(x$x)
@@ -48,6 +49,8 @@ tidy.circular <- function(x, conf.int = FALSE, conf.level = 0.95, ...) {
 
 # Parsnip Methods ====
 
+#' @description Parsnip methods that are called by the `.onLoad()` function to create the `circular_reg()` model specification.
+#' @noRd
 make_circular_reg <- function() {
 
 	# Check to see if already loaded
@@ -62,7 +65,7 @@ make_circular_reg <- function() {
 		# Add parsnip models to another package
 		parsnip::set_model_mode(model = "circular_reg", mode = "regression")
 		parsnip::set_model_engine("circular_reg", mode = "regression", eng = "circular")
-		parsnip::set_dependency("circular_reg", eng = "circular", pkg = "circular")
+		parsnip::set_dependency("circular_reg", eng = "circular", pkg = "card")
 
 		# Arguments = type
 		parsnip::set_model_arg(
@@ -141,7 +144,6 @@ make_circular_reg <- function() {
 
 }
 
-
 #' @title General Interface for Circular Regression Models
 #' @description `circular_reg()` is a _parsnip_ friendly method for
 #'   specification of circular regression model before fitting. When using the
@@ -165,9 +167,12 @@ make_circular_reg <- function() {
 #'   lower or higher tolerance which sets the accuracy for algorithm
 #'   convergence.
 #' @examples
+#' library(magrittr)
+#' library(circular)
+#' library(parsnip)
 #' f <- az_svg ~ lab_hba1c + cad
 #' df <- geh[c("az_svg", "lab_hba1c", "cad")]
-#' df$az_svg <- circular::circular(df$az_svg, units = "degrees")
+#' df$az_svg <- circular(df$az_svg, units = "degrees") %>% conversion.circular(., units = "radians")
 #' circular_reg(pattern = "c-l", initial = rep(0, 3), tolerance = 1e-3) %>%
 #'   set_engine("circular") %>%
 #'   fit(f, data = df)
@@ -236,17 +241,17 @@ update.circular_reg <- function(object, pattern = NULL, initial = NULL, toleranc
 
 #' @method print circular_reg
 #' @rdname circular_reg
-#' @param object circular model specification
+#' @param x circular model specification
 #' @param ... Extensible
 #' @export
-print.circular_reg <- function(object, ...) {
-	cat("Circular Model Specification (", object$mode, ")\n\n", sep = "")
-	parsnip::model_printer(object, ...)
+print.circular_reg <- function(x, ...) {
+	cat("Circular Model Specification (", x$mode, ")\n\n", sep = "")
+	parsnip::model_printer(x, ...)
 
-	if (!is.null(object$method$fit$args)) {
+	if (!is.null(x$method$fit$args)) {
 		cat("Model fit template:\n")
-		print(parsnip::show_call(object))
+		print(parsnip::show_call(x))
 	}
 
-	invisible(object)
+	invisible(x)
 }

@@ -330,10 +330,11 @@ make_cosinor_reg <- function() {
 #' @param mode A character string that describes the type of model. In this case, it only supports type of "regression".
 #' @param period A non-negative number or vector of numbers that represent the expected periodicity of the data to be analyzed.
 #' @examples
+#' library(parsnip)
 #' data(twins)
 #' cosinor_reg(period = 24) %>%
-#'   parsnip::set_engine("card") %>%
-#'   parsnip::fit(rDYX ~ hour, data = twins)
+#'   set_engine("card") %>%
+#'   fit(rDYX ~ hour, data = twins)
 #' @export
 cosinor_reg <- function(mode = "regression", period = NULL) {
 
@@ -393,19 +394,19 @@ update.cosinor_reg <- function(object, period = NULL, fresh = FALSE, ...) {
 
 #' @method print cosinor_reg
 #' @rdname cosinor_reg
-#' @param object Cosinor model specification
+#' @param x Cosinor model specification
 #' @param ... Extensible
 #' @export
-print.cosinor_reg <- function(object, ...) {
-	cat("Cosinor Model Specification (", object$mode, ")\n\n", sep = "")
-	parsnip::model_printer(object, ...)
+print.cosinor_reg <- function(x, ...) {
+	cat("Cosinor Model Specification (", x$mode, ")\n\n", sep = "")
+	parsnip::model_printer(x, ...)
 
-	if (!is.null(object$method$fit$args)) {
+	if (!is.null(x$method$fit$args)) {
 		cat("Model fit template:\n")
-		print(parsnip::show_call(object))
+		print(parsnip::show_call(x))
 	}
 
-	invisible(object)
+	invisible(x)
 }
 
 # }}}
@@ -547,7 +548,6 @@ tidy.cosinor <- function(x, conf.int = FALSE, conf.level = 0.95, ...) {
 	return(result)
 
 }
-
 
 ## Augment Method
 

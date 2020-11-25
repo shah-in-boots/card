@@ -45,12 +45,11 @@ Imports:
     broom,
     hardhat,
     recipes,
-		parsnip,
+    parsnip,
     data.table,
     Hmisc,
     generics,
     methods,
-    ggrepel,
 Suggests:
     kableExtra,
     plyr,
@@ -60,5 +59,7 @@ Suggests:
     covr,
     testthat,
     broom.mixed,
-    lme4
+    lme4,
+    circular,
+    ggrepel
 VignetteBuilder: knitr

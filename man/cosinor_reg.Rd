@@ -10,25 +10,28 @@ cosinor_reg(mode = "regression", period = NULL)
 
 \method{update}{cosinor_reg}(object, period = NULL, fresh = FALSE, ...)
 
-\method{print}{cosinor_reg}(object, ...)
+\method{print}{cosinor_reg}(x, ...)
 }
 \arguments{
 \item{mode}{A character string that describes the type of model. In this case, it only supports type of "regression".}
 
-\item{period}{A non-negative number or vector of numbers that represent hte expected periodicity of the data to be analyzed.}
+\item{period}{A non-negative number or vector of numbers that represent the expected periodicity of the data to be analyzed.}
 
 \item{object}{Cosinor model specification}
 
 \item{fresh}{A logical for whether the arguments should be modified in place or replaced altogether}
 
 \item{...}{Extensible}
+
+\item{x}{Cosinor model specification}
 }
 \description{
 \code{cosinor_reg()} is a \emph{parsnip} friendly method for specification of cosinor regression model before fitting.
 }
 \examples{
+library(parsnip)
 data(twins)
 cosinor_reg(period = 24) \%>\%
-  parsnip::set_engine("card") \%>\%
-  parsnip::fit(rDYX ~ hour, data = twins)
+  set_engine("card") \%>\%
+  fit(rDYX ~ hour, data = twins)
 }
