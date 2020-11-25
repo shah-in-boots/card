@@ -41,7 +41,7 @@
 
 <meta property="og:title" content="Read in Toolbox HRV — read_hrv_matlab" />
 <meta property="og:description" content="Takes the output from HRV Toolbox and reads it in for an
-individual patient. Unlike card::proc_hrv_matlab, this does not process
+individual patient. Unlike proc_hrv_matlab, this does not process
 or summarize the data, it just reads it the raw analysis. Uses the package
 data.table::fread() for reading in data due to size/speed." />
 
@@ -124,12 +124,12 @@ data.table::fread() for reading in data due to size/speed." />
 
     <div class="ref-description">
     <p>Takes the output from HRV Toolbox and reads it in for an
-individual patient. Unlike <a href='proc_hrv_matlab.html'>card::proc_hrv_matlab</a>, this does not process
+individual patient. Unlike <a href='proc_hrv_matlab.html'>proc_hrv_matlab</a>, this does not process
 or summarize the data, it just reads it the raw analysis. Uses the package
 <code><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>data.table::fread()</a></code> for reading in data due to size/speed.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>read_hrv_matlab</span>(<span class='no'>loc</span>, <span class='no'>name</span>)</pre>
+    <pre class="usage"><span class='fu'>read_hrv_matlab</span><span class='op'>(</span><span class='va'>loc</span>, <span class='va'>name</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -173,7 +173,7 @@ percent missing (e.g. 20.0% missing data) by time group.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

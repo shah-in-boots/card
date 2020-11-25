@@ -70,7 +70,8 @@
 
       
 
-      </header><div class="row">
+      </header><script src="Cosinor_files/header-attrs-2.5/header-attrs.js"></script><script src="Cosinor_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="Cosinor_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="Cosinor_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>cosinor</h1>
@@ -84,11 +85,12 @@
     
     
 <p>The function <code><a href="../reference/cosinor.html">cosinor()</a></code> is built off of literature supporting the analysis of circadian rhythms. There are two other packages on CRAN that provide cosinor analyses that are very good, <a href="https://CRAN.R-project.org/package=cosinor">cosinor</a> and <a href="https://CRAN.R-project.org/package=cosinor2">cosinor2</a>. This package was built for 1) learning about regression and model development, and 2) the raw material generated to allow for more expansive and experimental analysis of cosinor functions and circadian rhythms.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">card</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/asshah4/card">card</a></span><span class="op">)</span>
 
 <span class="co"># Using the provide dataset</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"twins"</span>)
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">twins</span>)
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"twins"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">twins</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 23</span>
 <span class="co">#&gt; # Groups:   patid, hour [6]</span>
 <span class="co">#&gt;   patid   age   bmi race  smoking hptn  dm    chf   prevchd med_beta_blocke…</span>
@@ -101,20 +103,22 @@
 <span class="co">#&gt; 6     1    49  27.4 0     1       1     0     0     0       0               </span>
 <span class="co">#&gt; # … with 13 more variables: med_antidepr &lt;fct&gt;, beck_total &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   sad_bin &lt;fct&gt;, sad_cat &lt;fct&gt;, PETdiff_2 &lt;fct&gt;, dyxtime &lt;dttm&gt;, date &lt;date&gt;,</span>
-<span class="co">#&gt; #   hour &lt;dbl&gt;, rDYX &lt;dbl&gt;, sDYX &lt;dbl&gt;, HR &lt;dbl&gt;, CP &lt;dbl&gt;, zip &lt;chr&gt;</span></pre></body></html></div>
+<span class="co">#&gt; #   hour &lt;dbl&gt;, rDYX &lt;dbl&gt;, sDYX &lt;dbl&gt;, HR &lt;dbl&gt;, CP &lt;dbl&gt;, zip &lt;chr&gt;</span></code></pre></div>
 <p>The <code>twins</code> dataset contains clinical covariates and continuous time measures, such as heart rate variability at each hour of the day. These continuous measures follow a circadian pattern.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">twins</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">hour</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">rDYX</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">geom_smooth</a></span>(<span class="kw">method</span> <span class="kw">=</span> <span class="st">"gam"</span>)
-<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></pre></body></html></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">twins</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">hour</span>, y <span class="op">=</span> <span class="va">rDYX</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"gam"</span><span class="op">)</span>
+<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></code></pre></div>
 <p><img src="Cosinor_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 <p>Cosinor analysis can be used to generate model statistics. Confidence intervals of the amplitude and acrophase can be generated. It is based of the <code>hardhat</code> package.</p>
 <p>The model can return information about an individual cosinor. The model statistics can be extracted, as well as visualized.</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="co"># Model</span>
-<span class="no">m</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cosinor.html">cosinor</a></span>(<span class="no">rDYX</span> ~ <span class="no">hour</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">twins</span>, <span class="kw">tau</span> <span class="kw">=</span> <span class="fl">24</span>)
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Model</span>
+<span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cosinor.html">cosinor</a></span><span class="op">(</span><span class="va">rDYX</span> <span class="op">~</span> <span class="va">hour</span>, data <span class="op">=</span> <span class="va">twins</span>, tau <span class="op">=</span> <span class="fl">24</span><span class="op">)</span>
 
 <span class="co"># Summary</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">m</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span>
 <span class="co">#&gt; Individual Cosinor Model </span>
 <span class="co">#&gt; ------------------------------------------</span>
 <span class="co">#&gt; Call: </span>
@@ -133,17 +137,18 @@
 <span class="co">#&gt; phi1  -2.6687044 0.028860014</span>
 
 <span class="co"># Plot</span>
-<span class="fu"><a href="../reference/ggcosinor.html">ggcosinor</a></span>(<span class="no">m</span>, <span class="kw">labels</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
+<span class="fu"><a href="../reference/ggcosinor.html">ggcosinor</a></span><span class="op">(</span><span class="va">m</span>, labels <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; Warning in regularize.values(x, y, ties, missing(ties)): collapsing to unique</span>
 <span class="co">#&gt; 'x' values</span>
-<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></pre></body></html></div>
+<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></code></pre></div>
 <p><img src="Cosinor_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 <p>More complex models can also be made using multiple components, which is represented by additional, user-defined periods.</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="co"># Model</span>
-<span class="no">m</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cosinor.html">cosinor</a></span>(<span class="no">rDYX</span> ~ <span class="no">hour</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">twins</span>, <span class="kw">tau</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">24</span>, <span class="fl">12</span>))
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Model</span>
+<span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cosinor.html">cosinor</a></span><span class="op">(</span><span class="va">rDYX</span> <span class="op">~</span> <span class="va">hour</span>, data <span class="op">=</span> <span class="va">twins</span>, tau <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">24</span>, <span class="fl">12</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># Summary</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">m</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span>
 <span class="co">#&gt; Individual Cosinor Model </span>
 <span class="co">#&gt; ------------------------------------------</span>
 <span class="co">#&gt; Call: </span>
@@ -164,19 +169,20 @@
 <span class="co">#&gt; phi2  -3.6636921 0.065235427</span>
 
 <span class="co"># Plot</span>
-<span class="fu"><a href="../reference/ggcosinor.html">ggcosinor</a></span>(<span class="no">m</span>, <span class="kw">labels</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
+<span class="fu"><a href="../reference/ggcosinor.html">ggcosinor</a></span><span class="op">(</span><span class="va">m</span>, labels <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; This is a harmonic multiple-component cosinor object. The orthophase, bathyphase, and global amplitude were calculated.</span>
 <span class="co">#&gt; Warning in regularize.values(x, y, ties, missing(ties)): collapsing to unique</span>
 <span class="co">#&gt; 'x' values</span>
-<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></pre></body></html></div>
+<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></code></pre></div>
 <p><img src="Cosinor_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <p>And, these models can be repeated for an entire population if warranted.</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="co"># Model</span>
-<span class="no">m</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cosinor.html">cosinor</a></span>(<span class="no">rDYX</span> ~ <span class="no">hour</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">twins</span>, <span class="kw">tau</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">24</span>), <span class="kw">population</span> <span class="kw">=</span> <span class="st">"patid"</span>)
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Model</span>
+<span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cosinor.html">cosinor</a></span><span class="op">(</span><span class="va">rDYX</span> <span class="op">~</span> <span class="va">hour</span>, data <span class="op">=</span> <span class="va">twins</span>, tau <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">24</span><span class="op">)</span>, population <span class="op">=</span> <span class="st">"patid"</span><span class="op">)</span>
 <span class="co">#&gt; 18 subjects were removed due to having insufficient observations.</span>
 
 <span class="co"># Summary</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">m</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span>
 <span class="co">#&gt; Population Cosinor Model </span>
 <span class="co">#&gt; ------------------------------------------</span>
 <span class="co">#&gt; Call: </span>
@@ -193,7 +199,7 @@
 <span class="co">#&gt;         Estimate Std. Error</span>
 <span class="co">#&gt; mesor  2.8248529 0.02497310</span>
 <span class="co">#&gt; amp1   0.2880224 0.01661657</span>
-<span class="co">#&gt; phi1  -2.7924872 0.04034663</span></pre></body></html></div>
+<span class="co">#&gt; phi1  -2.7924872 0.04034663</span></code></pre></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -209,7 +215,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -7,7 +7,7 @@
     <loc>https://asshah4.github.io/card//reference/augment.cosinor.html</loc>
   </url>
   <url>
-    <loc>https://asshah4.github.io/card//reference/build_sequential_models.html</loc>
+    <loc>https://asshah4.github.io/card//reference/build_models.html</loc>
   </url>
   <url>
     <loc>https://asshah4.github.io/card//reference/card-package.html</loc>
@@ -28,6 +28,9 @@
     <loc>https://asshah4.github.io/card//reference/circ_sun.html</loc>
   </url>
   <url>
+    <loc>https://asshah4.github.io/card//reference/circular_reg.html</loc>
+  </url>
+  <url>
     <loc>https://asshah4.github.io/card//reference/cosinor.html</loc>
   </url>
   <url>
@@ -38,6 +41,9 @@
   </url>
   <url>
     <loc>https://asshah4.github.io/card//reference/cosinor_goodness_of_fit.html</loc>
+  </url>
+  <url>
+    <loc>https://asshah4.github.io/card//reference/cosinor_reg.html</loc>
   </url>
   <url>
     <loc>https://asshah4.github.io/card//reference/cosinor_zero_amplitude.html</loc>
@@ -62,9 +68,6 @@
   </url>
   <url>
     <loc>https://asshah4.github.io/card//reference/ggforest.html</loc>
-  </url>
-  <url>
-    <loc>https://asshah4.github.io/card//reference/heart-class.html</loc>
   </url>
   <url>
     <loc>https://asshah4.github.io/card//reference/hrv.html</loc>
@@ -106,6 +109,9 @@
     <loc>https://asshah4.github.io/card//reference/tidy.cosinor.html</loc>
   </url>
   <url>
+    <loc>https://asshah4.github.io/card//reference/tidy.lm.circular.cl.html</loc>
+  </url>
+  <url>
     <loc>https://asshah4.github.io/card//reference/triplets.html</loc>
   </url>
   <url>
@@ -119,5 +125,8 @@
   </url>
   <url>
     <loc>https://asshah4.github.io/card//articles/cosinor.html</loc>
+  </url>
+  <url>
+    <loc>https://asshah4.github.io/card//articles/modeling.html</loc>
   </url>
 </urlset>

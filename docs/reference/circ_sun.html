@@ -133,7 +133,7 @@ calculations. Requires geographic position in latitude and longitude to
 calculate sunrise or sunset. Uses the function <a href='https://andyteucher.ca/lutz/reference/tz_lookup_coords.html'>lutz::tz_lookup_coords</a>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>circ_sun</span>(<span class='no'>date</span>, <span class='no'>lat</span>, <span class='no'>lon</span>, <span class='kw'>zenith</span> <span class='kw'>=</span> <span class='st'>"official"</span>, <span class='kw'>sunset</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>circ_sun</span><span class='op'>(</span><span class='va'>date</span>, <span class='va'>lat</span>, <span class='va'>lon</span>, zenith <span class='op'>=</span> <span class='st'>"official"</span>, sunset <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -176,12 +176,14 @@ been corrected to the appropriate time-zone. Can use <code><a href='https://rdrr
 strip the time zone away.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"twins"</span>)
-<span class='no'>twins</span>$<span class='no'>lat</span> <span class='kw'>&lt;-</span> <span class='fl'>33.749</span>
-<span class='no'>twins</span>$<span class='no'>lon</span> <span class='kw'>&lt;-</span> -<span class='fl'>84.388</span>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"twins"</span><span class='op'>)</span>
+<span class='va'>twins</span><span class='op'>$</span><span class='va'>lat</span> <span class='op'>&lt;-</span> <span class='fl'>33.749</span>
+<span class='va'>twins</span><span class='op'>$</span><span class='va'>lon</span> <span class='op'>&lt;-</span> <span class='op'>-</span><span class='fl'>84.388</span>
 
 <span class='co'># Using latitude/longitude from Atlanta, GA, USA</span>
-<span class='no'>twins</span>$<span class='no'>sunrise</span> <span class='kw'>&lt;-</span> <span class='fu'>circ_sun</span>(<span class='no'>twins</span>$<span class='no'>date</span>, <span class='no'>twins</span>$<span class='no'>lat</span>, <span class='no'>twins</span>$<span class='no'>lon</span>)</div></pre>
+<span class='va'>twins</span><span class='op'>$</span><span class='va'>sunrise</span> <span class='op'>&lt;-</span> <span class='fu'>circ_sun</span><span class='op'>(</span><span class='va'>twins</span><span class='op'>$</span><span class='va'>date</span>, <span class='va'>twins</span><span class='op'>$</span><span class='va'>lat</span>, <span class='va'>twins</span><span class='op'>$</span><span class='va'>lon</span><span class='op'>)</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -197,7 +199,7 @@ strip the time zone away.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

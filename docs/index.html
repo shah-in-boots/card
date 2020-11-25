@@ -94,16 +94,19 @@
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>Once published, you can install the released version of <strong>card</strong> from <a href="https://CRAN.R-project.org">CRAN</a> with:</p>
-<div class="sourceCode" id="cb1"><pre class="r">#install.packages("card")</pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co">#install.packages("card")</span></code></pre></div>
 <p>And the development version from <a href="https://github.com/">GitHub</a> with:</p>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="co"># install.packages("devtools")</span>
-<span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="st">"asshah4/card"</span>)</pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
+<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"asshah4/card"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
 <p>This package is intended for analyzing cardiovascular signals and autonomic physiology. The current collection of functions are built practically around this paradigm. The current focus, in <code>card v0.1.0</code> is the development of a flexible and tidy analytical approach to circadian rhythms.</p>
-<div class="sourceCode" id="cb3"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">card</span>)</pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/asshah4/card">card</a></span><span class="op">)</span></code></pre></div>
 <div id="datasets" class="section level3">
 <h3 class="hasAnchor">
 <a href="#datasets" class="anchor"></a>Datasets</h3>
@@ -113,9 +116,10 @@
 <li>Vectorcardiography data in a high-risk cohort</li>
 <li>Continuous electrocardiography recordings in a clinical cohort with quantitative stress data</li>
 </ul>
-<!-- end list --><div class="sourceCode" id="cb4"><pre class="r"><span class="co"># ECG data</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"twins"</span>)
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">twins</span>)
+<!-- end list --><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># ECG data</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"twins"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">twins</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 23</span>
 <span class="co">#&gt; # Groups:   patid, hour [6]</span>
 <span class="co">#&gt;   patid   age   bmi race  smoking hptn  dm    chf   prevchd med_beta_blocke…</span>
@@ -131,8 +135,8 @@
 <span class="co">#&gt; #   hour &lt;dbl&gt;, rDYX &lt;dbl&gt;, sDYX &lt;dbl&gt;, HR &lt;dbl&gt;, CP &lt;dbl&gt;, zip &lt;chr&gt;</span>
 
 <span class="co"># Outcomes data</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"mims"</span>)
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">mims</span>)
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"mims"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">mims</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 11</span>
 <span class="co">#&gt;   patid first_visit_dat… ldka       mi_date_1  mi_date_2  mi_date_3  CHF_DATE_1</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;date&gt;           &lt;date&gt;     &lt;date&gt;     &lt;date&gt;     &lt;date&gt;     &lt;date&gt;    </span>
@@ -146,8 +150,8 @@
 <span class="co">#&gt; #   DEATH_CV_YN &lt;dbl&gt;, RDR_ISCHEMIA_M_YN_bl &lt;dbl&gt;</span>
 
 <span class="co"># VCG data</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"geh"</span>)
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">geh</span>)
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"geh"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">geh</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 70</span>
 <span class="co">#&gt;      pid hhp_id   age sex   age_cat systolic_bp_fir… systolic_bp_sec…</span>
 <span class="co">#&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;              &lt;dbl&gt;            &lt;dbl&gt;</span>
@@ -174,14 +178,15 @@
 <span class="co">#&gt; #   p_amp &lt;dbl&gt;, qrs_duration &lt;dbl&gt;, qt_interval &lt;dbl&gt;, cornell_voltage &lt;fct&gt;,</span>
 <span class="co">#&gt; #   nhanes_score &lt;dbl&gt;, svg_mag &lt;dbl&gt;, az_svg &lt;dbl&gt;, az_svg_m &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   el_svg &lt;dbl&gt;, el_svg_m &lt;dbl&gt;, qrs_tang &lt;dbl&gt;, auc_vm_qt &lt;dbl&gt;, wvg &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   log_svg &lt;dbl&gt;, log_auc_qt &lt;dbl&gt;, log_wvg &lt;dbl&gt;</span></pre></div>
+<span class="co">#&gt; #   log_svg &lt;dbl&gt;, log_auc_qt &lt;dbl&gt;, log_wvg &lt;dbl&gt;</span></code></pre></div>
 </div>
 <div id="cosinor-analysis" class="section level3">
 <h3 class="hasAnchor">
 <a href="#cosinor-analysis" class="anchor"></a>Cosinor Analysis</h3>
 <p>This modeling algorithm requires only base <code>R</code>, which allows internal flexibility for modeling heuristics and improved efficiency. For the user, it also allows standard modeling tools/approachs, and a flexible user interface that accounts for individual/population analysis and single/multiple component analysis.</p>
-<div class="sourceCode" id="cb5"><pre class="r"><span class="no">m</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/cosinor.html">cosinor</a></span>(<span class="no">rDYX</span> ~ <span class="no">hour</span>, <span class="no">twins</span>, <span class="kw">tau</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">24</span>, <span class="fl">12</span>))
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">m</span>)
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/cosinor.html">cosinor</a></span><span class="op">(</span><span class="va">rDYX</span> <span class="op">~</span> <span class="va">hour</span>, <span class="va">twins</span>, tau <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">24</span>, <span class="fl">12</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span>
 <span class="co">#&gt; Individual Cosinor Model </span>
 <span class="co">#&gt; ------------------------------------------</span>
 <span class="co">#&gt; Call: </span>
@@ -200,14 +205,15 @@
 <span class="co">#&gt; amp2   0.1302012 0.008542526</span>
 <span class="co">#&gt; phi1  -2.6542757 0.028911445</span>
 <span class="co">#&gt; phi2  -3.6636921 0.065235427</span>
-<span class="fu"><a href="reference/ggcosinor.html">ggcosinor</a></span>(<span class="no">m</span>)
+<span class="fu"><a href="reference/ggcosinor.html">ggcosinor</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span>
 <span class="co">#&gt; This is a harmonic multiple-component cosinor object. The orthophase, bathyphase, and global amplitude were calculated.</span>
 <span class="co">#&gt; Warning in regularize.values(x, y, ties, missing(ties)): collapsing to unique</span>
 <span class="co">#&gt; 'x' values</span>
-<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></pre></div>
+<span class="co">#&gt; `geom_smooth()` using formula 'y ~ s(x, bs = "cs")'</span></code></pre></div>
 <p><img src="reference/figures/unnamed-chunk-6-1.png" width="100%"></p>
-<div class="sourceCode" id="cb6"><pre class="r">
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span>(<span class="no">m</span>))
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 8</span>
 <span class="co">#&gt;       y     t     x1        x2        z1        z2 .fitted .resid</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;</span>
@@ -216,7 +222,7 @@
 <span class="co">#&gt; 3  1.81    10 -0.866  5.00e- 1  5.00e- 1 -8.66e- 1    3.15 -1.34 </span>
 <span class="co">#&gt; 4  2.01    11 -0.966  8.66e- 1  2.59e- 1 -5.00e- 1    3.08 -1.07 </span>
 <span class="co">#&gt; 5  1.63    12 -1      1.00e+ 0  1.22e-16 -2.45e-16    3.01 -1.38 </span>
-<span class="co">#&gt; 6  1.95    13 -0.966  8.66e- 1 -2.59e- 1  5.00e- 1    2.95 -0.996</span></pre></div>
+<span class="co">#&gt; 6  1.95    13 -0.966  8.66e- 1 -2.59e- 1  5.00e- 1    2.95 -0.996</span></code></pre></div>
 </div>
 </div>
 </div>
@@ -227,6 +233,8 @@
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
+<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=card">https://​cloud.r-project.org/​package=card</a>
+</li>
 <li>Browse source code at <br><a href="https://github.com/asshah4/card/">https://​github.com/​asshah4/​card/​</a>
 </li>
 <li>Report a bug at <br><a href="https://github.com/asshah4/card/issues">https://​github.com/​asshah4/​card/​issues</a>
@@ -266,7 +274,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
