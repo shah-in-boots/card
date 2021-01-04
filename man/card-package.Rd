@@ -19,7 +19,7 @@ Tools that can aid in the assessment of the autonomic regulation
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/asshah4/card}
+  \item \url{https://cran.r-project.org/package=card}
   \item Report bugs at \url{https://github.com/asshah4/card/issues}
 }
 

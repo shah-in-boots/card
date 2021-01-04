@@ -319,11 +319,6 @@ make_cosinor_reg <- function() {
 
 }
 
-.onLoad <- function(libname, pkgname) {
-	# Loads cosinor_reg in the model database
-	make_cosinor_reg()
-	make_circular_reg()
-}
 
 #' @title General Interface for Cosinor Regression Models
 #' @description `cosinor_reg()` is a _parsnip_ friendly method for specification of cosinor regression model before fitting.

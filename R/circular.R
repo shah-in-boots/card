@@ -49,6 +49,8 @@ tidy.lm.circular.cl <- function(x, conf.int = FALSE, conf.level = 0.95, ...) {
 
 # Parsnip Methods ====
 
+# nocov start
+
 #' @description Parsnip methods that are called by the `.onLoad()` function to create the `circular_reg()` model specification.
 #' @noRd
 make_circular_reg <- function() {
@@ -65,6 +67,7 @@ make_circular_reg <- function() {
 		# Add parsnip models to another package
 		parsnip::set_model_mode(model = "circular_reg", mode = "regression")
 		parsnip::set_model_engine("circular_reg", mode = "regression", eng = "circular")
+		parsnip::set_dependency("circular_reg", eng = "circular", pkg = "circular")
 		parsnip::set_dependency("circular_reg", eng = "circular", pkg = "card")
 
 		# Arguments = type
@@ -255,3 +258,5 @@ print.circular_reg <- function(x, ...) {
 
 	invisible(x)
 }
+
+# nocov end

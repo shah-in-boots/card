@@ -1,44 +1,96 @@
-# Recurrent Survival Table {{{ ====
-
-#' @title Recurrent Survival Data Format
+#' Recurrent Survival Data Format
 #'
 #' @description Reformats recurrent event data (wide) into different models for
 #'   survival analysis, but can also be used for simple survival analysis tables
-#'   as well. Importantly, for large datasets, this function will show
-#'   significant slow-down since it uses an intuitive approach on defining the
-#'   datasets. Future iterations will create a vectorized approach that should
-#'   provide performance speed-ups.
+#'   as well. The general format is how data tends to be collected. There is
+#'   left and right censoring date, a labeled event column that contains the
+#'   date of the event, and a censoring column for a final censoring event. The
+#'   accepted parameter options are listed, with the type of table that will be
+#'   generated:
 #'
-#'   * For recurrent events, the final censoring event can include death, or can
+#'   - `traditional`: Traditional survival table that has single censoring event
+#'   (`trad`)
+#'
+#'   - `counting`: Formally called the Andersen and Gill model (`ag`). Counting
+#'   process model assumes each event is independent and that a subject
+#'   contributes to the risk set during the time under observation. Multiple
+#'   events are treated as a new (but delayed) entry that is followed until the
+#'   next event. This means subjects under observation are at risk for a second
+#'   event, even without having had a prior event. There are thus no *strata* in
+#'   the model.
+#'
+#'   - `marginal`: Marginal model assumes each event is a separate process. Each
+#'   subject is at risk for all events. The time for an event starts at the
+#'   beginning of follow-up for each subject. Thus, each risk period is
+#'   considered a different *strata* (regardless of if subject had an event or
+#'   not).
+#'
+#'   - `conditional A`: Formally called the Prentice, Williams, and Peterson
+#'   total time model (`pwptt`). Conditional A models order events by
+#'   stratification, based on the number of events prior. All subjects are at
+#'   risk for the first *strata*, but only those with a previous event are at
+#'   risk for a successive event. The total time to event is used.
+#'
+#'   - `conditional B`: Formally called the Prentice, Williams, and Peterson gap
+#'   time model (`pwpgt`). Conditional B models also order events by strata
+#'   (like conditional A), however the time to outcome is defined as the gap
+#'   between the time of previous event.
+#'
+#' @details This function takes every event date, and creates several types of
+#'   recurrent event tables. It orders the data chronologically for repeat
+#'   events. Currently does normal (first event) and recurrent models (counting,
+#'   marginal, and conditional A and B models). Further details can be found at
+#'   [IDRE](https://stats.idre.ucla.edu/sas/faq/how-can-i-model-repeated-events-survival-analysis-in-proc-phreg/).
+#'
+#'   - For recurrent events, the final censoring event can include death, or can
 #'   be ignored if its not considered a failure event.
 #'
-#'   * For simple survival analysis, death censoring should be left as NULL, and
-#'   the event (e.g. "date_of_death"), should be used as a single `event.dates`
-#'   parameter. The function will do the rest.
+#'   - For traditional survival analysis, `censor` is required and `event_dates`
+#'   should be left as NULL. The function will do the rest.
 #'
-#' @details This function takes every data event date, and creates several types
-#'   of recurrent event tables. It orders the data chronologically for repeat
-#'   events. Currently does marginal and conditional A and B models. The large
+#'   **Performance**: Importantly, for large datasets of recurrent data (>500
+#'   rows), this function will show significant slow-down since it uses an
+#'   intuitive approach on defining the datasets. Future iterations will create
+#'   a vectorized approach that should provide performance speed-ups.
+#'
+#' @return A data frame organized into a survival table format. Output options
+#'   are in **Details**. Generally, the following columns are generated:
+#'
+#'   - **id**: An ID column is created
+#'
+#'   - **start**: A formatted start time, usually 0
+#'
+#'   - **stop**: A formatted stop time, in days, from prior event
+#'
+#'   - **status**: If event occurred or not
+#'
+#'   - **strata**: Event strata that is being applied
 #'
 #' @param data A dataframe containing the subsequent parameters
+#' @param model_type Model type that is indicated:
+#'
+#'   - `trad` makes traditional survival table
+#'
+#'   - `ag` makes table with risk periods starting at time of prior event
+#'   without conditional strata
+#'
+#'   - `marginal` makes table with risk periods from entry to censorship with
+#'   strata per each event
+#'
+#'   - `pwptt` makes table with risk periods starting at time of prior event
+#'   with conditional strata
+#'
+#'   - `pwpgt` makes table with risk periods of each time interval between
+#'   events,  with conditional strata
 #'
 #' @param id Column in dataframe that contains unique IDs for each row
-#'
 #' @param first Column with left/enrollment dates
-#'
 #' @param last Column with right/censoring time point, or last contact
-#'
-#' @param event.dates Vector of columns that contain event dates
-#'
-#' @param model.type Character/string = c("marginal", "pwptt", "pwpgt")
-#'
-#' @param death Column created for if death is known (0 or 1), original
-#'   dataframe (e.g. can add column of zeroes PRN). Death defaults to null for
-#'   intermediate calculations otherwise.
-#'
-#' @importFrom magrittr %>% %<>%
-#'
-#' @return A data frame organized into a survival table format
+#' @param censor Column that names if death/final censorship is known (0 or 1).
+#'   The default is that, if no censorship information is given, that are no
+#'   failure events at time of last contact. `censor` is not required for
+#'   recurrent event analysis, but is required for traditional survival tables.
+#' @param event_dates Vector of columns that contain event dates
 #'
 #' @examples
 #' \donttest{
@@ -49,36 +101,365 @@
 #' id <- "patid"
 #' first <- "first_visit_date_bl"
 #' last <- "ldka"
-#' event.dates <- c("mi_date_1", "mi_date_2", "mi_date_3")
-#' model.type <- "marginal"
-#' death <- "DEATH_CV_YN"
+#' event_dates <- c("mi_date_1", "mi_date_2", "mi_date_3")
+#' model_type <- "marginal"
+#' censor <- "DEATH_CV_YN"
 #'
 #' # Run analysis
-#' tbl <- recur_survival_table(
-#'   mims, id, first, last, event.dates, model.type, death
+#' out <- recur(
+#'   mims, model_type, id, first, last, censor, event_dates
 #' )
 #' }
 #'
+#' @importFrom magrittr %>%
+#' @importFrom dplyr select all_of mutate arrange group_by ungroup
+#' @importFrom purrr map
+#' @importFrom tidyr nest unnest pivot_longer pivot_wider
 #' @export
-recur_survival_table <-
-  function(data, id, first, last, event.dates, model.type, death = NULL) {
+#' @rdname recur
+recur <- function(data, model_type, id, first, last, censor = NULL, event_dates = NULL) {
+
+  # Check to see if censoring column is available
+  if (is.null(censor)) {
+    data$censor <- 0
+    warning("Censorship data was not provided.")
+  }
+
+  # Check on event dates
+  if (model_type == "trad") {
+    if (!is.null(event_dates)) {
+      warning("Event dates shouldn't be specified for traditional survival table.")
+    }
+  } else if (model_type != "trad") {
+    if (is.null(event_dates)) {
+      stop("Event dates should be specified for recurrent events.", call. = FALSE)
+    }
+  }
+
+  # Appropriate columns for recurrent data
+  if (model_type != "trad") {
+    if (
+      !id %in% names(data) |
+      !first %in% names(data) |
+      !last %in% names(data) |
+      !censor %in% names(data) |
+      length(setdiff(event_dates, names(data))) != 0
+    ) {
+      stop("The columns required for recurrent event analysis are not contained with the dataframe.", call. = FALSE)
+    }
+  }
+
+  # Possible strata
+  strata <- paste0("strata_", 0:length(event_dates))
+
+  if (model_type == "trad") {
+    tbl <-
+      data %>%
+      select(all_of(c(id, first, last, censor, event_dates))) %>%
+      dplyr::rename(
+        id = all_of(id),
+        first = all_of(first),
+        last = all_of(last),
+        censor = all_of(censor)
+      ) %>%
+      mutate(strata = strata) %>%
+      mutate(events = sum(!is.na(dplyr::c_across(all_of(event_dates)))))
+  } else {
+    # Make base table
+    tbl <-
+      data %>%
+      select(all_of(c(id, first, last, censor, event_dates))) %>%
+      dplyr::rename(
+        id = all_of(id),
+        first = all_of(first),
+        last = all_of(last),
+        censor = all_of(censor)
+      ) %>%
+      dplyr::rowwise() %>%
+      mutate(strata_0 = first) %>%
+      # Arrange by date
+      pivot_longer(
+        cols = c(strata_0, all_of(event_dates)),
+        names_to = "strata",
+        values_to = "date"
+      ) %>%
+      arrange(date) %>%
+      # Check all ordered events and rename them (removing same day events)
+      group_by(id) %>%
+      nest(nested = c(strata, date)) %>%
+      mutate(nested = map(nested, function(x) {
+        # NA values get trimmed as side effect (will be recovered in pivot wider)
+        y <- x %>% group_by(date) %>% dplyr::slice(1)
+        n <- length(y$strata)
+        y$strata <- strata[1:n]
+        return(y)
+      })) %>%
+      unnest(cols = c(nested)) %>%
+      arrange(id, date) %>%
+      ungroup()
+  }
+
+  # Initialize basic columns for survival table output
+  tbl$status <- tbl$start <- tbl$stop <- 0
+
+  # Make final table
+  tbl <- recur_model_type(tbl, model_type)
+
+  # Return
+  tbl
+}
+
+#' @description Switch method for model types
+#' @noRd
+recur_model_type <- function(tbl, model_type) {
+
+  # Modeling switch
+  switch(
+    model_type,
+    # Traditional / simple model
+    trad = {
+      tbl$status <- tbl$censor
+      tbl$stop <- tbl$last - tbl$first
+      tbl$date <- tbl$last
+      res <- tbl
+    },
+    # Marginal Model
+    marginal = {
+      res <-
+        tbl %>%
+        group_by(id) %>%
+        nest() %>%
+        mutate(data = map(data, function(x) {
+          # Remove missing rows as they have no data
+          x <- na.omit(x)
+
+          # Total number of events, excluding censoring events
+          x$events <- nrow(x[x$strata != "strata_0",])
+          n <- seq(1:max(x$events))
+
+          # Stop time for events
+          for (i in n) {
+            # Stop time will be event date - first
+            x$stop[x$strata == paste0("strata_", i)] <-
+              x$date[x$strata == paste0("strata_", i)] -
+              x$first[x$strata == paste0("strata_", i - 1)]
+
+            # Status if event occurs
+            x$status[x$strata == paste0("strata_", i)] <- 1
+          }
+
+          # Set censor date
+          x$date[x$strata == "strata_0"] <-
+            x$last[x$strata == "strata_0"]
+
+          # Censoring stop time
+          x$stop[x$strata == "strata_0"] <-
+            x$date[x$strata == "strata_0"] - x$first[x$strata == "strata_0"]
+
+          # Status of censoring events
+          x$status[x$strata == "strata_0" & x$censor == 1] <- 1
+
+          # Return
+          return(x)
+
+        })) %>%
+        unnest(cols = c(data))
+    },
+    # Conditional A / PWP Total Time Model
+    pwptt = {
+      res <-
+        tbl %>%
+        group_by(id) %>%
+        nest() %>%
+        mutate(data = map(data, function(x) {
+          # Remove missing rows as they have no data
+          x <- na.omit(x)
+
+          # Total number of events, excluding censoring events
+          x$events <- nrow(x[x$strata != "strata_0",])
+          n <- seq(1:max(x$events))
+
+          # Time for events
+          for (i in n) {
+            # Stop time will be event date - first
+            x$stop[x$strata == paste0("strata_", i)] <-
+              x$date[x$strata == paste0("strata_", i)] -
+              x$first[x$strata == paste0("strata_", i - 1)]
+
+            # Status if event occurs
+            x$status[x$strata == paste0("strata_", i)] <- 1
+
+            # Start time
+            x$start[x$strata == paste0("strata_", i)] <-
+              x$stop[x$strata == paste0("strata_", i - 1)]
+          }
+
+          # Set censor date
+          x$date[x$strata == "strata_0"] <-
+            x$last[x$strata == "strata_0"]
+
+          # Censoring stop time
+          x$stop[x$strata == "strata_0"] <-
+            x$date[x$strata == "strata_0"] - x$first[x$strata == "strata_0"]
+
+          # Status of censoring events
+          x$status[x$strata == "strata_0" & x$censor == 1] <- 1
+
+          # Censor start time
+          x$start[x$strata == "strata_0" & x$events > 0] <-
+            x$stop[x$strata == paste0("strata_", max(n))]
+
+          # Return
+          return(x)
+
+        })) %>%
+        unnest(cols = c(data))
+    },
+    # Conditional B / PWP Gap Time Model
+    pwpgt = {
+      res <-
+        tbl %>%
+        group_by(id) %>%
+        nest() %>%
+        mutate(data = map(data, function(x) {
+          # Remove missing rows as they have no data
+          x <- na.omit(x)
+
+          # Total number of events, excluding censoring events
+          x$events <- nrow(x[x$strata != "strata_0",])
+          n <- seq(1:max(x$events))
+
+          # Time for events
+          for (i in n) {
+            # Stop time will be event date - first (to be modified / collapsed)
+            x$stop[x$strata == paste0("strata_", i)] <-
+              x$date[x$strata == paste0("strata_", i)] -
+              x$first[x$strata == paste0("strata_", i - 1)]
+
+            # Status if event occurs
+            x$status[x$strata == paste0("strata_", i)] <- 1
+
+            # Start time will be from prior event
+            x$start[x$strata == paste0("strata_", i)] <-
+              x$stop[x$strata == paste0("strata_", i - 1)]
+          }
+
+          # Set censor date
+          x$date[x$strata == "strata_0"] <-
+            x$last[x$strata == "strata_0"]
+
+          # Censoring stop time
+          x$stop[x$strata == "strata_0"] <-
+            x$date[x$strata == "strata_0"] - x$first[x$strata == "strata_0"]
+
+          # Status of censoring events
+          x$status[x$strata == "strata_0" & x$censor == 1] <- 1
+
+          # Censor start time
+          x$start[x$strata == "strata_0" & x$events > 0] <-
+            x$stop[x$strata == paste0("strata_", max(n))]
+
+          # Conditional B has the "start times" collapse down to zero
+          x$stop <- x$stop - x$start
+          x$start <- x$start - x$start
+
+          # Return
+          return(x)
+
+        })) %>%
+        unnest(cols = c(data))
+    },
+    # Counting / Anderson & Gill Model
+    ag = {
+      res <-
+        tbl %>%
+        group_by(id) %>%
+        nest() %>%
+        mutate(data = map(data, function(x) {
+          # Remove missing rows as they have no data
+          x <- na.omit(x)
+
+          # Total number of events, excluding censoring events
+          x$events <- nrow(x[x$strata != "strata_0",])
+          n <- seq(1:max(x$events))
+
+          # Time for events
+          for (i in n) {
+            # Stop time will be event date - first
+            x$stop[x$strata == paste0("strata_", i)] <-
+              x$date[x$strata == paste0("strata_", i)] -
+              x$first[x$strata == paste0("strata_", i - 1)]
+
+            # Status if event occurs
+            x$status[x$strata == paste0("strata_", i)] <- 1
+
+            # Start time
+            x$start[x$strata == paste0("strata_", i)] <-
+              x$stop[x$strata == paste0("strata_", i - 1)]
+          }
+
+          # Set censor date
+          x$date[x$strata == "strata_0"] <-
+            x$last[x$strata == "strata_0"]
+
+          # Censoring stop time
+          x$stop[x$strata == "strata_0"] <-
+            x$date[x$strata == "strata_0"] - x$first[x$strata == "strata_0"]
+
+          # Status of censoring events
+          x$status[x$strata == "strata_0" & x$censor == 1] <- 1
+
+          # Censor start time
+          x$start[x$strata == "strata_0" & x$events > 0] <-
+            x$stop[x$strata == paste0("strata_", max(n))]
+
+          # For counting model, similar to Conditional A, however only 1 stratum
+          x$strata <- "strata_0"
+
+          # Return
+          return(x)
+
+        })) %>%
+        unnest(cols = c(data))
+
+    },
+    # Error catch
+    stop(
+      paste0("The model type `", model_type, "` is not currently supported.")
+    )
+  )
+
+  # Return clean results
+  res %>%
+    arrange(id, date) %>%
+    select(c(id, status, start, stop, strata, date, events)) %>%
+    ungroup() %>%
+    mutate(
+      stop = as.numeric(stop),
+      start = as.numeric(start)
+    )
+
+}
+
+#' @noRd
+recur_old <- function(data, id, first, last, event_dates, model_type, censor = NULL) {
 
   # Check for missing optional parameter of death
   # Creates minimally required table
   if (is.null(death)) {
-    df <- data[c(id, first, last, event.dates)]
+    df <- data[c(id, first, last, event_dates)]
     death <- "null_death"
     df$null_death <- 0
   } else {
-    df <- data[c(id, first, last, event.dates, death)]
+    df <- data[c(id, first, last, event_dates, death)]
   }
 
   # Identify number of events
-  n <- 0:length(event.dates)
+  n <- 0:length(event_dates)
   events <- paste0("EVENT_DATE_", c(1:(length(n) - 1)))
 
   # Event dates need to be organized by actual values
-  x <- df[c(id, event.dates)] %>%
+  x <- df[c(id, event_dates)] %>%
     tidyr::pivot_longer(-c(dplyr::all_of(id)), names_to = "EVENT", values_to = "DATE") %>%
     dplyr::group_by_(dplyr::all_of(id)) %>%
     dplyr::arrange(DATE) %>%
@@ -132,7 +513,7 @@ recur_survival_table <-
 
   # Now switch to options based on type of data
   switch(
-    model.type,
+    model_type,
 
     # Marginal order
     marginal = {
@@ -287,10 +668,6 @@ recur_survival_table <-
   return(y)
 }
 
-# }}}
-
-# Recurrent Events Summary {{{ ====
-
 #' @title Recurrent Event Summary Table by Group
 #'
 #' @description `recur_summary` Creates a table with summary of
@@ -348,11 +725,6 @@ recur_summary <- function(data, covar) {
   return(tbl)
 }
 
-# }}}
-
-
-# Propensity Score Weighting {{{ ====
-
 #' @title Propensity Score Weighting
 #'
 #' @description
@@ -398,10 +770,6 @@ recurrent_propensity <- function(data, vars) {
   # Return new data frame
   return(x)
 }
-
-# }}}
-
-# Recurrent Event Sequential Model Building {{{ ====
 
 #' @title Recurrent Event Sequential Model Building
 #'
@@ -477,10 +845,6 @@ recurrent_model_building <-
     # Return output
     return(m)
   }
-
-# }}}
-
-### Initial and Final Visit Table {{{ ====
 
 #' @title Initial and Final Visit Table
 #'
@@ -564,4 +928,3 @@ recur_followup_table <- function(data, studyid, keyid, date) {
   return(x)
 }
 
-### }}}

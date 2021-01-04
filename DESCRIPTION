@@ -1,6 +1,6 @@
 Package: card
 Type: Package
-Title: Cardiovascular and Autonomic Research Design
+Title: Circadian and Autonomic Research Design
 Version: 0.1.0
 Authors@R: c(
 			person("Anish S. Shah", 
@@ -18,7 +18,7 @@ Description: Tools that can aid in the assessment of the autonomic regulation
 		the methods by Cornelissen (2014) <doi:10.1186/1742-4682-11-16> and 
 		Refinetti, Cornelissen, Halberg (2014) <doi:10.1080/09291010600903692>.
 License: MIT + file LICENSE
-URL: https://github.com/asshah4/card
+URL: https://cran.r-project.org/package=card
 BugReports: https://github.com/asshah4/card/issues
 Encoding: UTF-8
 LazyData: true
