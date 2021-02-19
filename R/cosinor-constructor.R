@@ -107,7 +107,7 @@ cosinor.matrix <- function(t, y, tau, population = NULL, ...) {
 #' @rdname cosinor
 cosinor.formula <- function(formula, data, tau, population = NULL, ...) {
   processed <- hardhat::mold(formula, data)
-  if(is.character(population)) {
+  if (is.character(population)) {
     population <- data[[population]]
   }
   cosinor_bridge(processed, tau, population, data, ...)
@@ -119,7 +119,7 @@ cosinor.formula <- function(formula, data, tau, population = NULL, ...) {
 #' @rdname cosinor
 cosinor.recipe <- function(t, data, tau, population = NULL, ...) {
   processed <- hardhat::mold(t, data)
-  if(is.character(population)) {
+  if (is.character(population)) {
     population <- data[[population]]
   }
   cosinor_bridge(processed, tau, population, data, ...)
@@ -148,7 +148,7 @@ cosinor_bridge <- function(processed, tau, population, data, ...) {
   l <- length(tau)
   ls <- list()
 
-  for(i in 1:l) {
+  for (i in 1:l) {
     ls[[i]] <- paste0("A", i, " * cos(2*pi*", t, "/", tau[i], " + phi", i,")")
   }
   f <- paste0(y, " ~ M + ", paste0(ls, collapse = " + "))
@@ -166,13 +166,13 @@ cosinor_bridge <- function(processed, tau, population, data, ...) {
   outcomes <- processed$outcomes[[1]]
 
   # If population value is NULL, then perform individual cosinor
-  if(is.null(population)) {
+  if (is.null(population)) {
 
     # Implemented function for single and multiple component cosinor
     fit <- cosinor_impl(predictors, outcomes, tau)
     type <- "Individual"
 
-  } else if(length(population) == length(predictors)) {
+  } else if (length(population) == length(predictors)) {
 
     # Modified function, usings cosinor_impl internally
     fit <- cosinor_pop_impl(predictors, outcomes, tau, population)
@@ -529,18 +529,19 @@ tidy.cosinor <- function(x, conf.int = FALSE, conf.level = 0.95, ...) {
 	  dplyr::as_tibble(rownames = "term") %>%
 	  dplyr::rename(estimate = coefs, std.error = se)
 
-	# Add confidence intervals if needed
-	if(conf.int) {
-	  ci <- val$confints
-	  colnames(ci) <- c("conf.low", "conf.high")
-	  result <-
-	    ci %>%
+	if (conf.int) {
+
+		ci <- val$ci
+		colnames(ci) <- c("conf.low", "conf.high")
+		result <-
+			ci %>%
 	    dplyr::as_tibble(rownames = "term") %>%
 	    dplyr::left_join(result, ., by = "term")
+
 	}
 
 	# Return findings
-	return(result)
+	result
 
 }
 

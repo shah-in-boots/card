@@ -39,9 +39,9 @@ recurrent event analysis, but is required for traditional survival tables.}
 A data frame organized into a survival table format. Output options
 are in \strong{Details}. Generally, the following columns are generated:
 \itemize{
-\item \strong{id}: Patient ID given
-\item \strong{start}: Start time, usually 0
-\item \strong{stop}: Time, in days, from prior event
+\item \strong{id}: An ID column is created
+\item \strong{start}: A formatted start time, usually 0
+\item \strong{stop}: A formatted stop time, in days, from prior event
 \item \strong{status}: If event occurred or not
 \item \strong{strata}: Event strata that is being applied
 }
@@ -93,10 +93,10 @@ be ignored if its not considered a failure event.
 should be left as NULL. The function will do the rest.
 }
 
-\strong{Performance}: Importantly, for large datasets, this function will show
-significant slow-down since it uses an intuitive approach on defining the
-datasets. Future iterations will create a vectorized approach that should
-provide performance speed-ups.
+\strong{Performance}: Importantly, for large datasets of recurrent data (>500
+rows), this function will show significant slow-down since it uses an
+intuitive approach on defining the datasets. Future iterations will create
+a vectorized approach that should provide performance speed-ups.
 }
 \examples{
 \donttest{
@@ -113,7 +113,7 @@ censor <- "DEATH_CV_YN"
 
 # Run analysis
 out <- recur(
-  mims, model_type, id, first, last, censor
+  mims, model_type, id, first, last, censor, event_dates
 )
 }
 

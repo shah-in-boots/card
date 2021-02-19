@@ -4,7 +4,7 @@
 \name{card-package}
 \alias{card}
 \alias{card-package}
-\title{card: Cardiovascular and Autonomic Research Design}
+\title{card: Circadian and Autonomic Research Design}
 \description{
 Tools that can aid in the assessment of the autonomic regulation 
 		of cardiovascular physiology. The aims of this package are to: 1) study 

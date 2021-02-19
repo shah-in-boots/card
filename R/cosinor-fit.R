@@ -52,7 +52,7 @@ cosinor_impl <- function(predictors, outcomes, tau) {
 
   # Need to create number of x values to match number of taus
   # x1, x2, z1, z2 in this case
-  for(i in 1:p) {
+  for (i in 1:p) {
     assign(paste0("x", i), cos((2 * pi * t) / tau[i]))
     assign(paste0("z", i), sin((2 * pi * t) / tau[i]))
   }
@@ -77,7 +77,7 @@ cosinor_impl <- function(predictors, outcomes, tau) {
   coefs <- solve(t(xmat) %*% xmat) %*% t(xmat) %*% ymat
   mesor <- coefs[1]
 
-  for(i in 1:p) {
+  for (i in 1:p) {
 
     # Beta and gamma terms
     assign(paste0("beta", i), unname(coefs[paste0("x", i),]))
@@ -111,7 +111,7 @@ cosinor_impl <- function(predictors, outcomes, tau) {
 	  # y(t) = M + amp1 * cos(2*pi*t/tau1 + phi1) + amp2 * cos(2*pi*t/tau2 + phi2)
 
   pars <- list()
-  for(i in 1:p) {
+  for (i in 1:p) {
 		pars[[i]] <- get(paste0("amp", i)) * cos(2*pi*t / tau[i] + get(paste0("phi", i)))
   }
   df <- data.frame(mesor = mesor, matrix(unlist(pars), ncol = length(pars), byrow = FALSE))
@@ -161,7 +161,7 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   p <- length(tau) # Number of parameters ... single cosinor ~ 2p + 1 = 3
 
   # Create data frame for split/apply approach
-  df <- data.frame(predictors, outcomes, population)
+  df <- na.omit(data.frame(predictors, outcomes, population))
 
   # Remove patients with only p observations (will cause a det ~ 0 error)
   counts <- by(df, df[, "population"], nrow)
@@ -169,7 +169,7 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   df <- subset(df, !(population %in% lowCounts))
 
   # Message about population count removal
-  if(length(lowCounts) != 0) {
+  if (length(lowCounts) != 0) {
     message(length(lowCounts), " subjects were removed due to having insufficient observations.")
   }
 
@@ -182,7 +182,7 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
 
   # Need to create number of x values to match number of taus
   # x1, x2, z1, z2 in this case
-  for(i in 1:p) {
+  for (i in 1:p) {
     assign(paste0("x", i), cos((2 * pi * t) / tau[i]))
     assign(paste0("z", i), sin((2 * pi * t) / tau[i]))
   }
@@ -216,7 +216,7 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   # Get mean for each parameter (mesor, beta, gamma), ignoring averaged amp/phi
   coefs <- colMeans(xmat, na.rm = TRUE)
 
-  for(i in 1:p) {
+  for (i in 1:p) {
 
     # Beta and gamma terms
     assign(paste0("beta", i), unname(coefs[paste0("beta", i)]))
