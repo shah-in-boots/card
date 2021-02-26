@@ -10,4 +10,10 @@ load_all()
 ecg <- readRDS("../twins/_targets/objects/ecg")
 data <- ecg
 
-# Use the template from cosinor to set everything up
+# Labels
+tau <- 24
+population <- "patid"
+
+processed <- hardhat::mold(dyx ~ hour, data)
+population <- data[[population]]
+
