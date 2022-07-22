@@ -21,22 +21,14 @@ cox_reg(mode = "censored regression", penalty = NULL, mixture = NULL)
 Possible values for this model are "unknown", or "censored regression".}
 
 \item{penalty}{A non-negative number representing the total
-amount of regularization (\code{glmnet}, \code{keras}, and \code{spark} only).
-For \code{keras} models, this corresponds to purely L2 regularization
-(aka weight decay) while the other models can be a combination
-of L1 and L2 (depending on the value of \code{mixture}; see below).}
+amount of regularization (specific engines only).}
 
 \item{mixture}{A number between zero and one (inclusive) that is the
 proportion of L1 regularization (i.e. lasso) in the model. When
 \code{mixture = 1}, it is a pure lasso model while \code{mixture = 0} indicates that
-ridge regression is being used. (\code{glmnet} and \code{spark} only).}
+ridge regression is being used (specific engines only).}
 
 \item{object}{A cox model specification.}
-
-\item{parameters}{A 1-row tibble or named list with \emph{main}
-parameters to update. If the individual arguments are used,
-these will supersede the values in \code{parameters}. Also, using
-engine arguments in this object will result in an error.}
 
 \item{fresh}{A logical for whether the arguments should be
 modified in-place of or replaced wholesale.}

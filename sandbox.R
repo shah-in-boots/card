@@ -1,10 +1,11 @@
 # Libraries for package development ====
 
 # For exploring
+library(devtools)
+document()
+
 library(tidyverse)
 library(tidymodels)
-library(devtools)
-load_all()
 
 # Problem with population cosinor
 ecg <- readRDS("../twins/_targets/objects/ecg")
