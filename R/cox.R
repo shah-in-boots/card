@@ -224,7 +224,6 @@ predict._coxnet <-
 
 ### CREATE COX PARSNIP
 
-
 make_cox_reg_survival <- function() {
 
 	# Check to see if already loaded
