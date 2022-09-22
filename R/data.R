@@ -10,7 +10,7 @@
 #' @docType data
 #' @format An tibble data frame
 #' @keywords datasets
-"mims"
+"stress"
 
 # }}}
 
