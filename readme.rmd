@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 # __card__
 
-## Cardiovascular and Autonomic Research Design
+## Cardiovascular Research Data
 
 The inspiration for `card` was to create useful functions and analytical approaches in computational neurocardiology, with a on electrocardiography and epidemiology. 
 

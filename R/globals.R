@@ -53,5 +53,4 @@ utils::globalVariables(c(
 	"bathyphase",
 	"orthophase",
 	"ampGlobal",
-	"tidy.lm.circular.lm"
 ))
