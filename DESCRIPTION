@@ -1,6 +1,6 @@
 Package: card
 Type: Package
-Title: Circadian and Autonomic Research Design
+Title: Cardiovascular and Autonomic Research Datasets
 Version: 0.1.0
 Authors@R: c(
 			person("Anish S. Shah", 
