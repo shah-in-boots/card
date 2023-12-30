@@ -1,4 +1,4 @@
-# Recurrent Event Sample Data {{{ ====
+# Recurrent Event Sample Data ====
 
 #' Recurrent event sample data
 #'
@@ -12,8 +12,6 @@
 #' @keywords datasets
 "stress"
 
-# }}}
-
 # Clinical Variables and Dyx Hourly Data {{{ ====
 
 #' Hourly time series data with clinical covariates
@@ -25,9 +23,7 @@
 #' @keywords datasets
 "twins"
 
-# }}}
-
-# Clinical Variables and Dyx Hourly Data {{{ ====
+# Clinical Variables and Dyx Hourly Data ====
 
 #' Hourly time series data with clinical covariates
 #'
@@ -38,9 +34,7 @@
 #' @keywords datasets
 "triplets"
 
-# }}}
-
-# Global Electrical Heterogeneity Data {{{ ====
+# Global Electrical Heterogeneity Data ====
 
 #' GEH parameters in a large clinical cohort
 #'
@@ -51,9 +45,7 @@
 #' @keywords datasets
 "geh"
 
-# }}}
-
-# Output from MATLAB HRV Toolbox {{{ ====
+# Output from MATLAB HRV Toolbox ====
 
 #' Output from MATLAB HRV Toolbox
 #'
@@ -64,9 +56,7 @@
 #' @keywords datasets
 "hrv"
 
-# }}}
-
-# Zipcodes with Associated Latitude and Longitude {{{ ====
+# Zipcodes with Associated Latitude and Longitude ====
 
 #' Zipcodes with Associated Latitude and Longitude
 #'
@@ -76,5 +66,3 @@
 #' @format A data frame with character vector zipcodes and latitude/longitude
 #' @keywords datasets
 "zipcode"
-
-# }}}

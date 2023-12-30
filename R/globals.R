@@ -52,5 +52,5 @@ utils::globalVariables(c(
 	"trough",
 	"bathyphase",
 	"orthophase",
-	"ampGlobal",
+	"ampGlobal"
 ))

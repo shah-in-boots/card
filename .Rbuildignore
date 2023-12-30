@@ -12,3 +12,4 @@
 ^LICENSE\.md$
 ^codecov\.yml$
 ^R/dev\.R$
+^data-raw$
