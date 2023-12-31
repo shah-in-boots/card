@@ -7,11 +7,11 @@
 procedure_codes(format, version)
 }
 \arguments{
-\item{format}{The format of the procedure codes. Currently supported formats
-are: \verb{c('ICD9', ICD10', HCPCS', 'CPT')} (case-sensitive character vector).}
+\item{format}{\if{html}{\out{<character>}} The format of the procedure codes. Currently supported formats
+are: \code{c("icd9", "icd10", "hcpcs", "cpt")} (case-insensitive).}
 
-\item{version}{The version of the procedure codes. Currently supported:
-\code{c(2014, 2023)} (numeric vector).}
+\item{version}{\if{html}{\out{<character>}} The version of the procedure codes. Currently supported:
+\code{c("2014", "2023")}}
 }
 \description{
 This is a generative function used to call CMS procedure codes. It is used to

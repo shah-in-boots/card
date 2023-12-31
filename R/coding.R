@@ -30,11 +30,11 @@
 #'
 #' * CPT: 2023
 #'
-#' @param format The format of the procedure codes. Currently supported formats
-#'   are: `c('ICD9', ICD10', HCPCS', 'CPT')` (case-sensitive character vector).
+#' @param format <character> The format of the procedure codes. Currently supported formats
+#'   are: `c("icd9", "icd10", "hcpcs", "cpt")` (case-insensitive).
 #'
-#' @param version The version of the procedure codes. Currently supported:
-#'   `c(2014, 2023)` (numeric vector).
+#' @param version <character> The version of the procedure codes. Currently supported:
+#'   `c("2014", "2023")`
 #'
 #' @name procedure_codes
 #' @export
@@ -44,24 +44,35 @@ procedure_codes <- function(format, version) {
     stop("Format not supported. Please use one of the following: icd9, icd10, hcpcs, cpt")
   }
 
-  # Check if the version is supported
-  if (!version %in% c("2014", "2023")) {
-    stop("Version not supported. Please use one of the following: 2014, 2023")
-  }
+	# Identify which dataset to use based on format code
+	# 	Add checks to see if version is supported
+  # 	Check if the version is supported
 
 	if (format == 'icd9') {
+	  if (!version %in% c("2014")) {
+	    stop("Version not supported. Please use one of the following: 2014")
+	  }
 		dat <- icd9
 	}
 
 	if (format == 'icd10') {
+	  if (!version %in% c("2023")) {
+	    stop("Version not supported. Please use one of the following: 2023")
+	  }
 		dat <- icd10
 	}
 
 	if (format == 'hcpcs') {
+	  if (!version %in% c("2023")) {
+	    stop("Version not supported. Please use one of the following: 2023")
+	  }
 		dat <- hcpcs
 	}
 
 	if (format == 'cpt') {
+	  if (!version %in% c("2023")) {
+	    stop("Version not supported. Please use one of the following: 2023")
+	  }
 		dat <- cpt
 	}
 
