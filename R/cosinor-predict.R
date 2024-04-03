@@ -1,4 +1,4 @@
-# Predict {{{ ====
+# Predict ----
 
 #' Predict from a `cosinor`
 #' @param object A `cosinor` object.
@@ -27,9 +27,7 @@ valid_predict_types <- function() {
   c("numeric")
 }
 
-# }}}
-
-# Bridge {{{ ====
+# Bridge ----
 
 predict_cosinor_bridge <- function(type, object, predictors) {
 
@@ -53,9 +51,7 @@ get_predict_function <- function(type) {
   )
 }
 
-# }}}
-
-# Implementation {{{ ====
+# Implementation ----
 
 # Numeric prediction
 predict_cosinor_numeric <- function(object, predictors) {
@@ -73,7 +69,7 @@ predict_cosinor_numeric <- function(object, predictors) {
   mesor <- coefs[1]
 
   # Assign to environemntal variables the values of coefficients
-  for(i in 1:p) {
+  for (i in 1:p) {
     assign(paste0("amp", i), unname(coefs[paste0("amp", i)]))
     assign(paste0("phi", i), unname(coefs[paste0("phi", i)]))
   }
@@ -81,7 +77,7 @@ predict_cosinor_numeric <- function(object, predictors) {
   # Make prediction based on parameters/coefficients
   # y(t) = M + amp1 * cos(2*pi*t/tau1 + phi1) + amp2 * cos(2*pi*t/tau2 + phi2)
   pars <- list()
-  for(i in 1:p) {
+  for (i in 1:p) {
 		pars[[i]] <- get(paste0("amp", i)) * cos(2*pi*t / tau[i] + get(paste0("phi", i)))
   }
   df <- data.frame(mesor = mesor, trig = matrix(unlist(pars), ncol = length(pars), byrow = FALSE))
@@ -91,6 +87,3 @@ predict_cosinor_numeric <- function(object, predictors) {
   out <- hardhat::spruce_numeric(pred)
   return(out)
 }
-
-# }}}
-

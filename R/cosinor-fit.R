@@ -1,4 +1,4 @@
-# Cosinor Implementation {{{ ====
+# Cosinor Implementation ----
 
 ## Single Component Cosinor Implementation
 
@@ -279,9 +279,7 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
 
 }
 
-# }}}
-
-# Statistical Methods {{{ ====
+# Statistical Methods ----
 
 ## Confidence Intervals
 
@@ -303,7 +301,7 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 	n <- length(t)
 	p <- length(object$tau)
 
-  for(i in 1:p) {
+  for (i in 1:p) {
     assign(paste0("x", i), object$model[, paste0("x", i)])
     assign(paste0("z", i), object$model[, paste0("z", i)])
   }
@@ -312,7 +310,7 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 	yhat <- object$fitted.values
 	coefs <- object$coefficients
 	names(coefs) <- object$coef_names
-  for(i in 1:length(coefs)) {
+  for (i in 1:length(coefs)) {
     assign(names(coefs)[i], unname(coefs[i]))
 	}
 
@@ -481,7 +479,7 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 #' @export
 cosinor_zero_amplitude <- function(object, level = 0.95) {
 
-	if(object$type == "Population") {
+	if (object$type == "Population") {
 		message("Zero amplitude test may not be accurate for population-mean cosinor method.")
 	}
 
@@ -542,7 +540,7 @@ cosinor_zero_amplitude <- function(object, level = 0.95) {
 #' @export
 cosinor_goodness_of_fit <- function(object, level = 0.95, ...) {
 
-	if(object$type == "Population") {
+	if (object$type == "Population") {
 		message("Goodness of fit may not be accurate for population-mean cosinor method.")
 	}
 
@@ -555,7 +553,7 @@ cosinor_goodness_of_fit <- function(object, level = 0.95, ...) {
 	n <- length(t)
 	p <- length(object$tau)
 
-  for(i in 1:p) {
+  for (i in 1:p) {
     assign(paste0("x", i), object$model[, paste0("x", i)])
     assign(paste0("z", i), object$model[, paste0("z", i)])
   }
@@ -564,7 +562,7 @@ cosinor_goodness_of_fit <- function(object, level = 0.95, ...) {
 	yhat <- object$fitted.values
 	coefs <- object$coefficients
 	names(coefs) <- object$coef_names
-  for(i in 1:length(coefs)) {
+  for (i in 1:length(coefs)) {
     assign(names(coefs)[i], unname(coefs[i]))
 	}
 
@@ -592,7 +590,7 @@ cosinor_goodness_of_fit <- function(object, level = 0.95, ...) {
   # SSPE = sum(observed value at t - local average at t)^2
   df <- data.frame(y, t)
   SSPE <- vector()
-  for(l in seq_along(ybar$t)) {
+  for (l in seq_along(ybar$t)) {
     yl <- df$y[df$t == ybar$t[l]]
     ybarl <- ybar$ybar[ybar$t == ybar$t[l]]
     SSPE[l] <- sum((yl - ybarl)^2)
@@ -632,10 +630,10 @@ cosinor_goodness_of_fit <- function(object, level = 0.95, ...) {
 #' @export
 cosinor_area <- function(object, level = 0.95, ...) {
 
-	if(object$type == "Population") {
+	if (object$type == "Population") {
 		message("Area calculations may not be accurate for population-mean cosinor method.")
 	}
-  if(length(object$tau) > 1) {
+  if (length(object$tau) > 1) {
     message("Area calculations currently use only the principal amplitude and acrophase in multiple-component cosinor method.")
   }
 
@@ -648,7 +646,7 @@ cosinor_area <- function(object, level = 0.95, ...) {
 	n <- length(t)
 	p <- length(object$tau)
 
-  for(i in 1:p) {
+  for (i in 1:p) {
     assign(paste0("x", i), object$model[, paste0("x", i)])
     assign(paste0("z", i), object$model[, paste0("z", i)])
   }
@@ -657,7 +655,7 @@ cosinor_area <- function(object, level = 0.95, ...) {
 	yhat <- object$fitted.values
 	coefs <- object$coefficients
 	names(coefs) <- object$coef_names
-  for(i in 1:length(coefs)) {
+  for (i in 1:length(coefs)) {
     assign(names(coefs)[i], unname(coefs[i]))
 	}
 
@@ -788,7 +786,7 @@ cosinor_features <- function(object, population = TRUE, ...) {
 	tau <- object$tau
 	p <- length(tau)
 	harmonic <- ifelse(length(tau) > 1 & max(tau) %% min(tau) == 0, TRUE, FALSE)
-	if(harmonic) {
+	if (harmonic) {
 		message("This is a harmonic multiple-component cosinor object. The orthophase, bathyphase, and global amplitude were calculated.")
 	}
 
@@ -870,5 +868,3 @@ cosinor_features <- function(object, population = TRUE, ...) {
 	return(results)
 
 }
-
-# }}}
