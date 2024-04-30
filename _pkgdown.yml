@@ -1,4 +1,4 @@
-url: https://asshah4.github.io/card/
+url: https://shah-in-boots.github.io/card/
 
 destination: docs
 
@@ -25,7 +25,7 @@ navbar:
       href: reference/index.html
     github:
       icon: fab fa-github fa-lg
-      href: https://github.com/asshah4/card/
+      href: https://github.com/shah-in-boots/card/
 
 reference:
 - title: Cosinor Analysis
