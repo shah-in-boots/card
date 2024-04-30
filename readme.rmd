@@ -16,10 +16,10 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-[![R build status](https://github.com/asshah4/card/workflows/R-CMD-check/badge.svg)](https://github.com/asshah4/card/actions)
-[![Travis build status](https://travis-ci.com/asshah4/card.svg?branch=master)](https://travis-ci.com/asshah4/card)
-[![Github commit frequency](https://img.shields.io/github/commit-activity/w/asshah4/card)](https://github.com/asshah4/card/graphs/commit-activity)
-[![Codecov test coverage](https://codecov.io/gh/asshah4/card/branch/master/graph/badge.svg)](https://codecov.io/gh/asshah4/card?branch=master)
+[![R build status](https://github.com/shah-in-boots/card/workflows/R-CMD-check/badge.svg)](https://github.com/shah-in-boots/card/actions)
+[![Travis build status](https://travis-ci.com/shah-in-boots/card.svg?branch=master)](https://travis-ci.com/shah-in-boots/card)
+[![Github commit frequency](https://img.shields.io/github/commit-activity/w/shah-in-boots/card)](https://github.com/shah-in-boots/card/graphs/commit-activity)
+[![Codecov test coverage](https://codecov.io/gh/shah-in-boots/card/branch/master/graph/badge.svg)](https://codecov.io/gh/shah-in-boots/card?branch=master)
 <!-- badges: end -->
 
 # __card__
@@ -45,7 +45,7 @@ And the development version from [GitHub](https://github.com/) with:
 
 ```{r, eval=FALSE}
 # install.packages("devtools")
-devtools::install_github("asshah4/card")
+devtools::install_github("shah-in-boots/card")
 ```
 
 ## Usage

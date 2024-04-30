@@ -1,6 +1,6 @@
 Package: card
 Type: Package
-Title: Cardiovascular Research Data
+Title: Cardiovascular Approaches in Research Data
 Version: 0.1.0.9000
 Authors@R: c(
 			person("Anish S. Shah", 
@@ -14,7 +14,7 @@ Description: A collection of cardiovascular research datasets and analytical
 		methods exist for analysis of procedural billing codes.
 License: MIT + file LICENSE
 URL: https://cran.r-project.org/package=card
-BugReports: https://github.com/asshah4/card/issues
+BugReports: https://github.com/shah-in-boots/card/issues
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.1

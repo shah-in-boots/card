@@ -1,10 +1,24 @@
-url: https://shah-in-boots.github.io/card/
+template:
+  bootstrap: 5
+  bootswatch: flatly
+  theme: solarized-light
+  bslib:
+    primary: "#ee7733"
+    secondary: "#0077bb"
+    success: "#ee3377"
+    info: "#33bbee"
+    warning: "#009988"
+    danger: "#cc3311"
+    light: "#ffffff"
+    dark: "#bbbbbb"
 
 destination: docs
 
+url: https://shah-in-boots.github.io/card/
+
 home:
-  title: An R package in Computational Neurocardiology
-  description: Analyze the autonomic regulation of cardiovascular physiology.
+  title: Cardiovascular Approaches in Research Data
+  description: A collection of cardiovascular research datasets and analytical tools, including methods for cardiovascular procedural data, such as electrocardiography, echocardiography, and catheterization data. Additional methods exist for analysis of procedural billing codes.
 
 navbar:
   structure:
