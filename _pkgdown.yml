@@ -3,37 +3,34 @@ template:
   bootswatch: flatly
   theme: solarized-light
   bslib:
-    primary: "#ee7733"
-    secondary: "#0077bb"
-    success: "#ee3377"
-    info: "#33bbee"
-    warning: "#009988"
-    danger: "#cc3311"
-    light: "#ffffff"
-    dark: "#bbbbbb"
+    bg: "#ffffff"
+    fg: "#070707"
+    primary: "#1c6897"
+    secondary: "#0097b4"
+    success: "#16bab3"
+    danger: "#f33e6c"
+    info: "#95d9bf"
+    warning: "#351d3b"
+    light: "#e0f7e1"
+    dark: "#070707"
 
 destination: docs
 
 url: https://shah-in-boots.github.io/card/
 
 home:
-  title: Cardiovascular Approaches in Research Data
-  description: A collection of cardiovascular research datasets and analytical tools, including methods for cardiovascular procedural data, such as electrocardiography, echocardiography, and catheterization data. Additional methods exist for analysis of procedural billing codes.
+  title: Cardiovascular Applications for Research Data
+  description: >
+    A collection of cardiovascular research datasets and analytical tools, including methods for cardiovascular procedural data, such as electrocardiography, echocardiography, and catheterization data. Additional methods exist for analysis of procedural billing codes.
 
 navbar:
   structure:
-    left:
-    - home
-    - intro
-    - reference
-    - articles
-    - tutorials
-    - news
-    right: github
+    left:  [home, reference, articles, tutorials, news]
+    right: [github]
   components:
     home:
       icon: fas fa-home fa-lg
-      href: index.html
+      href: https://shah-in-boots.github.io/
     reference:
       text: Reference
       href: reference/index.html
@@ -41,26 +38,9 @@ navbar:
       icon: fab fa-github fa-lg
       href: https://github.com/shah-in-boots/card/
 
-reference:
-- title: Cosinor Analysis
-- contents:
-  - contains("cosinor")
-- title: Circadian Rhythm
-- contents:
-  - contains("circ_")
-  - ggforest
-- title: Recurrent Events
-- contents:
-  - starts_with("recur_")
-- title: Electrocardiography
-- contents:
-  - hrv_linear_model
-  - build_sequential_models
-  - ggerror
-  - geom_residuals
-
-articles:
-- title: Circadian Rhythm
-  contents:
-  - cosinor
-  - circadian
+footer:
+  structure:
+    left: developed_by
+    right: [built_with, colors]
+  components:
+    colors: Colorspace from the **mako** palette

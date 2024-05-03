@@ -1,6 +1,6 @@
 Package: card
 Type: Package
-Title: Cardiovascular Approaches in Research Data
+Title: Cardiovascular Applications in Research Data
 Version: 0.1.0.9000
 Authors@R: c(
 			person("Anish S. Shah", 
