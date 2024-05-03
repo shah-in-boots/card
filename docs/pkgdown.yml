@@ -1,12 +1,10 @@
-pandoc: 2.9.2.1
-pkgdown: 1.6.1
+pandoc: 3.1.13
+pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
-  circadian: circadian.html
-  cosinor: cosinor.html
-  modeling: modeling.html
-last_built: 2020-11-25T11:31Z
+  Cosinor: Cosinor.html
+last_built: 2024-05-03T20:31Z
 urls:
-  reference: https://asshah4.github.io/card//reference
-  article: https://asshah4.github.io/card//articles
+  reference: https://shah-in-boots.github.io/card/reference
+  article: https://shah-in-boots.github.io/card/articles
 

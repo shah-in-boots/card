@@ -4,15 +4,15 @@ template:
   theme: solarized-light
   bslib:
     bg: "#ffffff"
-    fg: "#070707"
-    primary: "#1c6897"
-    secondary: "#0097b4"
-    success: "#16bab3"
-    danger: "#f33e6c"
-    info: "#95d9bf"
-    warning: "#351d3b"
-    light: "#e0f7e1"
-    dark: "#070707"
+    fg: "#772c4b"
+    primary: "#924055"
+    secondary: "#ad555b"
+    success: "#c96b5e"
+    danger: "#df8461"
+    info: "#eaa376"
+    warning: "#f3c194"
+    light: "#f8dfc1"
+    dark: "#772c4b"
 
 destination: docs
 
@@ -21,7 +21,10 @@ url: https://shah-in-boots.github.io/card/
 home:
   title: Cardiovascular Applications for Research Data
   description: >
-    A collection of cardiovascular research datasets and analytical tools, including methods for cardiovascular procedural data, such as electrocardiography, echocardiography, and catheterization data. Additional methods exist for analysis of procedural billing codes.
+    A collection of cardiovascular research datasets and analytical tools,
+    including methods for cardiovascular procedural data, such as
+    electrocardiography, echocardiography, and catheterization data.
+    Additional methods exist for analysis of procedural billing codes.
 
 navbar:
   structure:
@@ -43,4 +46,4 @@ footer:
     left: developed_by
     right: [built_with, colors]
   components:
-    colors: Colorspace from the **mako** palette
+    colors: Colorspace from the **BurgYl** palette
