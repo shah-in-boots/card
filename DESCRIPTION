@@ -20,41 +20,28 @@ LazyData: true
 RoxygenNote: 7.3.1
 Roxygen: list(markdown = TRUE)
 Depends:
-		R (>= 3.1),
+		R (>= 4.1),
 Imports:
     utils,
     stats,
     sf,
-    lutz,
-    magrittr,
     ggplot2,
     tidyr,
     dplyr,
     purrr,
     tibble,
-    readr,
-    lubridate,
-    stringr,
     rlang,
-    survival,
     broom,
     hardhat,
-    recipes,
     parsnip,
-    data.table,
-    Hmisc,
     generics,
     methods,
 Suggests:
     kableExtra,
-    plyr,
-    stargazer,
     knitr,
     rmarkdown,
     covr,
     testthat,
     broom.mixed,
-    lme4,
-    circular,
     ggrepel
 VignetteBuilder: knitr

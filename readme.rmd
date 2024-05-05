@@ -15,18 +15,18 @@ knitr::opts_chunk$set(
 ```
 
 <!-- badges: start -->
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-[![R build status](https://github.com/shah-in-boots/card/workflows/R-CMD-check/badge.svg)](https://github.com/shah-in-boots/card/actions)
 [![Github commit frequency](https://img.shields.io/github/commit-activity/w/shah-in-boots/card)](https://github.com/shah-in-boots/card/graphs/commit-activity)
-[![Codecov test coverage](https://codecov.io/gh/shah-in-boots/card/branch/master/graph/badge.svg)](https://codecov.io/gh/shah-in-boots/card?branch=master)
+[![R-CMD-check](https://github.com/shah-in-boots/card/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/shah-in-boots/card/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://github.com/shah-in-boots/card/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/shah-in-boots/card/actions/workflows/pkgdown.yaml)
 [![CRAN status](https://www.r-pkg.org/badges/version/card)](https://CRAN.R-project.org/package=card)
+[![](http://cranlogs.r-pkg.org/badges/grand-total/card?color=blue)](https://cran.r-project.org/package=card)
 <!-- badges: end -->
 
 # __card__
 
-## Cardiovascular Applications in Research Data
+## Cardiovascular Applications for Research Data
 
-The inspiration for `card` was to create useful functions and analytical approaches in computational neurocardiology, with a on electrocardiography and epidemiology. 
+The inspiration for `{card}` was to create useful functions and analytical approaches in computational neurocardiology, with a on electrocardiography and epidemiology. 
 
 The areas of focus of this package are the following:
 
@@ -35,7 +35,7 @@ The areas of focus of this package are the following:
 
 ## Installation
 
-You can install the released version of __card__ from [CRAN](https://CRAN.R-project.org) with:
+You can install the released version of `{card}` from [CRAN](https://CRAN.R-project.org) with:
 
 ```{r, eval=FALSE}
 install.packages("card")
@@ -75,8 +75,8 @@ data("twins")
 head(twins)
 
 # Outcomes data
-data("mims")
-head(mims)
+data("stress")
+head(stress)
 
 # VCG data
 data("geh")
@@ -96,7 +96,3 @@ ggcosinor(m)
 
 head(augment(m))
 ```
-
-### Recurrent Events
-
-### Model Building

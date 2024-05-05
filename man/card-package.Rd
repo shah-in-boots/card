@@ -4,7 +4,7 @@
 \name{card-package}
 \alias{card}
 \alias{card-package}
-\title{card: Cardiovascular Research Data}
+\title{card: Cardiovascular Applications in Research Data}
 \description{
 A collection of cardiovascular research datasets and analytical tools, including methods for cardiovascular procedural data, such as electrocardiography, echocardiography, and catheterization data. Additional methods exist for analysis of procedural billing codes.
 }
@@ -12,7 +12,7 @@ A collection of cardiovascular research datasets and analytical tools, including
 Useful links:
 \itemize{
   \item \url{https://cran.r-project.org/package=card}
-  \item Report bugs at \url{https://github.com/asshah4/card/issues}
+  \item Report bugs at \url{https://github.com/shah-in-boots/card/issues}
 }
 
 }
