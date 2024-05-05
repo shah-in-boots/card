@@ -1,15 +1,12 @@
 # card {development version}
 
-
-# card v0.1.1
-
 ## Next Steps
 
 * `cosinor()` to be expanded upon to include prediction, and integration into the __tidymodels__ approach in the `parsnip` package
 	* Evaluation of plotting functions for cosinor models
 	* Confidence interval methods to be improved upon
-* Inclusion of HRV functions for analysis.
-* Improvement of recurrent event analysis (and potential release of improved modeling functions)
+
+* Population cosinor analysis to be reworked for correct predictions and confidence interval estimates
 
 ## Deprecations
 
