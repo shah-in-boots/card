@@ -11,6 +11,12 @@
 * Inclusion of HRV functions for analysis.
 * Improvement of recurrent event analysis (and potential release of improved modeling functions)
 
+## Deprecations
+
+* The circadian-focused features are being deprecated in this upcoming release. The goal is to position functions in the appropriate package, with the key `cosinor()` functions to move to a separate package in a future release.
+
+* The longitudinal event functions are being moved to a separate package to make maintenance more straightforward.
+
 # card v0.1.0
 
 ## Bugs
