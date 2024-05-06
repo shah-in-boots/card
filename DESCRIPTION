@@ -24,7 +24,8 @@ Depends:
 Imports:
     utils,
     stats,
-    sf,
+    generics,
+    methods,
     ggplot2,
     tidyr,
     dplyr,
@@ -32,10 +33,8 @@ Imports:
     tibble,
     rlang,
     broom,
-    hardhat,
     parsnip,
-    generics,
-    methods,
+    hardhat,
 Suggests:
     kableExtra,
     knitr,

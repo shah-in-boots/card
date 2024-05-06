@@ -30,7 +30,7 @@
 #' Clinical data is also available for visualization and comparison. Other HRV measures are used here for comparison and testing out functions.
 #'
 #' @docType data
-#' @format An tibble data frame
+#' @format A `tbl_df`
 #' @keywords datasets
 "triplets"
 

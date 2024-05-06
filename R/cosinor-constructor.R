@@ -10,25 +10,25 @@
 #' @param t Represents the _ordered_ time indices that provide the positions for the
 #'   cosine wave. Depending on the context:
 #'
-#'   - A __data frame__ of a time-based predictor/index.
+#'   - A `data frame` of a time-based predictor/index.
 #'
-#'   - A __matrix__ of time-based predictor/index.
+#'   - A `matrix` of time-based predictor/index.
 #'
-#'   - A __recipe__ specifying a set of preprocessing steps
+#'   - A `recipe` specifying a set of preprocessing steps
 #'     created from [recipes::recipe()].
 #'
-#' @param y When `t` is a __data frame__ or __matrix__, `y` is the outcome
+#' @param y When __t__ is a `data frame` or `matrix`, __y__ is the outcome
 #' specified as:
 #'
-#'   - A __data frame__ with 1 numeric column.
+#'   - A `data frame` with 1 numeric column.
 #'
-#'   - A __matrix__ with 1 numeric column.
+#'   - A `matrix` with 1 numeric column.
 #'
-#'   - A numeric __vector__.
+#'   - A numeric `vector`.
 #'
-#' @param data When a __recipe__ or __formula__ is used, `data` is specified as:
+#' @param data When a `recipe` or `formula` is used, __data__ is specified as:
 #'
-#'   - A __data frame__ containing both the predictors and the outcome.
+#'   - A `data frame` containing both the predictors and the outcome.
 #'
 #' @param formula A formula specifying the outcome terms on the left-hand side,
 #' and the predictor terms on the right-hand side.
@@ -37,23 +37,23 @@
 #'   number of elements in the vector determine the number of components (e.g.
 #'   single versus multiple cosinor).
 #'
-#'   - A __vector__ with a single element = single-component cosinor, e.g.
+#'   - A `vector` with a single element = single-component cosinor, e.g.
 #'   period = c(24)
-#'   - A __vector__ with multiple elements = multiple-component
+#'   - A `vector` with multiple elements = multiple-component
 #'   cosinor, e.g. period = c(24, 12)
 #'
 #' @param population Represents the population to be analyzed with a
 #'   population-mean cosinor. Defaults to NULL, assuming individual cosinors are
-#'   being generated. When a __recipe__ or __formula__ is used, `population` is
+#'   being generated. When a `recipe` or `formula` is used, __population__ is
 #'   specified as:
 #'
-#'   - A __character__ name of the column contained in `data` that contains
+#'   - A `character` name of the column contained in __data__ that contains
 #'   identifiers for each subject. Every row will have a subject name which
 #'   should be duplicated for each time index given.
 #'
-#'   When a __data frame__ or __matrix__ is used, `population` is specified as:
+#'   When a `data frame` or `matrix` is used, __population__ is specified as:
 #'
-#'   - A __vector__ of the same length as `t`, with values representing each
+#'   - A `vector` of the same length as __t__, with values representing each
 #'   subject at the correct indices.
 #'
 #' @param ... Not currently used, but required for extensibility.
@@ -73,7 +73,7 @@ cosinor <- function(t, ...) {
   UseMethod("cosinor")
 }
 
-# Cosinor Methods {{{ ----
+# Cosinor Methods ----
 
 ## Default method
 
@@ -125,15 +125,13 @@ cosinor.recipe <- function(t, data, tau, population = NULL, ...) {
   cosinor_bridge(processed, tau, population, data, ...)
 }
 
-# }}}
-
-# Cosinor Construction {{{ ----
+# Cosinor Construction ----
 
 ## Bridging Function
 
 #' @description Bridging function takes user-facing call, after it is processed,
-#'   and moves it to `cosinor_bridge`, which then calls both `cosinor_impl`, the
-#'   fitting algorithm, and `new_cosinor`, the constructor for a new type of S3
+#'   and moves it to `cosinor_bridge()`, which then calls both `cosinor_impl()`, the
+#'   fitting algorithm, and `new_cosinor()`, the constructor for a new type of S3
 #'   class. This also bridges to population-mean cosinor implementation if
 #'   needed.
 #' @noRd
@@ -254,9 +252,7 @@ new_cosinor <- function(
   )
 }
 
-# }}}
-
-# Cosinor Parsnip Methods {{{ ----
+# Cosinor Parsnip Methods ----
 
 # Wrapper function to load parsnip model
 make_cosinor_reg <- function() {
@@ -327,8 +323,8 @@ make_cosinor_reg <- function() {
 #' @examples
 #' library(parsnip)
 #' data(twins)
-#' cosinor_reg(period = 24) %>%
-#'   set_engine("card") %>%
+#' cosinor_reg(period = 24) |>
+#'   set_engine("card") |>
 #'   fit(rDYX ~ hour, data = twins)
 #' @export
 cosinor_reg <- function(mode = "regression", period = NULL) {
@@ -404,9 +400,7 @@ print.cosinor_reg <- function(x, ...) {
 	invisible(x)
 }
 
-# }}}
-
-# Cosinor Generic S3 Methods {{{ ----
+# Cosinor Generic S3 Methods ----
 
 ## Print Method
 
@@ -487,10 +481,7 @@ plot.cosinor <- function(x, ...) {
 	plot(model$t, model$yhat)
 }
 
-
-# }}}
-
-# Cosinor Tidiers {{{ ----
+# Cosinor Tidiers ----
 
 ## Tidy Method
 
@@ -525,8 +516,8 @@ tidy.cosinor <- function(x, conf.int = FALSE, conf.level = 0.95, ...) {
 
 	# Tibble it
 	result <-
-	  mat %>%
-	  dplyr::as_tibble(rownames = "term") %>%
+	  mat |>
+	  dplyr::as_tibble(rownames = "term") |>
 	  dplyr::rename(estimate = coefs, std.error = se)
 
 	if (conf.int) {
@@ -534,8 +525,8 @@ tidy.cosinor <- function(x, conf.int = FALSE, conf.level = 0.95, ...) {
 		ci <- val$ci
 		colnames(ci) <- c("conf.low", "conf.high")
 		result <-
-			ci %>%
-	    dplyr::as_tibble(rownames = "term") %>%
+			ci |>
+	    dplyr::as_tibble(rownames = "term") |>
 	    dplyr::left_join(result, ., by = "term")
 
 	}
@@ -572,4 +563,3 @@ augment.cosinor <- function(x, ...) {
   return(result)
 
 }
-
