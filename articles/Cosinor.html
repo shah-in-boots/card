@@ -147,8 +147,9 @@ model statistics can be extracted, as well as visualized.</p>
 <span><span class="co">#&gt;         Estimate  Std. Error</span></span>
 <span><span class="co">#&gt; mesor  2.8604855 0.006098624</span></span>
 <span><span class="co">#&gt; amp1   0.2986101 0.008746706</span></span>
-<span><span class="co">#&gt; phi1  -2.6687044 0.028860014</span></span>
-<span></span>
+<span><span class="co">#&gt; phi1  -2.6687044 0.028860014</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># Plot</span></span>
 <span><span class="fu"><a href="../reference/ggcosinor.html">ggcosinor</a></span><span class="op">(</span><span class="va">m</span>, labels <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in regularize.values(x, y, ties, missing(ties)): collapsing to unique</span></span>
@@ -157,7 +158,7 @@ model statistics can be extracted, as well as visualized.</p>
 <p><img src="Cosinor_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 <p>More complex models can also be made using multiple components, which
 is represented by additional, user-defined periods.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Model</span></span>
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cosinor.html">cosinor</a></span><span class="op">(</span><span class="va">rDYX</span> <span class="op">~</span> <span class="va">hour</span>, data <span class="op">=</span> <span class="va">twins</span>, tau <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">24</span>, <span class="fl">12</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -180,8 +181,9 @@ is represented by additional, user-defined periods.</p>
 <span><span class="co">#&gt; amp1   0.2964114 0.008702368</span></span>
 <span><span class="co">#&gt; amp2   0.1302012 0.008542526</span></span>
 <span><span class="co">#&gt; phi1  -2.6542757 0.028911445</span></span>
-<span><span class="co">#&gt; phi2  -3.6636921 0.065235427</span></span>
-<span></span>
+<span><span class="co">#&gt; phi2  -3.6636921 0.065235427</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># Plot</span></span>
 <span><span class="fu"><a href="../reference/ggcosinor.html">ggcosinor</a></span><span class="op">(</span><span class="va">m</span>, labels <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; This is a harmonic multiple-component cosinor object. The orthophase, bathyphase, and global amplitude were calculated.</span></span>
@@ -191,11 +193,12 @@ is represented by additional, user-defined periods.</p>
 <p><img src="Cosinor_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <p>And, these models can be repeated for an entire population if
 warranted.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Model</span></span>
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cosinor.html">cosinor</a></span><span class="op">(</span><span class="va">rDYX</span> <span class="op">~</span> <span class="va">hour</span>, data <span class="op">=</span> <span class="va">twins</span>, tau <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">24</span><span class="op">)</span>, population <span class="op">=</span> <span class="st">"patid"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 18 subjects were removed due to having insufficient observations.</span></span>
-<span></span>
+<span><span class="co">#&gt; 18 subjects were removed due to having insufficient observations.</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># Summary</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Population Cosinor Model </span></span>
