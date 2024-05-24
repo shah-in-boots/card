@@ -18,3 +18,7 @@ population <- "patid"
 processed <- hardhat::mold(dyx ~ hour, data)
 population <- data[[population]]
 
+ecg |>
+	select(1:3) |>
+	select(1)
+
