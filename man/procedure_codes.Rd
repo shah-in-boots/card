@@ -7,17 +7,24 @@
 procedure_codes(format, version)
 }
 \arguments{
-\item{format}{\if{html}{\out{<character>}} The format of the procedure codes. Currently supported formats
-are: \code{c("icd9", "icd10", "hcpcs", "cpt")} (case-insensitive).}
+\item{format}{The format of the procedure codes, written as a \code{character}.
+Currently supported formats are: \code{c("icd9", "icd10", "hcpcs", "cpt")}
+(case-insensitive).}
 
-\item{version}{\if{html}{\out{<character>}} The version of the procedure codes. Currently supported:
-\code{c("2014", "2023")}}
+\item{version}{The version of the procedure codes, which are written as a
+\code{character} although the majority are listed as a year. Currently
+supported: \code{c("2014", "2023")}}
+}
+\value{
+A \code{tbl_df} with two columns: \code{code} and \code{description}. The \code{code}
+refers to the procedure code, while the \code{description} refers to the
+description of the procedure.
 }
 \description{
-This is a generative function used to call CMS procedure codes. It is used to
-create a dataset that can be generally used to map procedure codes to their
-descriptions, allowing for understanding of interventions performed. The
-currently supported codes are explained in the details.
+This is a generative function used to call CMS procedure codes.
+It is used to create a dataset that can be generally used to map procedure
+codes to their descriptions, allowing for understanding of interventions
+performed. The currently supported codes are explained in the details.
 
 The following procedure codes are currently supported:
 \itemize{
@@ -28,10 +35,10 @@ The following procedure codes are currently supported:
 }
 }
 \details{
-CMS will usually release updated version of these codes on an annual basis.
-Each dataset that is supported below can be identified by the year it was
-published (not the \emph{go-live} date, but the \emph{publically-available} date). The
-previous versions that are included in the package are as below.
+CMS will usually release updated version of these codes on an annual
+basis. Each dataset that is supported below can be identified by the year it
+was published (not the \emph{go-live} date, but the \emph{publically-available} date).
+The previous versions that are included in the package are as below.
 \itemize{
 \item ICD9: 2014
 \item ICD10: 2023

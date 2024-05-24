@@ -11,17 +11,17 @@
 
 \item{new_data}{A data frame or matrix of new predictors.}
 
-\item{type}{A single character. The type of predictions to generate.
-Valid options are:
+\item{type}{A single character. The type of predictions to generate. Valid
+options are:
 \itemize{
 \item \code{"numeric"} for numeric predictions.
 }}
 
-\item{...}{Not used, but required for extensibility.}
+\item{...}{Additional arguments passed to the prediction function}
 }
 \value{
-A tibble of predictions. The number of rows in the tibble is guaranteed
-to be the same as the number of rows in \code{new_data}.
+A tibble of predictions. The number of rows in the tibble is
+guaranteed to be the same as the number of rows in \code{new_data}.
 }
 \description{
 Predict from a \code{cosinor}

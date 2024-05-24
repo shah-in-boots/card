@@ -1,18 +1,20 @@
 # Predict ----
 
 #' Predict from a `cosinor`
+#'
 #' @param object A `cosinor` object.
+#'
 #' @param new_data A data frame or matrix of new predictors.
-#' @param type A single character. The type of predictions to generate.
-#' Valid options are:
+#'
+#' @param type A single character. The type of predictions to generate. Valid
+#'   options are:
 #'
 #' - `"numeric"` for numeric predictions.
 #'
-#' @param ... Not used, but required for extensibility.
-#' @return
+#' @param ... Additional arguments passed to the prediction function
 #'
-#' A tibble of predictions. The number of rows in the tibble is guaranteed
-#' to be the same as the number of rows in `new_data`.
+#' @return A tibble of predictions. The number of rows in the tibble is
+#' guaranteed to be the same as the number of rows in `new_data`.
 #'
 #' @export
 predict.cosinor <- function(object, new_data, type = "numeric", ...) {

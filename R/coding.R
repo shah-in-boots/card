@@ -1,10 +1,9 @@
 #' Center for Medicare and Medicaid Services (CMS) Procedure Codes
 #'
-#' @description
-#' This is a generative function used to call CMS procedure codes. It is used to
-#' create a dataset that can be generally used to map procedure codes to their
-#' descriptions, allowing for understanding of interventions performed. The
-#' currently supported codes are explained in the details.
+#' @description This is a generative function used to call CMS procedure codes.
+#' It is used to create a dataset that can be generally used to map procedure
+#' codes to their descriptions, allowing for understanding of interventions
+#' performed. The currently supported codes are explained in the details.
 #'
 #' The following procedure codes are currently supported:
 #'
@@ -16,11 +15,10 @@
 #'
 #' * CPT procedure codes, most recently updated on `2023-11-29`
 #'
-#' @details
-#' CMS will usually release updated version of these codes on an annual basis.
-#' Each dataset that is supported below can be identified by the year it was
-#' published (not the _go-live_ date, but the _publically-available_ date). The
-#' previous versions that are included in the package are as below.
+#' @details CMS will usually release updated version of these codes on an annual
+#' basis. Each dataset that is supported below can be identified by the year it
+#' was published (not the _go-live_ date, but the _publically-available_ date).
+#' The previous versions that are included in the package are as below.
 #'
 #' * ICD9: 2014
 #'
@@ -30,11 +28,17 @@
 #'
 #' * CPT: 2023
 #'
-#' @param format <character> The format of the procedure codes. Currently supported formats
-#'   are: `c("icd9", "icd10", "hcpcs", "cpt")` (case-insensitive).
+#' @param format The format of the procedure codes, written as a `character`.
+#'   Currently supported formats are: `c("icd9", "icd10", "hcpcs", "cpt")`
+#'   (case-insensitive).
 #'
-#' @param version <character> The version of the procedure codes. Currently supported:
-#'   `c("2014", "2023")`
+#' @param version The version of the procedure codes, which are written as a
+#'   `character` although the majority are listed as a year. Currently
+#'   supported: `c("2014", "2023")`
+#'
+#' @returns A `tbl_df` with two columns: `code` and `description`. The `code`
+#'   refers to the procedure code, while the `description` refers to the
+#'   description of the procedure.
 #'
 #' @name procedure_codes
 #' @export

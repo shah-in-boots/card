@@ -5,7 +5,7 @@
 \alias{triplets}
 \title{Hourly time series data with clinical covariates}
 \format{
-An tibble data frame
+A \code{tbl_df}
 }
 \usage{
 triplets

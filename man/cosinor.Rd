@@ -25,54 +25,54 @@ cosinor(t, ...)
 \item{t}{Represents the \emph{ordered} time indices that provide the positions for the
 cosine wave. Depending on the context:
 \itemize{
-\item A \strong{data frame} of a time-based predictor/index.
-\item A \strong{matrix} of time-based predictor/index.
-\item A \strong{recipe} specifying a set of preprocessing steps
+\item A \verb{data frame} of a time-based predictor/index.
+\item A \code{matrix} of time-based predictor/index.
+\item A \code{recipe} specifying a set of preprocessing steps
 created from \code{\link[recipes:recipe]{recipes::recipe()}}.
 }}
 
 \item{...}{Not currently used, but required for extensibility.}
 
-\item{y}{When \code{t} is a \strong{data frame} or \strong{matrix}, \code{y} is the outcome
+\item{y}{When \strong{t} is a \verb{data frame} or \code{matrix}, \strong{y} is the outcome
 specified as:
 \itemize{
-\item A \strong{data frame} with 1 numeric column.
-\item A \strong{matrix} with 1 numeric column.
-\item A numeric \strong{vector}.
+\item A \verb{data frame} with 1 numeric column.
+\item A \code{matrix} with 1 numeric column.
+\item A numeric \code{vector}.
 }}
 
 \item{tau}{A vector that determines the periodicity of the time index. The
 number of elements in the vector determine the number of components (e.g.
 single versus multiple cosinor).
 \itemize{
-\item A \strong{vector} with a single element = single-component cosinor, e.g.
+\item A \code{vector} with a single element = single-component cosinor, e.g.
 period = c(24)
-\item A \strong{vector} with multiple elements = multiple-component
+\item A \code{vector} with multiple elements = multiple-component
 cosinor, e.g. period = c(24, 12)
 }}
 
 \item{population}{Represents the population to be analyzed with a
 population-mean cosinor. Defaults to NULL, assuming individual cosinors are
-being generated. When a \strong{recipe} or \strong{formula} is used, \code{population} is
+being generated. When a \code{recipe} or \code{formula} is used, \strong{population} is
 specified as:
 \itemize{
-\item A \strong{character} name of the column contained in \code{data} that contains
+\item A \code{character} name of the column contained in \strong{data} that contains
 identifiers for each subject. Every row will have a subject name which
 should be duplicated for each time index given.
 }
 
-When a \strong{data frame} or \strong{matrix} is used, \code{population} is specified as:
+When a \verb{data frame} or \code{matrix} is used, \strong{population} is specified as:
 \itemize{
-\item A \strong{vector} of the same length as \code{t}, with values representing each
+\item A \code{vector} of the same length as \strong{t}, with values representing each
 subject at the correct indices.
 }}
 
 \item{formula}{A formula specifying the outcome terms on the left-hand side,
 and the predictor terms on the right-hand side.}
 
-\item{data}{When a \strong{recipe} or \strong{formula} is used, \code{data} is specified as:
+\item{data}{When a \code{recipe} or \code{formula} is used, \strong{data} is specified as:
 \itemize{
-\item A \strong{data frame} containing both the predictors and the outcome.
+\item A \verb{data frame} containing both the predictors and the outcome.
 }}
 }
 \value{

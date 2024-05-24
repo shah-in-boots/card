@@ -31,7 +31,7 @@ cosinor_reg(mode = "regression", period = NULL)
 \examples{
 library(parsnip)
 data(twins)
-cosinor_reg(period = 24) \%>\%
-  set_engine("card") \%>\%
+cosinor_reg(period = 24) |>
+  set_engine("card") |>
   fit(rDYX ~ hour, data = twins)
 }

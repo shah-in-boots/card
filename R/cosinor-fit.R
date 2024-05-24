@@ -2,7 +2,7 @@
 
 ## Single Component Cosinor Implementation
 
-#' @description Model fitting algorithm for cosinor. Results in output that define the new S3 class, as seen by the [hardhat::new_model], which generates the `new_cosinor` function.
+#' @description Model fitting algorithm for cosinor. Results in output that define the new S3 class, as seen by the [hardhat::new_model], which generates the `new_cosinor()` function.
 #' @noRd
 cosinor_impl <- function(predictors, outcomes, tau) {
 
@@ -857,9 +857,9 @@ cosinor_features <- function(object, population = TRUE, ...) {
 
 		# Fits are based on individuals, already made from original pop-cosinor
 		results <-
-			aug %>%
-			tidyr::nest(models = -population) %>%
-			dplyr::mutate(purrr::map_df(models, features)) %>%
+			aug |>
+			tidyr::nest(models = -population) |>
+			dplyr::mutate(purrr::map_df(models, features)) |>
 			dplyr::select(-models)
 
 	}

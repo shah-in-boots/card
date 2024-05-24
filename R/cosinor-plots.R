@@ -452,7 +452,7 @@ ggmulticosinor <- function(object, labels, ...) {
 	# Merge together
 	aug <- dplyr::bind_rows(aug, .id = ".id")
 	features <-
-		dplyr::bind_rows(features, .id = ".id") %>%
+		dplyr::bind_rows(features, .id = ".id") |>
 		tibble::add_column(mesor = unlist(mesor))
 
 	# Plot
