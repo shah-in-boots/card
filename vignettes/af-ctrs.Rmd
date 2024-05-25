@@ -1,0 +1,20 @@
+---
+title: "Atrial Fibrillation Composite Treatment Response Score"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Atrial Fibrillation Composite Treatment Response Score}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(card)
+```
+
