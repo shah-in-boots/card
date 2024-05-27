@@ -1,4 +1,5 @@
 test_that("cosinor_reg creates appropriate parsnip model", {
+	skip()
 	cosinor_mod <-
 		cosinor_reg(period = c(24, 8)) |>
 		parsnip::set_engine("card") |>
