@@ -8,6 +8,9 @@ frequency](https://img.shields.io/github/commit-activity/w/shah-in-boots/card)](
 [![pkgdown](https://github.com/shah-in-boots/card/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/shah-in-boots/card/actions/workflows/pkgdown.yaml)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/card)](https://CRAN.R-project.org/package=card)
+[![test-coverage](https://github.com/shah-in-boots/card/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/shah-in-boots/card/actions/workflows/test-coverage.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/shah-in-boots/card/branch/main/graph/badge.svg)](https://app.codecov.io/gh/shah-in-boots/card?branch=main)
 [![](http://cranlogs.r-pkg.org/badges/grand-total/card?color=blue)](https://cran.r-project.org/package=card)
 <!-- badges: end -->
 
@@ -174,7 +177,3 @@ head(augment(m))
 #> 5  1.63    12 -1      1   e+ 0  1.22e-16 -2.45e-16    3.01 -1.38 
 #> 6  1.95    13 -0.966  8.66e- 1 -2.59e- 1  5   e- 1    2.95 -0.996
 ```
-
-### Recurrent Events
-
-### Model Building
