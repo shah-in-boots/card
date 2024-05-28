@@ -2,16 +2,18 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <!-- badges: start -->
 
-[![Github commit
-frequency](https://img.shields.io/github/commit-activity/w/shah-in-boots/card)](https://github.com/shah-in-boots/card/graphs/commit-activity)
-[![R-CMD-check](https://github.com/shah-in-boots/card/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/shah-in-boots/card/actions/workflows/R-CMD-check.yaml)
-[![pkgdown](https://github.com/shah-in-boots/card/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/shah-in-boots/card/actions/workflows/pkgdown.yaml)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/card)](https://CRAN.R-project.org/package=card)
+[![](http://cranlogs.r-pkg.org/badges/grand-total/card?color=blue)](https://cran.r-project.org/package=card)
+[![R-CMD-check](https://github.com/shah-in-boots/card/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/shah-in-boots/card/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://github.com/shah-in-boots/card/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/shah-in-boots/card/actions/workflows/pkgdown.yaml)
 [![test-coverage](https://github.com/shah-in-boots/card/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/shah-in-boots/card/actions/workflows/test-coverage.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/shah-in-boots/card/branch/main/graph/badge.svg)](https://app.codecov.io/gh/shah-in-boots/card?branch=main)
-[![](http://cranlogs.r-pkg.org/badges/grand-total/card?color=blue)](https://cran.r-project.org/package=card)
+[![Github commit
+frequency](https://img.shields.io/github/commit-activity/w/shah-in-boots/card)](https://github.com/shah-in-boots/card/graphs/commit-activity)
 <!-- badges: end -->
 
 # **card**
