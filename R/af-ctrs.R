@@ -7,7 +7,7 @@
 #'
 #' @param symptom_type A `character` string indicating the type of symptom
 #'   burden ("AFEQT" or "NYHA").
-
+#'
 #' @param afeqt_total A `numeric` value representing the total AFEQT score
 #'   (0-100), if applicable.
 #'
@@ -28,6 +28,10 @@
 #'
 #' @param mct_burden A `numeric` value representing the percentage of time in AF
 #'   from MCT data, if applicable.
+#'
+#' @param mct_duration An `integer` value representing the number of days of
+#'   monitoring that occurred. For very short duration monitoring, please round
+#'   to the nearest whole day (> 0).
 #'
 #' @param ecg_total A `integer` value representing the total number of ECGs, if
 #'   applicable.
@@ -59,12 +63,12 @@ afib_score <- function(symptom_type = c("AFEQT", "NYHA"),
                        afeqt_activities = NULL,
                        afeqt_treatment = NULL,
                        nyha_class = NULL,
-                       electrical_type = c("ECG", "MCT"),
+                       electrical_type = c("MCT", "ECG"),
                        mct_burden = NULL,
+                       mct_duration = NULL,
                        ecg_total = NULL,
                        ecg_sinus = NULL,
                        ecg_time_range = NULL) {
-
   symptom_type <- match.arg(symptom_type)
   electrical_type <- match.arg(electrical_type)
 
@@ -98,6 +102,8 @@ afib_score <- function(symptom_type = c("AFEQT", "NYHA"),
   }
 
   # Calculate electrical burden based on electrical_type
+  # The data probably should be weighed against the time duration of monitoring
+  # The "density" of monitoring also probably matters
   electricalBurden <- 0
   if (electrical_type == "MCT") {
     if (!is.null(mct_burden)) {
@@ -128,10 +134,15 @@ afib_score <- function(symptom_type = c("AFEQT", "NYHA"),
     stop("Invalid electrical burden data type. Please specify either 'ECG' or 'MCT'.")
   }
 
+  # TODO
+  # Structural burden
+  # Can consider LA size, volume, strain, etc
+  # May also incorporate actual most recent ECG to evaluate P wave morphology
+
   # Calculate the composite score
   compositeScore <-
-  	(symptomBurden * parameters$weight_symptoms) +
-  	(electricalBurden * parameters$weight_electrical)
+    (symptomBurden * parameters$weight_symptoms) +
+    (electricalBurden * parameters$weight_electrical)
 
   return(compositeScore)
 }
@@ -185,7 +196,7 @@ afib_score <- function(symptom_type = c("AFEQT", "NYHA"),
 #'
 #' @export
 set_afib_score_parameters <- function(weight_symptoms = NULL,
-																			weight_afeqt_total = NULL,
+                                      weight_afeqt_total = NULL,
                                       weight_afeqt_symptoms = NULL,
                                       weight_afeqt_activities = NULL,
                                       weight_afeqt_treatment = NULL,
@@ -195,7 +206,6 @@ set_afib_score_parameters <- function(weight_symptoms = NULL,
                                       mct_cutoff_medium = NULL,
                                       ecg_cutoff_low = NULL,
                                       ecg_cutoff_medium = NULL) {
-
   currentParameters <- getOption("afib_parameters")
 
   # Overall weights for composite score

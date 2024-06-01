@@ -18,3 +18,5 @@ knitr::opts_chunk$set(
 library(card)
 ```
 
+This document serves as the develpomental log for the *Atrial Fibrillation Composite Treatment Response Score*. 
+It was generated from the conceptual work by [Darbar and Roden 2005](https://doi.org/10.1016/j.hrthm.2005.01.028). 
