@@ -1,93 +1,33 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://shah-in-boots.github.io/card/404.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/articles/Cosinor.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/index.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/readme.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/augment.cosinor.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/card-package.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/cosinor.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/cosinor_area.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/cosinor_features.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/cosinor_goodness_of_fit.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/cosinor_reg.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/cosinor_zero_amplitude.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/geh.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/ggcosinor.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/ggellipse.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/hrv.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/predict.cosinor.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/procedure_codes.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/reexports.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/stress.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/tidy.cosinor.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/triplets.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/twins.html</loc>
-  </url>
-  <url>
-    <loc>https://shah-in-boots.github.io/card/reference/zipcode.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://shah-in-boots.github.io/card/404.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/LICENSE-text.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/LICENSE.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/articles/Cosinor.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/articles/index.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/authors.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/index.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/news/index.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/readme.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/augment.cosinor.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/card-package.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/cosinor.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/cosinor_area.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/cosinor_features.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/cosinor_goodness_of_fit.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/cosinor_reg.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/cosinor_zero_amplitude.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/geh.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/ggcosinor.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/ggellipse.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/hrv.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/index.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/predict.cosinor.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/procedure_codes.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/reexports.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/stress.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/tidy.cosinor.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/triplets.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/twins.html</loc></url>
+<url><loc>https://shah-in-boots.github.io/card/reference/zipcode.html</loc></url>
 </urlset>
+
