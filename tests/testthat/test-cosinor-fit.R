@@ -13,7 +13,7 @@ test_that("models can be generally fit", {
 	# Harmonic checks
 	expect_gt(length(mcos$tau), 1)
 	expect_equal(max(mcos$tau) %% min(mcos$tau), 0)
-	expect_message(cosinor_features(mcos))
+	expect_warning(cosinor_features(mcos))
 
 	# Confidence intervals
 	expect_type(confint(scos), "list")
@@ -21,10 +21,11 @@ test_that("models can be generally fit", {
 
 test_that("population cosinors can be fit", {
 
+	# Single population cosinor
 	f <- sDYX ~ hour
 	data <- twins
 	population = "patid"
-	cosinor(formula = f, data = data, tau = 24, population = population)
+	m <- cosinor(formula = f, data = data, tau = 24, population = population)
 
 
 })

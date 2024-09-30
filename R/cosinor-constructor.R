@@ -7,8 +7,8 @@
 #'   linearization of the parameters to assess their statistics and
 #'   distribution.
 #'
-#' @param t Represents the _ordered_ time indices that provide the positions for the
-#'   cosine wave. Depending on the context:
+#' @param t Represents the _ordered_ time indices that provide the positions for
+#'   the cosine wave. Depending on the context:
 #'
 #'   - A `data frame` of a time-based predictor/index.
 #'

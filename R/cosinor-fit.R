@@ -165,7 +165,7 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
 
   # Remove patients with only p observations (will cause a det ~ 0 error)
   counts <- by(df, df[, "population"], nrow)
-  lowCounts <- as.numeric(names(counts[counts <= 2*p + 1]))
+  lowCounts <- as.numeric(names(counts[counts <= 2 * p + 1]))
   df <- subset(df, !(population %in% lowCounts))
 
   # Message about population count removal
@@ -315,71 +315,159 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 	}
 
 	switch(
-	  object$type,
-	  Population = {
-  		# Message
-  		message("Confidence intervals for amplitude and acrophase for population-mean cosinor use the methods described by Fernando et al 2004, which may not be applicable to multiple-components.")
+		object$type,
+		Population = {
+			# Message
+			message("Confidence intervals for amplitude and acrophase for population-mean cosinor use the methods described by Fernández et al. 2004.")
 
-  		# Freedom by number of individuals
-  		k <- nrow(object$xmat)
+			# Number of individuals
+			k <- nrow(xmat)
 
-  		# Standard errors
-  	  SE_mesor <- sd(xmat[, "mesor"]) / sqrt(k)
-  		for(i in 1:p) {
-  		  assign(paste0("SE_amp", i), (sd(xmat[, paste0("amp", i)]) / sqrt(k)))
-  		  assign(paste0("SE_phi", i), (sd(xmat[, paste0("phi", i)]) / sqrt(k)))
-  		  assign(paste0("SE_beta", i), (sd(xmat[, paste0("beta", i)]) / sqrt(k)))
-  		  assign(paste0("SE_gamma", i), (sd(xmat[, paste0("gamma", i)]) / sqrt(k)))
-  		}
+			# Extract parameters from xmat
+			params <- as.data.frame(xmat)
 
-  	  # Save SE
-  	  se <- list()
-      for(i in 1:p) {
-        se[[i]] <- c(
-          paste0("SE_amp", i),
-          paste0("SE_phi", i),
-          paste0("SE_beta", i),
-          paste0("SE_gamma", i)
-        )
-      }
-  	  se <- c(SE_mesor, unlist(mget(unlist(se))))
-  	  names(se)[1] <- "SE_mesor"
-  	  names(se) <- gsub("SE_", "", names(se))
+			# Convert column names to lowercase
+			colnames(params) <- tolower(colnames(params))
 
-  	  # Confidence intervals
-  	  tdist <- stats::qt(1 - a/2, df = n - k)
-  	  confints <- list()
-  	  for(i in 1:p) {
-  	    confints[[i]] <-
-  	      c(
-  	        # Amp
-    	      get(paste0("amp", i)) - tdist * get(paste0("SE_amp", i)),
-    	      get(paste0("amp", i)) + tdist * get(paste0("SE_amp", i)),
-    	      # Phi
-    	      get(paste0("phi", i)) - tdist * get(paste0("SE_phi", i)),
-    	      get(paste0("phi", i)) + tdist * get(paste0("SE_phi", i))
-  	    )
-  	  }
+			popParams <- colMeans(params)
+			varCovMat <- cov(params)
 
-      df <- rbind(
-        c(mesor - tdist*SE_mesor, mesor + tdist*SE_mesor),
-        matrix(unlist(confints), ncol = 2, byrow = TRUE)
-      )
-      rnames <- list()
-      for(i in 1:p) {
-        rnames[[i]] <- c(paste0("amp", i), paste0("phi", i))
-      }
-      rownames(df) <- c("mesor", unlist(rnames))
-      colnames(df) <- c(paste0(100*(a/2),"%"), paste0(100*(1-a/2), "%"))
+			# Degrees of freedom
+			df <- k - 1
 
-  	  # Returned
-      estimates <- list(
-        ci = df,
-        se = se
-      )
-      return(estimates)
+			# Critical value from chi-squared distribution
+			cValue <- qchisq(level, df = 2)
 
-	  },
+			# Initialize data structures for output
+			ciMatrix <- matrix(nrow = 0, ncol = 2)
+			colnames(ciMatrix) <- c(
+				sprintf("%.1f%%", a / 2 * 100),
+				sprintf("%.1f%%", (1 - a / 2) * 100)
+			)
+
+			seVector <- numeric()
+			names(seVector) <- character()
+
+			# MESOR confidence interval
+			seMesor <- sqrt(varCovMat["mesor", "mesor"] / k)
+			tValue <- qt(1 - a / 2, df)
+			ciMesor <- c(
+				popParams["mesor"] - tValue * seMesor,
+				popParams["mesor"] + tValue * seMesor
+			)
+
+			# Add MESOR to outputs
+			ciMatrix <- rbind(ciMatrix, ciMesor)
+			rownames(ciMatrix)[nrow(ciMatrix)] <- "mesor"
+
+			seVector <- c(seVector, seMesor)
+			names(seVector)[length(seVector)] <- "mesor"
+
+			# For each component
+			for (i in 1:p) {
+				# Get beta and gamma parameter names
+				betaName <- paste0("beta", i)
+				gammaName <- paste0("gamma", i)
+
+				# Extract individual estimates
+				beta_i <- params[[betaName]]
+				gamma_i <- params[[gammaName]]
+
+				# Compute sample means
+				betaBar <- mean(beta_i)
+				gammaBar <- mean(gamma_i)
+
+				# Compute covariance matrix for beta and gamma
+				covMat <- cov(cbind(beta_i, gamma_i))
+
+				# Eigen decomposition of covariance matrix
+				eig <- stats::eigen(covMat)
+				V <- eig$vectors
+				D <- diag(eig$values)
+
+				# Square root of covariance matrix
+				rootCov <- V %*% sqrt(D) %*% t(V)
+
+				# Generate ellipse points
+				thetaSeq <- seq(0, 2 * pi, length.out = 1000)
+				ellipsePoints <- sqrt(cValue) * (rootCov %*% rbind(cos(thetaSeq), sin(thetaSeq)))
+
+				betaTheta <- betaBar + ellipsePoints[1, ]
+				gammaTheta <- gammaBar + ellipsePoints[2, ]
+
+				# Compute amplitude and acrophase
+				# Make sure acrophase is within the unit circle
+				amplitudeTheta <- sqrt(betaTheta^2 + gammaTheta^2)
+				acrophaseTheta <- atan2(-gammaTheta, betaTheta)
+				acrophaseTheta <- (acrophaseTheta + pi) %% (2 * pi) - pi
+
+				# Compute confidence intervals for amplitude and acrophase
+				ampLower <- min(amplitudeTheta)
+				ampUpper <- max(amplitudeTheta)
+
+				phiLower <- min(acrophaseTheta)
+				phiUpper <- max(acrophaseTheta)
+
+				# Compute standard errors for beta and gamma
+				seBeta <- sqrt(var(beta_i) / k)
+				seGamma <- sqrt(var(gamma_i) / k)
+
+				# Compute t-value for beta and gamma
+				tValueBetaGamma <- qt(1 - alpha / 2, df)
+
+				# Confidence intervals for beta and gamma
+				betaLower <- betaBar - tValueBetaGamma * seBeta
+				betaUpper <- betaBar + tValueBetaGamma * seBeta
+
+				gammaLower <- gammaBar - tValueBetaGamma * seGamma
+				gammaUpper <- gammaBar + tValueBetaGamma * seGamma
+
+				# Add beta to outputs
+				ciMatrix <- rbind(ciMatrix, c(betaLower, betaUpper))
+				rownames(ciMatrix)[nrow(ciMatrix)] <- paste0("beta", i)
+
+				seVector <- c(seVector, seBeta)
+				names(seVector)[length(seVector)] <- paste0("beta", i)
+
+				# Add gamma to outputs
+				ciMatrix <- rbind(ciMatrix, c(gammaLower, gammaUpper))
+				rownames(ciMatrix)[nrow(ciMatrix)] <- paste0("gamma", i)
+
+				seVector <- c(seVector, seGamma)
+				names(seVector)[length(seVector)] <- paste0("gamma", i)
+
+				# Add amplitude to outputs
+				ciMatrix <- rbind(ciMatrix, c(ampLower, ampUpper))
+				rownames(ciMatrix)[nrow(ciMatrix)] <- paste0("amplitude", i)
+
+				# Standard error for amplitude
+				amplitude_i <- sqrt(beta_i^2 + gamma_i^2)
+				seAmplitude <- sqrt(var(amplitude_i) / k)
+				seVector <- c(seVector, seAmplitude)
+				names(seVector)[length(seVector)] <- paste0("amplitude", i)
+
+				# Add acrophase to outputs
+				ciMatrix <- rbind(ciMatrix, c(phiLower, phiUpper))
+				rownames(ciMatrix)[nrow(ciMatrix)] <- paste0("acrophase", i)
+
+				# Standard error for acrophase
+				acrophase_i <- atan2(-gamma_i, beta_i)
+				acrophase_i <- (acrophase_i + pi) %% (2 * pi) - pi
+				# Compute angular standard deviation
+				seAcrophase <- sqrt(-2 * log(abs(mean(exp(1i * acrophase_i)))))
+				seVector <- c(seVector, seAcrophase)
+				names(seVector)[length(seVector)] <- paste0("acrophase", i)
+			}
+
+			# Name the columns of ciMatrix according to confidence levels
+			colnames(ciMatrix) <- c(
+				sprintf("%.1f%%", a / 2 * 100),
+				sprintf("%.1f%%", (1 - a / 2) * 100)
+			)
+
+			# Return the output as a list
+			return(list(ci = ciMatrix, se = seVector))
+		},
 	  Individual = {
 
   		# Nummber of parameters
@@ -466,6 +554,9 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 	)
 
 }
+
+
+
 
 ## Zero Amplitude Test
 

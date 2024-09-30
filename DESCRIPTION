@@ -2,12 +2,12 @@ Package: card
 Type: Package
 Title: Cardiovascular Applications in Research Data
 Version: 0.1.0.9000
-Authors@R: c(
-			person("Anish S. Shah", 
-			email = "ashah282@uic.edu", 
-			role = c("aut", "cre", "cph"),
-			comment = c(ORCID = "0000-0002-9729-1558"))
-		)
+Authors@R: 
+    person(given = "Anish S.",
+           family = "Shah",
+           role = c("aut", "cre", "cph"),
+           email = "shah.in.boots@gmail.com",
+           comment = c(ORCID = "0000-0002-9729-1558"))
 Description: A collection of cardiovascular research datasets and analytical
 		tools, including methods for cardiovascular procedural data, such as 
 		electrocardiography, echocardiography, and catheterization data. Additional
@@ -17,7 +17,7 @@ URL: https://cran.r-project.org/package=card
 BugReports: https://github.com/shah-in-boots/card/issues
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 Depends:
 		R (>= 4.1),
