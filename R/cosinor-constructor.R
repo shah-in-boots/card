@@ -172,7 +172,7 @@ cosinor_bridge <- function(processed, tau, population, data, ...) {
 
   } else if (length(population) == length(predictors)) {
 
-    # Modified function, usings cosinor_impl internally
+    # Modified function, using `cosinor_impl()` internally
     fit <- cosinor_pop_impl(predictors, outcomes, tau, population)
     type <- "Population"
 

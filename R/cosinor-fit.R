@@ -33,8 +33,19 @@ cosinor_impl <- function(predictors, outcomes, tau) {
   # y(t) = M + sum_j[beta_j * x_j + gamma_j * z_j] + error(t)
 
   # Number of parameters will be the number of taus
-    # e.g. single component = 3 components, where 3 = 2p + 1 (p = 1 component)
+  # 	e.g. single component = 3 components, where 3 = 2p + 1 (p = 1 component)
   p <- length(tau)
+
+  # Create null variables
+  mesor <- NULL
+  for (i in 1:p) {
+    assign(paste0("x", i), NULL)
+    assign(paste0("z", i), NULL)
+    assign(paste("amp", i), NULL)
+    assign(paste("phi", i), NULL)
+    assign(paste("beta", i), NULL)
+    assign(paste("gamma", i), NULL)
+  }
 
   # Single parameters
   y <- outcomes
@@ -42,11 +53,11 @@ cosinor_impl <- function(predictors, outcomes, tau) {
   n  <- length(t)
 
   # Normal equation for 3 components
-    # Normal equations (where M, beta, gamma are the coefficients to solve for)
-    # sum(y) = M*n + beta*sum(x) + gamma*sum(z)
-    # sum(y*x) = M*sum(x) + beta*sum(x^2) + gamma*sum(x*z)
-    # sum(y*z) = M*sum(z) + beta*sum(x*z) + gamma*sum(z^2)
-    # d = Su (for single component, 3 equations with 3 unknowns)
+  # 	Normal equations (where M, beta, gamma are the coefficients to solve for)
+  # 	sum(y) = M*n + beta*sum(x) + gamma*sum(z)
+  # 	sum(y*x) = M*sum(x) + beta*sum(x^2) + gamma*sum(x*z)
+  # 	sum(y*z) = M*sum(z) + beta*sum(x*z) + gamma*sum(z^2)
+  # 	d = Su (for single component, 3 equations with 3 unknowns)
 
   # For multiple components, the matrix must be expanded
 
@@ -160,6 +171,17 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   # Period
   p <- length(tau) # Number of parameters ... single cosinor ~ 2p + 1 = 3
 
+  # Create null variables based on number of parameters
+  mesor <- NULL
+  for (i in 1:p) {
+    assign(paste0("x", i), NULL)
+    assign(paste0("z", i), NULL)
+    assign(paste("amp", i), NULL)
+    assign(paste("phi", i), NULL)
+    assign(paste("beta", i), NULL)
+    assign(paste("gamma", i), NULL)
+  }
+
   # Create data frame for split/apply approach
   df <- na.omit(data.frame(predictors, outcomes, population))
 
@@ -193,15 +215,19 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   # Create matrix that we can apply cosinor to subgroups
   kCosinors <- with(
     df,
-    by(df, population, function(x) {
-      cosinor_impl(x$predictors, x$outcomes, tau)
+    by(df, population, function(.x) {
+      cosinor_impl(.x$predictors, .x$outcomes, tau)
     })
   )
 
   ### Coefficients
 
   # Fits of individual cosinors
-  kfits <- sapply(kCosinors, stats::fitted)
+  # Must be a data frame to have column names
+  kfits <- sapply(kCosinors, stats::fitted, USE.NAMES = TRUE)
+  if (inherits(kfits, "matrix")) {
+  	kfits <- as.data.frame(kfits)
+  }
   fits <- data.frame(
     population = rep(names(kfits), sapply(kfits, length)),
     yhat = unlist(kfits)
@@ -223,7 +249,10 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
     assign(paste0("gamma", i), unname(coefs[paste0("gamma", i)]))
 
     # Amplitude
-    assign(paste0("amp", i), sqrt(get(paste0("beta", i))^2 + get(paste0("gamma", i))^2))
+    # Currently using the population mean method
+    # Eventually will require implementation of trigonometric method
+    #assign(paste0("amp", i), sqrt(get(paste0("beta", i))^2 + get(paste0("gamma", i))^2))
+    assign(paste0("amp", i), unname(coefs[paste0("amp", i)]))
 
     # Phi / acrophase
     sb <- sign(get(paste0("beta", i)))
@@ -381,7 +410,7 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 				covMat <- cov(cbind(beta_i, gamma_i))
 
 				# Eigen decomposition of covariance matrix
-				eig <- stats::eigen(covMat)
+				eig <- eigen(covMat)
 				V <- eig$vectors
 				D <- diag(eig$values)
 
@@ -413,7 +442,7 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 				seGamma <- sqrt(var(gamma_i) / k)
 
 				# Compute t-value for beta and gamma
-				tValueBetaGamma <- qt(1 - alpha / 2, df)
+				tValueBetaGamma <- qt(1 - a / 2, df)
 
 				# Confidence intervals for beta and gamma
 				betaLower <- betaBar - tValueBetaGamma * seBeta
@@ -448,7 +477,7 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 
 				# Add acrophase to outputs
 				ciMatrix <- rbind(ciMatrix, c(phiLower, phiUpper))
-				rownames(ciMatrix)[nrow(ciMatrix)] <- paste0("acrophase", i)
+				rownames(ciMatrix)[nrow(ciMatrix)] <- paste0("phi", i)
 
 				# Standard error for acrophase
 				acrophase_i <- atan2(-gamma_i, beta_i)
@@ -456,7 +485,7 @@ confint.cosinor <- function(object, parm, level = 0.95, ...) {
 				# Compute angular standard deviation
 				seAcrophase <- sqrt(-2 * log(abs(mean(exp(1i * acrophase_i)))))
 				seVector <- c(seVector, seAcrophase)
-				names(seVector)[length(seVector)] <- paste0("acrophase", i)
+				names(seVector)[length(seVector)] <- paste0("phi", i)
 			}
 
 			# Name the columns of ciMatrix according to confidence levels
