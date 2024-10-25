@@ -22,8 +22,8 @@ cosinor(t, ...)
 \method{cosinor}{recipe}(t, data, tau, population = NULL, ...)
 }
 \arguments{
-\item{t}{Represents the \emph{ordered} time indices that provide the positions for the
-cosine wave. Depending on the context:
+\item{t}{Represents the \emph{ordered} time indices that provide the positions for
+the cosine wave. Depending on the context:
 \itemize{
 \item A \verb{data frame} of a time-based predictor/index.
 \item A \code{matrix} of time-based predictor/index.

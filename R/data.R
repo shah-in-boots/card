@@ -60,7 +60,7 @@
 
 #' Zipcodes with Associated Latitude and Longitude
 #'
-#' This is a dataset from the archived/orphaned {zipcode} package.
+#' This is a dataset from the archived/orphaned `zipcode` package.
 #'
 #' @docType data
 #' @format A data frame with character vector zipcodes and latitude/longitude

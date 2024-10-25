@@ -1,0 +1,71 @@
+---
+title: "cosinor"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cosinor}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The function `cosinor()` is built off of literature supporting the analysis of circadian rhythms. There are two other packages on CRAN that provide cosinor analyses that are very good, [cosinor](https://CRAN.R-project.org/package=cosinor) and [cosinor2](https://CRAN.R-project.org/package=cosinor2). This package was built for 1) learning about regression and model development, and 2) the raw material generated to allow for more expansive and experimental analysis of cosinor functions and circadian rhythms.
+
+```{r, setup}
+library(card)
+
+# Using the provide dataset
+data("twins")
+head(twins)
+```
+
+The `twins` dataset contains clinical covariates and continuous time measures, such as heart rate variability at each hour of the day. These continuous measures follow a circadian pattern.
+
+```{r}
+library(ggplot2)
+ggplot(twins, aes(x = hour, y = rDYX)) +
+  geom_smooth(method = "gam")
+```
+
+Cosinor analysis can be used to generate model statistics. Confidence intervals of the amplitude and acrophase can be generated. It is based of the `hardhat` package. 
+
+The model can return information about an individual cosinor. The model statistics can be extracted, as well as visualized.
+
+```{r}
+# Model
+m <- cosinor(rDYX ~ hour, data = twins, tau = 24)
+
+# Summary
+summary(m)
+
+# Plot
+ggcosinor(m, labels = TRUE)
+```
+
+More complex models can also be made using multiple components, which is represented by additional, user-defined periods.
+
+```{r}
+# Model
+m <- cosinor(rDYX ~ hour, data = twins, tau = c(24, 12))
+
+# Summary
+summary(m)
+
+# Plot
+ggcosinor(m, labels = TRUE)
+```
+
+And, these models can be repeated for an entire population if warranted.
+
+```{r}
+# Model
+m <- cosinor(rDYX ~ hour, data = twins, tau = c(24), population = "patid")
+
+# Summary
+summary(m)
+```

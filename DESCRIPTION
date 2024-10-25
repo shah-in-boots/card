@@ -1,7 +1,7 @@
 Package: card
 Type: Package
 Title: Cardiovascular Applications in Research Data
-Version: 0.1.0.9000
+Version: 0.1.1
 Authors@R: 
     person(given = "Anish S.",
            family = "Shah",
@@ -22,17 +22,14 @@ Roxygen: list(markdown = TRUE)
 Depends:
 		R (>= 4.1),
 Imports:
-    utils,
     stats,
     generics,
-    methods,
     ggplot2,
     tidyr,
     dplyr,
     purrr,
     tibble,
     rlang,
-    broom,
     parsnip,
     hardhat,
 Suggests:

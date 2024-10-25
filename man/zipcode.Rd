@@ -11,6 +11,6 @@ A data frame with character vector zipcodes and latitude/longitude
 zipcode
 }
 \description{
-This is a dataset from the archived/orphaned {zipcode} package.
+This is a dataset from the archived/orphaned \code{zipcode} package.
 }
 \keyword{datasets}

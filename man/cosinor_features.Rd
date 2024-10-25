@@ -9,7 +9,9 @@ cosinor_features(object, population = TRUE, ...)
 \arguments{
 \item{object}{Model of class \code{cosinor} with multiple periods}
 
-\item{population}{If the object is a population cosinor, should the features be calculated for the individual cosinors or for the population-cosinors. Default is TRUE. This has no effect on "Individual" cosinor objects.
+\item{population}{If the object is a population cosinor, should the features
+be calculated for the individual cosinors or for the population-cosinors.
+Default is TRUE. This has no effect on "Individual" cosinor objects.
 \itemize{
 \item If TRUE, then will calculate features for entire population.
 \item If FALSE, then will calculate features for every individual cosinor in the population.
@@ -18,10 +20,19 @@ cosinor_features(object, population = TRUE, ...)
 \item{...}{For extensibility}
 }
 \value{
-When returning the cosinor features for a single model, will return an object of class \code{list}. When returning the cosinor features for every individual in a population cosinor, will return an object of class \code{tibble}.
+When returning the cosinor features for a single model, will return
+an object of class \code{list}. When returning the cosinor features for every
+individual in a population cosinor, will return an object of class
+\code{tibble}.
 }
 \description{
-Extract the special/global features of a multiple component cosinor. In a multiple component model, there are specific parameters that are not within the model itself, but must be extracted from the model fit. When extracted, can be used to improve the plot of a multiple component cosinor. However, this is only possible if the cosinor is harmonic (see \code{details}). For single-component models, the orthophase is the same as the acrophase and the global amplitude
+Extract the special/global features of a multiple component
+cosinor. In a multiple component model, there are specific parameters that
+are not within the model itself, but must be extracted from the model fit.
+When extracted, can be used to improve the plot of a multiple component
+cosinor. However, this is only possible if the cosinor is harmonic (see
+\code{details}). For single-component models, the orthophase is the same as the
+acrophase and the global amplitude
 \itemize{
 \item Global Amplitude (Ag) = the overall amplitude is defined as half the difference between the peak and trough values
 \item Orthophase (Po) = the lag until the peak time
@@ -29,11 +40,15 @@ Extract the special/global features of a multiple component cosinor. In a multip
 }
 }
 \details{
-These calculations can only occur if the periods of the cosinor are harmonic - as in, the longest period is a integer multiple of the smallest period (known as the fundamental frequency). Otherwise, these statistics are not accurate or interpretable.
+These calculations can only occur if the periods of the cosinor are
+harmonic - as in, the longest period is a integer multiple of the smallest
+period (known as the fundamental frequency). Otherwise, these statistics
+are not accurate or interpretable.
 }
 \examples{
 data(twins)
 model <- cosinor(rDYX ~ hour, twins, c(24, 8), "patid")
 results <- cosinor_features(model, population = FALSE)
 head(results)
+
 }

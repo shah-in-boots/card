@@ -1,0 +1,42 @@
+augment.cosinor         Augment data with information from a 'cosinor'
+                        object
+build_sequential_models
+                        Model Building
+circ_center             Center Time Around a Zeitgeiber
+circ_compare_groups     Compare Repeated Measurements by Group
+circ_odds               Odds Ratio Table by Time Point
+circ_rad                Convert Time to Radians
+circ_sun                Sunrise and Sunset Times
+cosinor                 Fit a 'cosinor'
+cosinor_area            Area of Ellipse
+cosinor_features        Multiple Component Cosinor Features
+cosinor_goodness_of_fit
+                        Goodness of Fit of Cosinor
+cosinor_zero_amplitude
+                        Zero Amplitude Test
+geh                     GEH parameters in a large clinical cohort
+geom_residuals          Plotting Residual of a Model
+ggcircadian             Circadian Plot by Group
+ggcosinor               ggplot of cosinor model
+ggellipse               Graphical Assessment of Amplitude and Acrophase
+ggerror                 Plotting Error of Models
+ggforest                Forest Plot of Hourly Odds
+heart-class             'heart' class
+hrv                     Output from MATLAB HRV Toolbox
+hrv_linear_model        HRV Linear Modeling
+mims                    Recurrent event sample data
+predict.cosinor         Predict from a 'cosinor'
+proc_hrv_matlab         Process Toolbox HRV
+read_hrv_matlab         Read in Toolbox HRV
+recur_followup_table    Initial and Final Visit Table
+recur_summary           Recurrent Event Summary Table by Group
+recur_survival_table    Recurrent Survival Data Format
+recurrent_model_building
+                        Recurrent Event Sequential Model Building
+recurrent_propensity    Propensity Score Weighting
+tidy.cosinor            Tidy a(n) cosinor object
+triplets                Hourly time series data with clinical
+                        covariates
+twins                   Hourly time series data with clinical
+                        covariates
+zipcode                 Zipcodes with Associated Latitude and Longitude

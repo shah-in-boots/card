@@ -1,0 +1,39 @@
+Package: card
+Type: Package
+Title: Cardiovascular and Autonomic Research Design
+Version: 0.1.0
+Authors@R: c(
+			person("Anish S. Shah", 
+			email = "asshah4@emory.edu", 
+			role = c("aut", "cre", "cph"),
+			comment = c(ORCID = "0000-0002-9729-1558"))
+		)
+Description: Tools that can aid in the assessment of the autonomic regulation 
+		of cardiovascular physiology. The aims of this package are to: 1) study 
+		electrocardiography (both intervals and morphology) as extensions 
+		of signal processing, 2) study circadian rhythms and how it effects 
+		autonomic physiology, 3) assess clinical risk of autonomic dysfunction on 
+		cardiovascular health through the perspective of epidemiology and causality.
+		The analysis of circadian rhythms through cosinor analysis are built upon 
+		the methods by Cornelissen (2014) <doi:10.1186/1742-4682-11-16> and 
+		Refinetti, Cornelissen, Halberg (2014) <doi:10.1080/09291010600903692>.
+License: MIT + file LICENSE
+URL: https://github.com/asshah4/card
+BugReports: https://github.com/asshah4/card/issues
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.0
+Depends: R (>= 3.5.0)
+Imports: utils, stats, sf, lutz, magrittr, ggplot2, tidyr, dplyr,
+        purrr, tibble, readr, lubridate, stringr, rlang, survival,
+        broom, hardhat, recipes, data.table, Hmisc, generics, methods,
+        ggrepel
+Suggests: kableExtra, plyr, stargazer, knitr, rmarkdown, covr, testthat
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2020-08-29 15:11:54 UTC; asshah4
+Author: Anish S. Shah [aut, cre, cph] (<https://orcid.org/0000-0002-9729-1558>)
+Maintainer: Anish S. Shah <asshah4@emory.edu>
+Repository: CRAN
+Date/Publication: 2020-09-03 07:52:10 UTC
+Built: R 4.4.0; ; 2024-04-07 01:10:44 UTC; unix

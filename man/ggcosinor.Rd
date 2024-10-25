@@ -48,14 +48,12 @@ the lag time to peak value
 }
 }
 \examples{
-\donttest{
 data(triplets)
 m1 <- cosinor(rDYX ~ hour, twins, tau = 24)
 m2 <- cosinor(rDYX ~ hour, twins, tau = c(24, 12))
 ggcosinor(m1, labels = FALSE)
 ggcosinor(m2)
 ggcosinor(list(single = m1, multiple = m2))
-}
 }
 \seealso{
 Other cosinor: 

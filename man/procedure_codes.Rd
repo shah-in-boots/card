@@ -11,9 +11,8 @@ procedure_codes(format, version)
 Currently supported formats are: \code{c("icd9", "icd10", "hcpcs", "cpt")}
 (case-insensitive).}
 
-\item{version}{The version of the procedure codes, which are written as a
-\code{character} although the majority are listed as a year. Currently
-supported: \code{c("2014", "2023")}}
+\item{version}{The version of the procedure codes, which are generally
+written as a year. Currently supported: \code{c("2014", "2023")}}
 }
 \value{
 A \code{tbl_df} with two columns: \code{code} and \code{description}. The \code{code}
@@ -36,13 +35,18 @@ The following procedure codes are currently supported:
 }
 \details{
 CMS will usually release updated version of these codes on an annual
-basis. Each dataset that is supported below can be identified by the year it
-was published (not the \emph{go-live} date, but the \emph{publically-available} date).
-The previous versions that are included in the package are as below.
+basis. Each dataset that is supported below can be identified by the year
+it was published (not the \emph{go-live} date, but the \emph{publically-available}
+date). The previous versions that are included in the package are as below.
 \itemize{
 \item ICD9: 2014
 \item ICD10: 2023
 \item HCPCS: 2023
 \item CPT: 2023
 }
+}
+\examples{
+# Procedure codes from the 2014 version of ICD-9
+icd9 <- procedure_codes(format = "icd9", version = 2014)
+
 }

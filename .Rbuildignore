@@ -13,3 +13,5 @@
 ^codecov\.yml$
 ^R/dev\.R$
 ^data-raw$
+^sandbox.R$
+^revdep/*$

@@ -10,9 +10,11 @@
 \item{x}{A \code{cosinor} object created by \code{\link[=cosinor]{cosinor()}}}
 
 \item{conf.int}{Logical indicating whether or not to include confidence
+
 interval in tidied output}
 
 \item{conf.level}{The confidence level to use if \code{conf.int = TRUE}. Must be
+
 between 0 and 1, with default to 0.95 (the 95\% confidence interval).}
 
 \item{...}{For extensibility}

@@ -1,0 +1,24 @@
+augment.cosinor         Augment data with information from a 'cosinor'
+                        object
+cosinor                 Fit a 'cosinor'
+cosinor_area            Area of Ellipse
+cosinor_features        Multiple Component Cosinor Features
+cosinor_goodness_of_fit
+                        Goodness of Fit of Cosinor
+cosinor_reg             General Interface for Cosinor Regression Models
+cosinor_zero_amplitude
+                        Zero Amplitude Test
+geh                     GEH parameters in a large clinical cohort
+ggcosinor               ggplot of cosinor model
+ggellipse               Graphical Assessment of Amplitude and Acrophase
+hrv                     Output from MATLAB HRV Toolbox
+predict.cosinor         Predict from a 'cosinor'
+procedure_codes         Center for Medicare and Medicaid Services (CMS)
+                        Procedure Codes
+stress                  Recurrent event sample data
+tidy.cosinor            Tidy a(n) cosinor object
+triplets                Hourly time series data with clinical
+                        covariates
+twins                   Hourly time series data with clinical
+                        covariates
+zipcode                 Zipcodes with Associated Latitude and Longitude

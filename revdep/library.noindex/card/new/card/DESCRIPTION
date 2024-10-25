@@ -1,0 +1,34 @@
+Package: card
+Type: Package
+Title: Cardiovascular Applications in Research Data
+Version: 0.1.1
+Authors@R: 
+    person(given = "Anish S.",
+           family = "Shah",
+           role = c("aut", "cre", "cph"),
+           email = "shah.in.boots@gmail.com",
+           comment = c(ORCID = "0000-0002-9729-1558"))
+Description: A collection of cardiovascular research datasets and analytical
+		tools, including methods for cardiovascular procedural data, such as 
+		electrocardiography, echocardiography, and catheterization data. Additional
+		methods exist for analysis of procedural billing codes.
+License: MIT + file LICENSE
+URL: https://cran.r-project.org/package=card
+BugReports: https://github.com/shah-in-boots/card/issues
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2
+Roxygen: list(markdown = TRUE)
+Depends: R (>= 4.1),
+Imports: stats, generics, ggplot2, tidyr, dplyr, purrr, tibble, rlang,
+        parsnip, hardhat,
+Suggests: kableExtra, knitr, rmarkdown, covr, testthat, broom.mixed,
+        ggrepel
+VignetteBuilder: knitr
+RemoteType: local
+RemoteUrl: /Users/asshah4/projects/card
+NeedsCompilation: no
+Packaged: 2024-10-25 16:41:24 UTC; asshah4
+Author: Anish S. Shah [aut, cre, cph] (<https://orcid.org/0000-0002-9729-1558>)
+Maintainer: Anish S. Shah <shah.in.boots@gmail.com>
+Built: R 4.4.1; ; 2024-10-25 16:41:24 UTC; unix

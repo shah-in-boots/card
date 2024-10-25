@@ -14,6 +14,24 @@
 
 * The longitudinal event functions are being moved to a separate package to make maintenance more straightforward.
 
+# card v0.1.1
+
+## Updates
+
+* `cosinor()` now has a stable population mean cosinor option with appropriate confidence intervals
+
+* `procedure_codes()` has the latest ICD10 codes, as of 11/2023, and are included in the package
+
+## Next steps
+
+* Adding additional data analysis tools for cardiology data (including catheterization and echocardiogram data)
+
+## Deprecations
+
+* The circadian-rhythm features have been deprecated and recurrent data features have been removed 
+
+* The `cosinor()` functions will be updated to be more customizable and more efficient, however will be moving to a separate package by v0.2.0
+
 # card v0.1.0
 
 ## Bugs

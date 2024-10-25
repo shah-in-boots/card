@@ -17,7 +17,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Anish S. Shah \email{ashah282@uic.edu} (\href{https://orcid.org/0000-0002-9729-1558}{ORCID}) [copyright holder]
+\strong{Maintainer}: Anish S. Shah \email{shah.in.boots@gmail.com} (\href{https://orcid.org/0000-0002-9729-1558}{ORCID}) [copyright holder]
 
 }
 \keyword{internal}

@@ -322,10 +322,9 @@ make_cosinor_reg <- function() {
 #' @param period A non-negative number or vector of numbers that represent the expected periodicity of the data to be analyzed.
 #' @examples
 #' library(parsnip)
-#' data(twins)
-#' cosinor_reg(period = 24) |>
-#'   set_engine("card") |>
-#'   fit(rDYX ~ hour, data = twins)
+#' cosinor_reg(period = c(24, 8)) |>
+#' 	parsnip::set_engine("card") |>
+#' 	parsnip::set_mode("regression")
 #' @export
 cosinor_reg <- function(mode = "regression", period = NULL) {
 
@@ -489,20 +488,26 @@ plot.cosinor <- function(x, ...) {
 #' @export
 generics::tidy
 
-#' @title Tidy a(n) cosinor object
+#' Tidy a(n) cosinor object
 #' @description Tidy summarizes information about the components of a `cosinor`
 #'   model.
+#'
 #' @details `cosinor` objects do not necessarily have a T-statistic as the
 #'   standard error is not based on a mean value, but form a joint-confidence
 #'   interval. The standard error is generated using Taylor series expansion as
 #'   the object is a subspecies of harmonic regressions.
+#'
 #' @param x A `cosinor` object created by [card::cosinor()]
+#'
 #' @param conf.int Logical indicating whether or not to include confidence
+#'
 #'   interval in tidied output
 #' @param conf.level The confidence level to use if `conf.int = TRUE`. Must be
+#'
 #'   between 0 and 1, with default to 0.95 (the 95% confidence interval).
 #' @param ... For extensibility
 #' @return a `tibble` object
+#'
 #' @export
 tidy.cosinor <- function(x, conf.int = FALSE, conf.level = 0.95, ...) {
 
@@ -511,14 +516,14 @@ tidy.cosinor <- function(x, conf.int = FALSE, conf.level = 0.95, ...) {
 	coefs <- x$coefficients
   coefs <- coefs[grep("mesor|amp|phi", names(coefs))]
   val <- stats::confint(x, level = conf.level)
-	l <- list(coefs = coefs, se = val$se)
+	l <- list("coefs" = coefs, "se" = val$se)
 	mat <- do.call(cbind, lapply(l, function(x) {x[match(names(l[[1]]), names(x))]}))
 
 	# Tibble it
 	result <-
 	  mat |>
 	  dplyr::as_tibble(rownames = "term") |>
-	  dplyr::rename(estimate = coefs, std.error = se)
+	  dplyr::rename("estimate" = "coefs", "std.error" = "se")
 
 	if (conf.int) {
 
@@ -527,7 +532,7 @@ tidy.cosinor <- function(x, conf.int = FALSE, conf.level = 0.95, ...) {
 		result <-
 			ci |>
 	    dplyr::as_tibble(rownames = "term") |>
-	    dplyr::left_join(result, ., by = "term")
+	    dplyr::left_join(x = result, y = _, by = "term")
 
 	}
 

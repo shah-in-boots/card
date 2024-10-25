@@ -35,6 +35,18 @@ ggellipse <- function(object, level = 0.95, ...) {
 	n <- length(t)
 	p <- length(object$tau)
 
+  # Create null variables
+  mesor <- NULL
+  for (i in 1:p) {
+    assign(paste0("x", i), NULL)
+    assign(paste0("z", i), NULL)
+    assign(paste("amp", i), NULL)
+    assign(paste("phi", i), NULL)
+    assign(paste("beta", i), NULL)
+    assign(paste("gamma", i), NULL)
+  }
+  x1 <- z1 <- beta1 <- gamma1 <- amp1 <- phi1 <- NULL
+
   for (i in 1:p) {
     assign(paste0("x", i), object$model[, paste0("x", i)])
     assign(paste0("z", i), object$model[, paste0("z", i)])
@@ -134,14 +146,12 @@ ggellipse <- function(object, level = 0.95, ...) {
 #'   Attributes of the object will be passed down, or calculated on the fly.
 #' @return Object of class `ggplot` that can be layered
 #' @examples
-#' \donttest{
 #' data(triplets)
 #' m1 <- cosinor(rDYX ~ hour, twins, tau = 24)
 #' m2 <- cosinor(rDYX ~ hour, twins, tau = c(24, 12))
 #' ggcosinor(m1, labels = FALSE)
 #' ggcosinor(m2)
 #' ggcosinor(list(single = m1, multiple = m2))
-#' }
 #' @import ggplot2
 #' @family cosinor
 #' @export
@@ -152,6 +162,20 @@ ggcosinor <- function(object, labels = TRUE, ...) {
 		# Model basic data
 		tau <- object$tau
 		p <- length(tau) # Single or multicomponent
+
+	  # Create null variables
+	  mesor <- NULL
+	  for (i in 1:p) {
+	    assign(paste0("x", i), NULL)
+	    assign(paste0("z", i), NULL)
+	    assign(paste("amp", i), NULL)
+	    assign(paste("phi", i), NULL)
+	    assign(paste("beta", i), NULL)
+	    assign(paste("gamma", i), NULL)
+	  }
+	  .fitted <- .resid <- x <- y <- term <- value <- NULL
+	  orthophase <- bathyphase <- trough <- ampGlobal <- NULL
+
 		type <- dplyr::case_when(
 			p == 1 & object$type == "Individual" ~ "scomp",
 			p > 1 & object$type == "Individual" ~ "mcomp",
@@ -431,6 +455,20 @@ ggmulticosinor <- function(object, labels, ...) {
 
 	# Number of cosinor objects
 	n <- length(object)
+	p <- length(object$tau)
+
+	# Null variables
+  mesor <- NULL
+  for (i in 1:p) {
+    assign(paste0("x", i), NULL)
+    assign(paste0("z", i), NULL)
+    assign(paste("amp", i), NULL)
+    assign(paste("phi", i), NULL)
+    assign(paste("beta", i), NULL)
+    assign(paste("gamma", i), NULL)
+  }
+  .fitted <- .resid <- orthophase <- bathyphase <- trough <- ampGlobal <- .id <- peak <- NULL
+
 	# Can be character vector or NULL
 	objNames <- if(is.null(names(object))) {
 		c(1:n)
