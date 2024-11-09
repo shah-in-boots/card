@@ -2,7 +2,7 @@
 
 0 errors | 0 warnings | 0 notes
 
-* This is an update for this package.
+* This is an update for this package
 
 ## revdepcheck results
 

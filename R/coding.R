@@ -51,14 +51,16 @@ procedure_codes <- function(format, version) {
   # 	Check if the format is supported
 	# 	Add checks to see if version is supported
   # 	Check if the version is supported
-  if (!format %in% c("icd9", "icd10", "hcpcs", "cpt")) {
-    stop("Format not supported. Please use one of the following: icd9, icd10, hcpcs, cpt")
-  }
 	if (length(format) > 1) {
 		stop("Only one format can be referenced at a time.")
 	}
 
+  if (!format %in% c("icd9", "icd10", "hcpcs", "cpt")) {
+    stop("Format not supported. Please use one of the following: icd9, icd10, hcpcs, cpt")
+  }
+
 	version <- as.character(version) # In case is numeric
+
 	if (length(version) > 1) {
 		stop("Only one version can be referenced at a time.")
 	}

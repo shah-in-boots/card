@@ -48,16 +48,9 @@ devtools::install_github("shah-in-boots/card")
 
 ## Usage
 
-The intent for this `card` is to develop several key functions for the
-analysis of recurrent or cyclical data, and assistance with
-epidemiological approaches to regression modeling.
-
-The key features are:
-
-1.  Sample datasets
-2.  Cosinor analysis
-3.  Recurrent events
-4.  Model building
+The intent for `card` is to assist in the analysis of cardiovascular and
+epidemiological data, with a focus on cardiac-specific datasets and data
+types.
 
 ``` r
 library(card)
