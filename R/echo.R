@@ -211,7 +211,7 @@ extract_la_diameter <- function(text, min_val = 1, max_val = 10) {
 			}
 		}
 
-		# No valid matches found
+		# No valid matches found, defaults to NA
 		NA_real_
 	}
 }
