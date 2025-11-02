@@ -8,7 +8,9 @@ query_genetic_variants(
   phenotype,
   database = "clinvar",
   api_key = NULL,
-  max_results = 100
+  max_results = 1000,
+  genes = NULL,
+  clean_gene_symbols = TRUE
 )
 }
 \arguments{
@@ -25,12 +27,22 @@ Providing an API key increases the rate limit from 3 to 10 requests
 per second. Get a key at: https://www.ncbi.nlm.nih.gov/account/}
 
 \item{max_results}{Integer specifying maximum number of results to return.
-Default is 100. Maximum allowed is 500.}
+Default is 1000. Maximum allowed is 10,000. Large queries will automatically
+paginate and may take several minutes due to API rate limits.}
+
+\item{genes}{Optional character vector of gene symbols to filter results.
+If provided, only variants in these genes will be returned. Default is
+NULL (return all genes).}
+
+\item{clean_gene_symbols}{Logical indicating whether to clean gene symbols
+by removing pseudogenes and non-standard gene symbols (e.g., LOC* genes)
+from multi-gene entries. When TRUE (default), entries like "LOC123; TTN"
+become "TTN". No data is lost; all rows are retained.}
 }
 \value{
 A tibble with the following columns:
 \describe{
-\item{gene_symbol}{Gene symbol (e.g., "BRCA1")}
+\item{gene_symbol}{Gene symbol (e.g., "TTN")}
 \item{variant_id}{Database-specific variant identifier}
 \item{variant_name}{Human-readable variant name (HGVS notation when available)}
 \item{chromosome}{Chromosome location}
@@ -62,6 +74,7 @@ return variants for the exact condition as well as related conditions
 af_variants <- query_genetic_variants("atrial fibrillation")
 
 # Query with API key for faster rate limit
+# This will error without an API key
 af_variants <- query_genetic_variants(
   "atrial fibrillation",
   api_key = "your_api_key_here"
@@ -71,6 +84,25 @@ af_variants <- query_genetic_variants(
 af_variants <- query_genetic_variants(
   "atrial fibrillation",
   max_results = 50
+)
+
+# Filter to specific genes only
+af_variants <- query_genetic_variants(
+  "atrial fibrillation",
+  genes = c("SCN5A", "KCNQ1", "KCNH2")
+)
+
+# Keep pseudogenes in gene symbols (don't clean)
+af_variants <- query_genetic_variants(
+  "atrial fibrillation",
+  clean_gene_symbols = FALSE
+)
+
+# Large query with automatic pagination
+# Progress updates shown for queries > 1000 variants
+hcm_variants <- query_genetic_variants(
+  "hypertrophic cardiomyopathy",
+  max_results = 5000
 )
 }
 
