@@ -30,6 +30,7 @@ Imports:
     purrr,
     tibble,
     rlang,
+    httr,
     parsnip,
     hardhat,
 Suggests:
