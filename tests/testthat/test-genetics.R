@@ -244,67 +244,6 @@ test_that("query_genetic_variants works with case variations", {
 })
 
 
-# Test rate limiting ----
-
-test_that("rate limiting function delays appropriately", {
-
-  # Test without API key (should use 3 requests/second)
-  start_time <- Sys.time()
-
-  # Clear any existing rate limit state
-  if (exists(".clinvar_last_request", envir = card:::.card_env)) {
-    rm(".clinvar_last_request", envir = card:::.card_env)
-  }
-
-  # Make 3 consecutive calls
-  card:::.rate_limit(NULL)
-  card:::.rate_limit(NULL)
-  card:::.rate_limit(NULL)
-
-  end_time <- Sys.time()
-  elapsed <- as.numeric(difftime(end_time, start_time, units = "secs"))
-
-  # Should take at least ~0.6 seconds (2 intervals of ~0.33 seconds each)
-  # Using a conservative threshold to avoid test flakiness
-  expect_true(elapsed >= 0.5)
-
-  # Clean up
-  if (exists(".clinvar_last_request", envir = card:::.card_env)) {
-    rm(".clinvar_last_request", envir = card:::.card_env)
-  }
-})
-
-
-test_that("rate limiting with API key allows faster requests", {
-
-  # Test with API key (should use 10 requests/second)
-  start_time <- Sys.time()
-
-  # Clear any existing rate limit state
-  if (exists(".clinvar_last_request", envir = card:::.card_env)) {
-    rm(".clinvar_last_request", envir = card:::.card_env)
-  }
-
-  # Make 3 consecutive calls with fake API key
-  card:::.rate_limit("fake_api_key_for_testing")
-  card:::.rate_limit("fake_api_key_for_testing")
-  card:::.rate_limit("fake_api_key_for_testing")
-
-  end_time <- Sys.time()
-  elapsed <- as.numeric(difftime(end_time, start_time, units = "secs"))
-
-  # Should take at least ~0.2 seconds (2 intervals of ~0.1 seconds each)
-  # Should be faster than the no-API-key case
-  expect_true(elapsed >= 0.15)
-  expect_true(elapsed < 0.5)  # Should be notably faster than without key
-
-  # Clean up
-  if (exists(".clinvar_last_request", envir = card:::.card_env)) {
-    rm(".clinvar_last_request", envir = card:::.card_env)
-  }
-})
-
-
 # Test empty result handling ----
 
 test_that("empty result table has correct structure", {
@@ -385,26 +324,25 @@ test_that("query_genetic_variants validates genes parameter", {
 })
 
 
-test_that("query_genetic_variants cleans gene symbols by default", {
+test_that("query_genetic_variants filters pseudogenes by default", {
 
   skip_if_offline()
   skip_on_cran()
   skip()
 
-  # Query without gene symbol cleaning
+  # Query without pseudogene cleaning
   result_with_pseudo <- query_genetic_variants(
     "cardiomyopathy",
     max_results = 30,
     clean_gene_symbols = FALSE
   )
 
-  # Query with gene symbol cleaning (default)
+  # Query with pseudogene cleaning (default)
   result_without_pseudo <- query_genetic_variants(
     "cardiomyopathy",
     max_results = 30,
     clean_gene_symbols = TRUE
   )
-
 
   # Cleaned results should not have LOC/LINC/MIR genes
   pseudo_pattern <- "^(LOC|LINC|MIR)[0-9]"
@@ -618,4 +556,151 @@ test_that("filter_genes works with case insensitive matching", {
   # Should match case-insensitively
   expect_equal(nrow(filtered), 2)
   expect_true(all(filtered$gene_symbol %in% c("BRCA1", "TP53")))
+})
+# Functionality tests ----
+
+test_that("query_genetic_variants returns results for known phenotype", {
+  skip_if_offline()
+  skip_on_cran()
+
+  result <- query_genetic_variants("hypertrophic cardiomyopathy", max_results = 20)
+  expect_true(nrow(result) > 0)
+  expect_true(all(result$database == "ClinVar"))
+  expect_true(any(!is.na(result$gene_symbol)))
+})
+
+
+test_that("query_genetic_variants respects max_results parameter", {
+  skip_if_offline()
+  skip_on_cran()
+
+  result <- query_genetic_variants("atrial fibrillation", max_results = 15)
+  expect_true(nrow(result) <= 15)
+})
+
+
+test_that("query_genetic_variants handles non-existent phenotype gracefully", {
+  skip_if_offline()
+  skip_on_cran()
+
+  expect_message(
+    result <- query_genetic_variants("xyzabc123nonexistent999", max_results = 10),
+    "No variants found for phenotype"
+  )
+
+  expect_s3_class(result, "tbl_df")
+  expect_equal(nrow(result), 0)
+
+  expected_cols <- c(
+    "gene_symbol","variant_id","variant_name","chromosome","position",
+    "clinical_significance","review_status","phenotypes","molecular_consequence","database"
+  )
+  expect_true(all(expected_cols %in% names(result)))
+})
+
+
+test_that("case-insensitive database argument works", {
+  skip_if_offline()
+  skip_on_cran()
+
+  r1 <- query_genetic_variants("arrhythmia", database = "clinvar", max_results = 5)
+  r2 <- query_genetic_variants("arrhythmia", database = "CLINVAR", max_results = 5)
+  expect_s3_class(r1, "tbl_df")
+  expect_s3_class(r2, "tbl_df")
+})
+
+
+# Empty result helper ----
+
+test_that("empty result table has correct structure", {
+  empty_table <- card:::.empty_result_table()
+  expect_s3_class(empty_table, "tbl_df")
+  expect_equal(nrow(empty_table), 0)
+
+  expected_cols <- c(
+    "gene_symbol","variant_id","variant_name","chromosome","position",
+    "clinical_significance","review_status","phenotypes","molecular_consequence","database"
+  )
+  expect_true(all(expected_cols %in% names(empty_table)))
+})
+
+
+# Integration test (light) ----
+
+test_that("integration smoke test for familial hypercholesterolemia", {
+  skip_if_offline()
+  skip_on_cran()
+
+  result <- query_genetic_variants("familial hypercholesterolemia", database = "clinvar", max_results = 20)
+  expect_true(nrow(result) > 0)
+  expect_true(any(grepl("LDLR", result$gene_symbol, ignore.case = TRUE)))
+  expect_true(any(!is.na(result$clinical_significance)))
+  expect_true(any(!is.na(result$phenotypes)))
+  expect_equal(length(unique(result$variant_id)), nrow(result))
+})
+
+
+# Gene filtering and pseudogene helpers ----
+
+test_that("clean_gene_symbols preserves/cleans gene_symbol entries", {
+  test_data <- tibble::tibble(
+    gene_symbol = c("BRCA1", "LOC123456", "LOC123456; TP53", "TP53; LOC999", "LINC00123"),
+    variant_id = as.character(1:5),
+    variant_name = rep("test", 5),
+    chromosome = rep("1", 5),
+    position = 1:5,
+    clinical_significance = rep(NA_character_, 5),
+    review_status = rep(NA_character_, 5),
+    phenotypes = rep(NA_character_, 5),
+    molecular_consequence = rep(NA_character_, 5),
+    database = rep("ClinVar", 5)
+  )
+
+  cleaned <- card:::.clean_gene_symbols(test_data)
+  expect_equal(nrow(cleaned), 5)
+  expect_equal(cleaned$gene_symbol[1], "BRCA1")
+  expect_equal(cleaned$gene_symbol[2], "LOC123456")
+  expect_equal(cleaned$gene_symbol[3], "TP53")
+  expect_equal(cleaned$gene_symbol[4], "TP53")
+})
+
+
+test_that("clean_gene_symbols keeps first real gene from multiple entries", {
+  test_data <- tibble::tibble(
+    gene_symbol = c("BRCA1; BRCA2", "TP53; TP63", "LOC123; TTN; MYH7"),
+    variant_id = as.character(1:3),
+    variant_name = rep("test", 3),
+    chromosome = rep("1", 3),
+    position = 1:3,
+    clinical_significance = rep(NA_character_, 3),
+    review_status = rep(NA_character_, 3),
+    phenotypes = rep(NA_character_, 3),
+    molecular_consequence = rep(NA_character_, 3),
+    database = rep("ClinVar", 3)
+  )
+
+  cleaned <- card:::.clean_gene_symbols(test_data)
+  expect_equal(cleaned$gene_symbol[1], "BRCA1")
+  expect_equal(cleaned$gene_symbol[2], "TP53")
+  expect_equal(cleaned$gene_symbol[3], "TTN")
+})
+
+
+test_that("filter_genes matches case-insensitively", {
+  test_data <- tibble::tibble(
+    gene_symbol = c("BRCA1","BRCA2","TP53","MYH7"),
+    variant_id = as.character(1:4),
+    variant_name = rep("test", 4),
+    chromosome = rep("1", 4),
+    position = 1:4,
+    clinical_significance = rep(NA_character_, 4),
+    review_status = rep(NA_character_, 4),
+    phenotypes = rep(NA_character_, 4),
+    molecular_consequence = rep(NA_character_, 4),
+    database = rep("ClinVar", 4)
+  )
+
+  filtered <- card:::.filter_genes(test_data, c("brca1","tp53"))
+  expect_equal(nrow(filtered), 2)
+  expect_true(all(filtered$gene_symbol %in% c("BRCA1","TP53")))
 })

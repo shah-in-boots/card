@@ -8,7 +8,7 @@ query_genes_by_phenotype(
   phenotype,
   database = "clinvar",
   api_key = NULL,
-  max_results = 2000,
+  max_results = 500,
   genes = NULL,
   clean_gene_symbols = TRUE
 )
@@ -17,19 +17,19 @@ query_genes_by_phenotype(
 \item{phenotype}{Character string specifying the phenotype or disease
 condition to search for (same as \code{\link[=query_genetic_variants]{query_genetic_variants()}}).}
 
-\item{database}{Character string specifying which database to query.
-Currently supports "clinvar" (default).}
+\item{database}{Character string specifying which database to query.}
 
 \item{api_key}{Optional character string containing your NCBI API key.}
 
 \item{max_results}{Integer specifying maximum number of variants to query
-before aggregation. Default is 2000. Maximum allowed is 10,000. Larger
-values provide more complete gene lists but take longer to retrieve.}
+before aggregation. Default is 500. Large queries will automatically
+paginate in 500-record batches and may take several minutes due to API
+rate limits. There is no hard maximum.}
 
 \item{genes}{Optional character vector of gene symbols to filter results.}
 
-\item{clean_gene_symbols}{Logical indicating whether to clean gene symbols
-by removing pseudogenes and non-standard gene symbols. Default is TRUE.}
+\item{clean_gene_symbols}{Logical indicating whether to clean gene symbols.
+Default is TRUE.}
 }
 \value{
 A tibble with one row per unique gene, containing:
@@ -47,26 +47,4 @@ A tibble with one row per unique gene, containing:
 \description{
 Takes variant-level results from \code{\link[=query_genetic_variants]{query_genetic_variants()}} and aggregates
 them to unique genes with summary statistics about associated variants.
-}
-\details{
-This function queries genetic variant databases and returns a gene-level
-summary instead of variant-level details. Each gene appears only once,
-with counts of different variant classifications and a list of associated
-phenotypes.
-
-This is useful when you want to identify which genes are associated with
-a phenotype, rather than examining individual variants.
-}
-\examples{
-\dontrun{
-# Get gene-level summary for a phenotype
-genes <- query_genes_by_phenotype("atrial fibrillation")
-
-# Filter to specific genes
-genes <- query_genes_by_phenotype(
-  "cardiomyopathy",
-  genes = c("MYH7", "MYBPC3", "TNNT2")
-)
-}
-
 }
