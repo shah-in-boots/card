@@ -1,323 +1,427 @@
-# VCF/VEP Files ----
+# VCF & VEP Files ----
 
-#' Summarize VEP-Annotated VCF Headers
+#' Read VCF/VEP Header Annotations
 #'
-#' Inspect the INFO header lines of a VCF produced by Ensembl VEP to understand
-#' which annotations are available (e.g., CSQ/ANN content) and how they are
-#' encoded. This helper makes it easier to decide which columns to keep when
-#' parsing the data table.
+#' Extract field names and descriptions from VCF or VEP-annotated file headers.
+#' This helps you understand what annotations are available without reading the
+#' entire file.
 #'
-#' @param vcf_path Path to a VCF file annotated with Ensembl VEP.
+#' @param vcf_path Path to a VCF file (standard or VEP-annotated).
 #'
-#' @param info_id INFO field identifier that stores the VEP annotations. The
-#'   default (`"CSQ"`) matches the format produced by the `vep` command.
+#' @return A named list where names are field names (e.g., `SYMBOL`, `Consequence`,
+#'   `LoF`) and values are their descriptions.
 #'
-#' @return A list with elements:
-#'   \describe{
-#'     \item{info_fields}{A tibble with parsed INFO metadata (ID, Number, Type,
-#'       Description) for each INFO line in the header.}
-#'     \item{csq_fields}{Character vector describing the pipe-delimited CSQ/ANN
-#'       annotation order as defined by VEP (e.g., `Allele`, `Consequence`,
-#'       `IMPACT`, `SYMBOL`).}
-#'     \item{lof_codes}{Named list describing loss-of-function confidence codes
-#'       (high/low confidence). The codes are derived from the VEP LOF plugin
-#'       definitions (typically `HC` and `LC`).}
-#'   }
-#'
-#' @details The Ensembl VEP header provides a `Format: ...` statement inside the
-#' INFO line for the CSQ/ANN field. This function extracts those field names so
-#' that downstream parsing can map each pipe-separated element to a column. If
-#' the LOF plugin is present, the resulting data typically contain `LoF`,
-#' `LoF_filter`, `LoF_flags`, and `LoF_info` columns where `LoF` values of `HC`
-#' (high confidence) or `LC` (low confidence) indicate the plugin's assessment.
+#' @details This function extracts annotation metadata from both standard VCF
+#' headers (##INFO and ##FORMAT lines) and VEP text format headers (## Column
+#' descriptions and ## Extra column keys sections). For VEP files, key
+#' annotations include consequence predictions (SIFT, PolyPhen), impact
+#' classifications (IMPACT), loss-of-function calls (LoF), and allele
+#' frequencies (gnomAD, 1000 Genomes).
 #'
 #' @examples
 #' \dontrun{
-#' header_info <- read_vcf_header("path/to/annotated.vcf.gz")
-#' header_info$csq_fields
+#' annotations <- read_vep_header("path/to/annotated.vcf.gz")
+#' annotations$LoF
+#' names(annotations)
 #' }
 #'
 #' @export
-read_vcf_header <- function(vcf_path, info_id = "CSQ") {
+read_vep_header <- function(vcf_path) {
   if (!file.exists(vcf_path)) {
     stop("File not found: ", vcf_path)
   }
 
-  all_lines <- readLines(vcf_path, warn = FALSE)
-  header_lines <- all_lines[grepl("^##", all_lines)]
+  lines <- readLines(vcf_path, warn = FALSE)
+  header_lines <- lines[grepl("^##", lines)]
 
   if (length(header_lines) == 0) {
     stop("No VCF header lines detected. Confirm the file is a valid VCF.")
   }
 
-  # Detect format type
+  # Check if this is VEP text format or standard VCF
   is_vep_text <- any(grepl("^## [Cc]olumn [Dd]escriptions:", header_lines))
-  is_standard_vcf <- any(grepl("^##INFO=<", header_lines))
 
   if (is_vep_text) {
-    # Parse VEP text format
-    # Find column descriptions section
-    col_desc_start <- which(grepl(
-      "^## [Cc]olumn [Dd]escriptions:",
-      header_lines
-    ))
-    extra_keys_start <- which(grepl(
-      "^## [Ee]xtra [Cc]olumn [Kk]eys:",
-      header_lines
-    ))
+    # VEP text format: extract from "Column descriptions" and "Extra column keys"
+    fields <- character()
+    descriptions <- character()
 
-    # Parse main column descriptions
-    csq_fields <- character(0)
-    if (length(col_desc_start) > 0) {
-      if (length(extra_keys_start) > 0) {
-        col_desc_lines <- header_lines[
-          (col_desc_start + 1):(extra_keys_start - 1)
-        ]
-      } else {
-        # If no extra keys section, go until end or command line
-        cmd_line <- which(grepl("^## VEP command-line:", header_lines))
-        end_idx <- if (length(cmd_line) > 0) {
-          cmd_line - 1
-        } else {
-          length(header_lines)
+    # Find section boundaries
+    col_start <- which(grepl("^## [Cc]olumn [Dd]escriptions:", header_lines))
+    extra_start <- which(grepl("^## [Ee]xtra [Cc]olumn [Kk]eys:", header_lines))
+    cmd_line <- which(grepl("^## VEP command-line:", header_lines))
+
+    # Parse the column descriptions section
+    if (length(col_start) > 0) {
+      end_idx <- if (length(extra_start) > 0) extra_start - 1 else if (length(cmd_line) > 0) cmd_line - 1 else length(header_lines)
+      if (end_idx > col_start) {
+        section <- header_lines[(col_start + 1):end_idx]
+        for (line in section) {
+          parts <- strsplit(line, "\\s+:\\s+", perl = TRUE)[[1]]
+          if (length(parts) == 2) {
+            field <- sub("^##\\s+", "", parts[1])
+            fields <- c(fields, field)
+            descriptions <- c(descriptions, parts[2])
+          }
         }
-        col_desc_lines <- header_lines[(col_desc_start + 1):end_idx]
       }
-
-      # Extract field names from column descriptions (format: "## FieldName : Description")
-      col_fields <- sub("^## ([^ ]+) :.*", "\\1", col_desc_lines)
-      csq_fields <- col_fields
     }
 
-    # Parse extra column keys if present
-    if (length(extra_keys_start) > 0) {
-      cmd_line <- which(grepl("^## VEP command-line:", header_lines))
-      end_idx <- if (length(cmd_line) > 0) {
-        cmd_line - 1
-      } else {
-        length(header_lines)
-      }
-      extra_lines <- header_lines[(extra_keys_start + 1):end_idx]
-
-      # Extract field names from extra keys (format: "## FieldName : Description")
-      extra_fields <- sub("^## ([^ ]+) :.*", "\\1", extra_lines)
-      csq_fields <- c(csq_fields, extra_fields)
-    }
-
-    # Create a minimal info_fields tibble for VEP text format
-    info_df <- tibble::tibble(
-      id = character(0),
-      number = character(0),
-      type = character(0),
-      description = character(0)
-    )
-  } else if (is_standard_vcf) {
-    # Parse standard VCF format (existing logic)
-    info_lines <- header_lines[grepl("^##INFO=<", header_lines)]
-
-    parse_info_line <- function(x) {
-      content <- sub("^##INFO=<", "", x)
-      content <- sub(">$", "", content)
-      parts <- strsplit(content, ",(?=[A-Za-z]+\\=)", perl = TRUE)[[1]]
-      key_vals <- strsplit(parts, "=", fixed = TRUE)
-      names <- vapply(key_vals, `[[`, character(1), 1)
-      values <- vapply(
-        key_vals,
-        function(y) paste(y[-1], collapse = "="),
-        character(1)
-      )
-      tibble::tibble(
-        id = names[match("ID", names)],
-        number = values[match("Number", names)],
-        type = values[match("Type", names)],
-        description = values[match("Description", names)]
-      )
-    }
-
-    info_df <- purrr::map_dfr(info_lines, parse_info_line)
-
-    csq_line <- info_lines[grepl(paste0("ID=", info_id, "[,>]"), info_lines)]
-    csq_fields <- character(0)
-    if (length(csq_line) > 0) {
-      format_match <- regmatches(
-        csq_line[1],
-        regexpr("Format: [^\"]+", csq_line[1])
-      )
-      if (length(format_match) > 0) {
-        format_string <- sub('^Format: ', '', format_match)
-        csq_fields <- strsplit(format_string, "\\|", fixed = FALSE)[[1]]
+    # Parse the extra column keys section
+    if (length(extra_start) > 0) {
+      end_idx <- if (length(cmd_line) > 0) cmd_line - 1 else length(header_lines)
+      if (end_idx > extra_start) {
+        section <- header_lines[(extra_start + 1):end_idx]
+        for (line in section) {
+          parts <- strsplit(line, "\\s+:\\s+", perl = TRUE)[[1]]
+          if (length(parts) == 2) {
+            field <- sub("^##\\s+", "", parts[1])
+            fields <- c(fields, field)
+            descriptions <- c(descriptions, parts[2])
+          }
+        }
       }
     }
   } else {
-    stop(
-      "Unable to determine file format. Expected either standard VCF with ##INFO lines or VEP text format with ## Column descriptions section."
-    )
+    # Standard VCF format: parse INFO and FORMAT lines
+    fields <- character()
+    descriptions <- character()
+
+    # Parse INFO lines
+    info_lines <- header_lines[grepl("^##INFO=<", header_lines)]
+    for (line in info_lines) {
+      id_match <- regmatches(line, regexpr("ID=[^,>]+", line))
+      desc_match <- regmatches(line, regexpr("Description=\"[^\"]+\"", line))
+      if (length(id_match) > 0 && length(desc_match) > 0) {
+        field <- sub("ID=", "", id_match)
+        description <- sub("Description=\"(.+)\"", "\\1", desc_match)
+        fields <- c(fields, field)
+        descriptions <- c(descriptions, description)
+      }
+    }
+
+    # Parse FORMAT lines
+    format_lines <- header_lines[grepl("^##FORMAT=<", header_lines)]
+    for (line in format_lines) {
+      id_match <- regmatches(line, regexpr("ID=[^,>]+", line))
+      desc_match <- regmatches(line, regexpr("Description=\"[^\"]+\"", line))
+      if (length(id_match) > 0 && length(desc_match) > 0) {
+        field <- sub("ID=", "", id_match)
+        description <- sub("Description=\"(.+)\"", "\\1", desc_match)
+        fields <- c(fields, field)
+        descriptions <- c(descriptions, description)
+      }
+    }
+
+    # Extract CSQ/ANN fields if present
+    csq_line <- info_lines[grepl("Format:", info_lines)]
+    if (length(csq_line) > 0) {
+      format_match <- regmatches(csq_line[1], regexpr("Format: [^\"]+", csq_line[1]))
+      if (length(format_match) > 0) {
+        format_str <- sub("^Format: ", "", format_match)
+        csq_fields <- strsplit(format_str, "\\|")[[1]]
+        # Remove CSQ/ANN from main list and add individual fields
+        keep_idx <- !(fields %in% c("CSQ", "ANN"))
+        fields <- fields[keep_idx]
+        descriptions <- descriptions[keep_idx]
+        for (field in csq_fields) {
+          fields <- c(fields, field)
+          descriptions <- c(descriptions, paste0("VEP annotation: ", field))
+        }
+      }
+    }
   }
 
-  list(
-    info_fields = info_df,
-    csq_fields = csq_fields,
-    lof_codes = list(
-      LoF = c(
-        HC = "High confidence loss-of-function",
-        LC = "Low confidence loss-of-function"
-      )
-    )
-  )
+  # Return as named list
+  result <- as.list(descriptions)
+  names(result) <- fields
+  result
 }
 
 
-#' Parse VEP-Annotated VCF Files
+#' Read VCF/VEP Data into Tibble
 #'
-#' Convert an annotated VCF file into a tidy tibble by expanding the CSQ/ANN
-#' annotation field and selecting commonly used consequence columns (e.g.,
-#' `SIFT`, `PolyPhen`, `LoF`). Optional filters allow you to keep only variants
-#' matching specific impact or loss-of-function confidence levels.
+#' Read variant data from a VCF or VEP-annotated file and extract selected
+#' columns into a tibble. This allows you to build variant databases by
+#' combining data from multiple files using tibble's row-binding capabilities.
 #'
-#' @param vcf_path Path to a VCF file annotated with Ensembl VEP.
-#' @param info_id INFO field identifier that stores the VEP annotations.
-#' @param selected_fields Character vector of CSQ/ANN columns to retain. Columns
-#'   absent from the file are silently dropped.
-#' @param impact_filter Optional character vector of `IMPACT` labels to retain
-#'   (e.g., `c("HIGH", "MODERATE")`).
-#' @param lof_confidence Optional character vector of `LoF` confidence codes to
-#'   retain (typically `"HC"` or `"LC"`).
-#' @param polyphen_min Optional numeric cutoff; keeps rows with parsed PolyPhen
-#'   probability greater than or equal to this value when available.
-#' @param sift_max Optional numeric cutoff; keeps rows with parsed SIFT
-#'   probability less than or equal to this value when available.
+#' @param vcf_path Path to a VCF file (standard or VEP-annotated).
 #'
-#' @return A tibble with base VCF columns (`CHROM`, `POS`, `ID`, `REF`, `ALT`,
-#'   `QUAL`, `FILTER` when present) plus the selected CSQ/ANN annotation
-#'   columns. One row is returned per alternate allele consequence.
+#' @param columns Character vector of column names to extract. If NULL (default),
+#'   all available columns are returned. Use [read_vep_header()] to see available
+#'   column names. For VEP text format files, this includes columns like
+#'   "Uploaded_variation", "Location", "Allele", "Gene", "Consequence", and all
+#'   fields in the Extra column (e.g., "SYMBOL", "IMPACT", "SIFT", "LoF"). For
+#'   standard VCF files with CSQ annotations, this includes the pipe-delimited
+#'   VEP fields.
+#'
+#' @return A tibble with one row per variant and columns for each selected field.
+#'   Missing values are represented as NA.
+#'
+#' @details This function handles two VCF formats:
+#'
+#' **VEP text format**: Files with "## Column descriptions:" headers. These have
+#' tab-delimited columns plus additional fields in an "Extra" column. The function
+#' automatically parses the Extra column and creates separate columns for each
+#' key=value pair.
+#'
+#' **Standard VCF with CSQ**: Files with standard VCF structure and a CSQ field
+#' in the INFO column containing pipe-delimited VEP annotations. The function
+#' parses the CSQ field according to the Format specification in the header.
+#'
+#' The resulting tibble can be easily combined with data from other VCF/VEP files
+#' using standard tibble operations like [dplyr::bind_rows()].
 #'
 #' @examples
 #' \dontrun{
-#' parsed <- read_vcf_annotation(
-#'   "path/to/annotated.vcf.gz",
-#'   selected_fields = c("Consequence", "IMPACT", "SYMBOL", "SIFT", "PolyPhen")
+#' # See available columns
+#' annotations <- read_vep_header("annotated.vcf.gz")
+#' names(annotations)
+#'
+#' # Read all columns
+#' variants <- read_vep_data("annotated.vcf.gz")
+#'
+#' # Read selected columns only
+#' variants <- read_vep_data(
+#'   "annotated.vcf.gz",
+#'   columns = c("Uploaded_variation", "SYMBOL", "Consequence", "IMPACT", "LoF")
 #' )
+#'
+#' # Combine multiple files
+#' v1 <- read_vep_data("file1.vcf", columns = c("SYMBOL", "Consequence"))
+#' v2 <- read_vep_data("file2.vcf", columns = c("SYMBOL", "Consequence"))
+#' combined <- dplyr::bind_rows(v1, v2)
 #' }
 #'
 #' @export
-read_vcf_annotation <- function(
-  vcf_path,
-  info_id = "CSQ",
-  selected_fields = c(
-    "Consequence",
-    "IMPACT",
-    "SYMBOL",
-    "Gene",
-    "Feature",
-    "BIOTYPE",
-    "HGVSp",
-    "HGVSc",
-    "EXON",
-    "INTRON",
-    "SIFT",
-    "PolyPhen",
-    "LoF",
-    "LoF_filter",
-    "LoF_flags",
-    "LoF_info"
-  ),
-  impact_filter = NULL,
-  lof_confidence = NULL,
-  polyphen_min = NULL,
-  sift_max = NULL
-) {
-  header_info <- read_vcf_header(vcf_path, info_id = info_id)
-  csq_fields <- header_info$csq_fields
-
-  if (length(csq_fields) == 0) {
-    stop(
-      "Unable to identify CSQ/ANN format in VCF header. Check the INFO line for ",
-      info_id
-    )
+read_vep_data <- function(vcf_path, columns = NULL) {
+  if (!file.exists(vcf_path)) {
+    stop("File not found: ", vcf_path)
   }
 
-  raw_lines <- readLines(vcf_path, warn = FALSE)
-  header_line <- tail(grep("^#CHROM", raw_lines, value = TRUE), 1)
-  if (length(header_line) == 0) {
-    stop("VCF header with column names (#CHROM ...) not found.")
-  }
-  col_names <- strsplit(sub("^#", "", header_line), "\t")[[1]]
+  lines <- readLines(vcf_path, warn = FALSE)
+  header_lines <- lines[grepl("^##", lines)]
 
-  vcf_data <- utils::read.delim(
-    vcf_path,
-    comment.char = "#",
-    header = FALSE,
-    stringsAsFactors = FALSE,
-    sep = "\t",
-    quote = "",
-    check.names = FALSE
-  )
-
-  if (ncol(vcf_data) < length(col_names)) {
-    stop("VCF file has fewer columns than expected from the header line.")
+  if (length(header_lines) == 0) {
+    stop("No VCF header lines detected. Confirm the file is a valid VCF.")
   }
 
-  colnames(vcf_data)[seq_along(col_names)] <- col_names
+  # Check if this is VEP text format or standard VCF
+  is_vep_text <- any(grepl("^## [Cc]olumn [Dd]escriptions:", header_lines))
 
-  info_values <- vapply(
-    strsplit(vcf_data$INFO, ";"),
-    function(parts) {
-      match_val <- parts[grepl(paste0("^", info_id, "="), parts)]
-      if (length(match_val) == 0) {
-        return(NA_character_)
-      }
-      sub(paste0("^", info_id, "="), "", match_val[1])
-    },
-    character(1)
-  )
-
-  base_cols <- intersect(
-    c("CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER"),
-    colnames(vcf_data)
-  )
-  selected_fields <- intersect(selected_fields, csq_fields)
-
-  tidy <- vcf_data %>%
-    dplyr::mutate(.vep_raw = info_values) %>%
-    dplyr::filter(!is.na(.vep_raw)) %>%
-    tidyr::separate_rows(.vep_raw, sep = ",") %>%
-    tidyr::separate(
-      .vep_raw,
-      into = csq_fields,
-      sep = "\\|",
-      fill = "right",
-      extra = "drop"
-    ) %>%
-    dplyr::select(dplyr::all_of(base_cols), dplyr::any_of(selected_fields))
-
-  if (!is.null(impact_filter) && "IMPACT" %in% colnames(tidy)) {
-    tidy <- dplyr::filter(tidy, IMPACT %in% impact_filter)
+  if (is_vep_text) {
+    # VEP text format
+    result <- .read_vep_text_format(lines, columns)
+  } else {
+    # Standard VCF format with CSQ
+    result <- .read_vcf_csq_format(lines, header_lines, columns)
   }
 
-  if (!is.null(lof_confidence) && "LoF" %in% colnames(tidy)) {
-    tidy <- dplyr::filter(tidy, LoF %in% lof_confidence)
-  }
-
-  numeric_from_annotation <- function(x) {
-    suppressWarnings(as.numeric(sub(".*\\(([^()]*)\\).*", "\\1", x)))
-  }
-
-  if (!is.null(polyphen_min) && "PolyPhen" %in% colnames(tidy)) {
-    tidy <- tidy %>%
-      dplyr::mutate(.polyphen_prob = numeric_from_annotation(PolyPhen)) %>%
-      dplyr::filter(!is.na(.polyphen_prob) & .polyphen_prob >= polyphen_min) %>%
-      dplyr::select(-.polyphen_prob)
-  }
-
-  if (!is.null(sift_max) && "SIFT" %in% colnames(tidy)) {
-    tidy <- tidy %>%
-      dplyr::mutate(.sift_prob = numeric_from_annotation(SIFT)) %>%
-      dplyr::filter(!is.na(.sift_prob) & .sift_prob <= sift_max) %>%
-      dplyr::select(-.sift_prob)
-  }
-
-  tibble::as_tibble(tidy)
+  return(result)
 }
+
+# VCF & VEP Helpers ----
+
+# Internal function to read VEP text format files
+.read_vep_text_format <- function(lines, columns = NULL) {
+  # Find the column header line (starts with #Uploaded_variation)
+  header_idx <- which(grepl("^#Uploaded_variation", lines))
+
+  if (length(header_idx) == 0) {
+    stop("Could not find VEP text format header line")
+  }
+
+  header_line <- lines[header_idx]
+  col_names <- strsplit(header_line, "\t")[[1]]
+  col_names <- sub("^#", "", col_names)
+
+  # Find data lines (everything after header, not starting with #)
+  data_start <- header_idx + 1
+  data_lines <- lines[data_start:length(lines)]
+  data_lines <- data_lines[!grepl("^#", data_lines) & nchar(data_lines) > 0]
+
+  if (length(data_lines) == 0) {
+    # Return empty tibble with requested columns
+    if (is.null(columns)) {
+      columns <- col_names
+    }
+    result <- tibble::tibble()
+    for (col in columns) {
+      result[[col]] <- character(0)
+    }
+    return(result)
+  }
+
+  # Parse data lines
+  data_list <- lapply(data_lines, function(line) {
+    fields <- strsplit(line, "\t")[[1]]
+    row <- as.list(fields)
+    names(row) <- col_names[1:length(fields)]
+
+    # Parse Extra column if present
+    if ("Extra" %in% names(row)) {
+      extra_str <- row$Extra
+      extra_pairs <- strsplit(extra_str, ";")[[1]]
+      for (pair in extra_pairs) {
+        parts <- strsplit(pair, "=")[[1]]
+        if (length(parts) == 2) {
+          key <- parts[1]
+          value <- parts[2]
+          row[[key]] <- value
+        }
+      }
+      # Remove the Extra column
+      row$Extra <- NULL
+    }
+
+    row
+  })
+
+  # Get all unique column names across all rows
+  all_cols <- unique(unlist(lapply(data_list, names)))
+
+  # If columns specified, validate and filter
+  if (!is.null(columns)) {
+    missing_cols <- setdiff(columns, all_cols)
+    if (length(missing_cols) > 0) {
+      warning("Requested columns not found in data: ", paste(missing_cols, collapse = ", "))
+    }
+    all_cols <- intersect(columns, all_cols)
+  }
+
+  # Build tibble column by column as a list
+  result_list <- list()
+  for (col in all_cols) {
+    values <- sapply(data_list, function(row) {
+      if (col %in% names(row)) row[[col]] else NA_character_
+    })
+    result_list[[col]] <- values
+  }
+
+  # Convert to tibble
+  tibble::as_tibble(result_list)
+}
+
+
+# Internal function to read standard VCF with CSQ format
+.read_vcf_csq_format <- function(lines, header_lines, columns = NULL) {
+  # Find CSQ format from INFO header
+  csq_line <- header_lines[grepl("^##INFO=<ID=CSQ", header_lines)]
+
+  if (length(csq_line) == 0) {
+    csq_line <- header_lines[grepl("^##INFO=<ID=ANN", header_lines)]
+    csq_field <- "ANN"
+  } else {
+    csq_field <- "CSQ"
+  }
+
+  if (length(csq_line) == 0) {
+    stop("No CSQ or ANN field found in VCF header. This may not be a VEP-annotated file.")
+  }
+
+  # Extract CSQ format
+  format_match <- regmatches(csq_line[1], regexpr("Format: [^\"]+", csq_line[1]))
+  if (length(format_match) == 0) {
+    stop("Could not parse CSQ format from header")
+  }
+
+  format_str <- sub("^Format: ", "", format_match)
+  csq_col_names <- strsplit(format_str, "\\|")[[1]]
+
+  # Find column header line
+  header_idx <- which(grepl("^#CHROM", lines))
+  if (length(header_idx) == 0) {
+    stop("Could not find VCF column header line")
+  }
+
+  # Find data lines
+  data_start <- header_idx + 1
+  data_lines <- lines[data_start:length(lines)]
+  data_lines <- data_lines[!grepl("^#", data_lines) & nchar(data_lines) > 0]
+
+  if (length(data_lines) == 0) {
+    # Return empty tibble
+    if (is.null(columns)) {
+      columns <- csq_col_names
+    }
+    result <- tibble::tibble()
+    for (col in columns) {
+      result[[col]] <- character(0)
+    }
+    return(result)
+  }
+
+  # Parse data lines
+  data_list <- list()
+  for (line in data_lines) {
+    fields <- strsplit(line, "\t")[[1]]
+    if (length(fields) < 8) next
+
+    info_field <- fields[8]
+
+    # Extract CSQ value
+    csq_pattern <- paste0(csq_field, "=([^;]+)")
+    csq_match <- regmatches(info_field, regexpr(csq_pattern, info_field))
+
+    if (length(csq_match) == 0) next
+
+    csq_value <- sub(paste0(csq_field, "="), "", csq_match)
+
+    # CSQ can have multiple annotations separated by comma
+    csq_annotations <- strsplit(csq_value, ",")[[1]]
+
+    for (annotation in csq_annotations) {
+      csq_values <- strsplit(annotation, "\\|")[[1]]
+
+      row <- list()
+      for (i in seq_along(csq_col_names)) {
+        if (i <= length(csq_values) && nchar(csq_values[i]) > 0) {
+          row[[csq_col_names[i]]] <- csq_values[i]
+        } else {
+          row[[csq_col_names[i]]] <- NA_character_
+        }
+      }
+
+      data_list[[length(data_list) + 1]] <- row
+    }
+  }
+
+  if (length(data_list) == 0) {
+    # Return empty tibble
+    if (is.null(columns)) {
+      columns <- csq_col_names
+    }
+    result <- tibble::tibble()
+    for (col in columns) {
+      result[[col]] <- character(0)
+    }
+    return(result)
+  }
+
+  # If columns specified, validate
+  if (!is.null(columns)) {
+    missing_cols <- setdiff(columns, csq_col_names)
+    if (length(missing_cols) > 0) {
+      warning("Requested columns not found in CSQ format: ", paste(missing_cols, collapse = ", "))
+    }
+    use_cols <- intersect(columns, csq_col_names)
+  } else {
+    use_cols <- csq_col_names
+  }
+
+  # Build tibble column by column as a list
+  result_list <- list()
+  for (col in use_cols) {
+    values <- sapply(data_list, function(row) {
+      if (col %in% names(row)) row[[col]] else NA_character_
+    })
+    result_list[[col]] <- values
+  }
+
+  # Convert to tibble
+  tibble::as_tibble(result_list)
+}
+
 
 # Genetic Databases ----
 
