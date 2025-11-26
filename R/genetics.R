@@ -115,6 +115,217 @@ query_genetic_variants <- function(phenotype,
 }
 
 
+#' Summarize VEP-Annotated VCF Headers
+#'
+#' Inspect the INFO header lines of a VCF produced by Ensembl VEP to understand
+#' which annotations are available (e.g., CSQ/ANN content) and how they are
+#' encoded. This helper makes it easier to decide which columns to keep when
+#' parsing the data table.
+#'
+#' @param vcf_path Path to a VCF file annotated with Ensembl VEP.
+#' @param info_id INFO field identifier that stores the VEP annotations. The
+#'   default (`"CSQ"`) matches the format produced by the `vep` command.
+#'
+#' @return A list with elements:
+#'   \describe{
+#'     \item{info_fields}{A tibble with parsed INFO metadata (ID, Number, Type,
+#'       Description) for each INFO line in the header.}
+#'     \item{csq_fields}{Character vector describing the pipe-delimited CSQ/ANN
+#'       annotation order as defined by VEP (e.g., `Allele`, `Consequence`,
+#'       `IMPACT`, `SYMBOL`).}
+#'     \item{lof_codes}{Named list describing loss-of-function confidence codes
+#'       (high/low confidence). The codes are derived from the VEP LOF plugin
+#'       definitions (typically `HC` and `LC`).}
+#'   }
+#'
+#' @details
+#' The Ensembl VEP header provides a `Format: ...` statement inside the INFO
+#' line for the CSQ/ANN field. This function extracts those field names so that
+#' downstream parsing can map each pipe-separated element to a column. If the
+#' LOF plugin is present, the resulting data typically contain `LoF`,
+#' `LoF_filter`, `LoF_flags`, and `LoF_info` columns where `LoF` values of `HC`
+#' (high confidence) or `LC` (low confidence) indicate the plugin's assessment.
+#'
+#' @examples
+#' \dontrun{
+#' header_info <- vep_header_summary("path/to/annotated.vcf.gz")
+#' header_info$csq_fields
+#' }
+#'
+#' @export
+vep_header_summary <- function(vcf_path, info_id = "CSQ") {
+  if (!file.exists(vcf_path)) {
+    stop("File not found: ", vcf_path)
+  }
+
+  header_lines <- readLines(vcf_path, warn = FALSE)
+  header_lines <- header_lines[grepl("^##", header_lines)]
+
+  if (length(header_lines) == 0) {
+    stop("No VCF header lines detected. Confirm the file is a valid VCF.")
+  }
+
+  info_lines <- header_lines[grepl("^##INFO=<", header_lines)]
+
+  parse_info_line <- function(x) {
+    content <- sub("^##INFO=<", "", x)
+    content <- sub(">$", "", content)
+    parts <- strsplit(content, ",(?=[A-Za-z]+\\=)", perl = TRUE)[[1]]
+    key_vals <- strsplit(parts, "=", fixed = TRUE)
+    names <- vapply(key_vals, `[[`, character(1), 1)
+    values <- vapply(key_vals, function(y) paste(y[-1], collapse = "="), character(1))
+    tibble::tibble(
+      id = names[match("ID", names)],
+      number = values[match("Number", names)],
+      type = values[match("Type", names)],
+      description = values[match("Description", names)]
+    )
+  }
+
+  info_df <- purrr::map_dfr(info_lines, parse_info_line)
+
+  csq_line <- info_lines[grepl(paste0("ID=", info_id, "[,>]"), info_lines)]
+  csq_fields <- character(0)
+  if (length(csq_line) > 0) {
+    format_match <- regmatches(csq_line[1], regexpr("Format: [^"]+", csq_line[1]))
+    if (length(format_match) > 0) {
+      format_string <- sub("^Format: ", "", format_match)
+      csq_fields <- strsplit(format_string, "\\|", fixed = FALSE)[[1]]
+    }
+  }
+
+  list(
+    info_fields = info_df,
+    csq_fields = csq_fields,
+    lof_codes = list(
+      LoF = c(HC = "High confidence loss-of-function", LC = "Low confidence loss-of-function")
+    )
+  )
+}
+
+
+#' Parse VEP-Annotated VCF Files
+#'
+#' Convert an annotated VCF file into a tidy tibble by expanding the CSQ/ANN
+#' annotation field and selecting commonly used consequence columns (e.g.,
+#' `SIFT`, `PolyPhen`, `LoF`). Optional filters allow you to keep only variants
+#' matching specific impact or loss-of-function confidence levels.
+#'
+#' @param vcf_path Path to a VCF file annotated with Ensembl VEP.
+#' @param info_id INFO field identifier that stores the VEP annotations.
+#' @param selected_fields Character vector of CSQ/ANN columns to retain. Columns
+#'   absent from the file are silently dropped.
+#' @param impact_filter Optional character vector of `IMPACT` labels to retain
+#'   (e.g., `c("HIGH", "MODERATE")`).
+#' @param lof_confidence Optional character vector of `LoF` confidence codes to
+#'   retain (typically `"HC"` or `"LC"`).
+#' @param polyphen_min Optional numeric cutoff; keeps rows with parsed PolyPhen
+#'   probability greater than or equal to this value when available.
+#' @param sift_max Optional numeric cutoff; keeps rows with parsed SIFT
+#'   probability less than or equal to this value when available.
+#'
+#' @return A tibble with base VCF columns (`CHROM`, `POS`, `ID`, `REF`, `ALT`,
+#'   `QUAL`, `FILTER` when present) plus the selected CSQ/ANN annotation
+#'   columns. One row is returned per alternate allele consequence.
+#'
+#' @examples
+#' \dontrun{
+#' parsed <- parse_annotated_vcf(
+#'   "path/to/annotated.vcf.gz",
+#'   selected_fields = c("Consequence", "IMPACT", "SYMBOL", "SIFT", "PolyPhen")
+#' )
+#' }
+#'
+#' @export
+parse_annotated_vcf <- function(vcf_path,
+                                info_id = "CSQ",
+                                selected_fields = c(
+                                  "Consequence", "IMPACT", "SYMBOL", "Gene",
+                                  "Feature", "BIOTYPE", "HGVSp", "HGVSc",
+                                  "EXON", "INTRON", "SIFT", "PolyPhen",
+                                  "LoF", "LoF_filter", "LoF_flags", "LoF_info"
+                                ),
+                                impact_filter = NULL,
+                                lof_confidence = NULL,
+                                polyphen_min = NULL,
+                                sift_max = NULL) {
+
+  header_info <- vep_header_summary(vcf_path, info_id = info_id)
+  csq_fields <- header_info$csq_fields
+
+  if (length(csq_fields) == 0) {
+    stop("Unable to identify CSQ/ANN format in VCF header. Check the INFO line for ", info_id)
+  }
+
+  raw_lines <- readLines(vcf_path, warn = FALSE)
+  header_line <- tail(grep("^#CHROM", raw_lines, value = TRUE), 1)
+  if (length(header_line) == 0) {
+    stop("VCF header with column names (#CHROM ...) not found.")
+  }
+  col_names <- strsplit(sub("^#", "", header_line), "\t")[[1]]
+
+  vcf_data <- utils::read.delim(
+    vcf_path,
+    comment.char = "#",
+    header = FALSE,
+    stringsAsFactors = FALSE,
+    sep = "\t",
+    quote = "",
+    check.names = FALSE
+  )
+
+  if (ncol(vcf_data) < length(col_names)) {
+    stop("VCF file has fewer columns than expected from the header line.")
+  }
+
+  colnames(vcf_data)[seq_along(col_names)] <- col_names
+
+  info_values <- vapply(strsplit(vcf_data$INFO, ";"), function(parts) {
+    match_val <- parts[grepl(paste0("^", info_id, "="), parts)]
+    if (length(match_val) == 0) return(NA_character_)
+    sub(paste0("^", info_id, "="), "", match_val[1])
+  }, character(1))
+
+  base_cols <- intersect(c("CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER"), colnames(vcf_data))
+  selected_fields <- intersect(selected_fields, csq_fields)
+
+  tidy <- vcf_data %>%
+    dplyr::mutate(.vep_raw = info_values) %>%
+    dplyr::filter(!is.na(.vep_raw)) %>%
+    tidyr::separate_rows(.vep_raw, sep = ",") %>%
+    tidyr::separate(.vep_raw, into = csq_fields, sep = "\\|", fill = "right", extra = "drop") %>%
+    dplyr::select(dplyr::all_of(base_cols), dplyr::any_of(selected_fields))
+
+  if (!is.null(impact_filter) && "IMPACT" %in% colnames(tidy)) {
+    tidy <- dplyr::filter(tidy, IMPACT %in% impact_filter)
+  }
+
+  if (!is.null(lof_confidence) && "LoF" %in% colnames(tidy)) {
+    tidy <- dplyr::filter(tidy, LoF %in% lof_confidence)
+  }
+
+  numeric_from_annotation <- function(x) {
+    suppressWarnings(as.numeric(sub(".*\\(([^()]*)\\).*", "\\1", x)))
+  }
+
+  if (!is.null(polyphen_min) && "PolyPhen" %in% colnames(tidy)) {
+    tidy <- tidy %>%
+      dplyr::mutate(.polyphen_prob = numeric_from_annotation(PolyPhen)) %>%
+      dplyr::filter(!is.na(.polyphen_prob) & .polyphen_prob >= polyphen_min) %>%
+      dplyr::select(-.polyphen_prob)
+  }
+
+  if (!is.null(sift_max) && "SIFT" %in% colnames(tidy)) {
+    tidy <- tidy %>%
+      dplyr::mutate(.sift_prob = numeric_from_annotation(SIFT)) %>%
+      dplyr::filter(!is.na(.sift_prob) & .sift_prob <= sift_max) %>%
+      dplyr::select(-.sift_prob)
+  }
+
+  tibble::as_tibble(tidy)
+}
+
+
 # Internal function to query ClinVar
 #' @noRd
 #' @keywords internal
