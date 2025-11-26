@@ -35,183 +35,194 @@ NULL
 #' @rdname echocardiography
 #' @export
 extract_la_size <- function(text) {
-	# Early return for missing data
-	if (is.na(text) || is.null(text)) {
-		NA_character_
-	} else {
-		# Clean text
-		text <- text |>
-			tolower() |>
-			stringr::str_replace_all("\n", " ") |>
-			stringr::str_replace_all("\\s+", " ") |>
-			stringr::str_trim()
+  # Early return for missing data
+  if (is.na(text) || is.null(text)) {
+    NA_character_
+  } else {
+    # Clean text
+    text <- text |>
+      tolower() |>
+      stringr::str_replace_all("\n", " ") |>
+      stringr::str_replace_all("\\s+", " ") |>
+      stringr::str_trim()
 
-		# Pattern for LA size descriptions
-		pattern <- paste0(
-			"(?:left atrium|left atrial size)\\s*(?:is|size)?\\s*",
-			"(normal|not well seen|likely normal|mild(?:ly)?|moderate(?:ly)?|",
-			"severe(?:ly)?|very severely|elongated)"
-		)
+    # Pattern for LA size descriptions
+    pattern <- paste0(
+      "(?:left atrium|left atrial size)\\s*(?:is|size)?\\s*",
+      "(normal|not well seen|likely normal|mild(?:ly)?|moderate(?:ly)?|",
+      "severe(?:ly)?|very severely|elongated)"
+    )
 
-		# Extract match
-		match <- stringr::str_match_all(
-			text,
-			stringr::regex(pattern, ignore_case = TRUE)
-		)[[1]]
+    # Extract match
+    match <- stringr::str_match_all(
+      text,
+      stringr::regex(pattern, ignore_case = TRUE)
+    )[[1]]
 
-		if (nrow(match) > 0) match[1,2] else NA_character_
-	}
+    if (nrow(match) > 0) match[1, 2] else NA_character_
+  }
 }
 
 #' @rdname echocardiography
 #' @export
 extract_lvef <- function(text) {
-	# Early return for missing data
-	if (is.na(text) || is.null(text)) {
-		NA_real_
-	} else {
-		# Clean text
-		text <- text |>
-			tolower() |>
-			stringr::str_replace_all("\n", " ") |>
-			stringr::str_replace_all("\\s+", " ") |>
-			stringr::str_trim()
+  # Early return for missing data
+  if (is.na(text) || is.null(text)) {
+    NA_real_
+  } else {
+    # Clean text
+    text <- text |>
+      tolower() |>
+      stringr::str_replace_all("\n", " ") |>
+      stringr::str_replace_all("\\s+", " ") |>
+      stringr::str_trim()
 
-		# Define common EF patterns
-		patterns <- c(
-			# EF/LVEF with optional colon, digits, maybe decimal, optional % sign
-			"(?:ef\\s*|lvef\\s*|ejection fraction\\s*)(:?\\s*)(\\d{1,2}\\.?\\d?)(?:\\s*%| percent)?",
-			# Simpson's EF pattern
-			"(?:simpson'?s?\\s*ef\\s*)(\\d{1,2}\\.?\\d?)(?:\\s*%| percent)?"
-		)
+    # Define common EF patterns
+    patterns <- c(
+      # EF/LVEF with optional colon, digits, maybe decimal, optional % sign
+      "(?:ef\\s*|lvef\\s*|ejection fraction\\s*)(:?\\s*)(\\d{1,2}\\.?\\d?)(?:\\s*%| percent)?",
+      # Simpson's EF pattern
+      "(?:simpson'?s?\\s*ef\\s*)(\\d{1,2}\\.?\\d?)(?:\\s*%| percent)?"
+    )
 
-		# Try each pattern until we find a match
-		for (pat in patterns) {
-			match <- stringr::str_match(text, pat)
+    # Try each pattern until we find a match
+    for (pat in patterns) {
+      match <- stringr::str_match(text, pat)
 
-			# If we found a match, check columns from right to left for numeric value
-			if (!all(is.na(match))) {
-				for (i in rev(seq_len(ncol(match)))) {
-					possible_val <- match[1,i]
+      # If we found a match, check columns from right to left for numeric value
+      if (!all(is.na(match))) {
+        for (i in rev(seq_len(ncol(match)))) {
+          possible_val <- match[1, i]
 
-					# Try to convert to numeric if it looks like a percentage
-					if (!is.na(possible_val) && grepl("^\\d{1,2}(\\.\\d)?$", possible_val)) {
-						val <- suppressWarnings(as.numeric(possible_val))
-						if (!is.na(val)) return(val) # Explicit return for early exit
-					}
-				}
-			}
-		}
+          # Try to convert to numeric if it looks like a percentage
+          if (
+            !is.na(possible_val) && grepl("^\\d{1,2}(\\.\\d)?$", possible_val)
+          ) {
+            val <- suppressWarnings(as.numeric(possible_val))
+            if (!is.na(val)) return(val) # Explicit return for early exit
+          }
+        }
+      }
+    }
 
-		# No valid matches found
-		NA_real_
-	}
+    # No valid matches found
+    NA_real_
+  }
 }
 
 #' @rdname echocardiography
 #' @export
 extract_lvidd <- function(text) {
-	# Early return for missing data
-	if (is.na(text) || is.null(text)) {
-		NA_real_
-	} else {
-		# Clean text
-		text <- text |>
-			tolower() |>
-			stringr::str_replace_all("\n", " ") |>
-			stringr::str_replace_all("\\s+", " ") |>
-			stringr::str_trim()
+  # Early return for missing data
+  if (is.na(text) || is.null(text)) {
+    NA_real_
+  } else {
+    # Clean text
+    text <- text |>
+      tolower() |>
+      stringr::str_replace_all("\n", " ") |>
+      stringr::str_replace_all("\\s+", " ") |>
+      stringr::str_trim()
 
-		# Define common LVIDd patterns
-		patterns <- c(
-			# Various ways to write LVIDd with units
-			"(?:lv diameter in diastole|lvidd|lv edd|lv end diastolic dimension|lvid\\(d\\))\\D*(\\d+(?:\\.\\d+)?)(?:\\s*(mm|cm))?",
-			"(?:lv diastolic dimension|lv internal dimension diastole)\\D*(\\d+(?:\\.\\d+)?)(?:\\s*(mm|cm))?"
-		)
+    # Define common LVIDd patterns
+    patterns <- c(
+      # Various ways to write LVIDd with units
+      "(?:lv diameter in diastole|lvidd|lv edd|lv end diastolic dimension|lvid\\(d\\))\\D*(\\d+(?:\\.\\d+)?)(?:\\s*(mm|cm))?",
+      "(?:lv diastolic dimension|lv internal dimension diastole)\\D*(\\d+(?:\\.\\d+)?)(?:\\s*(mm|cm))?"
+    )
 
-		# Try each pattern
-		for (pat in patterns) {
-			match <- stringr::str_match(text, pat)
+    # Try each pattern
+    for (pat in patterns) {
+      match <- stringr::str_match(text, pat)
 
-			if (!is.na(match[1,2])) {
-				val <- suppressWarnings(as.numeric(match[1,2]))
-				# Check for units and convert if needed
-				unit <- if (ncol(match) > 2) match[1,3] else NA_character_
-				if (!is.na(unit) && unit == "mm") {
-					val <- val / 10  # Convert mm to cm
-				}
-				if (!is.na(val)) return(val) # Explicit return for early exit
-			}
-		}
+      if (!is.na(match[1, 2])) {
+        val <- suppressWarnings(as.numeric(match[1, 2]))
+        # Check for units and convert if needed
+        unit <- if (ncol(match) > 2) match[1, 3] else NA_character_
+        if (!is.na(unit) && unit == "mm") {
+          val <- val / 10 # Convert mm to cm
+        }
+        if (!is.na(val)) return(val) # Explicit return for early exit
+      }
+    }
 
-		# No valid matches found
-		NA_real_
-	}
+    # No valid matches found
+    NA_real_
+  }
 }
 
 #' @rdname echocardiography
 #' @export
 extract_la_diameter <- function(text, min_val = 1, max_val = 10) {
-	# Early return for missing data
-	if (is.na(text) || is.null(text)) {
-		NA_real_
-	} else {
-		# Define high-priority patterns for structured sections
-		priority_patterns <- list(
-			la_ap = "LA\\s*A/P:\\s*(\\d+\\.?\\d*)\\s*cm",
-			la_measure = "L\\.?\\s*Atrium\\s*\\(S\\)\\s*\\([^\\)]+\\):\\s*(\\d+\\.?\\d*)\\s*cm",
-			la_dim = "left\\s+atrial\\s+A/P\\s+dimension\\s+(?:is|of)\\s*(\\d+\\.?\\d*)\\s*cm"
-		)
+  # Early return for missing data
+  if (is.na(text) || is.null(text)) {
+    NA_real_
+  } else {
+    # Define high-priority patterns for structured sections
+    priority_patterns <- list(
+      la_ap = "LA\\s*A/P:\\s*(\\d+\\.?\\d*)\\s*cm",
+      la_measure = "L\\.?\\s*Atrium\\s*\\(S\\)\\s*\\([^\\)]+\\):\\s*(\\d+\\.?\\d*)\\s*cm",
+      la_dim = "left\\s+atrial\\s+A/P\\s+dimension\\s+(?:is|of)\\s*(\\d+\\.?\\d*)\\s*cm"
+    )
 
-		# Try priority patterns first
-		for (pattern in priority_patterns) {
-			match <- stringr::str_match(text, pattern)
-			if (!is.na(match[1,2])) {
-				val <- as.numeric(match[1,2])
-				if (!is.na(val) && val >= min_val && val <= max_val) {
-					return(val) # Explicit return for early exit
-				}
-			}
-		}
+    # Try priority patterns first
+    for (pattern in priority_patterns) {
+      match <- stringr::str_match(text, pattern)
+      if (!is.na(match[1, 2])) {
+        val <- as.numeric(match[1, 2])
+        if (!is.na(val) && val >= min_val && val <= max_val) {
+          return(val) # Explicit return for early exit
+        }
+      }
+    }
 
-		# If no priority matches, try more general approach
-		# Split into chunks and look for LA measurements
-		chunks <- unlist(strsplit(text, "[\\.!:\\n]+"))
+    # If no priority matches, try more general approach
+    # Split into chunks and look for LA measurements
+    chunks <- unlist(strsplit(text, "[\\.!:\\n]+"))
 
-		# Define LA keywords
-		la_keywords <- c(
-			"la diameter", "la dimension", "la size", "la a/p",
-			"left atrial diameter", "left atrial dimension",
-			"left atrial size", "left atrium"
-		)
+    # Define LA keywords
+    la_keywords <- c(
+      "la diameter",
+      "la dimension",
+      "la size",
+      "la a/p",
+      "left atrial diameter",
+      "left atrial dimension",
+      "left atrial size",
+      "left atrium"
+    )
 
-		# Pattern for numeric values in cm
-		numeric_pattern <- "(\\d+(?:\\.\\d+)?)\\s*cm"
+    # Pattern for numeric values in cm
+    numeric_pattern <- "(\\d+(?:\\.\\d+)?)\\s*cm"
 
-		# Check each chunk
-		for (chunk in chunks) {
-			chunk_clean <- tolower(trimws(chunk))
-			if (chunk_clean == "") next
+    # Check each chunk
+    for (chunk in chunks) {
+      chunk_clean <- tolower(trimws(chunk))
+      if (chunk_clean == "") {
+        next
+      }
 
-			# Check if chunk contains LA reference
-			has_la_keyword <- any(sapply(
-				la_keywords,
-				function(kw) grepl(kw, chunk_clean, fixed = TRUE)
-			))
+      # Check if chunk contains LA reference
+      has_la_keyword <- any(sapply(
+        la_keywords,
+        function(kw) grepl(kw, chunk_clean, fixed = TRUE)
+      ))
 
-			if (!has_la_keyword) next
+      if (!has_la_keyword) {
+        next
+      }
 
-			# Look for measurement
-			m <- stringr::str_match(chunk_clean, numeric_pattern)
-			if (!is.na(m[1,2])) {
-				val <- as.numeric(m[1,2])
-				if (!is.na(val) && val >= min_val && val <= max_val) {
-					return(val) # Explicit return for early exit
-				}
-			}
-		}
+      # Look for measurement
+      m <- stringr::str_match(chunk_clean, numeric_pattern)
+      if (!is.na(m[1, 2])) {
+        val <- as.numeric(m[1, 2])
+        if (!is.na(val) && val >= min_val && val <= max_val) {
+          return(val) # Explicit return for early exit
+        }
+      }
+    }
 
-		# No valid matches found, defaults to NA
-		NA_real_
-	}
+    # No valid matches found, defaults to NA
+    NA_real_
+  }
 }

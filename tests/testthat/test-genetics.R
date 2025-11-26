@@ -1,9 +1,6 @@
-# Tests for genetic variant query functions
-
-# Test input validation ----
+# Tests for genetic variant query functions ----------------------------
 
 test_that("query_genetic_variants validates phenotype parameter", {
-
   # Must be character
   expect_error(
     query_genetic_variants(123),
@@ -25,7 +22,6 @@ test_that("query_genetic_variants validates phenotype parameter", {
 
 
 test_that("query_genetic_variants validates database parameter", {
-
   # Must be character
   expect_error(
     query_genetic_variants("atrial fibrillation", database = 123),
@@ -34,7 +30,10 @@ test_that("query_genetic_variants validates database parameter", {
 
   # Must be length 1
   expect_error(
-    query_genetic_variants("atrial fibrillation", database = c("clinvar", "gnomad")),
+    query_genetic_variants(
+      "atrial fibrillation",
+      database = c("clinvar", "gnomad")
+    ),
     "'database' must be a single character string"
   )
 
@@ -47,7 +46,6 @@ test_that("query_genetic_variants validates database parameter", {
 
 
 test_that("query_genetic_variants validates api_key parameter", {
-
   # Must be NULL or character
   expect_error(
     query_genetic_variants("atrial fibrillation", api_key = 123),
@@ -63,7 +61,6 @@ test_that("query_genetic_variants validates api_key parameter", {
 
 
 test_that("query_genetic_variants validates max_results parameter", {
-
   # Must be numeric
   expect_error(
     query_genetic_variants("atrial fibrillation", max_results = "100"),
@@ -93,7 +90,6 @@ test_that("query_genetic_variants validates max_results parameter", {
 # Test return structure ----
 
 test_that("query_genetic_variants returns tibble with correct columns", {
-
   skip_if_offline()
   skip_on_cran()
 
@@ -124,7 +120,6 @@ test_that("query_genetic_variants returns tibble with correct columns", {
 
 
 test_that("query_genetic_variants returns correct column types", {
-
   skip_if_offline()
   skip_on_cran()
   skip()
@@ -150,7 +145,6 @@ test_that("query_genetic_variants returns correct column types", {
 # Test functionality ----
 
 test_that("query_genetic_variants returns results for known phenotype", {
-
   skip_if_offline()
   skip_on_cran()
 
@@ -172,7 +166,6 @@ test_that("query_genetic_variants returns results for known phenotype", {
 
 
 test_that("query_genetic_variants respects max_results parameter", {
-
   skip_if_offline()
   skip_on_cran()
 
@@ -187,7 +180,6 @@ test_that("query_genetic_variants respects max_results parameter", {
 
 
 test_that("query_genetic_variants handles non-existent phenotype gracefully", {
-
   skip_if_offline()
   skip_on_cran()
 
@@ -205,16 +197,22 @@ test_that("query_genetic_variants handles non-existent phenotype gracefully", {
   expect_equal(nrow(result), 0)
 
   expected_cols <- c(
-    "gene_symbol", "variant_id", "variant_name", "chromosome",
-    "position", "clinical_significance", "review_status",
-    "phenotypes", "molecular_consequence", "database"
+    "gene_symbol",
+    "variant_id",
+    "variant_name",
+    "chromosome",
+    "position",
+    "clinical_significance",
+    "review_status",
+    "phenotypes",
+    "molecular_consequence",
+    "database"
   )
   expect_true(all(expected_cols %in% names(result)))
 })
 
 
 test_that("query_genetic_variants works with case variations", {
-
   skip_if_offline()
   skip_on_cran()
 
@@ -247,16 +245,22 @@ test_that("query_genetic_variants works with case variations", {
 # Test empty result handling ----
 
 test_that("empty result table has correct structure", {
-
   empty_table <- card:::.empty_result_table()
 
   expect_s3_class(empty_table, "tbl_df")
   expect_equal(nrow(empty_table), 0)
 
   expected_cols <- c(
-    "gene_symbol", "variant_id", "variant_name", "chromosome",
-    "position", "clinical_significance", "review_status",
-    "phenotypes", "molecular_consequence", "database"
+    "gene_symbol",
+    "variant_id",
+    "variant_name",
+    "chromosome",
+    "position",
+    "clinical_significance",
+    "review_status",
+    "phenotypes",
+    "molecular_consequence",
+    "database"
   )
 
   expect_true(all(expected_cols %in% names(empty_table)))
@@ -266,7 +270,6 @@ test_that("empty result table has correct structure", {
 # Integration test ----
 
 test_that("full workflow integration test with known cardiovascular phenotype", {
-
   skip_if_offline()
   skip_on_cran()
 
@@ -297,7 +300,6 @@ test_that("full workflow integration test with known cardiovascular phenotype", 
 # Test new gene filtering features ----
 
 test_that("query_genetic_variants filters to specific genes", {
-
   skip_if_offline()
   skip_on_cran()
   skip()
@@ -315,7 +317,6 @@ test_that("query_genetic_variants filters to specific genes", {
 
 
 test_that("query_genetic_variants validates genes parameter", {
-
   # Must be character or NULL
   expect_error(
     query_genetic_variants("atrial fibrillation", genes = 123),
@@ -325,7 +326,6 @@ test_that("query_genetic_variants validates genes parameter", {
 
 
 test_that("query_genetic_variants filters pseudogenes by default", {
-
   skip_if_offline()
   skip_on_cran()
   skip()
@@ -351,7 +351,6 @@ test_that("query_genetic_variants filters pseudogenes by default", {
 
 
 test_that("query_genetic_variants validates clean_gene_symbols parameter", {
-
   # Must be logical
   expect_error(
     query_genetic_variants("atrial fibrillation", clean_gene_symbols = "yes"),
@@ -360,7 +359,10 @@ test_that("query_genetic_variants validates clean_gene_symbols parameter", {
 
   # Must be length 1
   expect_error(
-    query_genetic_variants("atrial fibrillation", clean_gene_symbols = c(TRUE, FALSE)),
+    query_genetic_variants(
+      "atrial fibrillation",
+      clean_gene_symbols = c(TRUE, FALSE)
+    ),
     "'clean_gene_symbols' must be a single logical value"
   )
 })
@@ -369,7 +371,6 @@ test_that("query_genetic_variants validates clean_gene_symbols parameter", {
 # Test gene-level summary function ----
 
 test_that("query_genes_by_phenotype returns correct structure", {
-
   skip_if_offline()
   skip_on_cran()
   skip()
@@ -405,7 +406,6 @@ test_that("query_genes_by_phenotype returns correct structure", {
 
 
 test_that("query_genes_by_phenotype aggregates correctly", {
-
   skip_if_offline()
   skip_on_cran()
   skip()
@@ -432,7 +432,6 @@ test_that("query_genes_by_phenotype aggregates correctly", {
 
 
 test_that("query_genes_by_phenotype accepts gene filter", {
-
   skip_if_offline()
   skip_on_cran()
   skip()
@@ -449,7 +448,6 @@ test_that("query_genes_by_phenotype accepts gene filter", {
 
 
 test_that("query_genes_by_phenotype handles no results gracefully", {
-
   skip_if_offline()
   skip_on_cran()
 
@@ -463,8 +461,14 @@ test_that("query_genes_by_phenotype handles no results gracefully", {
   expect_equal(nrow(result), 0)
 
   expected_cols <- c(
-    "gene_symbol", "n_variants", "n_pathogenic", "n_benign",
-    "n_vus", "phenotypes", "chromosomes", "database"
+    "gene_symbol",
+    "n_variants",
+    "n_pathogenic",
+    "n_benign",
+    "n_vus",
+    "phenotypes",
+    "chromosomes",
+    "database"
   )
   expect_true(all(expected_cols %in% names(result)))
 })
@@ -473,10 +477,15 @@ test_that("query_genes_by_phenotype handles no results gracefully", {
 # Test helper functions ----
 
 test_that("clean_gene_symbols extracts real genes from mixed strings", {
-
   # Create test data
   test_data <- tibble::tibble(
-    gene_symbol = c("BRCA1", "LOC123456", "LOC123456; TP53", "TP53; LOC999", "LINC00123"),
+    gene_symbol = c(
+      "BRCA1",
+      "LOC123456",
+      "LOC123456; TP53",
+      "TP53; LOC999",
+      "LINC00123"
+    ),
     variant_id = c("1", "2", "3", "4", "5"),
     variant_name = rep("test", 5),
     chromosome = rep("1", 5),
@@ -508,7 +517,6 @@ test_that("clean_gene_symbols extracts real genes from mixed strings", {
 
 
 test_that("clean_gene_symbols keeps first real gene from multiple", {
-
   # Create test data with multiple real genes
   test_data <- tibble::tibble(
     gene_symbol = c("BRCA1; BRCA2", "TP53; TP63", "LOC123; TTN; MYH7"),
@@ -535,7 +543,6 @@ test_that("clean_gene_symbols keeps first real gene from multiple", {
 
 
 test_that("filter_genes works with case insensitive matching", {
-
   # Create test data
   test_data <- tibble::tibble(
     gene_symbol = c("BRCA1", "BRCA2", "TP53", "MYH7"),
@@ -563,7 +570,10 @@ test_that("query_genetic_variants returns results for known phenotype", {
   skip_if_offline()
   skip_on_cran()
 
-  result <- query_genetic_variants("hypertrophic cardiomyopathy", max_results = 20)
+  result <- query_genetic_variants(
+    "hypertrophic cardiomyopathy",
+    max_results = 20
+  )
   expect_true(nrow(result) > 0)
   expect_true(all(result$database == "ClinVar"))
   expect_true(any(!is.na(result$gene_symbol)))
@@ -584,7 +594,10 @@ test_that("query_genetic_variants handles non-existent phenotype gracefully", {
   skip_on_cran()
 
   expect_message(
-    result <- query_genetic_variants("xyzabc123nonexistent999", max_results = 10),
+    result <- query_genetic_variants(
+      "xyzabc123nonexistent999",
+      max_results = 10
+    ),
     "No variants found for phenotype"
   )
 
@@ -592,8 +605,16 @@ test_that("query_genetic_variants handles non-existent phenotype gracefully", {
   expect_equal(nrow(result), 0)
 
   expected_cols <- c(
-    "gene_symbol","variant_id","variant_name","chromosome","position",
-    "clinical_significance","review_status","phenotypes","molecular_consequence","database"
+    "gene_symbol",
+    "variant_id",
+    "variant_name",
+    "chromosome",
+    "position",
+    "clinical_significance",
+    "review_status",
+    "phenotypes",
+    "molecular_consequence",
+    "database"
   )
   expect_true(all(expected_cols %in% names(result)))
 })
@@ -603,8 +624,16 @@ test_that("case-insensitive database argument works", {
   skip_if_offline()
   skip_on_cran()
 
-  r1 <- query_genetic_variants("arrhythmia", database = "clinvar", max_results = 5)
-  r2 <- query_genetic_variants("arrhythmia", database = "CLINVAR", max_results = 5)
+  r1 <- query_genetic_variants(
+    "arrhythmia",
+    database = "clinvar",
+    max_results = 5
+  )
+  r2 <- query_genetic_variants(
+    "arrhythmia",
+    database = "CLINVAR",
+    max_results = 5
+  )
   expect_s3_class(r1, "tbl_df")
   expect_s3_class(r2, "tbl_df")
 })
@@ -618,8 +647,16 @@ test_that("empty result table has correct structure", {
   expect_equal(nrow(empty_table), 0)
 
   expected_cols <- c(
-    "gene_symbol","variant_id","variant_name","chromosome","position",
-    "clinical_significance","review_status","phenotypes","molecular_consequence","database"
+    "gene_symbol",
+    "variant_id",
+    "variant_name",
+    "chromosome",
+    "position",
+    "clinical_significance",
+    "review_status",
+    "phenotypes",
+    "molecular_consequence",
+    "database"
   )
   expect_true(all(expected_cols %in% names(empty_table)))
 })
@@ -631,7 +668,11 @@ test_that("integration smoke test for familial hypercholesterolemia", {
   skip_if_offline()
   skip_on_cran()
 
-  result <- query_genetic_variants("familial hypercholesterolemia", database = "clinvar", max_results = 20)
+  result <- query_genetic_variants(
+    "familial hypercholesterolemia",
+    database = "clinvar",
+    max_results = 20
+  )
   expect_true(nrow(result) > 0)
   expect_true(any(grepl("LDLR", result$gene_symbol, ignore.case = TRUE)))
   expect_true(any(!is.na(result$clinical_significance)))
@@ -644,7 +685,13 @@ test_that("integration smoke test for familial hypercholesterolemia", {
 
 test_that("clean_gene_symbols preserves/cleans gene_symbol entries", {
   test_data <- tibble::tibble(
-    gene_symbol = c("BRCA1", "LOC123456", "LOC123456; TP53", "TP53; LOC999", "LINC00123"),
+    gene_symbol = c(
+      "BRCA1",
+      "LOC123456",
+      "LOC123456; TP53",
+      "TP53; LOC999",
+      "LINC00123"
+    ),
     variant_id = as.character(1:5),
     variant_name = rep("test", 5),
     chromosome = rep("1", 5),
@@ -688,7 +735,7 @@ test_that("clean_gene_symbols keeps first real gene from multiple entries", {
 
 test_that("filter_genes matches case-insensitively", {
   test_data <- tibble::tibble(
-    gene_symbol = c("BRCA1","BRCA2","TP53","MYH7"),
+    gene_symbol = c("BRCA1", "BRCA2", "TP53", "MYH7"),
     variant_id = as.character(1:4),
     variant_name = rep("test", 4),
     chromosome = rep("1", 4),
@@ -700,7 +747,25 @@ test_that("filter_genes matches case-insensitively", {
     database = rep("ClinVar", 4)
   )
 
-  filtered <- card:::.filter_genes(test_data, c("brca1","tp53"))
+  filtered <- card:::.filter_genes(test_data, c("brca1", "tp53"))
   expect_equal(nrow(filtered), 2)
-  expect_true(all(filtered$gene_symbol %in% c("BRCA1","TP53")))
+  expect_true(all(filtered$gene_symbol %in% c("BRCA1", "TP53")))
+})
+
+# VCF files ----------------------------------------------------
+
+test_that("can read VCF headers", {
+  vep_file <- test_path("sample-filtered-vep.vcf")
+  header_info <- read_vcf_header(vep_file)
+  expect_type(header_info, "list")
+  expect_true("info_fields" %in% names(header_info))
+  expect_true("csq_fields" %in% names(header_info))
+  expect_true("lof_codes" %in% names(header_info))
+
+  # Verify CSQ fields were extracted from VEP text format
+  expect_gt(length(header_info$csq_fields), 0)
+  expect_true("Uploaded_variation" %in% header_info$csq_fields)
+  expect_true("Gene" %in% header_info$csq_fields)
+  expect_true("Consequence" %in% header_info$csq_fields)
+  expect_true("LoF" %in% header_info$csq_fields)
 })
