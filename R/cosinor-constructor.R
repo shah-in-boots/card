@@ -136,18 +136,17 @@ cosinor.recipe <- function(t, data, tau, population = NULL, ...) {
 #'   needed.
 #' @noRd
 cosinor_bridge <- function(processed, tau, population, data, ...) {
-
   ### Create call ----
-    # Formal equation
-    # y(t) = M + A*cos(2*pi*t/period + phi)
-    # y(t) = M + beta*x + gamma*z + error(t)
+  # Formal equation
+  # y(t) = M + A*cos(2*pi*t/period + phi)
+  # y(t) = M + beta*x + gamma*z + error(t)
   y <- names(processed$outcomes)
   t <- names(processed$predictors)
   l <- length(tau)
   ls <- list()
 
   for (i in 1:l) {
-    ls[[i]] <- paste0("A", i, " * cos(2*pi*", t, "/", tau[i], " + phi", i,")")
+    ls[[i]] <- paste0("A", i, " * cos(2*pi*", t, "/", tau[i], " + phi", i, ")")
   }
   f <- paste0(y, " ~ M + ", paste0(ls, collapse = " + "))
   call <- paste0("cosinor(formula = ", f)
@@ -165,22 +164,19 @@ cosinor_bridge <- function(processed, tau, population, data, ...) {
 
   # If population value is NULL, then perform individual cosinor
   if (is.null(population)) {
-
     # Implemented function for single and multiple component cosinor
     fit <- cosinor_impl(predictors, outcomes, tau)
     type <- "Individual"
-
   } else if (length(population) == length(predictors)) {
-
     # Modified function, using `cosinor_impl()` internally
     fit <- cosinor_pop_impl(predictors, outcomes, tau, population)
     type <- "Population"
-
   } else {
-
     # Error if population cosinor cannot be run either
-    stop("Population-mean cosinor error: `population` does not match size of time indices", call. = FALSE)
-
+    stop(
+      "Population-mean cosinor error: `population` does not match size of time indices",
+      call. = FALSE
+    )
   }
 
   ## New Cosinor ----
@@ -216,19 +212,14 @@ new_cosinor <- function(
   type,
   blueprint
 ) {
-
   # Can validate coefs here
   if (!is.numeric(coefficients)) {
-    stop("`coefficients` should be a numeric vector.",
-      call. = FALSE
-    )
+    stop("`coefficients` should be a numeric vector.", call. = FALSE)
   }
 
   # Names check
   if (!is.character(coef_names)) {
-    stop("`coef_names` should be a character vector.",
-      call. = FALSE
-    )
+    stop("`coef_names` should be a character vector.", call. = FALSE)
   }
 
   # Length check
@@ -256,63 +247,60 @@ new_cosinor <- function(
 
 # Wrapper function to load parsnip model
 make_cosinor_reg <- function() {
+  # Check to see if already loaded
+  current <- parsnip::get_model_env()
 
-	# Check to see if already loaded
-	current <- parsnip::get_model_env()
+  # If not loaded, then set up model
+  if (!any(current$models == "cosinor_reg")) {
+    # Start making new model
+    parsnip::set_new_model("cosinor_reg")
 
-	# If not loaded, then set up model
-	if(!any(current$models == "cosinor_reg")) {
+    # Add parsnip models to another package
+    parsnip::set_model_mode(model = "cosinor_reg", mode = "regression")
+    parsnip::set_model_engine("cosinor_reg", mode = "regression", eng = "card")
+    parsnip::set_dependency("cosinor_reg", eng = "card", pkg = "card")
 
-		# Start making new model
-		parsnip::set_new_model("cosinor_reg")
+    # Arguments
+    parsnip::set_model_arg(
+      model = "cosinor_reg",
+      eng = "card",
+      parsnip = "period",
+      original = "tau",
+      func = list(pkg = "card", fun = "cosinor"),
+      has_submodel = FALSE
+    )
 
-		# Add parsnip models to another package
-		parsnip::set_model_mode(model = "cosinor_reg", mode = "regression")
-		parsnip::set_model_engine("cosinor_reg", mode = "regression", eng = "card")
-		parsnip::set_dependency("cosinor_reg", eng = "card", pkg = "card")
+    # Fit
+    parsnip::set_fit(
+      model = "cosinor_reg",
+      eng = "card",
+      mode = "regression",
+      value = list(
+        interface = "formula",
+        protect = c("formula", "data"),
+        func = c(pkg = "card", fun = "cosinor"),
+        defaults = list()
+      )
+    )
 
-		# Arguments
-		parsnip::set_model_arg(
-			model = "cosinor_reg",
-			eng = "card",
-			parsnip = "period",
-			original = "tau",
-			func = list(pkg = "card", fun = "cosinor"),
-			has_submodel = FALSE
-		)
-
-		# Fit
-		parsnip::set_fit(
-			model = "cosinor_reg",
-			eng = "card",
-			mode = "regression",
-			value = list(
-				interface = "formula",
-				protect = c("formula", "data"),
-				func = c(pkg = "card", fun = "cosinor"),
-				defaults = list()
-			)
-		)
-
-		# Prediction
-		parsnip::set_pred(
-			model = "cosinor_reg",
-			eng = "card",
-			mode = "regression",
-			type = "numeric",
-			value = list(
-				pre = NULL,
-				post = NULL,
-				func = c(fun = "predict"),
-				args = list(
-					object = quote(object$fit),
-					new_data = quote(new_data),
-					type = "numeric"
-				)
-			)
-		)
-	}
-
+    # Prediction
+    parsnip::set_pred(
+      model = "cosinor_reg",
+      eng = "card",
+      mode = "regression",
+      type = "numeric",
+      value = list(
+        pre = NULL,
+        post = NULL,
+        func = c(fun = "predict"),
+        args = list(
+          object = quote(object$fit),
+          new_data = quote(new_data),
+          type = "numeric"
+        )
+      )
+    )
+  }
 }
 
 
@@ -327,24 +315,23 @@ make_cosinor_reg <- function() {
 #' 	parsnip::set_mode("regression")
 #' @export
 cosinor_reg <- function(mode = "regression", period = NULL) {
+  # Check correct mode
+  if (mode != "regression") {
+    stop("`mode` should be 'regression'", call. = FALSE)
+  }
 
-	# Check correct mode
-	if(mode != "regression") {
-		stop("`mode` should be 'regression'", call. = FALSE)
-	}
+  # Capture arguments
+  args <- list(period = rlang::enquo(period))
 
-	# Capture arguments
-	args <- list(period = rlang::enquo(period))
-
-	# Model specs / slots
-	parsnip::new_model_spec(
-		"cosinor_reg",
-		args = args,
-		mode = mode,
-		eng_args = NULL,
-		method = NULL,
-		engine = NULL
-	)
+  # Model specs / slots
+  parsnip::new_model_spec(
+    "cosinor_reg",
+    args = args,
+    mode = mode,
+    eng_args = NULL,
+    method = NULL,
+    engine = NULL
+  )
 }
 
 #' @param object Cosinor model specification
@@ -354,32 +341,34 @@ cosinor_reg <- function(mode = "regression", period = NULL) {
 #' @rdname cosinor_reg
 #' @export
 update.cosinor_reg <- function(object, period = NULL, fresh = FALSE, ...) {
-	parsnip::update_dot_check(...)
+  parsnip::update_dot_check(...)
 
-	# Updated arguments
-	args <- list(
-		period = rlang::enquo(period)
-	)
+  # Updated arguments
+  args <- list(
+    period = rlang::enquo(period)
+  )
 
-	if (fresh) {
-		object$args <- args
-	} else {
-		null_args <- purrr::map_lgl(args, parsnip::null_value)
-		if (any(null_args))
-			args <- args[!null_args]
-		if (length(args) > 0)
-			object$args[names(args)] <- args
-	}
+  if (fresh) {
+    object$args <- args
+  } else {
+    null_args <- purrr::map_lgl(args, parsnip::null_value)
+    if (any(null_args)) {
+      args <- args[!null_args]
+    }
+    if (length(args) > 0) {
+      object$args[names(args)] <- args
+    }
+  }
 
-	# Model specs / slots
-	parsnip::new_model_spec(
-		"cosinor_reg",
-		args = object$args,
-		eng_args = object$eng_args,
-		mode = object$mode,
-		method = NULL,
-		engine = object$engine
-	)
+  # Model specs / slots
+  parsnip::new_model_spec(
+    "cosinor_reg",
+    args = object$args,
+    eng_args = object$eng_args,
+    mode = object$mode,
+    method = NULL,
+    engine = object$engine
+  )
 }
 
 #' @method print cosinor_reg
@@ -388,15 +377,15 @@ update.cosinor_reg <- function(object, period = NULL, fresh = FALSE, ...) {
 #' @param ... Extensible
 #' @export
 print.cosinor_reg <- function(x, ...) {
-	cat("Cosinor Model Specification (", x$mode, ")\n\n", sep = "")
-	parsnip::model_printer(x, ...)
+  cat("Cosinor Model Specification (", x$mode, ")\n\n", sep = "")
+  parsnip::model_printer(x, ...)
 
-	if (!is.null(x$method$fit$args)) {
-		cat("Model fit template:\n")
-		print(parsnip::show_call(x))
-	}
+  if (!is.null(x$method$fit$args)) {
+    cat("Model fit template:\n")
+    print(parsnip::show_call(x))
+  }
 
-	invisible(x)
+  invisible(x)
 }
 
 # Cosinor Generic S3 Methods ----
@@ -409,16 +398,14 @@ print.cosinor_reg <- function(x, ...) {
 #' @noRd
 #' @export
 print.cosinor <- function(x, ...) {
+  cat("Call: \n")
+  cat(x$call, "\n")
 
-	cat("Call: \n")
-	cat(x$call, "\n")
-
-	# Coefficients
-	cat("\n")
-	cat("Coefficients: \n")
-	names(x$coefficients) <- x$coef_names
-	print(x$coefficients)
-
+  # Coefficients
+  cat("\n")
+  cat("Coefficients: \n")
+  names(x$coefficients) <- x$coef_names
+  print(x$coefficients)
 }
 
 ## Summary Method
@@ -429,39 +416,42 @@ print.cosinor <- function(x, ...) {
 #' @noRd
 #' @export
 summary.cosinor <- function(object, ...) {
+  # Summary
+  cat(paste0(object$type, " Cosinor Model \n"))
+  cat(strrep("-", 42))
 
-	# Summary
-	cat(paste0(object$type, " Cosinor Model \n"))
-	cat(strrep("-", 42))
+  # Call
+  cat("\n")
+  cat("Call: \n")
+  cat(object$call, "\n")
 
-	# Call
-	cat("\n")
-	cat("Call: \n")
-	cat(object$call, "\n")
+  # Periods
+  cat("\n")
+  cat("Period(s): ")
+  cat(paste0(object$tau, collapse = ", "), "\n")
 
-	# Periods
-	cat("\n")
-	cat("Period(s): ")
-	cat(paste0(object$tau, collapse = ", "), "\n")
+  # Residuals
+  cat("\n")
+  cat("Residuals: \n")
+  print(summary(object$residuals))
 
-	# Residuals
-	cat("\n")
-	cat("Residuals: \n")
-	print(summary(object$residuals))
-
-	# Coefficients (estimate, SE, t.value, P.value)
-	cat("\n")
-	cat("Coefficients: \n")
-	names(object$coefficients) <- object$coef_names
-	coefs <- object$coefficients
+  # Coefficients (estimate, SE, t.value, P.value)
+  cat("\n")
+  cat("Coefficients: \n")
+  names(object$coefficients) <- object$coef_names
+  coefs <- object$coefficients
   coefs <- coefs[grep("mesor|amp|phi", names(coefs))]
   se <- stats::confint(object)$se
-	l <- list(coefs = coefs, se = se)
+  l <- list(coefs = coefs, se = se)
 
-	mat <- do.call(cbind, lapply(l, function(x) {x[match(names(l[[1]]), names(x))]}))
-	colnames(mat) <- c("Estimate", "Std. Error")
-	print(mat)
-
+  mat <- do.call(
+    cbind,
+    lapply(l, function(x) {
+      x[match(names(l[[1]]), names(x))]
+    })
+  )
+  colnames(mat) <- c("Estimate", "Std. Error")
+  print(mat)
 }
 
 #' @description Generic plot method
@@ -470,14 +460,13 @@ summary.cosinor <- function(object, ...) {
 #' @noRd
 #' @export
 plot.cosinor <- function(x, ...) {
+  # Model data
+  model <- as.data.frame(x$model)
+  model$yhat <- x$fitted.values
+  model$res <- x$residuals
 
-	# Model data
-	model <- as.data.frame(x$model)
-	model$yhat <- x$fitted.values
-	model$res <- x$residuals
-
-	# Plotting function
-	plot(model$t, model$yhat)
+  # Plotting function
+  plot(model$t, model$yhat)
 }
 
 # Cosinor Tidiers ----
@@ -510,35 +499,36 @@ generics::tidy
 #'
 #' @export
 tidy.cosinor <- function(x, conf.int = FALSE, conf.level = 0.95, ...) {
-
   # Get base data
   names(x$coefficients) <- x$coef_names
-	coefs <- x$coefficients
+  coefs <- x$coefficients
   coefs <- coefs[grep("mesor|amp|phi", names(coefs))]
   val <- stats::confint(x, level = conf.level)
-	l <- list("coefs" = coefs, "se" = val$se)
-	mat <- do.call(cbind, lapply(l, function(x) {x[match(names(l[[1]]), names(x))]}))
+  l <- list("coefs" = coefs, "se" = val$se)
+  mat <- do.call(
+    cbind,
+    lapply(l, function(x) {
+      x[match(names(l[[1]]), names(x))]
+    })
+  )
 
-	# Tibble it
-	result <-
-	  mat |>
-	  dplyr::as_tibble(rownames = "term") |>
-	  dplyr::rename("estimate" = "coefs", "std.error" = "se")
+  # Tibble it
+  result <-
+    mat |>
+    dplyr::as_tibble(rownames = "term") |>
+    dplyr::rename("estimate" = "coefs", "std.error" = "se")
 
-	if (conf.int) {
+  if (conf.int) {
+    ci <- val$ci
+    colnames(ci) <- c("conf.low", "conf.high")
+    result <-
+      ci |>
+      dplyr::as_tibble(rownames = "term") |>
+      dplyr::left_join(x = result, y = _, by = "term")
+  }
 
-		ci <- val$ci
-		colnames(ci) <- c("conf.low", "conf.high")
-		result <-
-			ci |>
-	    dplyr::as_tibble(rownames = "term") |>
-	    dplyr::left_join(x = result, y = _, by = "term")
-
-	}
-
-	# Return findings
-	result
-
+  # Return findings
+  result
 }
 
 ## Augment Method
@@ -555,16 +545,14 @@ generics::augment
 #' @export
 #' @family cosinor
 augment.cosinor <- function(x, ...) {
-
   # Add fitted and residual values
   result <-
     dplyr::bind_cols(
-    dplyr::tibble(x$model),
-    dplyr::tibble(.fitted = x$fitted.values),
-    dplyr::tibble(.resid = x$residuals)
-  )
+      dplyr::tibble(x$model),
+      dplyr::tibble(.fitted = x$fitted.values),
+      dplyr::tibble(.resid = x$residuals)
+    )
 
   # Return
   return(result)
-
 }

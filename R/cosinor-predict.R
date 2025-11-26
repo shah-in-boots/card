@@ -32,7 +32,6 @@ valid_predict_types <- function() {
 # Bridge ----
 
 predict_cosinor_bridge <- function(type, object, predictors) {
-
   # Get_predict below needs to have matching type
   predict_function <- get_predict_function(type)
   predictions <- predict_function(object, predictors)
@@ -41,11 +40,9 @@ predict_cosinor_bridge <- function(type, object, predictors) {
 
   # Return
   return(predictions)
-
 }
 
 get_predict_function <- function(type) {
-
   # Make sure that the prediction classes match up to model type
   switch(
     type,
@@ -80,9 +77,13 @@ predict_cosinor_numeric <- function(object, predictors) {
   # y(t) = M + amp1 * cos(2*pi*t/tau1 + phi1) + amp2 * cos(2*pi*t/tau2 + phi2)
   pars <- list()
   for (i in 1:p) {
-		pars[[i]] <- get(paste0("amp", i)) * cos(2*pi*t / tau[i] + get(paste0("phi", i)))
+    pars[[i]] <- get(paste0("amp", i)) *
+      cos(2 * pi * t / tau[i] + get(paste0("phi", i)))
   }
-  df <- data.frame(mesor = mesor, trig = matrix(unlist(pars), ncol = length(pars), byrow = FALSE))
+  df <- data.frame(
+    mesor = mesor,
+    trig = matrix(unlist(pars), ncol = length(pars), byrow = FALSE)
+  )
   pred <- rowSums(df)
 
   # Reformat and return

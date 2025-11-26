@@ -46,51 +46,52 @@
 #' @name procedure_codes
 #' @export
 procedure_codes <- function(format, version) {
-
-	# Identify which dataset to use based on format code
+  # Identify which dataset to use based on format code
   # 	Check if the format is supported
-	# 	Add checks to see if version is supported
+  # 	Add checks to see if version is supported
   # 	Check if the version is supported
-	if (length(format) > 1) {
-		stop("Only one format can be referenced at a time.")
-	}
-
-  if (!format %in% c("icd9", "icd10", "hcpcs", "cpt")) {
-    stop("Format not supported. Please use one of the following: icd9, icd10, hcpcs, cpt")
+  if (length(format) > 1) {
+    stop("Only one format can be referenced at a time.")
   }
 
-	version <- as.character(version) # In case is numeric
+  if (!format %in% c("icd9", "icd10", "hcpcs", "cpt")) {
+    stop(
+      "Format not supported. Please use one of the following: icd9, icd10, hcpcs, cpt"
+    )
+  }
 
-	if (length(version) > 1) {
-		stop("Only one version can be referenced at a time.")
-	}
+  version <- as.character(version) # In case is numeric
 
-	if (format == "icd9") {
-	  if (!version %in% c("2014")) {
-	    stop("Version not supported. Please use one of the following: 2014")
-	  }
-	}
+  if (length(version) > 1) {
+    stop("Only one version can be referenced at a time.")
+  }
 
-	if (format == "icd10") {
-	  if (!version %in% c("2023")) {
-	    stop("Version not supported. Please use one of the following: 2023")
-	  }
-	}
+  if (format == "icd9") {
+    if (!version %in% c("2014")) {
+      stop("Version not supported. Please use one of the following: 2014")
+    }
+  }
 
-	if (format == "hcpcs") {
-	  if (!version %in% c("2023")) {
-	    stop("Version not supported. Please use one of the following: 2023")
-	  }
-	}
+  if (format == "icd10") {
+    if (!version %in% c("2023")) {
+      stop("Version not supported. Please use one of the following: 2023")
+    }
+  }
 
-	if (format == "cpt") {
-	  if (!version %in% c("2023")) {
-	    stop("Version not supported. Please use one of the following: 2023")
-	  }
-	}
+  if (format == "hcpcs") {
+    if (!version %in% c("2023")) {
+      stop("Version not supported. Please use one of the following: 2023")
+    }
+  }
 
-	dat <- .cms_codes[[format]][[version]]
+  if (format == "cpt") {
+    if (!version %in% c("2023")) {
+      stop("Version not supported. Please use one of the following: 2023")
+    }
+  }
 
-	# Return dataset
-	return(dat)
+  dat <- .cms_codes[[format]][[version]]
+
+  # Return dataset
+  return(dat)
 }
