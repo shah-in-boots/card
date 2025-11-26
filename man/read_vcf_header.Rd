@@ -32,10 +32,10 @@ encoded. This helper makes it easier to decide which columns to keep when
 parsing the data table.
 }
 \details{
-The Ensembl VEP header provides a \code{Format: ...} statement inside the INFO
-line for the CSQ/ANN field. This function extracts those field names so that
-downstream parsing can map each pipe-separated element to a column. If the
-LOF plugin is present, the resulting data typically contain \code{LoF},
+The Ensembl VEP header provides a \code{Format: ...} statement inside the
+INFO line for the CSQ/ANN field. This function extracts those field names so
+that downstream parsing can map each pipe-separated element to a column. If
+the LOF plugin is present, the resulting data typically contain \code{LoF},
 \code{LoF_filter}, \code{LoF_flags}, and \code{LoF_info} columns where \code{LoF} values of \code{HC}
 (high confidence) or \code{LC} (low confidence) indicate the plugin's assessment.
 }

@@ -8,6 +8,7 @@
 #' parsing the data table.
 #'
 #' @param vcf_path Path to a VCF file annotated with Ensembl VEP.
+#'
 #' @param info_id INFO field identifier that stores the VEP annotations. The
 #'   default (`"CSQ"`) matches the format produced by the `vep` command.
 #'
@@ -23,11 +24,10 @@
 #'       definitions (typically `HC` and `LC`).}
 #'   }
 #'
-#' @details
-#' The Ensembl VEP header provides a `Format: ...` statement inside the INFO
-#' line for the CSQ/ANN field. This function extracts those field names so that
-#' downstream parsing can map each pipe-separated element to a column. If the
-#' LOF plugin is present, the resulting data typically contain `LoF`,
+#' @details The Ensembl VEP header provides a `Format: ...` statement inside the
+#' INFO line for the CSQ/ANN field. This function extracts those field names so
+#' that downstream parsing can map each pipe-separated element to a column. If
+#' the LOF plugin is present, the resulting data typically contain `LoF`,
 #' `LoF_filter`, `LoF_flags`, and `LoF_info` columns where `LoF` values of `HC`
 #' (high confidence) or `LC` (low confidence) indicate the plugin's assessment.
 #'
