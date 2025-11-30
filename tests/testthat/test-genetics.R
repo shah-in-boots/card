@@ -21,7 +21,10 @@ test_that("query_genetic_variants validates all parameters", {
     "'database' must be a single character string"
   )
   expect_error(
-    query_genetic_variants("atrial fibrillation", database = c("clinvar", "gnomad")),
+    query_genetic_variants(
+      "atrial fibrillation",
+      database = c("clinvar", "gnomad")
+    ),
     "'database' must be a single character string"
   )
   expect_error(
@@ -69,7 +72,10 @@ test_that("query_genetic_variants validates all parameters", {
     "'clean_gene_symbols' must be a single logical value"
   )
   expect_error(
-    query_genetic_variants("atrial fibrillation", clean_gene_symbols = c(TRUE, FALSE)),
+    query_genetic_variants(
+      "atrial fibrillation",
+      clean_gene_symbols = c(TRUE, FALSE)
+    ),
     "'clean_gene_symbols' must be a single logical value"
   )
 })
@@ -108,7 +114,10 @@ test_that("query_genetic_variants returns results for known phenotype", {
   skip_if_offline()
   skip_on_cran()
 
-  result <- query_genetic_variants("hypertrophic cardiomyopathy", max_results = 20)
+  result <- query_genetic_variants(
+    "hypertrophic cardiomyopathy",
+    max_results = 20
+  )
 
   expect_true(nrow(result) > 0)
   expect_true(all(result$database == "ClinVar"))
@@ -130,7 +139,10 @@ test_that("query_genetic_variants handles non-existent phenotype gracefully", {
   skip_on_cran()
 
   expect_message(
-    result <- query_genetic_variants("xyzabc123nonexistent999", max_results = 10),
+    result <- query_genetic_variants(
+      "xyzabc123nonexistent999",
+      max_results = 10
+    ),
     "No variants found for phenotype"
   )
 
@@ -138,9 +150,16 @@ test_that("query_genetic_variants handles non-existent phenotype gracefully", {
   expect_equal(nrow(result), 0)
 
   expected_cols <- c(
-    "gene_symbol", "variant_id", "variant_name", "chromosome", "position",
-    "clinical_significance", "review_status", "phenotypes",
-    "molecular_consequence", "database"
+    "gene_symbol",
+    "variant_id",
+    "variant_name",
+    "chromosome",
+    "position",
+    "clinical_significance",
+    "review_status",
+    "phenotypes",
+    "molecular_consequence",
+    "database"
   )
   expect_true(all(expected_cols %in% names(result)))
 })
@@ -150,8 +169,16 @@ test_that("query_genetic_variants is case-insensitive for database parameter", {
   skip_if_offline()
   skip_on_cran()
 
-  r1 <- query_genetic_variants("arrhythmia", database = "clinvar", max_results = 5)
-  r2 <- query_genetic_variants("arrhythmia", database = "CLINVAR", max_results = 5)
+  r1 <- query_genetic_variants(
+    "arrhythmia",
+    database = "clinvar",
+    max_results = 5
+  )
+  r2 <- query_genetic_variants(
+    "arrhythmia",
+    database = "CLINVAR",
+    max_results = 5
+  )
 
   expect_s3_class(r1, "tbl_df")
   expect_s3_class(r2, "tbl_df")
@@ -194,9 +221,16 @@ test_that("empty result table has correct structure", {
   expect_equal(nrow(empty_table), 0)
 
   expected_cols <- c(
-    "gene_symbol", "variant_id", "variant_name", "chromosome", "position",
-    "clinical_significance", "review_status", "phenotypes",
-    "molecular_consequence", "database"
+    "gene_symbol",
+    "variant_id",
+    "variant_name",
+    "chromosome",
+    "position",
+    "clinical_significance",
+    "review_status",
+    "phenotypes",
+    "molecular_consequence",
+    "database"
   )
   expect_true(all(expected_cols %in% names(empty_table)))
 })
@@ -204,7 +238,13 @@ test_that("empty result table has correct structure", {
 
 test_that("clean_gene_symbols extracts real genes from mixed entries", {
   test_data <- tibble::tibble(
-    gene_symbol = c("BRCA1", "LOC123456", "LOC123456; TP53", "TP53; LOC999", "BRCA1; BRCA2"),
+    gene_symbol = c(
+      "BRCA1",
+      "LOC123456",
+      "LOC123456; TP53",
+      "TP53; LOC999",
+      "BRCA1; BRCA2"
+    ),
     variant_id = as.character(1:5),
     variant_name = rep("test", 5),
     chromosome = rep("1", 5),
@@ -262,7 +302,9 @@ test_that("read_vep_header extracts field metadata", {
   expect_true(length(header_info) > 0)
 
   # Check key VEP fields
-  expect_true(all(c("Consequence", "SYMBOL", "IMPACT", "LoF") %in% names(header_info)))
+  expect_true(all(
+    c("Consequence", "SYMBOL", "IMPACT", "LoF") %in% names(header_info)
+  ))
   expect_match(header_info$LoF, "Loss-of-function")
 })
 

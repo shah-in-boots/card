@@ -2,7 +2,7 @@
 % Please edit documentation in R/genetics.R
 \name{read_vep_data}
 \alias{read_vep_data}
-\title{Read VCF/VEP Data into Tibble}
+\title{Read VCF/VEP Data}
 \usage{
 read_vep_data(vcf_path, columns = NULL)
 }

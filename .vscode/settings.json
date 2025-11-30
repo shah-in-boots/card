@@ -1,0 +1,5 @@
+{
+  "html.format.wrapLineLength": 80,
+  "quarto.visualEditor.markdownWrapColumn": 80,
+  "editor.wordWrap": "wordWrapColumn"
+}
