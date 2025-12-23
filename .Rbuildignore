@@ -16,3 +16,5 @@
 ^sandbox.R$
 ^revdep/*$
 ^CRAN-SUBMISSION$
+^vignettes/\.quarto$
+^vignettes/*_files$

@@ -18,6 +18,9 @@ destination: docs
 
 url: https://shah-in-boots.github.io/card/
 
+development:
+  mode: auto
+
 home:
   title: Cardiovascular Applications for Research Data
   description: >

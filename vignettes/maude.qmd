@@ -1,0 +1,22 @@
+---
+title: "MAUDE Database"
+vignette: >
+  %\VignetteIndexEntry{MAUDE Database}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+```{r}
+#| label: setup
+library(card)
+```
+
+# Key Resources
+
+[About MAUDE](https://www.fda.gov/medical-devices/mandatory-reporting-requirements-manufacturers-importers-and-device-user-facilities/about-manufacturer-and-user-facility-device-experience-maude-database)
+
+[Coding Resources](https://www.fda.gov/medical-devices/mdr-adverse-event-codes/coding-resources-medical-device-reports)

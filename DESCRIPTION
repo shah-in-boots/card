@@ -33,12 +33,14 @@ Imports:
     httr,
     parsnip,
     hardhat,
+    readr,
+    vroom,
 Suggests:
-    kableExtra,
     knitr,
-    rmarkdown,
     covr,
     testthat,
     broom.mixed,
-    ggrepel
-VignetteBuilder: knitr
+    ggrepel,
+    rmarkdown,
+    quarto
+VignetteBuilder: knitr, quarto

@@ -2,35 +2,68 @@
 % Please edit documentation in R/genetics.R
 \name{read_vep_header}
 \alias{read_vep_header}
-\title{Read VCF/VEP Header Annotations}
+\title{Read VEP Header}
 \usage{
-read_vep_header(vcf_path)
+read_vep_header(file)
 }
 \arguments{
-\item{vcf_path}{Path to a VCF file (standard or VEP-annotated).}
+\item{file}{Path to a VCF file (optionally VEP-annotated)}
 }
 \value{
-A named list where names are field names (e.g., \code{SYMBOL}, \code{Consequence},
-\code{LoF}) and values are their descriptions.
+A \code{tibble} with three columns:
+\describe{
+\item{type}{Type of information: "meta" for file metadata, "vcf" for standard VCF columns, "csq" for VEP consequence fields}
+\item{name}{Name of the field or metadata item}
+\item{description}{Human-readable description (from file for meta fields, standard for VCF columns, NA for CSQ fields)}
+}
 }
 \description{
-Extract field names and descriptions from VCF or VEP-annotated file headers.
-This helps you understand what annotations are available without reading the
-entire file.
+Reads and parses the header section of a VCF file, extracting metadata,
+column definitions, and VEP consequence (CSQ) field information if present.
 }
 \details{
-This function extracts annotation metadata from both standard VCF
-headers (##INFO and ##FORMAT lines) and VEP text format headers (## Column
-descriptions and ## Extra column keys sections). For VEP files, key
-annotations include consequence predictions (SIFT, PolyPhen), impact
-classifications (IMPACT), loss-of-function calls (LoF), and allele
-frequencies (gnomAD, 1000 Genomes).
+This function reads VCF header lines (those starting with #) and extracts
+metadata about the file structure. The returned tibble contains three types of rows:
+
+\strong{Meta rows} (type = "meta"):
+\itemize{
+\item fileformat: VCF format version (e.g., "VCFv4.2")
+\item reference: Reference genome path or identifier
+\item n_samples: Number of sample columns in the file
+}
+
+\strong{VCF rows} (type = "vcf"):
+\itemize{
+\item Standard VCF column names (CHROM, POS, ID, REF, ALT, QUAL, FILTER, INFO, FORMAT)
+\item Sample column names if present
+\item Descriptions are standard VCF field descriptions
+}
+
+\strong{CSQ rows} (type = "csq"):
+\itemize{
+\item VEP consequence annotation field names extracted from the CSQ INFO field Format string
+\item Only present if the file contains VEP annotations
+\item Descriptions are NA (not provided in standard VCF format)
+}
+
+VCF files follow a standardized format where:
+\itemize{
+\item Lines starting with ## contain meta-information
+\item The line starting with #CHROM defines column names
+\item Data lines follow (not read by this function)
+}
 }
 \examples{
 \dontrun{
-annotations <- read_vep_header("path/to/annotated.vcf.gz")
-annotations$LoF
-names(annotations)
+header <- read_vep_header("variants.vcf")
+
+# View all fields
+print(header)
+
+# Filter to specific types
+header[header$type == "meta", ]
+header[header$type == "vcf", ]
+header[header$type == "csq", ]
 }
 
 }
