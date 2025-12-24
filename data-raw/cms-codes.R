@@ -81,9 +81,9 @@ cpt <- list(
   cpt = cpt
 )
 
-# Save all this data to the package as internal data, compressed
+# Save all this data to the package directory
 usethis::use_data(
   .cms_codes,
   overwrite = TRUE,
-  internal = TRUE
+  internal = FALSE
 )

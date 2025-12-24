@@ -1,4 +1,5 @@
-# MAUDE Database Querying ----
+# MAUDE Data ----
+s
 
 # MAUDE Narrative Evaluation with LLMs ----
 
@@ -10,6 +11,6 @@
 # - Narrative text to be evaluated from MAUDE database 
 
 
-get_maude_events <- function(api_key = NULL,) {
+get_maude_events <- function(api_key = NULL) {
 
 }
