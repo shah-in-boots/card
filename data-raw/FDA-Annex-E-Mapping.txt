@@ -1,0 +1,966 @@
+"Mapping Table Description:
+The mapping table is automatically generated from the AnnexE Terms sheet. Currently mapping has been established with MedDRA and may be extended to other terminologies in the future."				
+				
+IMDRF Code	MedDRA		MedDRA Code	MedDRA Term
+E01		:		
+E0101	MedDRA:10049848:Balance disorder	10049848:Balance disorder	10049848	Balance disorder
+E0102	MedDRA:10060690:Traumatic brain injury	10060690:Traumatic brain injury	10060690	Traumatic brain injury
+E010201	MedDRA:10014617:Encephalocele	10014617:Encephalocele	10014617	Encephalocele
+E0103	MedDRA:10008107:Cerebral edema	10008107:Cerebral edema	10008107	Cerebral edema
+E0104	MedDRA:10064730:Cerebral hyperperfusion syndrome	10064730:Cerebral hyperperfusion syndrome	10064730	Cerebral hyperperfusion syndrome
+E0105	MedDRA:10068352:Cerebral ventriculomegaly	10068352:Cerebral ventriculomegaly	10068352	Cerebral ventriculomegaly
+E0106	MedDRA:10008164:Cerebrospinal fluid leakage	10008164:Cerebrospinal fluid leakage	10008164	Cerebrospinal fluid leakage
+E0107	MedDRA:10057668:Cognitive disorder	10057668:Cognitive disorder	10057668	Cognitive disorder
+E010701	MedDRA:10010300:Confusion	10010300:Confusion	10010300	Confusion
+E010702	MedDRA:10012267:Dementia	10012267:Dementia	10012267	Dementia
+E0108	MedDRA:10010254:Concussion	10010254:Concussion	10010254	Concussion
+E0109	MedDRA:10010904:Convulsion	10010904:Convulsion	10010904	Convulsion
+E010901	MedDRA:10053398:Clonic convulsion	10053398:Clonic convulsion	10053398	Clonic convulsion
+E010902	MedDRA:10043994:Tonic convulsion	10043994:Tonic convulsion	10043994	Tonic convulsion
+E010903	MedDRA:10015037:Epilepsy	10015037:Epilepsy	10015037	Epilepsy
+E010904	MedDRA:10041962:Status epilepticus	10041962:Status epilepticus	10041962	Status epilepticus
+E0110	MedDRA:10071552:Hyporesponsive to stimuli	10071552:Hyporesponsive to stimuli	10071552	Hyporesponsive to stimuli
+E0111	MedDRA:10082489:Hyperresponsive to stimuli	10082489:Hyperresponsive to stimuli	10082489	Hyperresponsive to stimuli
+E0112	MedDRA:10013573:Dizziness	10013573:Dizziness	10013573	Dizziness
+E0113	MedDRA:10013951:Dysphasia	10013951:Dysphasia	10013951	Dysphasia
+E011301	MedDRA:10002953:Aphonia	10002953:Aphonia	10002953	Aphonia
+E0114	MedDRA:10014581:Encephalitis	10014581:Encephalitis	10014581	Encephalitis
+E0115	MedDRA:10014625:Encephalopathy	10014625:Encephalopathy	10014625	Encephalopathy
+E0116	MedDRA:10019211:Headache	10019211:Headache	10019211	Headache
+E0117	MedDRA:10020508:Hydrocephalus	10020508:Hydrocephalus	10020508	Hydrocephalus
+E0118	MedDRA:10022763:Intracranial hemorrhage	10022763:Intracranial hemorrhage	10022763	Intracranial hemorrhage
+E0119	MedDRA:10024855:Loss of consciousness	10024855:Loss of consciousness	10024855	Loss of consciousness
+E011901	MedDRA:10010071:Coma	10010071:Coma	10010071	Coma
+E011902	MedDRA:10036653:Presyncope	10036653:Presyncope	10036653	Presyncope
+E011903	MedDRA:10042772:Syncope	10042772:Syncope	10042772	Syncope
+E0120	MedDRA:10027176:Memory loss	10027176:Memory loss	10027176	Memory loss
+E0121	MedDRA:10027199:Meningitis	10027199:Meningitis	10027199	Meningitis
+E0122	MedDRA:10028035:Movement disorder	10028035:Movement disorder	10028035	Movement disorder
+E012201	MedDRA:10013916:Dyskinesia	10013916:Dyskinesia	10013916	Dyskinesia
+E012202	MedDRA:10033799:Paralysis	10033799:Paralysis	10033799	Paralysis
+E012203	MedDRA:10033892:Paraplegia	10033892:Paraplegia	10033892	Paraplegia
+E012204	MedDRA:10033985:Paresis	10033985:Paresis	10033985	Paresis
+E012205	MedDRA:10037714:Quadriplegia	10037714:Quadriplegia	10037714	Quadriplegia
+E012206	MedDRA:10040528:Shaking	10040528:Shaking	10040528	Shaking
+E012207	MedDRA:10045198:Twitching	10045198:Twitching	10045198	Twitching
+E012208	MedDRA:10058920:Restless legs syndrome	10058920:Restless legs syndrome	10058920	Restless legs syndrome
+E012209	MedDRA:10016062:Facial paralysis	10016062:Facial paralysis	10016062	Facial paralysis
+E0123	MedDRA:10029177:Nerve damage	10029177:Nerve damage	10029177	Nerve damage
+E012301	MedDRA:10030938:Optic nerve injury	10030938:Optic nerve injury	10030938	Optic nerve injury
+E0124	MedDRA:10080898:Nervous system injury	10080898:Nervous system injury	10080898	Nervous system injury
+E012401	MedDRA:10041552:Spinal cord injury	10041552:Spinal cord injury	10041552	Spinal cord injury
+E0125	MedDRA:10029223:Neuralgia	10029223:Neuralgia	10029223	Neuralgia
+E0126	MedDRA:10029328:Neuropathy	10029328:Neuropathy	10029328	Neuropathy
+E0127	MedDRA:10029829:Numbness	10029829:Numbness	10029829	Numbness
+E0128	MedDRA:10034586:Peripheral nerve injury	10034586:Peripheral nerve injury	10034586	Peripheral nerve injury
+E0129	MedDRA:10040012:Sensitivity of teeth	10040012:Sensitivity of teeth	10040012	Sensitivity of teeth
+E0130	MedDRA:10040984:Sleep disorder	10040984:Sleep disorder	10040984	Sleep disorder
+E0131	MedDRA:10041466:Speech disorder	10041466:Speech disorder	10041466	Speech disorder
+E0132	MedDRA:10068160:Spinal arachnoiditis	10068160:Spinal arachnoiditis	10068160	Spinal arachnoiditis
+E0133	MedDRA:10042244:Stroke	10042244:Stroke	10042244	Stroke
+E013301	MedDRA:10048863:Hemorrhagic stroke	10048863:Hemorrhagic stroke	10048863	Hemorrhagic stroke
+E013302	MedDRA:10055221:Ischemic stroke	10055221:Ischemic stroke	10055221	Ischemic stroke
+E0134	MedDRA:10062872:Dysesthesia	10062872:Dysesthesia	10062872	Dysesthesia
+E013401	MedDRA:10020622:Hyperesthesia	10020622:Hyperesthesia	10020622	Hyperesthesia
+E013402	MedDRA:10020976:Hypoesthesia	10020976:Hypoesthesia	10020976	Hypoesthesia
+E013403	MedDRA:10033987:Paresthesia	10033987:Paresthesia	10033987	Paresthesia
+E0135	MedDRA:10082490:Taste disorder	10082490:Taste disorder	10082490	Taste disorder
+E013501	MedDRA:10001480:Ageusia	10001480:Ageusia	10001480	Ageusia
+E013502	MedDRA:10013911:Dysgeusia	10013911:Dysgeusia	10013911	Dysgeusia
+E0136	MedDRA:10066770:Motor tic	10066770:Motor tic	10066770	Motor tic
+E0137	MedDRA:10072760:Transient ischemic attack	10072760:Transient ischemic attack	10072760	Transient ischemic attack
+E0138	MedDRA:10068145:Undesired device stimulation of nerve	10068145:Undesired device stimulation of nerve	10068145	Undesired device stimulation of nerve
+E0139		:		
+E0140	MedDRA:10022773:Intracranial pressure increased	10022773:Intracranial pressure increased	10022773	Intracranial pressure increased
+E0141	MedDRA:10048736:Pneumocephalus	10048736:Pneumocephalus	10048736	Pneumocephalus
+E0142	MedDRA:10078904:Idiopathic intracranial hypertension	10078904:Idiopathic intracranial hypertension	10078904	Idiopathic intracranial hypertension
+E0143	MedDRA:10001854:Altered state of consciousness	10001854:Altered state of consciousness	10001854	Altered state of consciousness
+E014301	MedDRA:10021683:Increased state of alertness	10021683:Increased state of alertness	10021683	Increased state of alertness
+E014302	MedDRA:10012373:Depressed level of consciousness	10012373:Depressed level of consciousness	10012373	Depressed level of consciousness
+E0144	MedDRA:10063395:Dural Tear	10063395:Dural Tear	10063395	Dural Tear
+E0901	MedDRA:10068150:Acoustic shock	10068150:Acoustic shock	10068150	Acoustic shock
+E0904	MedDRA:10043882:Tinnitus	10043882:Tinnitus	10043882	Tinnitus
+E1513	MedDRA:10056392:Perinatal brain damage	10056392:Perinatal brain damage	10056392	Perinatal brain damage
+E1621	MedDRA:10028350:Muscle weakness	10028350:Muscle weakness	10028350	Muscle weakness
+E2125	MedDRA:10064332:Complex regional pain syndrome	10064332:Complex regional pain syndrome	10064332	Complex regional pain syndrome
+E02		:		
+E0201	MedDRA:10006514:Bruxism	10006514:Bruxism	10006514	Bruxism
+E0202	MedDRA:10014551:Emotional disorder	10014551:Emotional disorder	10014551	Emotional disorder
+E020201	MedDRA:10002855:Anxiety	10002855:Anxiety	10002855	Anxiety
+E020202	MedDRA:10012378:Depression	10012378:Depression	10012378	Depression
+E020203	MedDRA:10049119:Emotional distress	10049119:Emotional distress	10049119	Emotional distress
+E020204	MedDRA:10025482:Malaise	10025482:Malaise	10025482	Malaise
+E020205	MedDRA:10022998:Irritability	10022998:Irritability	10022998	Irritability
+E0203	MedDRA:10019063:Hallucination	10019063:Hallucination	10019063	Hallucination
+E0204	MedDRA:10024264:Lethargy	10024264:Lethargy	10024264	Lethargy
+E0205	MedDRA:10042458:Suicidal ideation	10042458:Suicidal ideation	10042458	Suicidal ideation
+E0206		:		
+E0207	MedDRA:10012218:Delirium	10012218:Delirium	10012218	Delirium
+E0208	MedDRA:10037234:Psychosis	10037234:Psychosis	10037234	Psychosis
+E0209	MedDRA:10041349:Somnolence	10041349:Somnolence	10041349	Somnolence
+E03		:		
+E0301	MedDRA:10002272:Anemia	10002272:Anemia	10002272	Anemia
+E030101	MedDRA:10019493:Hemolytic anemia	10019493:Hemolytic anemia	10019493	Hemolytic anemia
+E0302	MedDRA:10009731:Coagulation disorder	10009731:Coagulation disorder	10009731	Coagulation disorder
+E030201	MedDRA:10013442:Disseminated intravascular coagulation	10013442:Disseminated intravascular coagulation	10013442	Disseminated intravascular coagulation
+E030202	MedDRA:10043554:Thrombocytopenia	10043554:Thrombocytopenia	10043554	Thrombocytopenia
+E0303	MedDRA:10019491:Hemolysis	10019491:Hemolysis	10019491	Hemolysis
+E0304	MedDRA:10020920:Hypervolemia	10020920:Hypervolemia	10020920	Hypervolemia
+E0305	MedDRA:10021139:Hypovolemia	10021139:Hypovolemia	10021139	Hypovolemia
+E0306	MedDRA:10040047:Sepsis	10040047:Sepsis	10040047	Sepsis
+E0307	MedDRA:10040102:Seroma	10040102:Seroma	10040102	Seroma
+E0308	MedDRA:10067201:Swollen lymph nodes	10067201:Swollen lymph nodes	10067201	Swollen lymph nodes
+E0309	MedDRA:10051617:White blood cell count low 	10051617:White blood cell count low 	10051617	White blood cell count low 
+E0310		:		
+E0311	MedDRA:10051771:White blood cell count high	10051771:White blood cell count high	10051771	White blood cell count high
+E0312	MedDRA:10044359:Transfusion reaction	10044359:Transfusion reaction	10044359	Transfusion reaction
+E0313		:		
+E1202	MedDRA:10014418:Electrolyte imbalance	10014418:Electrolyte imbalance	10014418	Electrolyte imbalance
+E120201	MedDRA:10020680:Hypernatremia	10020680:Hypernatremia	10020680	Hypernatremia
+E120202	MedDRA:10021038:Hyponatremia	10021038:Hyponatremia	10021038	Hyponatremia
+E04		:		
+E0401	MedDRA:10061664:Autoimmune disorder	10061664:Autoimmune disorder	10061664	Autoimmune disorder
+E0402	MedDRA:10020751:Hypersensitivity	10020751:Hypersensitivity	10020751	Hypersensitivity
+E040201	MedDRA:10002199:Anaphylactic shock	10002199:Anaphylactic shock	10002199	Anaphylactic shock
+E040202	MedDRA:10002218:Anaphylaxis	10002218:Anaphylaxis	10002218	Anaphylaxis
+E040203	MedDRA:10024769:Local reaction	10024769:Local reaction	10024769	Local reaction
+E0403	MedDRA:10061598:Immunodeficiency	10061598:Immunodeficiency	10061598	Immunodeficiency
+E0404	MedDRA:10060055:Antinuclear antibody positive	10060055:Antinuclear antibody positive	10060055	Antinuclear antibody positive
+E0405		:		
+E05		:		
+E0104	MedDRA:10064730:Cerebral hyperperfusion syndrome	10064730:Cerebral hyperperfusion syndrome	10064730	Cerebral hyperperfusion syndrome
+E0501	MedDRA:10002329:Aneurysm	10002329:Aneurysm	10002329	Aneurysm
+E050101	MedDRA:10048380:Aneurysm ruptured	10048380:Aneurysm ruptured	10048380	Aneurysm ruptured
+E050102	MedDRA:10069506:Aneurysm enlargement	10069506:Aneurysm enlargement	10069506	Aneurysm enlargement
+E0502	MedDRA:10003210:Arteriosclerosis	10003210:Arteriosclerosis	10003210	Arteriosclerosis
+E0503	MedDRA:10061169:Embolism	10061169:Embolism	10061169	Embolism
+E050301	MedDRA:10001526:Air embolism	10001526:Air embolism	10001526	Air embolism
+E050302	MedDRA:10075247:Foreign body embolism	10075247:Foreign body embolism	10075247	Foreign body embolism
+E050303	MedDRA:10037377:Pulmonary embolism	10037377:Pulmonary embolism	10037377	Pulmonary embolism
+E050304	MedDRA:10043566:Thromboembolism	10043566:Thromboembolism	10043566	Thromboembolism
+E050305	MedDRA:10016246:Fat embolism	10016246:Fat embolism	10016246	Fat embolism
+E0504	MedDRA:10015866:Extravasation	10015866:Extravasation	10015866	Extravasation
+E0505	MedDRA:10019428:Hematoma	10019428:Hematoma	10019428	Hematoma
+E0506	MedDRA:10019524:Hemorrhage	10019524:Hemorrhage	10019524	Hemorrhage
+E050601	MedDRA:10014080:Ecchymosis	10014080:Ecchymosis	10014080	Ecchymosis
+E050602	MedDRA:10015719:Exsanguination	10015719:Exsanguination	10015719	Exsanguination
+E0507	MedDRA:10037328:Pulmonary arterial wedge pressure high	10037328:Pulmonary arterial wedge pressure high	10037328	Pulmonary arterial wedge pressure high
+E0508	MedDRA:10037330:Pulmonary arterial wedge pressure low	10037330:Pulmonary arterial wedge pressure low	10037330	Pulmonary arterial wedge pressure low
+E0509	MedDRA:10054438:Ischemia	10054438:Ischemia	10054438	Ischemia
+E0510	MedDRA:10029114:Neovascularization	10029114:Neovascularization	10029114	Neovascularization
+E0511	MedDRA:10068149:Vessel perforation	10068149:Vessel perforation	10068149	Vessel perforation
+E051101	MedDRA:10080896:Perforation of great vessels	10080896:Perforation of great vessels	10080896	Perforation of great vessels
+E0512	MedDRA:10047115:Vasculitis	10047115:Vasculitis	10047115	Vasculitis
+E0513	MedDRA:10048977:Pseudoaneurysm	10048977:Pseudoaneurysm	10048977	Pseudoaneurysm
+E0514	MedDRA:10043607:Thrombosis	10043607:Thrombosis	10043607	Thrombosis
+E0515	MedDRA:10070693:Vascular dissection	10070693:Vascular dissection	10070693	Vascular dissection
+E051501	MedDRA:10002895:Aortic dissection	10002895:Aortic dissection	10002895	Aortic dissection
+E0516	MedDRA:10047139:Vasoconstriction	10047139:Vasoconstriction	10047139	Vasoconstriction
+E0517	MedDRA:10047141:Vasodilatation	10047141:Vasodilatation	10047141	Vasodilatation
+E0518		:		
+E0519	MedDRA:10054880:Vascular insufficiency	10054880:Vascular insufficiency	10054880	Vascular insufficiency
+E0520	MedDRA:10063837:Reperfusion injury	10063837:Reperfusion injury	10063837	Reperfusion injury
+E0521	MedDRA:10011103:Coronary occlusion	10011103:Coronary occlusion	10011103	Coronary occlusion
+E0607	MedDRA:10065929:Cardiovascular insufficiency	10065929:Cardiovascular insufficiency	10065929	Cardiovascular insufficiency
+E0707	MedDRA:10065757:Bronchial hemorrhage	10065757:Bronchial hemorrhage	10065757	Bronchial hemorrhage
+E0850	MedDRA:10010720:Conjunctival hemorrhage	10010720:Conjunctival hemorrhage	10010720	Conjunctival hemorrhage
+E0851	MedDRA:10038870:Retinal hemorrhage	10038870:Retinal hemorrhage	10038870	Retinal hemorrhage
+E0852	MedDRA:10055239:Choroidal hemorrhage	10055239:Choroidal hemorrhage	10055239	Choroidal hemorrhage
+E0853	MedDRA:10054519:Optic nerve sheath hemorrhage	10054519:Optic nerve sheath hemorrhage	10054519	Optic nerve sheath hemorrhage
+E1644	MedDRA:10010121:Compartment syndrome	10010121:Compartment syndrome	10010121	Compartment syndrome
+E1645	MedDRA:10019409:Hemarthrosis	10019409:Hemarthrosis	10019409	Hemarthrosis
+E2121	MedDRA:10063824:Endoleak	10063824:Endoleak	10063824	Endoleak
+E2337	MedDRA:10076711:Stenosis	10076711:Stenosis	10076711	Stenosis
+E06		:		
+E0521	MedDRA:10011103:Coronary occlusion	10011103:Coronary occlusion	10011103	Coronary occlusion
+E0601	MedDRA:10003119:Arrhythmia	10003119:Arrhythmia	10003119	Arrhythmia
+E060101	MedDRA:10003586:Asystole	10003586:Asystole	10003586	Asystole
+E060102	MedDRA:10003658:Atrial fibrillation	10003658:Atrial fibrillation	10003658	Atrial fibrillation
+E060103	MedDRA:10003662:Atrial flutter	10003662:Atrial flutter	10003662	Atrial flutter
+E060104	MedDRA:10006093:Bradycardia	10006093:Bradycardia	10006093	Bradycardia
+E060105	MedDRA:10014159:Ectopic heartbeats	10014159:Ectopic heartbeats	10014159	Ectopic heartbeats
+E060106	MedDRA:10019252:Heart block	10019252:Heart block	10019252	Heart block
+E060107	MedDRA:10039111:Rhythm idioventricular	10039111:Rhythm idioventricular	10039111	Rhythm idioventricular
+E060108	MedDRA:10022994:Irregular pulse	10022994:Irregular pulse	10022994	Irregular pulse
+E060109	MedDRA:10043071:Tachycardia	10043071:Tachycardia	10043071	Tachycardia
+E060110	MedDRA:10047290:Ventricular fibrillation	10047290:Ventricular fibrillation	10047290	Ventricular fibrillation
+E0602	MedDRA:10007515:Cardiac arrest	10007515:Cardiac arrest	10007515	Cardiac arrest
+E0603	MedDRA:10007548:Cardiac enzymes increased	10007548:Cardiac enzymes increased	10007548	Cardiac enzymes increased
+E0604	MedDRA:10058039:Cardiac perforation	10058039:Cardiac perforation	10058039	Cardiac perforation
+E0605	MedDRA:10007610:Cardiac tamponade	10007610:Cardiac tamponade	10007610	Cardiac tamponade
+E0606	MedDRA:10007636:Cardiomyopathy	10007636:Cardiomyopathy	10007636	Cardiomyopathy
+E0607	MedDRA:10065929:Cardiovascular insufficiency	10065929:Cardiovascular insufficiency	10065929	Cardiovascular insufficiency
+E0608	MedDRA:10068167:Cusp tear	10068167:Cusp tear	10068167	Cusp tear
+E0609	MedDRA:10037480:Pulse pressure decreased	10037480:Pulse pressure decreased	10037480	Pulse pressure decreased
+E0610	MedDRA:10014665:Endocarditis	10014665:Endocarditis	10014665	Endocarditis
+E0611	MedDRA:10019279:Heart failure	10019279:Heart failure	10019279	Heart failure
+E0612	MedDRA:10055218:Ischemic heart disease	10055218:Ischemic heart disease	10055218	Ischemic heart disease
+E061201	MedDRA:10002383:Angina pectoris	10002383:Angina pectoris	10002383	Angina pectoris
+E061202	MedDRA:10028596:Myocardial infarction	10028596:Myocardial infarction	10028596	Myocardial infarction
+E0613	MedDRA:10007595:Cardiac output decreased	10007595:Cardiac output decreased	10007595	Cardiac output decreased
+E0614	MedDRA:10068138:Mitral perforation	10068138:Mitral perforation	10068138	Mitral perforation
+E0615	MedDRA:10068147:Myocardial contusion	10068147:Myocardial contusion	10068147	Myocardial contusion
+E0616	MedDRA:10072733:Myocardial hypertrophy	10072733:Myocardial hypertrophy	10072733	Myocardial hypertrophy
+E0617	MedDRA:10028606:Myocarditis	10028606:Myocarditis	10028606	Myocarditis
+E0618	MedDRA:10061116:Electrocardiogram change	10061116:Electrocardiogram change	10061116	Electrocardiogram change
+E0619	MedDRA:10034474:Pericardial effusion 	10034474:Pericardial effusion 	10034474	Pericardial effusion 
+E0620	MedDRA:10034484:Pericarditis	10034484:Pericarditis	10034484	Pericarditis
+E0621	MedDRA:10058086:Heart valve insufficiency	10058086:Heart valve insufficiency	10058086	Heart valve insufficiency
+E062101	MedDRA:10052839:Aortic valve insufficiency	10052839:Aortic valve insufficiency	10052839	Aortic valve insufficiency
+E062102	MedDRA:10074862:Mitral valve insufficiency	10074862:Mitral valve insufficiency	10074862	Mitral valve insufficiency
+E062103	MedDRA:10052842:Pulmonary valve insufficiency	10052842:Pulmonary valve insufficiency	10052842	Pulmonary valve insufficiency
+E062104	MedDRA:10044635:Tricuspid insufficiency	10044635:Tricuspid insufficiency	10044635	Tricuspid insufficiency
+E0622	MedDRA:10061996:Heart valve stenosis	10061996:Heart valve stenosis	10061996	Heart valve stenosis
+E062201	MedDRA:10002918:Aortic valve stenosis	10002918:Aortic valve stenosis	10002918	Aortic valve stenosis
+E062202	MedDRA:10027733:Mitral valve stenosis	10027733:Mitral valve stenosis	10027733	Mitral valve stenosis
+E062203	MedDRA:10037450:Pulmonary valve stenosis	10037450:Pulmonary valve stenosis	10037450	Pulmonary valve stenosis
+E062204	MedDRA:10044642:Tricuspid valve stenosis	10044642:Tricuspid valve stenosis	10044642	Tricuspid valve stenosis
+E0623		:		
+E0624	MedDRA:10088741:Intraoperative cardiac valve injury	10088741:Intraoperative cardiac valve injury	10088741	Intraoperative cardiac valve injury
+E0625	MedDRA:10069121:Cardiac septal defect residual shunt	10069121:Cardiac septal defect residual shunt	10069121	Cardiac septal defect residual shunt
+E0626	MedDRA:10079128:Transvalvular pressure gradient increased	10079128:Transvalvular pressure gradient increased	10079128	Transvalvular pressure gradient increased
+E0627	MedDRA:10065843:Intraoperative cardiac injury	10065843:Intraoperative cardiac injury	10065843	Intraoperative cardiac injury
+E1507	MedDRA:10016486:Fetal distress	10016486:Fetal distress	10016486	Fetal distress
+E07		:		
+E050303	MedDRA:10037377:Pulmonary embolism	10037377:Pulmonary embolism	10037377	Pulmonary embolism
+E0701	MedDRA:10001409:Adult respiratory distress syndrome	10001409:Adult respiratory distress syndrome	10001409	Adult respiratory distress syndrome
+E0702	MedDRA:10001539:Airways obstruction	10001539:Airways obstruction	10001539	Airways obstruction
+E0703	MedDRA:10002972:Apnea	10002972:Apnea	10002972	Apnea
+E0704	MedDRA:10003504:Aspiration	10003504:Aspiration	10003504	Aspiration
+E0705	MedDRA:10003526:Aspiration pneumonitis	10003526:Aspiration pneumonitis	10003526	Aspiration pneumonitis
+E0706	MedDRA:10003553:Asthma	10003553:Asthma	10003553	Asthma
+E0707	MedDRA:10065757:Bronchial hemorrhage	10065757:Bronchial hemorrhage	10065757	Bronchial hemorrhage
+E0708	MedDRA:10006451:Bronchitis	10006451:Bronchitis	10006451	Bronchitis
+E0709	MedDRA:10006482:Bronchospasm	10006482:Bronchospasm	10006482	Bronchospasm
+E0710	MedDRA:10008589:Choking	10008589:Choking	10008589	Choking
+E0711	MedDRA:10009033:Chronic obstructive pulmonary disease	10009033:Chronic obstructive pulmonary disease	10009033	Chronic obstructive pulmonary disease
+E071101	MedDRA:10014563:Emphysema pulmonary	10014563:Emphysema pulmonary	10014563	Emphysema pulmonary
+E0712	MedDRA:10011224:Cough	10011224:Cough	10011224	Cough
+E0713	MedDRA:10034195:Peak expiratory flow rate decreased	10034195:Peak expiratory flow rate decreased	10034195	Peak expiratory flow rate decreased
+E0714	MedDRA:10034196:Peak expiratory flow rate increased	10034196:Peak expiratory flow rate increased	10034196	Peak expiratory flow rate increased
+E0715	MedDRA:10038710:Respiratory rate decreased	10038710:Respiratory rate decreased	10038710	Respiratory rate decreased
+E0716	MedDRA:10038712:Respiratory rate increased	10038712:Respiratory rate increased	10038712	Respiratory rate increased
+E0717	MedDRA:10013963:Dyspnea	10013963:Dyspnea	10013963	Dyspnea
+E0718	MedDRA:10015090:Epistaxis	10015090:Epistaxis	10015090	Epistaxis
+E0719	MedDRA:10016987:Forced expiratory volume decreased	10016987:Forced expiratory volume decreased	10016987	Forced expiratory volume decreased
+E0720	MedDRA:10016989:Forced expiratory volume increased	10016989:Forced expiratory volume increased	10016989	Forced expiratory volume increased
+E0721	MedDRA:10019523:Hemoptysis	10019523:Hemoptysis	10019523	Hemoptysis
+E0722	MedDRA:10019614:Hemothorax	10019614:Hemothorax	10019614	Hemothorax
+E0723	MedDRA:10020039:Hiccups	10020039:Hiccups	10020039	Hiccups
+E0724	MedDRA:10020910:Hyperventilation	10020910:Hyperventilation	10020910	Hyperventilation
+E0725	MedDRA:10021133:Hypoventilation	10021133:Hypoventilation	10021133	Hypoventilation
+E0726	MedDRA:10021143:Hypoxia	10021143:Hypoxia	10021143	Hypoxia
+E0727	MedDRA:10066239:Mediastinal shift	10066239:Mediastinal shift	10066239	Mediastinal shift
+E0728	MedDRA:10028748:Nasal obstruction	10028748:Nasal obstruction	10028748	Nasal obstruction
+E0729	MedDRA:10059487:Lung hyperinflation	10059487:Lung hyperinflation	10059487	Lung hyperinflation
+E0730	MedDRA:10034835:Pharyngitis	10034835:Pharyngitis	10034835	Pharyngitis
+E0731	MedDRA:10035598:Pleural effusion	10035598:Pleural effusion	10035598	Pleural effusion
+E0732	MedDRA:10037381:Pulmonary empyema	10037381:Pulmonary empyema	10037381	Pulmonary empyema
+E0733	MedDRA:10035664:Pneumonia	10035664:Pneumonia	10035664	Pneumonia
+E073301	MedDRA:10006469:Bronchopneumonia	10006469:Bronchopneumonia	10006469	Bronchopneumonia
+E0734	MedDRA:10035759:Pneumothorax	10035759:Pneumothorax	10035759	Pneumothorax
+E0735	MedDRA:10037386:Pulmonary function impairment	10037386:Pulmonary function impairment	10037386	Pulmonary function impairment
+E0736	MedDRA:10037375:Pulmonary edema	10037375:Pulmonary edema	10037375	Pulmonary edema
+E0737	MedDRA:10037400:Pulmonary hypertension	10037400:Pulmonary hypertension	10037400	Pulmonary hypertension
+E0738	MedDRA:10037410:Pulmonary infarction	10037410:Pulmonary infarction	10037410	Pulmonary infarction
+E0739	MedDRA:10038661:Respiratory acidosis	10038661:Respiratory acidosis	10038661	Respiratory acidosis
+E0740	MedDRA:10038664:Respiratory alkalosis	10038664:Respiratory alkalosis	10038664	Respiratory alkalosis
+E0741	MedDRA:10038669:Respiratory arrest	10038669:Respiratory arrest	10038669	Respiratory arrest
+E0742	MedDRA:10038695:Respiratory failure	10038695:Respiratory failure	10038695	Respiratory failure
+E0743	MedDRA:10038701:Respiratory insufficiency	10038701:Respiratory insufficiency	10038701	Respiratory insufficiency
+E0744	MedDRA:10062352:Respiratory tract infection	10062352:Respiratory tract infection	10062352	Respiratory tract infection
+E0745	MedDRA:10040748:Sinus perforation	10040748:Sinus perforation	10040748	Sinus perforation
+E0746	MedDRA:10041232:Sneezing	10041232:Sneezing	10041232	Sneezing
+E0747	MedDRA:10041367:Sore throat	10041367:Sore throat	10041367	Sore throat
+E0748	MedDRA:10068523:Breath stacking	10068523:Breath stacking	10068523	Breath stacking
+E0749	MedDRA:10042169:Strangulation	10042169:Strangulation	10042169	Strangulation
+E0750	MedDRA:10080927:Dependence on ventilator	10080927:Dependence on ventilator	10080927	Dependence on ventilator
+E0751	MedDRA:10047924:Wheezing	10047924:Wheezing	10047924	Wheezing
+E0752		:		
+E0753		:		
+E0754	MedDRA:10070841:Upper respiratory tract irritation	10070841:Upper respiratory tract irritation	10070841	Upper respiratory tract irritation
+E0755	MedDRA:10041235:Snoring	10041235:Snoring	10041235	Snoring
+E0756	MedDRA:10028735:Nasal congestion	10028735:Nasal congestion	10028735	Nasal congestion
+E0757	MedDRA:10006344:Breathing-related sleep disorder	10006344:Breathing-related sleep disorder	10006344	Breathing-related sleep disorder
+E0758	MedDRA:10039083:Rhinitis	10039083:Rhinitis	10039083	Rhinitis
+E1516	MedDRA:10038692:Respiratory distress syndrome in newborn	10038692:Respiratory distress syndrome in newborn	10038692	Respiratory distress syndrome in newborn
+E2202	MedDRA:10033319:Oxygen saturation high	10033319:Oxygen saturation high	10033319	Oxygen saturation high
+E2203	MedDRA:10033321:Oxygen saturation low	10033321:Oxygen saturation low	10033321	Oxygen saturation low
+E08		:		
+E0801	MedDRA:10063941:Posterior capsule tear	10063941:Posterior capsule tear	10063941	Posterior capsule tear
+E0802	MedDRA:10007739:Cataract	10007739:Cataract	10007739	Cataract
+E0803	MedDRA:10008435:Chemosis	10008435:Chemosis	10008435	Chemosis
+E0804	MedDRA:10010741:Conjunctivitis	10010741:Conjunctivitis	10010741	Conjunctivitis
+E0805	MedDRA:10052116:Corneal clouding	10052116:Corneal clouding	10052116	Corneal clouding
+E0806	MedDRA:10052117:Corneal decompensation	10052117:Corneal decompensation	10052117	Corneal decompensation
+E0807	MedDRA:10011007:Corneal edema	10011007:Corneal edema	10011007	Corneal edema
+E080701	MedDRA:10054772:Corneal stromal edema	10054772:Corneal stromal edema	10054772	Corneal stromal edema
+E080702	MedDRA:10068529:Corneal microcystic edema	10068529:Corneal microcystic edema	10068529	Corneal microcystic edema
+E0808	MedDRA:10068144:Corneal epithelial microcysts	10068144:Corneal epithelial microcysts	10068144	Corneal epithelial microcysts
+E0809	MedDRA:10011022:Corneal infiltrates	10011022:Corneal infiltrates	10011022	Corneal infiltrates
+E0810	MedDRA:10033682:Pannus (corneal)	10033682:Pannus (corneal)	10033682	Pannus (corneal)
+E0811	MedDRA:10011039:Corneal perforation	10011039:Corneal perforation	10011039	Corneal perforation
+E0812	MedDRA:10011044:Corneal scar	10011044:Corneal scar	10011044	Corneal scar
+E0813	MedDRA:10011055:Corneal touch	10011055:Corneal touch	10011055	Corneal touch
+E0814	MedDRA:10048492:Corneal ulcer	10048492:Corneal ulcer	10048492	Corneal ulcer
+E0815	MedDRA:10013774:Dry eye	10013774:Dry eye	10013774	Dry eye
+E0816	MedDRA:10014801:Endophthalmitis	10014801:Endophthalmitis	10014801	Endophthalmitis
+E0817	MedDRA:10015591:Excess tears	10015591:Excess tears	10015591	Excess tears
+E0818	MedDRA:10015929:Eye infection	10015929:Eye infection	10015929	Eye infection
+E081801	MedDRA:10054762:Eye infection intraocular	10054762:Eye infection intraocular	10054762	Eye infection intraocular
+E0819	MedDRA:10061128:Eye injury	10061128:Eye injury	10061128	Eye injury
+E081901	MedDRA:10010984:Corneal abrasion	10010984:Corneal abrasion	10010984	Corneal abrasion
+E081902	MedDRA:10015911:Eye burns	10015911:Eye burns	10015911	Eye burns
+E081903	MedDRA:10038848:Retinal detachment	10038848:Retinal detachment	10038848	Retinal detachment
+E081904	MedDRA:10057430:Retinal injury	10057430:Retinal injury	10057430	Retinal injury
+E081905	MedDRA:10038897:Retinal tear	10038897:Retinal tear	10038897	Retinal tear
+E081906	MedDRA:10047650:Vitreous detachment	10047650:Vitreous detachment	10047650	Vitreous detachment
+E0820	MedDRA:10015958:Eye pain	10015958:Eye pain	10015958	Eye pain
+E0821	MedDRA:10051116:Foreign body sensation in eyes	10051116:Foreign body sensation in eyes	10051116	Foreign body sensation in eyes
+E0822	MedDRA:10018304:Glaucoma	10018304:Glaucoma	10018304	Glaucoma
+E0823	MedDRA:10019099:Halo vision	10019099:Halo vision	10019099	Halo vision
+E0824	MedDRA:10020924:Hyphema	10020924:Hyphema	10020924	Hyphema
+E0825	MedDRA:10021086:Hypopyon	10021086:Hypopyon	10021086	Hypopyon
+E0826	MedDRA:10022804:Intraocular pressure decreased	10022804:Intraocular pressure decreased	10022804	Intraocular pressure decreased
+E0827	MedDRA:10022806:Intraocular pressure increased	10022806:Intraocular pressure increased	10022806	Intraocular pressure increased
+E0828	MedDRA:10022955:Iritis	10022955:Iritis	10022955	Iritis
+E0829	MedDRA:10023332:Keratitis	10023332:Keratitis	10023332	Keratitis
+E082901	MedDRA:10076672:Infective keratitis	10076672:Infective keratitis	10076672	Infective keratitis
+E0830	MedDRA:10054467:Macular edema	10054467:Macular edema	10054467	Macular edema
+E0831	MedDRA:10080905:Overwear syndrome	10080905:Overwear syndrome	10080905	Overwear syndrome
+E0832	MedDRA:10037520:Pupillary block	10037520:Pupillary block	10037520	Pupillary block
+E0833	MedDRA:10038189:Red eye	10038189:Red eye	10038189	Red eye
+E0834	MedDRA:10038845:Retinal degeneration	10038845:Retinal degeneration	10038845	Retinal degeneration
+E0835	MedDRA:10066366:Toxic anterior segment syndrome	10066366:Toxic anterior segment syndrome	10066366	Toxic anterior segment syndrome
+E0836	MedDRA:10068156:Uveitis-glaucoma-hyphema syndrome	10068156:Uveitis-glaucoma-hyphema syndrome	10068156	Uveitis-glaucoma-hyphema syndrome
+E0837	MedDRA:10046851:Uveitis	10046851:Uveitis	10046851	Uveitis
+E0838	MedDRA:10047545:Visual disturbances	10047545:Visual disturbances	10047545	Visual disturbances
+E083801	MedDRA:10047569:Visual flashes	10047569:Visual flashes	10047569	Visual flashes
+E083802	MedDRA:10034936:Phosphenes	10034936:Phosphenes	10034936	Phosphenes
+E083803	MedDRA:10047654:Vitreous floaters	10047654:Vitreous floaters	10047654	Vitreous floaters
+E083804	MedDRA:10034960:Photophobia	10034960:Photophobia	10034960	Photophobia
+E0839	MedDRA:10047571:Visual impairment	10047571:Visual impairment	10047571	Visual impairment
+E083901	MedDRA:10005886:Blurred vision	10005886:Blurred vision	10005886	Blurred vision
+E083902	MedDRA:10024881:Loss of vision	10024881:Loss of vision	10024881	Loss of vision
+E083903	MedDRA:10013036:Diplopia	10013036:Diplopia	10013036	Diplopia
+E0840	MedDRA:10047656:Vitreous hemorrhage	10047656:Vitreous hemorrhage	10047656	Vitreous hemorrhage
+E0841	MedDRA:10063942:Vitreous loss	10063942:Vitreous loss	10063942	Vitreous loss
+E0842	MedDRA:10047663:Vitritis	10047663:Vitritis	10047663	Vitritis
+E0843	MedDRA:10068351:Ciliary zonular dehiscence	10068351:Ciliary zonular dehiscence	10068351	Ciliary zonular dehiscence
+E0844		:		
+E0845	MedDRA:10015946:Eye irritation	10015946:Eye irritation	10015946	Eye irritation
+E0846	MedDRA:10054760:Corneal thinning	10054760:Corneal thinning	10054760	Corneal thinning
+E0847	MedDRA:10052134:Pigment dispersion syndrome	10052134:Pigment dispersion syndrome	10052134	Pigment dispersion syndrome
+E0848	MedDRA:10071681:Corneal endothelial cell loss	10071681:Corneal endothelial cell loss	10071681	Corneal endothelial cell loss
+E0849	MedDRA:10036346:Posterior capsule opacification	10036346:Posterior capsule opacification	10036346	Posterior capsule opacification
+E0850	MedDRA:10010720:Conjunctival hemorrhage	10010720:Conjunctival hemorrhage	10010720	Conjunctival hemorrhage
+E0851	MedDRA:10038870:Retinal hemorrhage	10038870:Retinal hemorrhage	10038870	Retinal hemorrhage
+E0852	MedDRA:10055239:Choroidal hemorrhage	10055239:Choroidal hemorrhage	10055239	Choroidal hemorrhage
+E0853	MedDRA:10054519:Optic nerve sheath hemorrhage	10054519:Optic nerve sheath hemorrhage	10054519	Optic nerve sheath hemorrhage
+E0854	MedDRA:10028521:Mydriasis	10028521:Mydriasis	10028521	Mydriasis
+E0855	MedDRA:10088740:Anterior capsule opacification	10088740:Anterior capsule opacification	10088740	Anterior capsule opacification
+E0856	MedDRA:10037521:Pupillary disorder	10037521:Pupillary disorder	10037521	Pupillary disorder
+E0857	MedDRA:10075404:Corneal warpage	10075404:Corneal warpage	10075404	Corneal warpage
+E0858	MedDRA:10008783:Choroidal detachment	10008783:Choroidal detachment	10008783	Choroidal detachment
+E0859	MedDRA:10063970:Choroidal effusion	10063970:Choroidal effusion	10063970	Choroidal effusion
+E09		:		
+E0901	MedDRA:10068150:Acoustic shock	10068150:Acoustic shock	10068150	Acoustic shock
+E0902	MedDRA:10000528:Acoustic trauma	10000528:Acoustic trauma	10000528	Acoustic trauma
+E0903	MedDRA:10019245:Hearing impaired	10019245:Hearing impaired	10019245	Hearing impaired
+E090301	MedDRA:10050564:Partial hearing loss	10050564:Partial hearing loss	10050564	Partial hearing loss
+E090302	MedDRA:10074290:Complete hearing loss	10074290:Complete hearing loss	10074290	Complete hearing loss
+E0904	MedDRA:10043882:Tinnitus	10043882:Tinnitus	10043882	Tinnitus
+E0905	MedDRA:10047340:Vertigo	10047340:Vertigo	10047340	Vertigo
+E0906		:		
+E0907	MedDRA:10014020:Ear pain	10014020:Ear pain	10014020	Ear pain
+E0908	MedDRA:10014011:Ear infection	10014011:Ear infection	10014011	Ear infection
+E090801	MedDRA:10033072:Otitis externa	10033072:Otitis externa	10033072	Otitis externa
+E090802	MedDRA:10033078:Otitis media	10033078:Otitis media	10033078	Otitis media
+E0909	MedDRA:10065838:Middle ear inflammation	10065838:Middle ear inflammation	10065838	Middle ear inflammation
+E0910	MedDRA:10023567:Labyrinthitis	10023567:Labyrinthitis	10023567	Labyrinthitis
+E1512	MedDRA:10080921:Neonatal hearing impairment	10080921:Neonatal hearing impairment	10080921	Neonatal hearing impairment
+E151201	MedDRA:10082499:Complete neonatal hearing loss	10082499:Complete neonatal hearing loss	10082499	Complete neonatal hearing loss
+E151202	MedDRA:10082496:Partial neonatal hearing loss	10082496:Partial neonatal hearing loss	10082496	Partial neonatal hearing loss
+E10		:		
+E1001	MedDRA:10000060:Abdominal distension	10000060:Abdominal distension	10000060	Abdominal distension
+E1002	MedDRA:10000081:Abdominal pain	10000081:Abdominal pain	10000081	Abdominal pain
+E1003	MedDRA:10000420:Achalasia	10000420:Achalasia	10000420	Achalasia
+E1004	MedDRA:10003445:Ascites	10003445:Ascites	10003445	Ascites
+E1005	MedDRA:10082501:Intestinal burn	10082501:Intestinal burn	10082501	Intestinal burn
+E1006	MedDRA:10006056:Bowel perforation	10006056:Bowel perforation	10006056	Bowel perforation
+E1007	MedDRA:10010774:Constipation	10010774:Constipation	10010774	Constipation
+E1008	MedDRA:10012727:Diarrhea	10012727:Diarrhea	10012727	Diarrhea
+E1009	MedDRA:10013950:Dysphagia	10013950:Dysphagia	10013950	Dysphagia
+E1010	MedDRA:10015137:Eructation	10015137:Eructation	10015137	Eructation
+E1011	MedDRA:10016769:Flatus	10016769:Flatus	10016769	Flatus
+E1012	MedDRA:10017853:Gastritis	10017853:Gastritis	10017853	Gastritis
+E1013	MedDRA:10082500:Gastroesophageal burn	10082500:Gastroesophageal burn	10082500	Gastroesophageal burn
+E1014	MedDRA:10017960:Gastrointestinal hemorrhage	10017960:Gastrointestinal hemorrhage	10017960	Gastrointestinal hemorrhage
+E1015	MedDRA:10067171:Regurgitation	10067171:Regurgitation	10067171	Regurgitation
+E1016	MedDRA:10019418:Hematemesis	10019418:Hematemesis	10019418	Hematemesis
+E1017	MedDRA:10055291:Intra-abdominal hemorrhage	10055291:Intra-abdominal hemorrhage	10055291	Intra-abdominal hemorrhage
+E1018	MedDRA:10068164:Esophageal laceration	10068164:Esophageal laceration	10068164	Esophageal laceration
+E1019	MedDRA:10027162:Melena	10027162:Melena	10027162	Melena
+E1020	MedDRA:10028813:Nausea	10028813:Nausea	10028813	Nausea
+E1021	MedDRA:10033645:Pancreatitis	10033645:Pancreatitis	10033645	Pancreatitis
+E1022	MedDRA:10034419:Perforation of esophagus	10034419:Perforation of esophagus	10034419	Perforation of esophagus
+E1023	MedDRA:10068140:Peritoneal laceration	10068140:Peritoneal laceration	10068140	Peritoneal laceration
+E1024	MedDRA:10034674:Peritonitis	10034674:Peritonitis	10034674	Peritonitis
+E1025	MedDRA:10013946:Dyspepsia	10013946:Dyspepsia	10013946	Dyspepsia
+E1026	MedDRA:10065894:Rectal anastomotic leak	10065894:Rectal anastomotic leak	10065894	Rectal anastomotic leak
+E1027	MedDRA:10038981:Retroperitoneal hemorrhage	10038981:Retroperitoneal hemorrhage	10038981	Retroperitoneal hemorrhage
+E1028	MedDRA:10061935:Salivary gland disorder	10061935:Salivary gland disorder	10061935	Salivary gland disorder
+E102801	MedDRA:10013781:Dry mouth	10013781:Dry mouth	10013781	Dry mouth
+E102802	MedDRA:10039424:Salivary hypersecretion	10039424:Salivary hypersecretion	10039424	Salivary hypersecretion
+E1029	MedDRA:10041978:Stenosis esophageal	10041978:Stenosis esophageal	10041978	Stenosis esophageal
+E1030	MedDRA:10042116:Stomach ulcer	10042116:Stomach ulcer	10042116	Stomach ulcer
+E1031	MedDRA:10042128:Stomatitis	10042128:Stomatitis	10042128	Stomatitis
+E103101	MedDRA:10018386:Glossitis	10018386:Glossitis	10018386	Glossitis
+E1032	MedDRA:10047700:Vomiting	10047700:Vomiting	10047700	Vomiting
+E1033		:		
+E1034	MedDRA:10012114:Defecation urgency	10012114:Defecation urgency	10012114	Defecation urgency
+E1035	MedDRA:10048299:Pneumoperitoneum	10048299:Pneumoperitoneum	10048299	Pneumoperitoneum
+E1036	MedDRA:10009887:Colitis	10009887:Colitis	10009887	Colitis
+E1303	MedDRA:10082492:Increased intraperitoneal volume	10082492:Increased intraperitoneal volume	10082492	Increased intraperitoneal volume
+E1607	MedDRA:10067464:Chewing difficulty	10067464:Chewing difficulty	10067464	Chewing difficulty
+E232401	MedDRA:10016296:Fecal incontinence	10016296:Fecal incontinence	10016296	Fecal incontinence
+E11		:		
+E1101	MedDRA:10004659:Biliary cirrhosis	10004659:Biliary cirrhosis	10004659	Biliary cirrhosis
+E1102	MedDRA:10056522:Hepatic infection	10056522:Hepatic infection	10056522	Hepatic infection
+E1103	MedDRA:10020582:Hyperbilirubinemia	10020582:Hyperbilirubinemia	10020582	Hyperbilirubinemia
+E1104	MedDRA:10019831:Hepatocellular damage	10019831:Hepatocellular damage	10019831	Hepatocellular damage
+E1105	MedDRA:10024678:Liver failure	10024678:Liver failure	10024678	Liver failure
+E1106	MedDRA:10068143:Liver laceration	10068143:Liver laceration	10068143	Liver laceration
+E1107		:		
+E1108	MedDRA:10057586:Post procedural bile leak	10057586:Post procedural bile leak	10057586	Post procedural bile leak
+E1109	MedDRA:10008604:Cholangitis	10008604:Cholangitis	10008604	Cholangitis
+E12		:		
+E0739	MedDRA:10038661:Respiratory acidosis	10038661:Respiratory acidosis	10038661	Respiratory acidosis
+E0740	MedDRA:10038664:Respiratory alkalosis	10038664:Respiratory alkalosis	10038664	Respiratory alkalosis
+E1201	MedDRA:10012174:Dehydration	10012174:Dehydration	10012174	Dehydration
+E1202	MedDRA:10014418:Electrolyte imbalance	10014418:Electrolyte imbalance	10014418	Electrolyte imbalance
+E120201	MedDRA:10020680:Hypernatremia	10020680:Hypernatremia	10020680	Hypernatremia
+E120202	MedDRA:10021038:Hyponatremia	10021038:Hyponatremia	10021038	Hyponatremia
+E120203	MedDRA:10020587:Hypercalcemia	10020587:Hypercalcemia	10020587	Hypercalcemia
+E120204	MedDRA:10020949:Hypocalcemia	10020949:Hypocalcemia	10020949	Hypocalcemia
+E120205	MedDRA:10020647:Hyperkalemia	10020647:Hyperkalemia	10020647	Hyperkalemia
+E120206	MedDRA:10021018:Hypokalemia	10021018:Hypokalemia	10021018	Hypokalemia
+E120207	MedDRA:10005360:Blood bicarbonate increased	10005360:Blood bicarbonate increased	10005360	Blood bicarbonate increased
+E120208	MedDRA:10005359:Blood bicarbonate decreased	10005359:Blood bicarbonate decreased	10005359	Blood bicarbonate decreased
+E120209	MedDRA:10020712:Hyperphosphatemia	10020712:Hyperphosphatemia	10020712	Hyperphosphatemia
+E1203	MedDRA:10061148:Feeding disorder	10061148:Feeding disorder	10061148	Feeding disorder
+E1204	MedDRA:10020407:Hot flashes	10020407:Hot flashes	10020407	Hot flashes
+E1205	MedDRA:10020639:Hyperglycemia	10020639:Hyperglycemia	10020639	Hyperglycemia
+E120501	MedDRA:10057594:Blood ketone body increased	10057594:Blood ketone body increased	10057594	Blood ketone body increased
+E1206	MedDRA:10021005:Hypoglycemia	10021005:Hypoglycemia	10021005	Hypoglycemia
+E1207	MedDRA:10036067:Polydipsia	10036067:Polydipsia	10036067	Polydipsia
+E1208	MedDRA:10049040:Weight fluctuation	10049040:Weight fluctuation	10049040	Weight fluctuation
+E1209	MedDRA:10020381:Hormonal imbalance	10020381:Hormonal imbalance	10020381	Hormonal imbalance
+E1210	MedDRA:10036601:Premature menopause	10036601:Premature menopause	10036601	Premature menopause
+E1211	MedDRA:10047628:Vitamin deficiency	10047628:Vitamin deficiency	10047628	Vitamin deficiency
+E1212	MedDRA:10021114:Hypothyroidism	10021114:Hypothyroidism	10021114	Hypothyroidism
+E1306	MedDRA:10046369:Uremia	10046369:Uremia	10046369	Uremia
+E2306	MedDRA:10061428:Decreased appetite	10061428:Decreased appetite	10061428	Decreased appetite
+E2307	MedDRA:10021654:Increased appetite	10021654:Increased appetite	10021654	Increased appetite
+E13		:		
+E1301	MedDRA:10013990:Dysuria	10013990:Dysuria	10013990	Dysuria
+E1302	MedDRA:10019450:Hematuria	10019450:Hematuria	10019450	Hematuria
+E1303	MedDRA:10082492:Increased intraperitoneal volume	10082492:Increased intraperitoneal volume	10082492	Increased intraperitoneal volume
+E1304	MedDRA:10027566:Micturition urgency	10027566:Micturition urgency	10027566	Micturition urgency
+E1305	MedDRA:10062237:Renal impairment	10062237:Renal impairment	10062237	Renal impairment
+E130501	MedDRA:10038435:Renal failure	10038435:Renal failure	10038435	Renal failure
+E1306	MedDRA:10046369:Uremia	10046369:Uremia	10046369	Uremia
+E1307	MedDRA:10065584:Urethral stenosis	10065584:Urethral stenosis	10065584	Urethral stenosis
+E1308	MedDRA:10036142:Polyuria	10036142:Polyuria	10036142	Polyuria
+E1309	MedDRA:10046555:Urinary retention	10046555:Urinary retention	10046555	Urinary retention
+E1310	MedDRA:10046571:Urinary tract infection	10046571:Urinary tract infection	10046571	Urinary tract infection
+E131001	MedDRA:10023424:Kidney infection	10023424:Kidney infection	10023424	Kidney infection
+E1311		:		
+E1312	MedDRA:10046707:Urolithiasis	10046707:Urolithiasis	10046707	Urolithiasis
+E1313	MedDRA:10011796:Cystitis interstitial	10011796:Cystitis interstitial	10011796	Cystitis interstitial
+E1314	MedDRA:10079064:Bladder wall thickening	10079064:Bladder wall thickening	10079064	Bladder wall thickening
+E1315	MedDRA:10020524:Hydronephrosis	10020524:Hydronephrosis	10020524	Hydronephrosis
+E1316	MedDRA:10069632:Bladder Dysfunction	10069632:Bladder Dysfunction	10069632	Bladder Dysfunction
+E1317	MedDRA:10070510:Traumatic renal injury	10070510:Traumatic renal injury	10070510	Traumatic renal injury
+E232402	MedDRA:10046543:Urinary incontinence	10046543:Urinary incontinence	10046543	Urinary incontinence
+E14		:		
+E1210	MedDRA:10036601:Premature menopause	10036601:Premature menopause	10036601	Premature menopause
+E1401	MedDRA:10057094:Vaginal discharge abnormality	10057094:Vaginal discharge abnormality	10057094	Vaginal discharge abnormality
+E1402	MedDRA:10006298:Breast pain	10006298:Breast pain	10006298	Breast pain
+E1403	MedDRA:10006272:Breast mass	10006272:Breast mass	10006272	Breast mass
+E1404	MedDRA:10008351:Cervix disorder	10008351:Cervix disorder	10008351	Cervix disorder
+E1405	MedDRA:10013941:Dyspareunia	10013941:Dyspareunia	10013941	Dyspareunia
+E1406	MedDRA:10065790:Fallopian tube perforation	10065790:Fallopian tube perforation	10065790	Fallopian tube perforation
+E1407	MedDRA:10071812:Genital bleeding	10071812:Genital bleeding	10071812	Genital bleeding
+E140701	MedDRA:10022559:Intermenstrual bleeding	10022559:Intermenstrual bleeding	10022559	Intermenstrual bleeding
+E140702	MedDRA:10027313:Menorrhagia	10027313:Menorrhagia	10027313	Menorrhagia
+E1408	MedDRA:10027333:Menstrual irregularity	10027333:Menstrual irregularity	10027333	Menstrual irregularity
+E1409	MedDRA:10082498:Nipple sensation changes	10082498:Nipple sensation changes	10082498	Nipple sensation changes
+E1410	MedDRA:10029424:Nipple ulceration	10029424:Nipple ulceration	10029424	Nipple ulceration
+E1411	MedDRA:10034254:Pelvic inflammatory disease	10034254:Pelvic inflammatory disease	10034254	Pelvic inflammatory disease
+E1412	MedDRA:10051097:Rectovaginal fistula	10051097:Rectovaginal fistula	10051097	Rectovaginal fistula
+E1413	MedDRA:10040477:Sexual dysfunction	10040477:Sexual dysfunction	10040477	Sexual dysfunction
+E141301	MedDRA:10061461:Erectile dysfunction	10061461:Erectile dysfunction	10061461	Erectile dysfunction
+E1414	MedDRA:10044248:Toxic shock syndrome	10044248:Toxic shock syndrome	10044248	Toxic shock syndrome
+E1415	MedDRA:10046810:Uterine perforation	10046810:Uterine perforation	10046810	Uterine perforation
+E1416	MedDRA:10069086:Vesicovaginal fistula	10069086:Vesicovaginal fistula	10069086	Vesicovaginal fistula
+E1417		:		
+E1418		:		
+E1419	MedDRA:10046904:Vaginal dryness	10046904:Vaginal dryness	10046904	Vaginal dryness
+E1420	MedDRA:10034263:Pelvic pain	10034263:Pelvic pain	10034263	Pelvic pain
+E1506	MedDRA:10014166:Ectopic pregnancy	10014166:Ectopic pregnancy	10014166	Ectopic pregnancy
+E1509	MedDRA:10021632:Incompetent cervix	10021632:Incompetent cervix	10021632	Incompetent cervix
+E1519	MedDRA:10080926:Vaginal mucosal damage	10080926:Vaginal mucosal damage	10080926	Vaginal mucosal damage
+E2341		:		
+E15		:		
+E1501	MedDRA:10000210:Abortion	10000210:Abortion	10000210	Abortion
+E150101	MedDRA:10060928:Abortion induced complete	10060928:Abortion induced complete	10060928	Abortion induced complete
+E150102	MedDRA:10053984:Abortion induced incomplete	10053984:Abortion induced incomplete	10053984	Abortion induced incomplete
+E150103	MedDRA:10021716:Induced abortion	10021716:Induced abortion	10021716	Induced abortion
+E150104	MedDRA:10027704:Missed abortion	10027704:Missed abortion	10027704	Missed abortion
+E150105	MedDRA:10041687:Spontaneous abortion	10041687:Spontaneous abortion	10041687	Spontaneous abortion
+E1502	MedDRA:10051242:Amnionitis	10051242:Amnionitis	10051242	Amnionitis
+E1503	MedDRA:10060531:Cephalohematoma	10060531:Cephalohematoma	10060531	Cephalohematoma
+E1504	MedDRA:10008755:Chorioamnionitis	10008755:Chorioamnionitis	10008755	Chorioamnionitis
+E1505	MedDRA:10048305:Birth defects	10048305:Birth defects	10048305	Birth defects
+E1506	MedDRA:10014166:Ectopic pregnancy	10014166:Ectopic pregnancy	10014166	Ectopic pregnancy
+E1507	MedDRA:10016486:Fetal distress	10016486:Fetal distress	10016486	Fetal distress
+E1508	MedDRA:10022748:Intra-uterine hypoxia	10022748:Intra-uterine hypoxia	10022748	Intra-uterine hypoxia
+E1509	MedDRA:10021632:Incompetent cervix	10021632:Incompetent cervix	10021632	Incompetent cervix
+E1510	MedDRA:10002944:Apgar score low	10002944:Apgar score low	10002944	Apgar score low
+E1511	MedDRA:10082494:Neonatal deformity	10082494:Neonatal deformity	10082494	Neonatal deformity
+E1512	MedDRA:10080921:Neonatal hearing impairment	10080921:Neonatal hearing impairment	10080921	Neonatal hearing impairment
+E151201	MedDRA:10082499:Complete neonatal hearing loss	10082499:Complete neonatal hearing loss	10082499	Complete neonatal hearing loss
+E151202	MedDRA:10082496:Partial neonatal hearing loss	10082496:Partial neonatal hearing loss	10082496	Partial neonatal hearing loss
+E1513	MedDRA:10056392:Perinatal brain damage	10056392:Perinatal brain damage	10056392	Perinatal brain damage
+E1514	MedDRA:10063130:Pregnancy with contraceptive device	10063130:Pregnancy with contraceptive device	10063130	Pregnancy with contraceptive device
+E1515	MedDRA:10036599:Premature labor	10036599:Premature labor	10036599	Premature labor
+E1516	MedDRA:10038692:Respiratory distress syndrome in newborn	10038692:Respiratory distress syndrome in newborn	10038692	Respiratory distress syndrome in newborn
+E1517	MedDRA:10043275:Teratogenicity	10043275:Teratogenicity	10043275	Teratogenicity
+E1518	MedDRA:10053487:Exposure to toxic agent	10053487:Exposure to toxic agent	10053487	Exposure to toxic agent
+E1519	MedDRA:10080926:Vaginal mucosal damage	10080926:Vaginal mucosal damage	10080926	Vaginal mucosal damage
+E1520	MedDRA:10021926:Infertility	10021926:Infertility	10021926	Infertility
+E190103	MedDRA:10059857:Toxemia	10059857:Toxemia	10059857	Toxemia
+E16		:		
+E1505	MedDRA:10048305:Birth defects	10048305:Birth defects	10048305	Birth defects
+E1511	MedDRA:10082494:Neonatal deformity	10082494:Neonatal deformity	10082494	Neonatal deformity
+E1601	MedDRA:10003239:Arthralgia	10003239:Arthralgia	10003239	Arthralgia
+E1602	MedDRA:10003246:Arthritis	10003246:Arthritis	10003246	Arthritis
+E160201	MedDRA:10039073:Rheumatoid arthritis	10039073:Rheumatoid arthritis	10039073	Rheumatoid arthritis
+E1603	MedDRA:10017076:Fracture	10017076:Fracture	10017076	Fracture
+E160301	MedDRA:10020100:Hip fracture	10020100:Hip fracture	10020100	Hip fracture
+E160302	MedDRA:10074551:Limb fracture	10074551:Limb fracture	10074551	Limb fracture
+E160303	MedDRA:10028200:Multiple fractures	10028200:Multiple fractures	10028200	Multiple fractures
+E160304	MedDRA:10061365:Skull fracture	10061365:Skull fracture	10061365	Skull fracture
+E160305	MedDRA:10047333:Vertebral fracture	10047333:Vertebral fracture	10047333	Vertebral fracture
+E1604	MedDRA:10061087:Connective tissue disorder	10061087:Connective tissue disorder	10061087	Connective tissue disorder
+E1605	MedDRA:10011285:Cramp	10011285:Cramp	10011285	Cramp
+E160501	MedDRA:10000057:Abdominal cramps	10000057:Abdominal cramps	10000057	Abdominal cramps
+E1606	MedDRA:10061223:Ligament injury	10061223:Ligament injury	10061223	Ligament injury
+E1607	MedDRA:10067464:Chewing difficulty	10067464:Chewing difficulty	10067464	Chewing difficulty
+E1608	MedDRA:10016228:Fasciitis	10016228:Fasciitis	10016228	Fasciitis
+E1609	MedDRA:10063041:Fibromyositis	10063041:Fibromyositis	10063041	Fibromyositis
+E1610	MedDRA:10019196:Head injury	10019196:Head injury	10019196	Head injury
+E1611	MedDRA:10062310:Joint hyperextension	10062310:Joint hyperextension	10062310	Joint hyperextension
+E1612	MedDRA:10068157:Inadequate osteointegration	10068157:Inadequate osteointegration	10068157	Inadequate osteointegration
+E161201	MedDRA:10090445:Aseptic joint prosthesis loosening	10090445:Aseptic joint prosthesis loosening	10090445	Aseptic joint prosthesis loosening
+E161202	MedDRA:10090446:Septic joint prosthesis loosening	10090446:Septic joint prosthesis loosening	10090446	Septic joint prosthesis loosening
+E1613	MedDRA:10055039:Intervertebral disc compression	10055039:Intervertebral disc compression	10055039	Intervertebral disc compression
+E1614	MedDRA:10023204:Joint dislocation	10023204:Joint dislocation	10023204	Joint dislocation
+E161401	MedDRA:10042402:Subluxation	10042402:Subluxation	10042402	Subluxation
+E1615	MedDRA:10070874:Joint laxity	10070874:Joint laxity	10070874	Joint laxity
+E1616	MedDRA:10048706:Joint range of motion decreased	10048706:Joint range of motion decreased	10048706	Joint range of motion decreased
+E161601	MedDRA:10002559:Ankylosis	10002559:Ankylosis	10002559	Ankylosis
+E161602	MedDRA:10023201:Joint contracture	10023201:Joint contracture	10023201	Joint contracture
+E161603	MedDRA:10028330:Muscle rigidity	10028330:Muscle rigidity	10028330	Muscle rigidity
+E161604	MedDRA:10058029:Arthrofibrosis	10058029:Arthrofibrosis	10058029	Arthrofibrosis
+E161605	MedDRA:10061258:Joint lock	10061258:Joint lock	10061258	Joint lock
+E1617	MedDRA:10026729:Malunion of fracture	10026729:Malunion of fracture	10026729	Malunion of fracture
+E1618	MedDRA:10081986:Periprosthetic metallosis	10081986:Periprosthetic metallosis	10081986	Periprosthetic metallosis
+E1619	MedDRA:10081180:Muscle hypotonia	10081180:Muscle hypotonia	10081180	Muscle hypotonia
+E1620	MedDRA:10028314:Muscle injury	10028314:Muscle injury	10028314	Muscle injury
+E1621	MedDRA:10028350:Muscle weakness	10028350:Muscle weakness	10028350	Muscle weakness
+E1622	MedDRA:10028411:Myalgia	10028411:Myalgia	10028411	Myalgia
+E1623	MedDRA:10028836:Neck pain	10028836:Neck pain	10028836	Neck pain
+E1624	MedDRA:10028843:Neck stiffness	10028843:Neck stiffness	10028843	Neck stiffness
+E1625	MedDRA:10017081:Fracture delayed union	10017081:Fracture delayed union	10017081	Fracture delayed union
+E1626	MedDRA:10049811:Extraskeletal ossification	10049811:Extraskeletal ossification	10049811	Extraskeletal ossification
+E1627	MedDRA:10031248:Osteolysis	10031248:Osteolysis	10031248	Osteolysis
+E1628	MedDRA:10031252:Osteomyelitis	10031252:Osteomyelitis	10031252	Osteomyelitis
+E1629	MedDRA:10049088:Osteopenia	10049088:Osteopenia	10049088	Osteopenia
+E1630	MedDRA:10036102:Polymyositis	10036102:Polymyositis	10036102	Polymyositis
+E1631	MedDRA:10069689:Spinal column injury	10069689:Spinal column injury	10069689	Spinal column injury
+E1632	MedDRA:10042868:Synovitis	10042868:Synovitis	10042868	Synovitis
+E1633	MedDRA:10062544:Tooth fracture	10062544:Tooth fracture	10062544	Tooth fracture
+E1634	MedDRA:10065738:Unequal limb length	10065738:Unequal limb length	10065738	Unequal limb length
+E1635		:		
+E1636	MedDRA:10044044:Tooth loss	10044044:Tooth loss	10044044	Tooth loss
+E1637	MedDRA:10006811:Bursitis	10006811:Bursitis	10006811	Bursitis
+E1638	MedDRA:10007705:Cartilage damage	10007705:Cartilage damage	10007705	Cartilage damage
+E1639	MedDRA:10087218:Joint impingement	10087218:Joint impingement	10087218	Joint impingement
+E1640	MedDRA:10026900:Mastoiditis	10026900:Mastoiditis	10026900	Mastoiditis
+E1641	MedDRA:10033447:Pain in limb 	10033447:Pain in limb 	10033447	Pain in limb 
+E1642	MedDRA:10058907:Spinal deformity	10058907:Spinal deformity	10058907	Spinal deformity
+E1643	MedDRA:10080130:Tendinopathy	10080130:Tendinopathy	10080130	Tendinopathy
+E1644	MedDRA:10010121:Compartment syndrome	10010121:Compartment syndrome	10010121	Compartment syndrome
+E1645	MedDRA:10019409:Hemarthrosis	10019409:Hemarthrosis	10019409	Hemarthrosis
+E1646	MedDRA:10057328:Bone Injury	10057328:Bone Injury	10057328	Bone Injury
+E1647	MedDRA:10015688:Exostosis	10015688:Exostosis	10015688	Exostosis
+E1648	MedDRA:10045982:Unspecified intrapelvic protrusion of acetabulum	10045982:Unspecified intrapelvic protrusion of acetabulum	10045982	Unspecified intrapelvic protrusion of acetabulum
+E1649	MedDRA:10051374:Joint crepitation	10051374:Joint crepitation	10051374	Joint crepitation
+E1650	MedDRA:10003285:Arthropathy	10003285:Arthropathy	10003285	Arthropathy
+E1651	MedDRA:10003988:Back pain	10003988:Back pain	10003988	Back pain
+E2126	MedDRA:10069723:Loss of anatomical alignment after fracture reduction	10069723:Loss of anatomical alignment after fracture reduction	10069723	Loss of anatomical alignment after fracture reduction
+E2127	MedDRA:10069135:Periprosthetic fracture	10069135:Periprosthetic fracture	10069135	Periprosthetic fracture
+E2302	MedDRA:10047810:Walking difficulty	10047810:Walking difficulty	10047810	Walking difficulty
+E17		:		
+E1701	MedDRA:10080919:Abrasion	10080919:Abrasion	10080919	Abrasion
+E1702	MedDRA:10002424:Angioedema	10002424:Angioedema	10002424	Angioedema
+E1703	MedDRA:10005191:Blister	10005191:Blister	10005191	Blister
+E1704	MedDRA:10006634:Burn	10006634:Burn	10006634	Burn
+E1005	MedDRA:10082501:Intestinal burn	10082501:Intestinal burn	10082501	Intestinal burn
+E1013	MedDRA:10082500:Gastroesophageal burn	10082500:Gastroesophageal burn	10082500	Gastroesophageal burn
+E170401	MedDRA:10008420:Chemical burn	10008420:Chemical burn	10008420	Chemical burn
+E170402	MedDRA:10081985:Cold burn	10081985:Cold burn	10081985	Cold burn
+E170403	MedDRA:10063640:Radiation burn	10063640:Radiation burn	10063640	Radiation burn
+E170404	MedDRA:10016700:First degree burns	10016700:First degree burns	10016700	First degree burns
+E170405	MedDRA:10039798:Second degree burns	10039798:Second degree burns	10039798	Second degree burns
+E170406	MedDRA:10043441:Third degree burns	10043441:Third degree burns	10043441	Third degree burns
+E1705	MedDRA:10006784:Burning sensation	10006784:Burning sensation	10006784	Burning sensation
+E170501	MedDRA:10054786:Skin burning sensation	10054786:Skin burning sensation	10054786	Skin burning sensation
+E1706	MedDRA:10082075:Iatrogenic metastasis	10082075:Iatrogenic metastasis	10082075	Iatrogenic metastasis
+E1708	MedDRA:10023084:Itching	10023084:Itching	10023084	Itching
+E1709	MedDRA:10023126:Jaundice	10023126:Jaundice	10023126	Jaundice
+E1710	MedDRA:10040882:Skin lesion	10040882:Skin lesion	10040882	Skin lesion
+E1711	MedDRA:10034218:Peeling	10034218:Peeling	10034218	Peeling
+E1712	MedDRA:10034977:Phototoxicity	10034977:Phototoxicity	10034977	Phototoxicity
+E1713	MedDRA:10035771:Pocket erosion	10035771:Pocket erosion	10035771	Pocket erosion
+E1714	MedDRA:10037844:Rash	10037844:Rash	10037844	Rash
+E1715	MedDRA:10039580:Scar	10039580:Scar	10039580	Scar
+E171501	MedDRA:10080564:Abnormal scarring	10080564:Abnormal scarring	10080564	Abnormal scarring
+E1716	MedDRA:10040828:Skin discoloration	10040828:Skin discoloration	10040828	Skin discoloration
+E171601	MedDRA:10015150:Erythema	10015150:Erythema	10015150	Erythema
+E171602	MedDRA:10040865:Skin hyperpigmentation	10040865:Skin hyperpigmentation	10040865	Skin hyperpigmentation
+E171603	MedDRA:10040868:Skin hypopigmentation	10040868:Skin hypopigmentation	10040868	Skin hypopigmentation
+E1717	MedDRA:10040831:Skin disorder	10040831:Skin disorder	10040831	Skin disorder
+E1718	MedDRA:10040840:Skin erosion	10040840:Skin erosion	10040840	Skin erosion
+E1719	MedDRA:10040872:Skin infection	10040872:Skin infection	10040872	Skin infection
+E1720	MedDRA:10062249:Skin inflammation	10062249:Skin inflammation	10062249	Skin inflammation
+E172001	MedDRA:10000269:Abscess	10000269:Abscess	10000269	Abscess
+E172002	MedDRA:10007882:Cellulitis	10007882:Cellulitis	10007882	Cellulitis
+E172003	MedDRA:10056540:Dermatitis irritant contact	10056540:Dermatitis irritant contact	10056540	Dermatitis irritant contact
+E172004	MedDRA:10014184:Eczema	10014184:Eczema	10014184	Eczema
+E172005	MedDRA:10061103:Dermatitis radiation	10061103:Dermatitis radiation	10061103	Dermatitis radiation
+E172006	MedDRA:10046735:Urticaria	10046735:Urticaria	10046735	Urticaria
+E172007	MedDRA:10047918:Wheals	10047918:Wheals	10047918	Wheals
+E2317	MedDRA:10018691:Granuloma	10018691:Granuloma	10018691	Granuloma
+E1721	MedDRA:10048704:Skin tear	10048704:Skin tear	10048704	Skin tear
+E1722	MedDRA:10042348:Subcutaneous nodule	10042348:Subcutaneous nodule	10042348	Subcutaneous nodule
+E1723	MedDRA:10048043:Wrinkling	10048043:Wrinkling	10048043	Wrinkling
+E1724	MedDRA:10013786:Dry skin	10013786:Dry skin	10013786	Dry skin
+E1725	MedDRA:10053425:Injection site swelling 	10053425:Injection site swelling 	10053425	Injection site swelling 
+E1726	MedDRA:10048625:Skin maceration	10048625:Skin maceration	10048625	Skin maceration
+E1727	MedDRA:10069389:Wound odor	10069389:Wound odor	10069389	Wound odor
+E1728	MedDRA:10028694:Nail disorder	10028694:Nail disorder	10028694	Nail disorder
+E2005	MedDRA:10076258:Tendency to bruise easily	10076258:Tendency to bruise easily	10076258	Tendency to bruise easily
+E18		:		
+E1801	MedDRA:10007050:Cancer	10007050:Cancer	10007050	Cancer
+E180101	MedDRA:10006187:Breast cancer	10006187:Breast cancer	10006187	Breast cancer
+E180102	MedDRA:10082495:Breast implant-associated anaplastic large cell lymphoma	10082495:Breast implant-associated anaplastic large cell lymphoma	10082495	Breast implant-associated anaplastic large cell lymphoma
+E180103	MedDRA:10024189:Leiomyosarcoma	10024189:Leiomyosarcoma	10024189	Leiomyosarcoma
+E180104	MedDRA:10025310:Lymphoma	10025310:Lymphoma	10025310	Lymphoma
+E1802	MedDRA:10011732:Cyst	10011732:Cyst	10011732	Cyst
+E1803	MedDRA:10054107:Nodule	10054107:Nodule	10054107	Nodule
+E1804	MedDRA:10065252:Solid tumor	10065252:Solid tumor	10065252	Solid tumor
+E1805	MedDRA:10060999:Benign neoplasm	10060999:Benign neoplasm	10060999	Benign neoplasm
+E19		:		
+E0114	MedDRA:10014581:Encephalitis	10014581:Encephalitis	10014581	Encephalitis
+E0121	MedDRA:10027199:Meningitis	10027199:Meningitis	10027199	Meningitis
+E0306	MedDRA:10040047:Sepsis	10040047:Sepsis	10040047	Sepsis
+E0610	MedDRA:10014665:Endocarditis	10014665:Endocarditis	10014665	Endocarditis
+E0733	MedDRA:10035664:Pneumonia	10035664:Pneumonia	10035664	Pneumonia
+E073301	MedDRA:10006469:Bronchopneumonia	10006469:Bronchopneumonia	10006469	Bronchopneumonia
+E0744	MedDRA:10062352:Respiratory tract infection	10062352:Respiratory tract infection	10062352	Respiratory tract infection
+E0803	MedDRA:10008435:Chemosis	10008435:Chemosis	10008435	Chemosis
+E0816	MedDRA:10014801:Endophthalmitis	10014801:Endophthalmitis	10014801	Endophthalmitis
+E0818	MedDRA:10015929:Eye infection	10015929:Eye infection	10015929	Eye infection
+E081801	MedDRA:10054762:Eye infection intraocular	10054762:Eye infection intraocular	10054762	Eye infection intraocular
+E1021	MedDRA:10033645:Pancreatitis	10033645:Pancreatitis	10033645	Pancreatitis
+E1024	MedDRA:10034674:Peritonitis	10034674:Peritonitis	10034674	Peritonitis
+E1102	MedDRA:10056522:Hepatic infection	10056522:Hepatic infection	10056522	Hepatic infection
+E1310	MedDRA:10046571:Urinary tract infection	10046571:Urinary tract infection	10046571	Urinary tract infection
+E131001	MedDRA:10023424:Kidney infection	10023424:Kidney infection	10023424	Kidney infection
+E1414	MedDRA:10044248:Toxic shock syndrome	10044248:Toxic shock syndrome	10044248	Toxic shock syndrome
+E1504	MedDRA:10008755:Chorioamnionitis	10008755:Chorioamnionitis	10008755	Chorioamnionitis
+E1609	MedDRA:10063041:Fibromyositis	10063041:Fibromyositis	10063041	Fibromyositis
+E1628	MedDRA:10031252:Osteomyelitis	10031252:Osteomyelitis	10031252	Osteomyelitis
+E1632	MedDRA:10042868:Synovitis	10042868:Synovitis	10042868	Synovitis
+E1719	MedDRA:10040872:Skin infection	10040872:Skin infection	10040872	Skin infection
+E172001	MedDRA:10000269:Abscess	10000269:Abscess	10000269	Abscess
+E172002	MedDRA:10007882:Cellulitis	10007882:Cellulitis	10007882	Cellulitis
+E1901	MedDRA:10060945:Bacterial infection	10060945:Bacterial infection	10060945	Bacterial infection
+E190101	MedDRA:10004052:Bacterial resistance	10004052:Bacterial resistance	10004052	Bacterial resistance
+E190102	MedDRA:10021861:Infection pyogenic	10021861:Infection pyogenic	10021861	Infection pyogenic
+E190103	MedDRA:10059857:Toxemia	10059857:Toxemia	10059857	Toxemia
+E1902	MedDRA:10017533:Fungal infection	10017533:Fungal infection	10017533	Fungal infection
+E1903	MedDRA:10068720:Sexually transmitted infection	10068720:Sexually transmitted infection	10068720	Sexually transmitted infection
+E1904	MedDRA:10068163:Subclinical infection	10068163:Subclinical infection	10068163	Subclinical infection
+E1905	MedDRA:10080750:Transmissible spongiform encephalopathy	10080750:Transmissible spongiform encephalopathy	10080750	Transmissible spongiform encephalopathy
+E1906	MedDRA:10021789:Infection	10021789:Infection	10021789	Infection
+E1907	MedDRA:10047461:Viral infection	10047461:Viral infection	10047461	Viral infection
+E190701	MedDRA:10011831:Cytomegalovirus infection	10011831:Cytomegalovirus infection	10011831	Cytomegalovirus infection
+E2012	MedDRA:10048038:Wound Infection	10048038:Wound Infection	10048038	Wound Infection
+E2115	MedDRA:10036410:Postoperative wound infection	10036410:Postoperative wound infection	10036410	Postoperative wound infection
+E2205	MedDRA:10003999:Bacteremia	10003999:Bacteremia	10003999	Bacteremia
+E2122	MedDRA:10040753:Sinusitis	10040753:Sinusitis	10040753	Sinusitis
+E2123	MedDRA:10075580:Medical device site infection	10075580:Medical device site infection	10075580	Medical device site infection
+E0908	MedDRA:10014011:Ear infection	10014011:Ear infection	10014011	Ear infection
+E090801	MedDRA:10033072:Otitis externa	10033072:Otitis externa	10033072	Otitis externa
+E090802	MedDRA:10033078:Otitis media	10033078:Otitis media	10033078	Otitis media
+E0910	MedDRA:10023567:Labyrinthitis	10023567:Labyrinthitis	10023567	Labyrinthitis
+E1640	MedDRA:10026900:Mastoiditis	10026900:Mastoiditis	10026900	Mastoiditis
+E20		:		
+E0102	MedDRA:10060690:Traumatic brain injury	10060690:Traumatic brain injury	10060690	Traumatic brain injury
+E010201	MedDRA:10014617:Encephalocele	10014617:Encephalocele	10014617	Encephalocele
+E0108	MedDRA:10010254:Concussion	10010254:Concussion	10010254	Concussion
+E0123	MedDRA:10029177:Nerve damage	10029177:Nerve damage	10029177	Nerve damage
+E012301	MedDRA:10030938:Optic nerve injury	10030938:Optic nerve injury	10030938	Optic nerve injury
+E0124	MedDRA:10080898:Nervous system injury	10080898:Nervous system injury	10080898	Nervous system injury
+E012401	MedDRA:10041552:Spinal cord injury	10041552:Spinal cord injury	10041552	Spinal cord injury
+E0128	MedDRA:10034586:Peripheral nerve injury	10034586:Peripheral nerve injury	10034586	Peripheral nerve injury
+E0710	MedDRA:10008589:Choking	10008589:Choking	10008589	Choking
+E0749	MedDRA:10042169:Strangulation	10042169:Strangulation	10042169	Strangulation
+E0819	MedDRA:10061128:Eye injury	10061128:Eye injury	10061128	Eye injury
+E081901	MedDRA:10010984:Corneal abrasion	10010984:Corneal abrasion	10010984	Corneal abrasion
+E081902	MedDRA:10015911:Eye burns	10015911:Eye burns	10015911	Eye burns
+E081903	MedDRA:10038848:Retinal detachment	10038848:Retinal detachment	10038848	Retinal detachment
+E081904	MedDRA:10057430:Retinal injury	10057430:Retinal injury	10057430	Retinal injury
+E081905	MedDRA:10038897:Retinal tear	10038897:Retinal tear	10038897	Retinal tear
+E081906	MedDRA:10047650:Vitreous detachment	10047650:Vitreous detachment	10047650	Vitreous detachment
+E1023	MedDRA:10068140:Peritoneal laceration	10068140:Peritoneal laceration	10068140	Peritoneal laceration
+E1603	MedDRA:10017076:Fracture	10017076:Fracture	10017076	Fracture
+E160301	MedDRA:10020100:Hip fracture	10020100:Hip fracture	10020100	Hip fracture
+E160302	MedDRA:10074551:Limb fracture	10074551:Limb fracture	10074551	Limb fracture
+E160303	MedDRA:10028200:Multiple fractures	10028200:Multiple fractures	10028200	Multiple fractures
+E160304	MedDRA:10061365:Skull fracture	10061365:Skull fracture	10061365	Skull fracture
+E160305	MedDRA:10047333:Vertebral fracture	10047333:Vertebral fracture	10047333	Vertebral fracture
+E1606	MedDRA:10061223:Ligament injury	10061223:Ligament injury	10061223	Ligament injury
+E1610	MedDRA:10019196:Head injury	10019196:Head injury	10019196	Head injury
+E1614	MedDRA:10023204:Joint dislocation	10023204:Joint dislocation	10023204	Joint dislocation
+E161401	MedDRA:10042402:Subluxation	10042402:Subluxation	10042402	Subluxation
+E1631	MedDRA:10069689:Spinal column injury	10069689:Spinal column injury	10069689	Spinal column injury
+E1633	MedDRA:10062544:Tooth fracture	10062544:Tooth fracture	10062544	Tooth fracture
+E1701	MedDRA:10080919:Abrasion	10080919:Abrasion	10080919	Abrasion
+E1704	MedDRA:10006634:Burn	10006634:Burn	10006634	Burn
+E1005	MedDRA:10082501:Intestinal burn	10082501:Intestinal burn	10082501	Intestinal burn
+E1013	MedDRA:10082500:Gastroesophageal burn	10082500:Gastroesophageal burn	10082500	Gastroesophageal burn
+E170401	MedDRA:10008420:Chemical burn	10008420:Chemical burn	10008420	Chemical burn
+E170402	MedDRA:10081985:Cold burn	10081985:Cold burn	10081985	Cold burn
+E170403	MedDRA:10063640:Radiation burn	10063640:Radiation burn	10063640	Radiation burn
+E170404	MedDRA:10016700:First degree burns	10016700:First degree burns	10016700	First degree burns
+E170405	MedDRA:10039798:Second degree burns	10039798:Second degree burns	10039798	Second degree burns
+E170406	MedDRA:10043441:Third degree burns	10043441:Third degree burns	10043441	Third degree burns
+E2001	MedDRA:10006011:Bone shedding debris	10006011:Bone shedding debris	10006011	Bone shedding debris
+E2002	MedDRA:10006502:Bruise	10006502:Bruise	10006502	Bruise
+E0615	MedDRA:10068147:Myocardial contusion	10068147:Myocardial contusion	10068147	Myocardial contusion
+E2003	MedDRA:10068154:Chemical exposure	10068154:Chemical exposure	10068154	Chemical exposure
+E2004	MedDRA:10061097:Crush injury	10061097:Crush injury	10061097	Crush injury
+E2005	MedDRA:10076258:Tendency to bruise easily	10076258:Tendency to bruise easily	10076258	Tendency to bruise easily
+E2006	MedDRA:10068527:Tissue erosion associated with device	10068527:Tissue erosion associated with device	10068527	Tissue erosion associated with device
+E1713	MedDRA:10035771:Pocket erosion	10035771:Pocket erosion	10035771	Pocket erosion
+E1718	MedDRA:10040840:Skin erosion	10040840:Skin erosion	10040840	Skin erosion
+E2007	MedDRA:10016173:Fall	10016173:Fall	10016173	Fall
+E2008	MedDRA:10070245:Foreign body	10070245:Foreign body	10070245	Foreign body
+E200801	MedDRA:10074498:Embedded device	10074498:Embedded device	10074498	Embedded device
+E2009	MedDRA:10023572:Laceration	10023572:Laceration	10023572	Laceration
+E2010	MedDRA:10028895:Needle stick/puncture	10028895:Needle stick/puncture	10028895	Needle stick/puncture
+E2011	MedDRA:10082491:Patient entrapped in device	10082491:Patient entrapped in device	10082491	Patient entrapped in device
+E2012	MedDRA:10048038:Wound Infection	10048038:Wound Infection	10048038	Wound Infection
+E2013	MedDRA:10080972:Tissue rupture	10080972:Tissue rupture	10080972	Tissue rupture
+E2014	MedDRA:10068521:Tissue breakdown associated with device	10068521:Tissue breakdown associated with device	10068521	Tissue breakdown associated with device
+E201401	MedDRA:10036651:Pressure sore	10036651:Pressure sore	10036651	Pressure sore
+E2015	MedDRA:10080903:Tissue injury	10080903:Tissue injury	10080903	Tissue injury
+E2016	MedDRA:10073329:Perineal injury	10073329:Perineal injury	10073329	Perineal injury
+E2104	MedDRA:10014357:Electric shock	10014357:Electric shock	10014357	Electric shock
+E210401	MedDRA:10075322:Device inappropriate shock delivery	10075322:Device inappropriate shock delivery	10075322	Device inappropriate shock delivery
+E2105	MedDRA:10068528:Exposure to device contaminated with body fluid	10068528:Exposure to device contaminated with body fluid	10068528	Exposure to device contaminated with body fluid
+E2116	MedDRA:10068142:Radiation sickness syndrome	10068142:Radiation sickness syndrome	10068142	Radiation sickness syndrome
+E21		:		
+E0144	MedDRA:10063395:Dural Tear	10063395:Dural Tear	10063395	Dural Tear
+E081906	MedDRA:10047650:Vitreous detachment	10047650:Vitreous detachment	10047650	Vitreous detachment
+E1026	MedDRA:10065894:Rectal anastomotic leak	10065894:Rectal anastomotic leak	10065894	Rectal anastomotic leak
+E1646	MedDRA:10057328:Bone Injury	10057328:Bone Injury	10057328	Bone Injury
+E2008	MedDRA:10070245:Foreign body	10070245:Foreign body	10070245	Foreign body
+E200801	MedDRA:10074498:Embedded device	10074498:Embedded device	10074498	Embedded device
+E2101	MedDRA:10059837:Adhesion	10059837:Adhesion	10059837	Adhesion
+E2102	MedDRA:10054330:Awareness during anesthesia	10054330:Awareness during anesthesia	10054330	Awareness during anesthesia
+E2103	MedDRA:10068141:Device overstimulation of tissue 	10068141:Device overstimulation of tissue 	10068141	Device overstimulation of tissue 
+E2104	MedDRA:10014357:Electric shock	10014357:Electric shock	10014357	Electric shock
+E210401	MedDRA:10075322:Device inappropriate shock delivery	10075322:Device inappropriate shock delivery	10075322	Device inappropriate shock delivery
+E2105	MedDRA:10068528:Exposure to device contaminated with body fluid	10068528:Exposure to device contaminated with body fluid	10068528	Exposure to device contaminated with body fluid
+E2106	MedDRA:10059057:Medical device pain	10059057:Medical device pain	10059057	Medical device pain
+E2107	MedDRA:10016153:Failure of implant	10016153:Failure of implant	10016153	Failure of implant
+E2108	MedDRA:10016164:Failure to anastomose	10016164:Failure to anastomose	10016164	Failure to anastomose
+E2109	MedDRA:10063782:Implant site pain	10063782:Implant site pain	10063782	Implant site pain
+E2110	MedDRA:10079788:Inadequate pain relief	10079788:Inadequate pain relief	10079788	Inadequate pain relief
+E2111	MedDRA:10022095:Injection site reaction	10022095:Injection site reaction	10022095	Injection site reaction
+E2112	MedDRA:10064882:Procedural pain	10064882:Procedural pain	10064882	Procedural pain
+E2113	MedDRA:10033305:Oversedation	10033305:Oversedation	10033305	Oversedation
+E2114	MedDRA:10076705:Perforation	10076705:Perforation	10076705	Perforation
+E0511	MedDRA:10068149:Vessel perforation	10068149:Vessel perforation	10068149	Vessel perforation
+E051101	MedDRA:10080896:Perforation of great vessels	10080896:Perforation of great vessels	10080896	Perforation of great vessels
+E0604	MedDRA:10058039:Cardiac perforation	10058039:Cardiac perforation	10058039	Cardiac perforation
+E0614	MedDRA:10068138:Mitral perforation	10068138:Mitral perforation	10068138	Mitral perforation
+E0745	MedDRA:10040748:Sinus perforation	10040748:Sinus perforation	10040748	Sinus perforation
+E0811	MedDRA:10011039:Corneal perforation	10011039:Corneal perforation	10011039	Corneal perforation
+E1006	MedDRA:10006056:Bowel perforation	10006056:Bowel perforation	10006056	Bowel perforation
+E1022	MedDRA:10034419:Perforation of esophagus	10034419:Perforation of esophagus	10034419	Perforation of esophagus
+E1406	MedDRA:10065790:Fallopian tube perforation	10065790:Fallopian tube perforation	10065790	Fallopian tube perforation
+E1415	MedDRA:10046810:Uterine perforation	10046810:Uterine perforation	10046810	Uterine perforation
+E211401	MedDRA:10080922:Perforation of organ	10080922:Perforation of organ	10080922	Perforation of organ
+E2115	MedDRA:10036410:Postoperative wound infection	10036410:Postoperative wound infection	10036410	Postoperative wound infection
+E2116	MedDRA:10068142:Radiation sickness syndrome	10068142:Radiation sickness syndrome	10068142	Radiation sickness syndrome
+E2117	MedDRA:10045184:Twiddler's syndrome	10045184:Twiddler's syndrome	10045184	Twiddler's syndrome
+E2118	MedDRA:10066823:Unintended endotracheal extubation	10066823:Unintended endotracheal extubation	10066823	Unintended endotracheal extubation
+E2119	MedDRA:10063155:Radiation exposure	10063155:Radiation exposure	10063155	Radiation exposure
+E2120	MedDRA:10085596:Bone cement implantation syndrome	10085596:Bone cement implantation syndrome	10085596	Bone cement implantation syndrome
+E2121	MedDRA:10063824:Endoleak	10063824:Endoleak	10063824	Endoleak
+E2122	MedDRA:10040753:Sinusitis	10040753:Sinusitis	10040753	Sinusitis
+E2123	MedDRA:10075580:Medical device site infection	10075580:Medical device site infection	10075580	Medical device site infection
+E2124	MedDRA:10070944:Vascular access failure	10070944:Vascular access failure	10070944	Vascular access failure
+E2125	MedDRA:10064332:Complex regional pain syndrome	10064332:Complex regional pain syndrome	10064332	Complex regional pain syndrome
+E2126	MedDRA:10069723:Loss of anatomical alignment after fracture reduction	10069723:Loss of anatomical alignment after fracture reduction	10069723	Loss of anatomical alignment after fracture reduction
+E2127	MedDRA:10069135:Periprosthetic fracture	10069135:Periprosthetic fracture	10069135	Periprosthetic fracture
+E2128	MedDRA:10063876:Implant site sclerosis	10063876:Implant site sclerosis	10063876	Implant site sclerosis
+E2129	MedDRA:10069638:Peritoneal effluent abnormal	10069638:Peritoneal effluent abnormal	10069638	Peritoneal effluent abnormal
+E2130	MedDRA:10069030:Graft failure	10069030:Graft failure	10069030	Graft failure
+E2332		:		
+E2340	MedDRA:10048031:Wound dehiscence	10048031:Wound dehiscence	10048031	Wound dehiscence
+E0847	MedDRA:10052134:Pigment dispersion syndrome	10052134:Pigment dispersion syndrome	10052134	Pigment dispersion syndrome
+E0848	MedDRA:10071681:Corneal endothelial cell loss	10071681:Corneal endothelial cell loss	10071681	Corneal endothelial cell loss
+E0849	MedDRA:10036346:Posterior capsule opacification	10036346:Posterior capsule opacification	10036346	Posterior capsule opacification
+E1108	MedDRA:10057586:Post procedural bile leak	10057586:Post procedural bile leak	10057586	Post procedural bile leak
+E1109	MedDRA:10008604:Cholangitis	10008604:Cholangitis	10008604	Cholangitis
+E0624	MedDRA:10088741:Intraoperative cardiac valve injury	10088741:Intraoperative cardiac valve injury	10088741	Intraoperative cardiac valve injury
+E22		:		
+E0507	MedDRA:10037328:Pulmonary arterial wedge pressure high	10037328:Pulmonary arterial wedge pressure high	10037328	Pulmonary arterial wedge pressure high
+E0508	MedDRA:10037330:Pulmonary arterial wedge pressure low	10037330:Pulmonary arterial wedge pressure low	10037330	Pulmonary arterial wedge pressure low
+E0603	MedDRA:10007548:Cardiac enzymes increased	10007548:Cardiac enzymes increased	10007548	Cardiac enzymes increased
+E0713	MedDRA:10034195:Peak expiratory flow rate decreased	10034195:Peak expiratory flow rate decreased	10034195	Peak expiratory flow rate decreased
+E0714	MedDRA:10034196:Peak expiratory flow rate increased	10034196:Peak expiratory flow rate increased	10034196	Peak expiratory flow rate increased
+E0715	MedDRA:10038710:Respiratory rate decreased	10038710:Respiratory rate decreased	10038710	Respiratory rate decreased
+E0716	MedDRA:10038712:Respiratory rate increased	10038712:Respiratory rate increased	10038712	Respiratory rate increased
+E0719	MedDRA:10016987:Forced expiratory volume decreased	10016987:Forced expiratory volume decreased	10016987	Forced expiratory volume decreased
+E0720	MedDRA:10016989:Forced expiratory volume increased	10016989:Forced expiratory volume increased	10016989	Forced expiratory volume increased
+E1205	MedDRA:10020639:Hyperglycemia	10020639:Hyperglycemia	10020639	Hyperglycemia
+E120501	MedDRA:10057594:Blood ketone body increased	10057594:Blood ketone body increased	10057594	Blood ketone body increased
+E1206	MedDRA:10021005:Hypoglycemia	10021005:Hypoglycemia	10021005	Hypoglycemia
+E1209	MedDRA:10020381:Hormonal imbalance	10020381:Hormonal imbalance	10020381	Hormonal imbalance
+E1404	MedDRA:10008351:Cervix disorder	10008351:Cervix disorder	10008351	Cervix disorder
+E1510	MedDRA:10002944:Apgar score low	10002944:Apgar score low	10002944	Apgar score low
+E2201	MedDRA:10005539:Blood gases abnormal	10005539:Blood gases abnormal	10005539	Blood gases abnormal
+E2202	MedDRA:10033319:Oxygen saturation high	10033319:Oxygen saturation high	10033319	Oxygen saturation high
+E2203	MedDRA:10033321:Oxygen saturation low	10033321:Oxygen saturation low	10033321	Oxygen saturation low
+E2204	MedDRA:10023654:Lactate dehydrogenase increased	10023654:Lactate dehydrogenase increased	10023654	Lactate dehydrogenase increased
+E2205	MedDRA:10003999:Bacteremia	10003999:Bacteremia	10003999	Bacteremia
+E2206	MedDRA:10086050:Heavy metal increased	10086050:Heavy metal increased	10086050	Heavy metal increased
+E2207		:		
+E23		:		
+E040202	MedDRA:10002218:Anaphylaxis	10002218:Anaphylaxis	10002218	Anaphylaxis
+E083802	MedDRA:10034936:Phosphenes	10034936:Phosphenes	10034936	Phosphenes
+E1705	MedDRA:10006784:Burning sensation	10006784:Burning sensation	10006784	Burning sensation
+E170501	MedDRA:10054786:Skin burning sensation	10054786:Skin burning sensation	10054786	Skin burning sensation
+E1707	MedDRA:10021519:Impaired healing	10021519:Impaired healing	10021519	Impaired healing
+E2301	MedDRA:10063488:Body temperature fluctuation	10063488:Body temperature fluctuation	10063488	Body temperature fluctuation
+E230101	MedDRA:10016558:Fever	10016558:Fever	10016558	Fever
+E230102	MedDRA:10020843:Hyperthermia	10020843:Hyperthermia	10020843	Hyperthermia
+E230103	MedDRA:10021113:Hypothermia	10021113:Hypothermia	10021113	Hypothermia
+E2302	MedDRA:10047810:Walking difficulty	10047810:Walking difficulty	10047810	Walking difficulty
+E2303	MedDRA:10080895:Capsular contracture associated with implant	10080895:Capsular contracture associated with implant	10080895	Capsular contracture associated with implant
+E2304	MedDRA:10008531:Chills	10008531:Chills	10008531	Chills
+E2305	MedDRA:10011703:Cyanosis	10011703:Cyanosis	10011703	Cyanosis
+E2306	MedDRA:10061428:Decreased appetite	10061428:Decreased appetite	10061428	Decreased appetite
+E2307	MedDRA:10021654:Increased appetite	10021654:Increased appetite	10021654	Increased appetite
+E2308	MedDRA:10061619:Deformity	10061619:Deformity	10061619	Deformity
+E2309	MedDRA:10070692:Device deposit issue	10070692:Device deposit issue	10070692	Device deposit issue
+E230901	MedDRA:10006958:Calcium deposits	10006958:Calcium deposits	10006958	Calcium deposits
+E2310	MedDRA:10012703:Diaphoresis	10012703:Diaphoresis	10012703	Diaphoresis
+E2311	MedDRA:10013082:Discomfort	10013082:Discomfort	10013082	Discomfort
+E2312	MedDRA:10016256:Fatigue	10016256:Fatigue	10016256	Fatigue
+E231201	MedDRA:10015667:Exhaustion	10015667:Exhaustion	10015667	Exhaustion
+E2313	MedDRA:10016642:Fibrosis	10016642:Fibrosis	10016642	Fibrosis
+E2101	MedDRA:10059837:Adhesion	10059837:Adhesion	10059837	Adhesion
+E2314	MedDRA:10016717:Fistula	10016717:Fistula	10016717	Fistula
+E2315	MedDRA:10080911:Fluid discharge	10080911:Fluid discharge	10080911	Fluid discharge
+E231501	MedDRA:10037569:Purulent discharge	10037569:Purulent discharge	10037569	Purulent discharge
+E2316	MedDRA:10068159:Foreign body reaction	10068159:Foreign body reaction	10068159	Foreign body reaction
+E2317	MedDRA:10018691:Granuloma	10018691:Granuloma	10018691	Granuloma
+E2318	MedDRA:10019045:Hair loss	10019045:Hair loss	10019045	Hair loss
+E2319	MedDRA:10019909:Hernia	10019909:Hernia	10019909	Hernia
+E2320	MedDRA:10020772:Hypertension	10020772:Hypertension	10020772	Hypertension
+E2321	MedDRA:10021097:Hypotension	10021097:Hypotension	10021097	Hypotension
+E2322	MedDRA:10020619:Hyperemia	10020619:Hyperemia	10020619	Hyperemia
+E2323	MedDRA:10020718:Hyperplasia	10020718:Hyperplasia	10020718	Hyperplasia
+E2324	MedDRA:10021639:Incontinence	10021639:Incontinence	10021639	Incontinence
+E232401	MedDRA:10016296:Fecal incontinence	10016296:Fecal incontinence	10016296	Fecal incontinence
+E232402	MedDRA:10046543:Urinary incontinence	10046543:Urinary incontinence	10046543	Urinary incontinence
+E2325	MedDRA:10080901:Tissue infiltration	10080901:Tissue infiltration	10080901	Tissue infiltration
+E2326	MedDRA:10061218:Inflammation	10061218:Inflammation	10061218	Inflammation
+E2327	MedDRA:10028851:Necrosis	10028851:Necrosis	10028851	Necrosis
+E2328	MedDRA:10061876:Obstruction	10061876:Obstruction	10061876	Obstruction
+E2329	MedDRA:10080904:Dehiscence	10080904:Dehiscence	10080904	Dehiscence
+E2330	MedDRA:10033371:Pain	10033371:Pain	10033371	Pain
+E0116	MedDRA:10019211:Headache	10019211:Headache	10019211	Headache
+E0820	MedDRA:10015958:Eye pain	10015958:Eye pain	10015958	Eye pain
+E0907	MedDRA:10014020:Ear pain	10014020:Ear pain	10014020	Ear pain
+E1002	MedDRA:10000081:Abdominal pain	10000081:Abdominal pain	10000081	Abdominal pain
+E1622	MedDRA:10028411:Myalgia	10028411:Myalgia	10028411	Myalgia
+E1623	MedDRA:10028836:Neck pain	10028836:Neck pain	10028836	Neck pain
+E1651	MedDRA:10003988:Back pain	10003988:Back pain	10003988	Back pain
+E2106	MedDRA:10059057:Medical device pain	10059057:Medical device pain	10059057	Medical device pain
+E2109	MedDRA:10063782:Implant site pain	10063782:Implant site pain	10063782	Implant site pain
+E2110	MedDRA:10079788:Inadequate pain relief	10079788:Inadequate pain relief	10079788	Inadequate pain relief
+E2112	MedDRA:10064882:Procedural pain	10064882:Procedural pain	10064882	Procedural pain
+E233001	MedDRA:10008479:Chest pain	10008479:Chest pain	10008479	Chest pain
+E2331	MedDRA:10033546:Pallor	10033546:Pallor	10033546	Pallor
+E2332		:		
+E2333	MedDRA:10076708:Prolapse	10076708:Prolapse	10076708	Prolapse
+E2334	MedDRA:10037272:Ptosis	10037272:Ptosis	10037272	Ptosis
+E2335	MedDRA:10067484:Adverse reaction	10067484:Adverse reaction	10067484	Adverse reaction
+E2336	MedDRA:10040560:Shock	10040560:Shock	10040560	Shock
+E040201	MedDRA:10002199:Anaphylactic shock	10002199:Anaphylactic shock	10002199	Anaphylactic shock
+E233601	MedDRA:10007625:Cardiogenic shock	10007625:Cardiogenic shock	10007625	Cardiogenic shock
+E233602	MedDRA:10060493:Hypoglycemic shock	10060493:Hypoglycemic shock	10060493	Hypoglycemic shock
+E233603	MedDRA:10021140:Hypovolemic shock	10021140:Hypovolemic shock	10021140	Hypovolemic shock
+E233604	MedDRA:10058119:Neurogenic shock	10058119:Neurogenic shock	10058119	Neurogenic shock
+E233605	MedDRA:10040070:Septic shock	10040070:Septic shock	10040070	Septic shock
+E2337	MedDRA:10076711:Stenosis	10076711:Stenosis	10076711	Stenosis
+E233701	MedDRA:10082493:Restenosis	10082493:Restenosis	10082493	Restenosis
+E2338	MedDRA:10014210:Edema	10014210:Edema	10014210	Edema
+E0103	MedDRA:10008107:Cerebral edema	10008107:Cerebral edema	10008107	Cerebral edema
+E0736	MedDRA:10037375:Pulmonary edema	10037375:Pulmonary edema	10037375	Pulmonary edema
+E0807	MedDRA:10011007:Corneal edema	10011007:Corneal edema	10011007	Corneal edema
+E080701	MedDRA:10054772:Corneal stromal edema	10054772:Corneal stromal edema	10054772	Corneal stromal edema
+E080702	MedDRA:10068529:Corneal microcystic edema	10068529:Corneal microcystic edema	10068529	Corneal microcystic edema
+E0830	MedDRA:10054467:Macular edema	10054467:Macular edema	10054467	Macular edema
+E1702	MedDRA:10002424:Angioedema	10002424:Angioedema	10002424	Angioedema
+E233801	MedDRA:10034570:Peripheral edema	10034570:Peripheral edema	10034570	Peripheral edema
+E233802	MedDRA:10023215:Joint effusion	10023215:Joint effusion	10023215	Joint effusion
+E2339	MedDRA:10045285:Ulcer	10045285:Ulcer	10045285	Ulcer
+E2340	MedDRA:10048031:Wound dehiscence	10048031:Wound dehiscence	10048031	Wound dehiscence
+E2341		:		
+E2342	MedDRA:10077361:Multiple organ dysfunction syndrome	10077361:Multiple organ dysfunction syndrome	10077361	Multiple organ dysfunction syndrome
+E2343	MedDRA:10058270:Hemodynamic instability	10058270:Hemodynamic instability	10058270	Hemodynamic instability
+E2344	MedDRA:10047681:Voice alteration	10047681:Voice alteration	10047681	Voice alteration
+E2345	MedDRA:10068188:Heat illness	10068188:Heat illness	10068188	Heat illness
+E2346	MedDRA:10020880:Hypertrophy	10020880:Hypertrophy	10020880	Hypertrophy
+E2347	MedDRA:10006325:Breath odor	10006325:Breath odor	10006325	Breath odor
+E2348	MedDRA:10073765:Mucus discharge	10073765:Mucus discharge	10073765	Mucus discharge
+E2349	MedDRA:10048010:Withdrawal syndrome	10048010:Withdrawal syndrome	10048010	Withdrawal syndrome
+E2350	MedDRA:10075582:Medical device site irritation	10075582:Medical device site irritation	10075582	Medical device site irritation
+E2351	MedDRA:10003694:Atrophy	10003694:Atrophy	10003694	Atrophy
+E1420	MedDRA:10034263:Pelvic pain	10034263:Pelvic pain	10034263	Pelvic pain
+E24		:		
+E2401		:		
+E2402		:		
+E2403		:		

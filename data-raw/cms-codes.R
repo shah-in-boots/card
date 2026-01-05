@@ -73,7 +73,7 @@ cpt <- list(
   "2023" = cpt_2023
 )
 
-# Combine the list of codes to be internally storied
+# Combine the list of codes to be stored
 .cms_codes <- list(
   icd9 = icd9,
   icd10 = icd10,
