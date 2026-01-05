@@ -168,43 +168,37 @@ query_maude <- function(
     stop("'api_key' must be NULL or a single character string")
   }
 
-  # Build search query
+  # Build search query with optional date range (inlined)
   query <- search
   if (!is.null(date_start) || !is.null(date_end)) {
-    date_query <- .build_date_query(date_start, date_end)
-    query <- paste0(query, "+AND+", date_query)
+    ds <- date_start %||% "19920101"
+    de <- date_end %||% format(Sys.Date(), "%Y%m%d")
+    query <- paste0(query, "+AND+date_received:[", ds, "+TO+", de, "]")
   }
 
   # Paginate if limit > 1000 (openFDA max per request)
   max_per_request <- 1000
   if (limit <= max_per_request) {
-    result <- .openfda_request(query, limit, 0, api_key)
+    result <- .maude_request(query, limit, skip = 0, api_key)
   } else {
-    # Paginate through results
     all_results <- list()
     n_batches <- ceiling(limit / max_per_request)
-    show_progress <- limit > 1000
 
     for (i in seq_len(n_batches)) {
       skip <- (i - 1) * max_per_request
       batch_limit <- min(max_per_request, limit - skip)
 
-      if (show_progress) {
-        message(
-          "  Retrieving batch ", i, "/", n_batches,
-          " (records ", skip + 1, "-", skip + batch_limit, ")..."
-        )
-      }
+      message(
+        "Retrieving batch ", i, "/", n_batches,
+        " (records ", skip + 1, "-", skip + batch_limit, ")..."
+      )
 
-      batch_result <- .openfda_request(query, batch_limit, skip, api_key)
-      if (nrow(batch_result) == 0) break
-      all_results[[i]] <- batch_result
+      batch <- .maude_request(query, batch_limit, skip, api_key)
+      if (nrow(batch) == 0) break
+      all_results[[i]] <- batch
+      if (nrow(batch) < batch_limit) break
 
-      # Stop if we got fewer results than requested (end of data)
-      if (nrow(batch_result) < batch_limit) break
-
-      # Rate limiting between requests
-      Sys.sleep(0.25)
+      Sys.sleep(0.25) # Rate limiting
     }
 
     result <- dplyr::bind_rows(all_results)
@@ -219,167 +213,55 @@ query_maude <- function(
   result
 }
 
-
-# Internal function to build date range query
+# Internal: Make openFDA request and parse results
 #' @noRd
-#' @keywords internal
-.build_date_query <- function(date_start, date_end) {
-  if (is.null(date_start)) date_start <- "19920101"
-  if (is.null(date_end)) date_end <- format(Sys.Date(), "%Y%m%d")
-  paste0("date_received:[", date_start, "+TO+", date_end, "]")
-}
+.maude_request <- function(search, limit, skip, api_key) {
+  params <- list(search = search, limit = limit, skip = skip)
+  if (!is.null(api_key)) params$api_key <- api_key
 
+  resp <- httr::GET("https://api.fda.gov/device/event.json", query = params)
 
-# Internal function to make openFDA API request
-#' @noRd
-#' @keywords internal
-.openfda_request <- function(search, limit, skip, api_key) {
-  base_url <- "https://api.fda.gov/device/event.json"
-
-  query_params <- list(
-    search = search,
-    limit = limit,
-    skip = skip
-  )
-
-  if (!is.null(api_key)) {
-    query_params$api_key <- api_key
+  if (httr::http_error(resp)) {
+    if (httr::status_code(resp) == 404) return(tibble::tibble())
+    stop("openFDA API request failed with status ", httr::status_code(resp))
   }
 
-  response <- httr::GET(base_url, query = query_params)
+  results <- httr::content(resp, as = "parsed")$results %||% list()
+  if (length(results) == 0) return(tibble::tibble())
 
-  if (httr::http_error(response)) {
-    status <- httr::status_code(response)
-    if (status == 404) {
-      return(.empty_maude_table())
-    }
-    stop("openFDA API request failed with status ", status)
-  }
+  # Parse each record
+  purrr::map_dfr(results, function(rec) {
+    device <- purrr::pluck(rec, "device", 1, .default = list())
 
-  content <- httr::content(response, as = "parsed")
-
-  if (is.null(content$results) || length(content$results) == 0) {
-    return(.empty_maude_table())
-  }
-
-  .parse_maude_results(content$results)
-}
-
-
-# Internal function to parse MAUDE API results
-#' @noRd
-#' @keywords internal
-.parse_maude_results <- function(results) {
-  parsed <- lapply(results, function(record) {
-    # Extract device information (may have multiple devices)
-    device <- if (!is.null(record$device) && length(record$device) > 0) {
-      record$device[[1]]
-    } else {
-      list()
+    # Helper to collapse nested lists into "; " separated strings
+    collapse_field <- function(items, field) {
+      vals <- purrr::map_chr(items, ~ {
+        x <- purrr::pluck(.x, field, .default = NULL)
+        if (is.null(x)) NA_character_ else paste(unlist(x), collapse = "; ")
+      })
+      out <- paste(stats::na.omit(vals), collapse = "; ")
+      if (out == "") NA_character_ else out
     }
 
-    # Extract patient problems (concatenate if multiple)
-    patient_problem <- tryCatch({
-      if (!is.null(record$patient) && length(record$patient) > 0) {
-        problems <- lapply(record$patient, function(p) {
-          if (!is.null(p$patient_problems)) {
-            paste(unlist(p$patient_problems), collapse = "; ")
-          } else {
-            NA_character_
-          }
-        })
-        paste(na.omit(unlist(problems)), collapse = "; ")
-      } else {
-        NA_character_
-      }
-    }, error = function(e) NA_character_)
-    if (length(patient_problem) == 0 || patient_problem == "") {
-      patient_problem <- NA_character_
-    }
-
-    # Extract device problems (concatenate if multiple)
-    device_problem <- tryCatch({
-      if (!is.null(record$device) && length(record$device) > 0) {
-        problems <- lapply(record$device, function(d) {
-          if (!is.null(d$device_problem_codes)) {
-            paste(unlist(d$device_problem_codes), collapse = "; ")
-          } else {
-            NA_character_
-          }
-        })
-        paste(na.omit(unlist(problems)), collapse = "; ")
-      } else {
-        NA_character_
-      }
-    }, error = function(e) NA_character_)
-    if (length(device_problem) == 0 || device_problem == "") {
-      device_problem <- NA_character_
-    }
-
-    # Extract event narrative texts
-    event_description <- tryCatch({
-      texts <- c()
-      if (!is.null(record$mdr_text) && length(record$mdr_text) > 0) {
-        texts <- sapply(record$mdr_text, function(t) {
-          if (!is.null(t$text)) t$text else NA_character_
-        })
-      }
-      if (length(texts) > 0 && any(!is.na(texts))) {
-        paste(na.omit(texts), collapse = " | ")
-      } else {
-        NA_character_
-      }
-    }, error = function(e) NA_character_)
+    # Extract narrative texts
+    texts <- purrr::map_chr(
+      purrr::pluck(rec, "mdr_text", .default = list()),
+      ~ purrr::pluck(.x, "text", .default = NA_character_)
+    )
+    event_desc <- paste(stats::na.omit(texts), collapse = " | ")
 
     tibble::tibble(
-      report_number = .safe_extract(record, "report_number"),
-      event_type = .safe_extract(record, "event_type"),
-      date_received = .safe_extract(record, "date_received"),
-      device_generic_name = .safe_extract(device, "generic_name"),
-      device_brand_name = .safe_extract(device, "brand_name"),
-      manufacturer_name = .safe_extract(device, "manufacturer_d_name"),
-      event_description = event_description,
-      patient_problem = patient_problem,
-      device_problem = device_problem
+      report_number = purrr::pluck(rec, "report_number", .default = NA_character_),
+      event_type = purrr::pluck(rec, "event_type", .default = NA_character_),
+      date_received = purrr::pluck(rec, "date_received", .default = NA_character_),
+      device_generic_name = purrr::pluck(device, "generic_name", .default = NA_character_),
+      device_brand_name = purrr::pluck(device, "brand_name", .default = NA_character_),
+      manufacturer_name = purrr::pluck(device, "manufacturer_d_name", .default = NA_character_),
+      event_description = if (event_desc == "") NA_character_ else event_desc,
+      patient_problem = collapse_field(purrr::pluck(rec, "patient", .default = list()), "patient_problems"),
+      device_problem = collapse_field(purrr::pluck(rec, "device", .default = list()), "device_problem_codes")
     )
   })
-
-  dplyr::bind_rows(parsed)
-}
-
-
-# Internal function to safely extract values from nested lists
-#' @noRd
-#' @keywords internal
-.safe_extract <- function(x, field) {
-  tryCatch({
-    val <- x[[field]]
-    if (is.null(val) || length(val) == 0) {
-      NA_character_
-    } else if (is.list(val)) {
-      paste(unlist(val), collapse = "; ")
-    } else {
-      as.character(val)
-    }
-  }, error = function(e) NA_character_)
-}
-
-
-# Internal function to create empty MAUDE result table
-#' @noRd
-#' @keywords internal
-.empty_maude_table <- function() {
-  tibble::tibble(
-    report_number = character(0),
-    event_type = character(0),
-    date_received = character(0),
-    device_generic_name = character(0),
-    device_brand_name = character(0),
-    manufacturer_name = character(0),
-    event_description = character(0),
-    patient_problem = character(0),
-    device_problem = character(0)
-  )
 }
 
 
