@@ -2,6 +2,7 @@
 % Please edit documentation in R/maude.R
 \name{query_maude}
 \alias{query_maude}
+\alias{maude_fda_api_call}
 \title{Query the FDA MAUDE Database}
 \usage{
 query_maude(
@@ -11,25 +12,37 @@ query_maude(
   date_end = NULL,
   api_key = NULL
 )
+
+maude_fda_api_call(search, limit, skip, api_key)
 }
 \arguments{
-\item{search}{Character string specifying the search query. Can be a simple
-term (e.g., \code{"pacemaker"}) or a field-specific query (e.g.,
-\code{"device.generic_name:pacemaker"}). See Details for query syntax.}
+\item{search}{Character string specifying the search query. For
+\code{query_maude()}, this can be a simple term (e.g., \code{"pacemaker"}) or a
+field-specific query (e.g., \code{"device.generic_name:pacemaker"}). For
+\code{maude_fda_api_call()}, this should be the fully constructed query string
+including any date filters.}
 
 \item{limit}{Integer specifying the maximum number of records to return.
-Default is 100. The openFDA API has a maximum of 1000 records per request;
-larger requests are automatically paginated.}
+For \code{query_maude()}, defaults to 100 and requests exceeding 1000 are
+automatically paginated. For \code{maude_fda_api_call()}, maximum is 1000 per the
+openFDA API limits.}
 
 \item{date_start}{Optional character string specifying the start date for
-filtering by \code{date_received} in \code{"YYYYMMDD"} format (e.g., \code{"20200101"}).}
+filtering by \code{date_received} in \code{"YYYYMMDD"} format (e.g., \code{"20200101"}).
+Only used by \code{query_maude()}.}
 
 \item{date_end}{Optional character string specifying the end date for
-filtering by \code{date_received} in \code{"YYYYMMDD"} format (e.g., \code{"20201231"}).}
+filtering by \code{date_received} in \code{"YYYYMMDD"} format (e.g., \code{"20201231"}).
+Only used by \code{query_maude()}.}
 
 \item{api_key}{Optional character string containing your openFDA API key.
 Not required, but recommended for heavy usage to avoid rate limiting.
-Register at: https://open.fda.gov/apis/authentication/}
+Register at: \url{https://open.fda.gov/apis/authentication/}}
+
+\item{skip}{Integer specifying the number of records to skip for pagination.
+Only used by \code{maude_fda_api_call()}. Combined with \code{limit}, allows fetching
+records in pages (e.g., skip=0 gets records 1-1000, skip=1000 gets
+1001-2000).}
 }
 \value{
 A \code{tbl_df} containing device adverse event reports with columns:
@@ -45,20 +58,24 @@ A \code{tbl_df} containing device adverse event reports with columns:
 \item{device_problem}{Reported problems with the device}
 }
 
-Returns an empty tibble with the correct column structure if no results
-are found.
+Returns an empty tibble if no results are found.
 }
 \description{
-Query the Manufacturer and User Facility Device Experience
-(MAUDE) database using the openFDA API. This database contains medical
-device adverse event reports submitted to the FDA.
+\code{query_maude()} queries the Manufacturer and User Facility Device Experience
+(MAUDE) database using the openFDA API. This is the recommended interface
+for most users, providing automatic pagination, date range handling, and
+input validation.
+
+\code{maude_fda_api_call()} is the lower-level function that makes direct API calls.
+Use this for advanced scenarios requiring manual pagination control or
+pre-constructed query strings.
 }
 \details{
-The function queries the openFDA device adverse event endpoint,
-which contains reports from mandatory reporters (manufacturers, importers,
-and device user facilities) and voluntary reporters (healthcare
-professionals, patients, and consumers). Data covers publicly releasable
-records from approximately 1992 to present and is updated weekly.
+\strong{Database Coverage:} The openFDA device adverse event endpoint contains
+reports from mandatory reporters (manufacturers, importers, and device user
+facilities) and voluntary reporters (healthcare professionals, patients, and
+consumers). Data covers publicly releasable records from approximately 1992
+to present and is updated weekly.
 
 \strong{Rate Limits:} The openFDA API allows approximately 240 requests per
 minute (4 per second) without an API key, and 240 requests per minute with
@@ -74,9 +91,23 @@ Common patterns include:
 \item Date range: \code{"date_received:[20200101+TO+20201231]"}
 \item Exact phrase: \verb{"device.brand_name:\\"Medtronic\\""}
 }
+
+\strong{API Response Handling:} The openFDA API returns HTTP 404 for queries with
+no results (rather than an empty array). Both functions handle this by
+returning an empty tibble instead of throwing an error.
+
+\strong{When to use \code{maude_fda_api_call()}:} Most users should use \code{query_maude()}.
+The lower-level \code{maude_fda_api_call()} is useful when you need:
+\itemize{
+\item Direct control over \code{skip} for custom pagination strategies
+\item Pre-constructed query strings with complex Elasticsearch syntax
+\item Integration into custom retry/error-handling logic
+}
 }
 \examples{
 \dontrun{
+# --- query_maude(): Recommended for most users ---
+
 # Search for pacemaker-related adverse events
 pacemaker_events <- query_maude("pacemaker", limit = 10)
 
@@ -91,18 +122,41 @@ results <- query_maude(
   limit = 100
 )
 
-# Search by manufacturer
-results <- query_maude(
-  search = "device.manufacturer_d_name:medtronic",
-  limit = 25
+# --- maude_fda_api_call(): Advanced usage with manual pagination ---
+
+# Direct API call for first page
+first_batch <- maude_fda_api_call(
+  search = "device.generic_name:pacemaker",
+  limit = 100,
+  skip = 0,
+  api_key = NULL
+)
+
+# Get next page
+second_batch <- maude_fda_api_call(
+  search = "device.generic_name:pacemaker",
+  limit = 100,
+  skip = 100,
+  api_key = NULL
+)
+
+# Complex pre-built query with date filter baked in
+results <- maude_fda_api_call(
+  search = "device.generic_name:pump+AND+date_received:[20220101+TO+20221231]",
+  limit = 500,
+  skip = 0,
+  api_key = Sys.getenv("OPENFDA_API_KEY")
 )
 }
 
 }
 \references{
 openFDA Device Adverse Event API:
-https://open.fda.gov/apis/device/event/
+\url{https://open.fda.gov/apis/device/event/}
 
 MAUDE Database Overview:
-https://open.fda.gov/data/maude/
+\url{https://open.fda.gov/data/maude/}
+
+openFDA API Query Parameters:
+\url{https://open.fda.gov/apis/query-parameters/}
 }

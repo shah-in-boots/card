@@ -50,47 +50,73 @@ load_maude_codes <- function(annex = "E") {
 
 #' Query the FDA MAUDE Database
 #'
-#' @description Query the Manufacturer and User Facility Device Experience
-#'   (MAUDE) database using the openFDA API. This database contains medical
-#'   device adverse event reports submitted to the FDA.
+#' @description
+#' `query_maude()` queries the Manufacturer and User Facility Device Experience
+#' (MAUDE) database using the openFDA API. This is the recommended interface
+#' for most users, providing automatic pagination, date range handling, and
+#' input validation.
 #'
-#' @details The function queries the openFDA device adverse event endpoint,
-#'   which contains reports from mandatory reporters (manufacturers, importers,
-#'   and device user facilities) and voluntary reporters (healthcare
-#'   professionals, patients, and consumers). Data covers publicly releasable
-#'   records from approximately 1992 to present and is updated weekly.
+#' `maude_fda_api_call()` is the lower-level function that makes direct API calls.
+#' Use this for advanced scenarios requiring manual pagination control or
+#' pre-constructed query strings.
 #'
-#'   **Rate Limits:** The openFDA API allows approximately 240 requests per
-#'   minute (4 per second) without an API key, and 240 requests per minute with
-#'   a key. Large queries are automatically paginated in batches of up to 1000
-#'   records.
+#' @details
+#' **Database Coverage:** The openFDA device adverse event endpoint contains
+#' reports from mandatory reporters (manufacturers, importers, and device user
+#' facilities) and voluntary reporters (healthcare professionals, patients, and
+#' consumers). Data covers publicly releasable records from approximately 1992
+#' to present and is updated weekly.
 #'
-#'   **Search Syntax:** The `search` parameter uses Elasticsearch query syntax.
-#'   Common patterns include:
-#'   - Simple term: `"pacemaker"`
-#'   - Field-specific: `"device.generic_name:pacemaker"`
-#'   - Multiple terms: `"device.generic_name:pacemaker+AND+event_type:malfunction"`
-#'   - Date range: `"date_received:[20200101+TO+20201231]"`
-#'   - Exact phrase: `"device.brand_name:\"Medtronic\""`
+#' **Rate Limits:** The openFDA API allows approximately 240 requests per
+#' minute (4 per second) without an API key, and 240 requests per minute with
+#' a key. Large queries are automatically paginated in batches of up to 1000
+#' records.
 #'
-#' @param search Character string specifying the search query. Can be a simple
-#'   term (e.g., `"pacemaker"`) or a field-specific query (e.g.,
-#'   `"device.generic_name:pacemaker"`). See Details for query syntax.
+#' **Search Syntax:** The `search` parameter uses Elasticsearch query syntax.
+#' Common patterns include:
+#' - Simple term: `"pacemaker"`
+#' - Field-specific: `"device.generic_name:pacemaker"`
+#' - Multiple terms: `"device.generic_name:pacemaker+AND+event_type:malfunction"`
+#' - Date range: `"date_received:[20200101+TO+20201231]"`
+#' - Exact phrase: `"device.brand_name:\"Medtronic\""`
+#'
+#' **API Response Handling:** The openFDA API returns HTTP 404 for queries with
+#' no results (rather than an empty array). Both functions handle this by
+#' returning an empty tibble instead of throwing an error.
+#'
+#' **When to use `maude_fda_api_call()`:** Most users should use `query_maude()`.
+#' The lower-level `maude_fda_api_call()` is useful when you need:
+#' - Direct control over `skip` for custom pagination strategies
+#' - Pre-constructed query strings with complex Elasticsearch syntax
+#' - Integration into custom retry/error-handling logic
+#'
+#' @param search Character string specifying the search query. For
+#'   `query_maude()`, this can be a simple term (e.g., `"pacemaker"`) or a
+#'   field-specific query (e.g., `"device.generic_name:pacemaker"`). For
+#'   `maude_fda_api_call()`, this should be the fully constructed query string
+#'   including any date filters.
 #'
 #' @param limit Integer specifying the maximum number of records to return.
-#'   Default is 100. The openFDA API has a maximum of 1000 records per request;
-#'   larger requests are automatically paginated.
+#'   For `query_maude()`, defaults to 100 and requests exceeding 1000 are
+#'   automatically paginated. For `maude_fda_api_call()`, maximum is 1000 per the
+#'   openFDA API limits.
 #'
 #' @param date_start Optional character string specifying the start date for
 #'   filtering by `date_received` in `"YYYYMMDD"` format (e.g., `"20200101"`).
+#'   Only used by `query_maude()`.
 #'
 #' @param date_end Optional character string specifying the end date for
 #'   filtering by `date_received` in `"YYYYMMDD"` format (e.g., `"20201231"`).
+#'   Only used by `query_maude()`.
+#'
+#' @param skip Integer specifying the number of records to skip for pagination.
+#'   Only used by `maude_fda_api_call()`. Combined with `limit`, allows fetching
+#'   records in pages (e.g., skip=0 gets records 1-1000, skip=1000 gets
+#'   1001-2000).
 #'
 #' @param api_key Optional character string containing your openFDA API key.
 #'   Not required, but recommended for heavy usage to avoid rate limiting.
-#'   Register at: https://open.fda.gov/apis/authentication/
-#'
+#'   Register at: <https://open.fda.gov/apis/authentication/>
 #'
 #' @return A `tbl_df` containing device adverse event reports with columns:
 #'   \describe{
@@ -105,18 +131,22 @@ load_maude_codes <- function(annex = "E") {
 #'     \item{device_problem}{Reported problems with the device}
 #'   }
 #'
-#'   Returns an empty tibble with the correct column structure if no results
-#'   are found.
+#'   Returns an empty tibble if no results are found.
 #'
 #' @references
 #' openFDA Device Adverse Event API:
-#' https://open.fda.gov/apis/device/event/
+#' <https://open.fda.gov/apis/device/event/>
 #'
 #' MAUDE Database Overview:
-#' https://open.fda.gov/data/maude/
+#' <https://open.fda.gov/data/maude/>
+#'
+#' openFDA API Query Parameters:
+#' <https://open.fda.gov/apis/query-parameters/>
 #'
 #' @examples
 #' \dontrun{
+#' # --- query_maude(): Recommended for most users ---
+#'
 #' # Search for pacemaker-related adverse events
 #' pacemaker_events <- query_maude("pacemaker", limit = 10)
 #'
@@ -131,13 +161,37 @@ load_maude_codes <- function(annex = "E") {
 #'   limit = 100
 #' )
 #'
-#' # Search by manufacturer
-#' results <- query_maude(
-#'   search = "device.manufacturer_d_name:medtronic",
-#'   limit = 25
+#' # --- maude_fda_api_call(): Advanced usage with manual pagination ---
+#'
+#' # Direct API call for first page
+#' first_batch <- maude_fda_api_call(
+#'   search = "device.generic_name:pacemaker",
+#'   limit = 100,
+#'   skip = 0,
+#'   api_key = NULL
+#' )
+#'
+#' # Get next page
+#' second_batch <- maude_fda_api_call(
+#'   search = "device.generic_name:pacemaker",
+#'   limit = 100,
+#'   skip = 100,
+#'   api_key = NULL
+#' )
+#'
+#' # Complex pre-built query with date filter baked in
+#' results <- maude_fda_api_call(
+#'   search = "device.generic_name:pump+AND+date_received:[20220101+TO+20221231]",
+#'   limit = 500,
+#'   skip = 0,
+#'   api_key = Sys.getenv("OPENFDA_API_KEY")
 #' )
 #' }
 #'
+#' @name query_maude
+NULL
+
+#' @rdname query_maude
 #' @export
 query_maude <- function(
     search,
@@ -179,7 +233,7 @@ query_maude <- function(
   # Paginate if limit > 1000 (openFDA max per request)
   max_per_request <- 1000
   if (limit <= max_per_request) {
-    result <- .maude_request(query, limit, skip = 0, api_key)
+    result <- maude_fda_api_call(query, limit, skip = 0, api_key)
   } else {
     all_results <- list()
     n_batches <- ceiling(limit / max_per_request)
@@ -193,7 +247,7 @@ query_maude <- function(
         " (records ", skip + 1, "-", skip + batch_limit, ")..."
       )
 
-      batch <- .maude_request(query, batch_limit, skip, api_key)
+      batch <- maude_fda_api_call(query, batch_limit, skip, api_key)
       if (nrow(batch) == 0) break
       all_results[[i]] <- batch
       if (nrow(batch) < batch_limit) break
@@ -213,27 +267,70 @@ query_maude <- function(
   result
 }
 
-# Internal: Make openFDA request and parse results
-#' @noRd
-.maude_request <- function(search, limit, skip, api_key) {
+#' @rdname query_maude
+#' @export
+maude_fda_api_call <- function(search, limit, skip, api_key) {
+
+  # Build query parameters as a named list.
+	# httr::GET accepts a `query` argument that takes a named list and
+	# automatically URL-encodes and appends each element as query string
+	# parameters (e.g., ?search=pacemaker&limit=100&skip=0).
+	# This approach is preferred over manual string concatenation because:
+	#   1. httr handles URL encoding of special characters automatically
+	#   2. NULL values are automatically omitted from the query string
+	#   3. The resulting URL is properly formatted without manual "&" joining
   params <- list(search = search, limit = limit, skip = skip)
+
+  # Conditionally add api_key only if provided.
+	# When api_key is NULL, this line is skipped and the parameter is not
+	# included in the request, resulting in an unauthenticated call.
   if (!is.null(api_key)) params$api_key <- api_key
 
+  # Make the HTTP GET request to the openFDA device adverse event endpoint.
+	# The `query` parameter passes our list, which httr converts to URL params.
+	# Example resulting URL:
+	#   https://api.fda.gov/device/event.json?search=pacemaker&limit=100&skip=0
   resp <- httr::GET("https://api.fda.gov/device/event.json", query = params)
 
+  # Handle HTTP errors from the API response.
+	# The openFDA API returns 404 when no results match the query (rather than
+	# returning an empty results array), so we treat 404 as "no results" and
+	# return an empty tibble instead of stopping with an error.
+	# Other error codes (400 bad request, 429 rate limited, 500 server error)
+	# indicate actual problems that should be surfaced to the user.
   if (httr::http_error(resp)) {
     if (httr::status_code(resp) == 404) return(tibble::tibble())
     stop("openFDA API request failed with status ", httr::status_code(resp))
   }
 
+  # Parse JSON response and extract the results array.
+	# httr::content with as="parsed" uses jsonlite to convert JSON to R lists.
+	# The openFDA response structure is: { "meta": {...}, "results": [...] }
+	# We only need the results array; if missing/NULL, default to empty list.
   results <- httr::content(resp, as = "parsed")$results %||% list()
   if (length(results) == 0) return(tibble::tibble())
 
-  # Parse each record
+  # Transform each API result record into a standardized tibble row.
+	# purrr::map_dfr iterates over results and row-binds the individual tibbles.
+	# This parsing is necessary because the raw API response contains deeply
+	# nested structures (device info in arrays, multiple narrative texts, etc.)
+	# that need to be flattened into a rectangular data frame format.
   purrr::map_dfr(results, function(rec) {
+
+    # Extract the first device entry from the record.
+		# Each MDR report can contain multiple devices, but we extract the primary
+		# device (index 1) for the main device fields. The full device list is
+		# accessed separately for device_problem_codes.
     device <- purrr::pluck(rec, "device", 1, .default = list())
 
-    # Helper to collapse nested lists into "; " separated strings
+    # Helper function to extract and collapse nested array fields.
+		# Many MAUDE fields (patient_problems, device_problem_codes) are stored as
+		# arrays of objects, where each object may contain an array of values.
+		# This helper navigates that structure and collapses all values into a
+		# single "; " separated string suitable for a data frame column.
+		# Example input structure for patient_problems:
+		#   [{"patient_problems": ["Arrhythmia", "Chest Pain"]}, ...]
+		# Example output: "Arrhythmia; Chest Pain"
     collapse_field <- function(items, field) {
       vals <- purrr::map_chr(items, ~ {
         x <- purrr::pluck(.x, field, .default = NULL)
@@ -243,13 +340,21 @@ query_maude <- function(
       if (out == "") NA_character_ else out
     }
 
-    # Extract narrative texts
+    # Extract and combine all narrative text entries.
+		# MDR reports contain multiple text blocks in mdr_text (e.g., event
+		# description from manufacturer, additional info, etc.). We combine all
+		# text entries with " | " as a delimiter to preserve all narrative content
+		# while keeping it in a single column.
     texts <- purrr::map_chr(
       purrr::pluck(rec, "mdr_text", .default = list()),
       ~ purrr::pluck(.x, "text", .default = NA_character_)
     )
     event_desc <- paste(stats::na.omit(texts), collapse = " | ")
 
+    # Build the standardized output tibble with selected fields.
+		# Field selection focuses on the most commonly needed data for adverse
+		# event analysis. Additional fields from the raw API response can be
+		# accessed by modifying this function or using the API directly.
     tibble::tibble(
       report_number = purrr::pluck(rec, "report_number", .default = NA_character_),
       event_type = purrr::pluck(rec, "event_type", .default = NA_character_),
