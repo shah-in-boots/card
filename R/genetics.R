@@ -40,7 +40,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' header <- read_vep_header("variants.vcf")
+#' header <- read_vep_header_2("variants.vcf")
 #'
 #' # View all fields
 #' print(header)
@@ -51,8 +51,9 @@
 #' header[header$type == "csq", ]
 #' }
 #'
+#' @name vep
 #' @export
-read_vep_header <- function(file) {
+read_vep_header_2 <- function(file) {
 
   # Read lines until we hit the first non-header line
   # VCF header lines always start with #
@@ -156,13 +157,14 @@ read_vep_header <- function(file) {
 
 #' Read VEP Data
 #'
-#' @returns A `tibble` containing the relevant columns from a VCF file that has been annotated by `vep` from [Ensembl-VEP](https://grch37.ensembl.org/info/docs/tools/vep/index.html). The columns can be selected 
-#' 
+#' @returns A `tibble` containing the relevant columns from a VCF file that has been annotated by `vep` from [Ensembl-VEP](https://grch37.ensembl.org/info/docs/tools/vep/index.html). The columns can be selected
+#'
+#' @rdname vep
 #' @export
-read_vep_data <- function(file, columns = NULL) {
+read_vep_data_2 <- function(file, columns = NULL) {
 
   # Get header information about the file
-  header <- read_vep_header(file)
+  header <- read_vep_header_2(file)
 
   # Extract VCF columns and CSQ fields from the header tibble
   vcf_columns <- header$name[header$type == "vcf"]
