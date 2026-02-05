@@ -4,11 +4,11 @@
 \alias{load_maude_codes}
 \title{Load FDA MAUDE Coding Resources by Annex}
 \usage{
-load_maude_codes(annex = "E")
+load_maude_codes(annex)
 }
 \arguments{
 \item{annex}{A single character identifying the FDA annex to load (e.g.,
-\code{"E"}). Case-sensitive. Only \code{"E"} is currently supported.}
+"E"). Case-sensitive. Only "E" and "F" are supported currently.}
 }
 \value{
 A \code{tbl_df} of codes and related metadata for the requested annex.

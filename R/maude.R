@@ -14,7 +14,7 @@
 #'   other annexes to be added with the same calling pattern.
 #'
 #' @param annex A single character identifying the FDA annex to load (e.g.,
-#'   `"E"`). Case-sensitive. Only `"E"` is currently supported.
+#'   "E"). Case-sensitive. Only "E" and "F" are supported currently.
 #'
 #' @return A `tbl_df` of codes and related metadata for the requested annex.
 #'   For Annex E, this includes hierarchical terms and mappings to IMDRF and
@@ -29,17 +29,17 @@
 #' annex_e <- load_maude_codes("E")
 #'
 #' @export
-load_maude_codes <- function(annex = "E") {
+load_maude_codes <- function(annex) {
   # Validate annex input
-  valid_annexes <- c("E")
+  valid_annexes <- c("E", "F")
   if (!(annex %in% valid_annexes)) {
     stop("Invalid annex specified. Valid options are: ",
          paste(valid_annexes, collapse = ", "))
   }
 
   # Load appropriate dataset
-  annex <- paste("annex_", tolower(annex))
-  dat <- .maude_codes[[annex]]
+  annex_name <- paste0("annex_", tolower(annex))
+  dat <- .maude_codes[[annex_name]]
 
   # Return
   dat
@@ -573,8 +573,13 @@ evaluate_maude_health_event <- function(
   api_key
 ) {
 
-  # Needs a way to see the problem text and search for the needed definitions from the annex
-  # Need a way to make sure we are reading in the correct annex as well (user specified?)
-  
+  # This function will generally be used with the API call from the MAUDE dataset
+  # This data table will have a column for a problem_code and an event description
+  # This function will take the problem code and match it to hte definition
+  # Then, it will ask an LLM to look at the event text to see if that event occurred
+  # The LLM model should return structured text of if the event(s) occurred
+  # Would use `{ellmer}` to help organized structured chat return
+  # LLM should be protected from prompt injection. Will need to prompt it from within the function, and not externally, to avoid issues
+  # Should also display the LLM prompt information so the user knows what is happening (and document this appropriately)
 
 }

@@ -65,7 +65,8 @@ annex_e <-
       clinical_term
     )
   ) |>
-  dplyr::relocate(clinical_term)
+  dplyr::relocate(clinical_term) |>
+  dplyr::distinct()
   
 annex_f <-
   vroom::vroom(
@@ -95,14 +96,15 @@ annex_f <-
       impact_term
     )
   ) |>
-  dplyr::relocate(impact_term)
+  dplyr::relocate(impact_term) |>
+  dplyr::distinct()
 
 
 # Dataset ----
 
 .maude_codes <- list(
   "annex_e" = annex_e,
-  "annex_f", annex_f
+  "annex_f" = annex_f
 )
 
 # Create dataset
