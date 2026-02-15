@@ -93,6 +93,8 @@ annex_e <-
     level_1, level_2, level_3, definition
   ) |>
   dplyr::distinct()
+
+# FDA Annex F ----
   
 annex_f <-
   vroom::vroom(
