@@ -36,6 +36,7 @@ Imports:
     readr,
     vroom,
 Suggests:
+    ellmer (>= 0.1.0),
     knitr,
     covr,
     testthat,

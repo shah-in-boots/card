@@ -1,0 +1,88 @@
+﻿Annex Name: Annex F,,,,,,,,,,
+Annex Title: Health Effects - Health Impact,,,,,,,,,,
+Release Number: 2024,,,,,,,,,,
+"Annex Description:
+Terms/codes for describing the consequences of the medical device adverse event/incident on the person affected.",,,,,,,,,,
+"Annex Instructions:
+Terms/Codes in this annex describe the resulting consequences of the medical device adverse event/incident on the person affected. The resulting consequences can include final patient outcomes and/or interventions or procedures required as a result of the clinical signs, symptoms and conditions captured using Annex E. It is likely that it will be necessary to use multiple terms. IMDRF Terms and Definitions use American spelling.",,,,,,,,,,
+Annex Approval Date: 18 January 2024,,,,,,,,,,
+,,,,,,,,,,
+Level 1 Term,Level 2 Term,Level 3 Term,FDA Code,NCIt Code,IMDRF Code,Definition,Non-IMDRF Code/Term,Status,Status Description,CodeHierarchy
+Change in Therapeutic Response,,,4601,C171956,F01,Change in response to treatment or cure of a disorder or disease.,,,,F01
+,Therapeutic Response Decreased,,2271,C50526,F0101,A reduction in the desirable and beneficial effects resulting from a medical treatment.,,,,F01|F0101
+,Therapeutic Response Increased,,2272,C50611,F0102,An increase in the desirable and beneficial effects resulting from a medical treatment.,,,,F01|F0102
+,Unexpected Therapeutic Effects,,2099,C50789,F0103,Unanticipated desirable and beneficial effects resulting from a medical treatment.,,,,F01|F0103
+Death,,,1802,C28554,F02,The cessation of life.,,,,F02
+,Intrauterine Fetal Death,,1855,C50620,F0201,"Death in utero; failure of the product of conception to show evidence of respiration, heart beat, or definite movement of a voluntary muscle after expulsion from the uterus, with no possibility of resuscitation.",,,,F02|F0201
+Brain Death,,,4602,C116340,F03,"The cessation of life due to permanent loss of brain function and brainstem for absence of responsiveness to external stimuli, absence of reflex and apnea.",,,,F03
+Delay to Diagnosis,,,4603,C171962,F04,Patient diagnosis was clinically significant delayed as a consequence of device performance.,,,,F04
+Delay to Treatment/ Therapy,,,4604,C171963,F05,Patient treatment was delayed as a consequence of device performance.,,,,F05
+Disruption of Subsequent Medical Procedure,,,4605,C171966,F06,Situation in which the use of the device impedes or affects a subsequent medical procedure or use of a medicine or device. The time elapsed between the use of the device and the medical procedure is not a factor. It is not necessary for the device to have broken or malfunctioned.,,,,F06
+Exacerbation of Existing Condition,,,4606,C171974,F07,Use of the device has lead to worsening of the existing disease or condition.,,,,F07
+Hospitalization or Prolonged Hospitalization,,,4607,C171989,F08,Hospitalization or prolonged hospitalization due to the health damage accompanying the use of device.,,,,F08
+,Intensive Care,,4608,C171998,F0801,Patient requires admission to or extension of stay in an intensive care unit.,,,,F08|F0801
+Fetal Harm,,,4609,C171977,F09,"Fetal distress, congenital physical or mental impairment or birth defect, excluding fetal death.",,,,F09
+Inadequate/Inappropriate Treatment or Diagnostic Exposure,,,4610,C171994,F10,Patient did not receive intended treatment from a device or received inadequate treatment as a consequence of device performance. This includes inadequate/inappropriate radiation dosage during procedures.,,,,F10
+,Absence of Treatment,,4611,C172014,F1001,Patient treatment was absent as a consequence of device performance.,,,,F10|F1001
+,Incompatible Blood Transfusion,,4612,C172090,F1002,Receiving incorrect or incompatible whole blood or a blood component.,,,,F10|F1002
+,Missed Dose,,2561,C50429,F1003,A dose of medicine was not taken or delivered at the prescribed dosing interval.,,,,F10|F1003
+,Underdose,,2542,C50428,F1004,"Exposure to, or intake of, an insufficient amount of a substance.",,,,F10|F1004
+,,Radiation Underdose,2166,C52354,F100401,A lower than intended dose of radiation to a single field.,,,,F10|F1004|F100401
+,Overdose,,1988,C50873,F1005,"Exposure to, or intake of, an excessive amount of a substance.",,,,F10|F1005
+,,Radiation Overdose,1510,C50862,F100501,A higher than intended cumulative dose of radiation to a single field.,,,,F10|F1005|F100501
+,Inadequate Treatment/Disease Progression,,4651,C187376,F1006,The worsening of a disease over time due to inadequate treatment.,,,"Term was added on 27 January 2022. For details, see comment No. 191 of the Change Log (Release Number 2022).",F10|F1006
+,Exposure to Contaminated Device/Risk of Infection,,4652,C187377,F1007,Exposure to a non-sterile device or conditions where infection is likely.,,,"Term was added on 27 January 2022. For details, see comment No. 214 of the Change Log (Release Number 2022).",F10|F1007
+,Accidental Exposure to substance,,4654,C206543,F1008,"Unintended exposure of the patient and/or healthcare providers to drugs or other substances.  This can include any exposure routes such as skin, mucous membranes, and respiratory.",,New,Term added for Release Number 2024. See no. 25 of Change Log,F10|F1008
+Minor Injury/ Illness / Impairment,,,4613,C172008,F11,"A mild injury, illness or impairment which can be treated with minimal or no intervention, including monitoring only.",,,"Definition was modified on 31 January 2023 (Old definition: A mild injury, illness or impairment which can be treated with minimal or no intervention.). For details, see comment No. 143 of the Change Log (Release Number 2023).",F11
+Serious Injury/ Illness/ Impairment,,,4614,C172031,F12,"A severe injury, illness or impairment which requires hospitalization or medical intervention.",,,,F12
+,Chronic Disease,,4615,C165593,F1201,"Disease that persists over a long period of time, cannot be prevented by vaccines or cured by medication, nor do they just disappear.",,,,F12|F1201
+,Disability,,4616,C21007,F1202,Any physical or mental impairment that interferes with an individual's ability to perform desired activities.,,,,F12|F1202
+,Life Threatening Illness or Injury,,4617,C172001,F1203,Patient suffered an illness or injury which if not treated would be fatal.,,,,F12|F1203
+,Permanent Impairment,,4618,C172018,F1204,Irreversible deterioration of the state of health.,,,,F12|F1204
+,Temporary Impairment,,4619,C172038,F1205,Reversible deterioration of the state of health.,,,,F12|F1205
+Misdiagnosis/ Misclassification,,,2159,C50432,F13,An incorrect diagnosis or classification of an illness or other problem.,,,,F13
+Prolonged Episode of Care,,,4620,C172023,F14,Clinically significant extended treatment time or procedural time. Not to be used for prolonged hospitalization or prolonged surgery.,,,Editorial change to the definition on 16 February 2021.,F14
+Recognised Device or Procedural Complication,,,4621,C172025,F15,Patient experiencing a complication that is well documented in association with the device or procedure.,,,,F15
+Reduction in Life Expectancy,,,4622,C172027,F16,Decrease in lifetime/ lifespan of an individual. Decline in the normal duration or in average life.,,,,F16
+Sedation,,,2368,C21097,F17,Patient required sedation or additional sedation.,,,,F17
+Rehabilitation,,,4623,C15315,F18,"Patient requires treatment to facilitate the process of recovery from injury, illness, or disease.",,,,F18
+Surgical Intervention,,,4624,C15329,F19,"One or more surgical procedures, including percutaneous or minimally invasive procedures, were required, or an existing procedure changed.",,,"Definition was modified on 31 January 2023 (Old definition: One or more surgical procedures was required, or an existing procedure changed). For details, see comment No. 135 /137/138 /139 /140/141 of the Change Log (Release Number 2023).",F19
+,Additional Surgery,,4625,C50831,F1901,Surgical intervention that was not planned and needed to be performed in addition to other interventions including surgical ones.,,,,F19|F1901
+,Amputation,,4626,C15179,F1902,"Patient required surgical removal of limb, extremities or other external body parts.",,,,F19|F1902
+,Device Explantation,,4627,C114146,F1903,"Patient required a corrective invasive procedure to remove a device, or parts/fragments of a device.",,,,F19|F1903
+,Device Repositioning,,4628,C171964,F1904,"Patient required a corrective invasive procedure in which a device was repositioned. This includes implantable, surgically invasive (penetration through the surface of the body) or invasive (penetration though a natural body orifice or permanent artificial opening, e.g. stoma) devices.",,,,F19|F1904
+,Device Revision or Replacement,,4629,C171965,F1905,"Patient required a corrective invasive procedure in which a device was replaced/revised. This includes implantable, surgically invasive (penetration through the surface of the body) or invasive (penetration though a natural body orifice or permanent artificial opening, e.g. stoma) devices.",,,,F19|F1905
+,Modified Surgical Procedure,,4630,C172009,F1906,A change of surgical procedures from the original plan.,,,,F19|F1906
+,More Complex Surgery,,4631,C172010,F1907,"Surgery that is more complicated, more comprehensive or more extensive than planned (e.g. percutaneous to open surgery).",,,"Definition was modified on 31 January 2023 (Old definition: Patient required additional or unexpected endoscopic procedure). For details, see comment No. 139 of the Change Log (Release Number 2023).",F19|F1907
+,Prolonged surgery,,4632,C50823,F1908,Surgery that takes longer than anticipated.,,,,F19|F1908
+,Surgical Procedure Delayed,,4633,C50422,F1909,Surgical procedure unable to be completed when originally scheduled and put off until some time in the future.,,,,F19|F1909
+,Cancelled/Aborted surgical procedure,,2563,C50421,F1910,"Surgical procedure aborted, or unable to be completed.
+This applies to cases where there is no information whether the procedure will be carried out at a later time, or where it is known that surgery will not go ahead.
+If it is known that the procedure has been, or will be, carried out later then use F1909 - Surgical Procedure Delayed",,New,Term added for Release Number 2024. See no. 110 of Change Log,F19|F1910
+Serious Public Health Threat,,,4634,C172032,F20,"Any event type, which results in imminent risk of death, serious injury, or serious illness to more than one individual, that requires prompt remedial action.",,,,F20
+Unexpected Deterioration,,,4635,C172044,F21,Unexpected clinical deterioration of patient.,,,,F21
+Unexpected Diagnostic Intervention,,,4636,C172045,F22,Diagnostic intervention needed to be completed that was not originally planned.,,,,F22
+,Biopsy,,4637,C15189,F2201,Patient required removal of tissue or fluid specimen to establish a diagnosis.,,,,F22|F2201
+,Endoscopic Diagnostic Procedure,,4638,C198673,F2202,Patient required additional or unexpected endoscopic diagnostic procedure.,,,"Definition was modified on 31 January 2023 (Old definition: Patient required additional or unexpected endoscopic procedure). For details, see comment No. 137 of the Change Log (Release Number 2023).",F22|F2202
+,Imaging Required,,4639,C172046,F2203,Requirement for imaging that was not originally planned.,,,,F22|F2203
+,IVD Testing,,4640,C172047,F2204,Patient required additional or unexpected IVD testing.,,,Editorial change to the definition on 16 February 2021.,F22|F2204
+Unexpected Medical Intervention,,,4641,C172048,F23,"Patient required an unforeseen medical intervention, excluding surgery, which was not on the original treatment plan.",,,,F23
+,Additional Device Required,,4642,C171939,F2301,Use of an additional or alternative device require to achieve optimal outcome.,,,,F23|F2301
+,Blood Transfusion,,4643,C15192,F2302,Patient required an infusion of whole blood or a blood component directly into the bloodstream.,,,,F23|F2302
+,Medication Required,,4644,C171940,F2303,Patient required additional medication or additional dose of existing medication.,,,,F23|F2303
+,Prophylactic Treatment,,4645,C95560,F2304,A medication or course of action used to prevent a possible disease or condition from occurring.,,,,F23|F2304
+,Radiation Therapy,,4646,C15313,F2305,Patient required additional radiation therapy.,,,Editorial change to the definition on 16 February 2021.,F23|F2305
+,Resuscitation,,4647,C50822,F2306,Patient required resuscitation.,,,,F23|F2306
+,Reprogramming of Device,,4653,C193439,F2307,Patient required programming changes to be made to an implantable or other programmable device.,,,"Term was added on 31 January 2023. For details, see comment No. 133 of the Change Log (Release Number 2023).",F23|F2307
+,Medical treatment under anaesthesia,,4655,C206555,F2308,Patient required non-surgical treatment under anaesthesia. ,,New,Term added for Release Number 2024. See no. 111 of Change Log,F23|F2308
+Insufficient Information,,,4648,C172138,F24,"It is not clear whether any health impact occurred, or health impact appears to have occurred, but there is not yet enough information available to classify the health impact.",,,"Definition was modified on 31 January 2023 (Old definition: There is not yet enough information available to classify the health impact). For details, see comment No. 102 of the Change Log (Release Number 2023).",F24
+Unanticipated Adverse Device Effect,,,4649,C172042,F25,Complication occurring in the patient that had not previously been identified or expected for this device.,,,Editorial change to the definition on 16 February 2021.,F25
+No Health Consequences or Impact,,,2199,C50675,F26,No apparent harm occurred in relation to the adverse event.,,,Editorial change to the definition on 16 February 2021.,F26
+,Problem identified before clinical use/exposure,,4656,C206541,F2601,"The adverse event occurred during or immediately prior to a clinical procedure, but the problem was identified and corrected before harm could be caused.
+E.g.1. an IVD gave a false reading but it was recognized as incorrect before treatment decisions were made and without any clinically significant delay to diagnosis;
+E.g.2. a surgical device malfunctioned during pre-use checks and the malfunction was corrected or an alternative device was available without any clinically significant delay to the procedure.",,New,Term added for Release Number 2024. See no. 120 of Change Log,F26|F2601
+Problem identified during non-clinical procedure.,,,2645,C206675,F27,"The adverse event occurred while the device was being used in a non-clinical setting and/or procedure and could not have any impact on a patient
+E.g.1. an IVD gave a false reading when testing an External Quality Assessment (EQA) sample;
+E.g.2. a surgical device malfunctioned during cleaning and/or maintenance.",,Modified (technical),Term and Definition modified for Release Number 2024. Previous term was No Patient Involvement. See no. 121 of Change Log,F27
+Appropriate Term/Code Not Available,,,4650,C171944,F28,The Health Impact is not adequately described by any other term. Note: this code must not be used unless there is no other feasible code. The preferred term should be documented when submitting an adverse event report. This information will be used to determine if a new term should be added to the code table.,,,,F28
+Death not related to reported adverse event,,,4657,C206569,F29,"A death has occurred, but it was confirmed that the event did not contribute to the death.  Other terms may also be selected if it is possible to link the adverse event to other identifiable health impacts.",,New,Term added for Release Number 2024. See no. 119 of Change Log,F29
