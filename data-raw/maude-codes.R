@@ -2,6 +2,36 @@
 # Data sourced from FDA Coding Resources for Medical Device Reports
 # https://www.fda.gov/medical-devices/mdr-adverse-event-codes/coding-resources-medical-device-reports
 
+# FDA Annex A: Device Problem Codes ----
+
+annex_a <-
+  vroom::vroom(
+    file.path("data-raw", "FDA-Annex-A.txt"),
+    delim = "\t",
+    skip = 8,
+    col_select = 1:7,
+    col_names = c(
+      "level_1",
+      "level_2",
+      "level_3",
+      "fda_code",
+      "ncit_code",
+      "imdrf_code",
+      "definition"
+    ),
+    show_col_types = FALSE
+  ) |>
+  tidyr::fill(level_1, level_2, .direction = "down") |>
+  dplyr::mutate(
+    annex = "A",
+    term = dplyr::coalesce(level_3, level_2, level_1)
+  ) |>
+  dplyr::select(
+    annex, imdrf_code, fda_code, ncit_code, term,
+    level_1, level_2, level_3, definition
+  ) |>
+  dplyr::distinct()
+
 # FDA Annex E: Health Effects - Clinical Signs and Symptoms or Conditions ----
 
 # Two CSV files:
@@ -10,25 +40,26 @@
 
 annex_e_data <-
   vroom::vroom(
-    system.file("data-raw", "FDA-Annex-E.csv", package = "card"),
+    file.path("data-raw", "FDA-Annex-E.csv"),
     skip = 8,
     col_select = 1:8,
     col_names = c(
-      "level_1_term",
-      "level_2_term",
-      "level_3_term",
+      "level_1",
+      "level_2",
+      "level_3",
       "fda_code",
       "ncit_code",
       "imdrf_code",
       "definition",
       "meddra_name"
-    )
+    ),
+    show_col_types = FALSE
   )
 
 # Skip first 4 lines which contain no information (header)
 annex_e_mapping <-
   vroom::vroom(
-    system.file("data-raw", "FDA-Annex-E-Mapping.txt", package = "card"),
+    file.path("data-raw", "FDA-Annex-E-Mapping.txt"),
     delim = "\t",
     skip = 3,
     col_names = c(
@@ -37,7 +68,8 @@ annex_e_mapping <-
       "unused",
       "meddra_code",
       "meddra_term"
-    )
+    ),
+    show_col_types = FALSE
   ) |>
   dplyr::select(-unused)
 
@@ -51,65 +83,55 @@ annex_e <-
     by = c("imdrf_code", "meddra_name"),
     relationship = "many-to-many"
   ) |>
-  dplyr::select(-meddra_name) |>
+  dplyr::select(-meddra_name, -meddra_code, -meddra_term) |>
   dplyr::mutate(
-    clinical_term = level_1_term,
-    clinical_term = dplyr::if_else(
-      !is.na(level_2_term),
-      level_2_term,
-      clinical_term
-    ),
-    clinical_term = dplyr::if_else(
-      !is.na(level_3_term),
-      level_3_term,
-      clinical_term
-    )
+    annex = "E",
+    term = dplyr::coalesce(level_3, level_2, level_1)
   ) |>
-  dplyr::relocate(clinical_term) |>
+  dplyr::select(
+    annex, imdrf_code, fda_code, ncit_code, term,
+    level_1, level_2, level_3, definition
+  ) |>
   dplyr::distinct()
   
 annex_f <-
   vroom::vroom(
-    system.file("data-raw", "FDA-Annex-F.csv", package = "card"),
+    file.path("data-raw", "FDA-Annex-F.csv"),
     skip = 8,
     col_select = 1:7,
     col_names = c(
-      "level_1_term",
-      "level_2_term",
-      "level_3_term",
+      "level_1",
+      "level_2",
+      "level_3",
       "fda_code",
       "ncit_code",
       "imdrf_code",
       "definition"
-    )
+    ),
+    show_col_types = FALSE
   ) |>
   dplyr::mutate(
-    impact_term = level_1_term,
-    impact_term = dplyr::if_else(
-      !is.na(level_2_term),
-      level_2_term,
-      impact_term
-    ),
-    impact_term = dplyr::if_else(
-      !is.na(level_3_term),
-      level_3_term,
-      impact_term
-    )
+    annex = "F",
+    term = dplyr::coalesce(level_3, level_2, level_1)
   ) |>
-  dplyr::relocate(impact_term) |>
+  dplyr::select(
+    annex, imdrf_code, fda_code, ncit_code, term,
+    level_1, level_2, level_3, definition
+  ) |>
   dplyr::distinct()
 
 
 # Dataset ----
 
 .maude_codes <- list(
-  "annex_e" = annex_e,
-  "annex_f" = annex_f
+  "device_problems" = annex_a,
+  "clinical_signs" = annex_e,
+  "health_impact" = annex_f
 )
 
 # Create dataset
 usethis::use_data(
   .maude_codes, 
   overwrite = TRUE,
-  internal = FALSE
+  internal = TRUE
 )

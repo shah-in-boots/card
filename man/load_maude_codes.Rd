@@ -7,13 +7,14 @@
 load_maude_codes(annex)
 }
 \arguments{
-\item{annex}{A single character identifying the FDA annex to load (e.g.,
-"E"). Case-sensitive. Only "E" and "F" are supported currently.}
+\item{annex}{A single character identifying the FDA annex to load:
+\code{"A"}, \code{"E"}, or \code{"F"}. Case-sensitive.}
 }
 \value{
 A \code{tbl_df} of codes and related metadata for the requested annex.
-For Annex E, this includes hierarchical terms and mappings to IMDRF and
-MedDRA identifiers.
+All returned annexes share the same core columns:
+\code{annex}, \code{imdrf_code}, \code{fda_code}, \code{ncit_code}, \code{term},
+\code{level_1}, \code{level_2}, \code{level_3}, and \code{definition}.
 }
 \description{
 Load Medical Device Report (MDR) adverse event coding tables
@@ -22,11 +23,14 @@ The interface is designed to support additional annexes over time as more
 code tables are added to the package data.
 }
 \details{
-The FDA publishes MDR adverse event codes as annexed code tables
-(e.g., Annex E for health effects such as clinical signs, symptoms, or
-conditions). This function returns the annex-specific table bundled with
-the package. Currently, only Annex E is available, but the structure allows
-other annexes to be added with the same calling pattern.
+The FDA publishes MDR adverse event codes as annexed code tables.
+This function returns the annex-specific table bundled with the package.
+Supported annexes:
+\itemize{
+\item \strong{A}: Device problem codes
+\item \strong{E}: Clinical signs, symptoms, or conditions
+\item \strong{F}: Health impact codes
+}
 }
 \examples{
 # Load Annex E health effects codes

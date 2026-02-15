@@ -18,10 +18,19 @@ query_maude(
   limit = 100,
   date_start = NULL,
   date_end = NULL,
-  api_key = NULL
+  api_key = NULL,
+  verbose = interactive()
 )
 
-maude_fda_api_call(search_query, limit, skip, api_key, sort = NULL)
+maude_fda_api_call(
+  search_query,
+  limit,
+  skip,
+  api_key,
+  sort = NULL,
+  max_retries = 3,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{search}{Character string specifying the search query or \code{NULL}. For
@@ -55,8 +64,9 @@ query. Names should match the openFDA searchable fields list.}
 
 \item{limit}{Integer specifying the maximum number of records to return.
 For \code{query_maude()}, defaults to 100 and requests exceeding 1000 are
-automatically paginated. For \code{maude_fda_api_call()}, maximum is 1000 per the
-openFDA API limits.}
+automatically paginated. Due to openFDA \code{skip} limits, \code{query_maude()}
+currently supports up to 26,000 records per call. For
+\code{maude_fda_api_call()}, maximum per request is 1000 per openFDA limits.}
 
 \item{date_start}{Optional start date for filtering by \code{date_received}.
 Accepts \code{Date}, POSIXt, \code{"YYYYMMDD"}, or \code{"YYYY-MM-DD"} formats. Only used
@@ -70,6 +80,9 @@ by \code{query_maude()}.}
 Not required, but recommended for heavy usage to avoid rate limiting.
 Register at: \url{https://open.fda.gov/apis/authentication/}}
 
+\item{verbose}{Logical. If \code{TRUE}, prints progress messages for pagination,
+retries, and total records retrieved. Defaults to \code{interactive()}.}
+
 \item{search_query}{Fully constructed query string to send to the openFDA
 API (advanced use). This should include any date or field filters that you
 want applied exactly as written.}
@@ -81,6 +94,9 @@ records in pages (e.g., skip=0 gets records 1-1000, skip=1000 gets
 
 \item{sort}{Optional sort specification for the openFDA API (e.g.,
 \code{"date_received:desc"}). Only used by \code{maude_fda_api_call()}.}
+
+\item{max_retries}{Integer giving the number of retry attempts for transient
+API failures in \code{maude_fda_api_call()} (HTTP 429/5xx). Defaults to \code{3}.}
 }
 \value{
 A \code{tbl_df} containing device adverse event reports with columns:
@@ -120,8 +136,9 @@ minute (4 per second) without an API key, and 240 requests per minute with
 a key. Large queries are automatically paginated in batches of up to 1000
 records.
 
-\strong{Default Sort:} When no date range is provided, \code{query_maude()} requests
-results in reverse chronological order by \code{date_received}.
+\strong{Result Order:} \code{query_maude()} requests results sorted in reverse
+chronological order by \code{date_received} (\code{date_received:desc}). This provides
+deterministic pagination for large requests.
 
 \strong{Search Syntax:} The \code{search} parameter uses \emph{Elasticsearch} query syntax.
 Common patterns include:

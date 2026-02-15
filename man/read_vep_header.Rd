@@ -10,50 +10,51 @@ read_vep_header(file, format = c("tab", "vcf"), n_max = 1000)
 \item{file}{Path to the VEP output file. Can be uncompressed or gzipped.}
 
 \item{format}{Character string specifying the output format. One of:
-\describe{
-\item{"tab"}{Default VEP tab-delimited output format}
-\item{"vcf"}{VCF format output (produced with \code{--vcf} flag)}
-}}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{- _tab_ = Default VEP tab-delimited output format
+
+- _vcf_ = VCF format output (produced with `--vcf` flag)
+}\if{html}{\out{</div>}}}
 
 \item{n_max}{Maximum number of lines to scan for header content. Default is
 1000, which should be sufficient for most VEP files.}
 }
 \value{
 A named list containing:
-\describe{
-\item{meta}{List of file metadata including format, VEP version, assembly,
-command line, and raw metadata lines}
-\item{columns}{Named character vector where names are column names and
-values are descriptions (if available)}
-\item{annotations}{Named list where names are annotation field names and
-values are their definitions from the header. For tab format these are
-Extra column fields; for VCF format these are CSQ fields (with NA values
-since VCF doesn't include descriptions). NULL if no annotations.}
-}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{- *meta* = List of file metadata including format, VEP version, assembly, command line, and raw metadata lines
+
+- *columns* = Named character vector where names are column names and values are descriptions (if available)
+
+- *annotations* = Named list where names are annotation field names and values are their definitions from the header. For tab format these are Extra column fields; for VCF format these are CSQ fields (with NA values since VCF doesn't include descriptions). NULL if no annotations.\}
+}\if{html}{\out{</div>}}
 }
 \description{
-Efficiently reads only the header portion of Variant Effect Predictor (VEP)
-output files without loading the entire file into memory.
+Read only the metadata section of a VEP output file.
 }
 \details{
-VEP can output results in different formats depending on command-line flags:
+This is useful when you want to inspect VEP version, assembly, parsed field
+definitions, or column layout before loading the full annotation table.
+
+VEP can output results in different formats depending on command-line flags.
+This function supports the two most common modes:
 
 \strong{Tab-delimited format} (default or \code{--tab}):
 \itemize{
 \item Metadata lines begin with \verb{##}
 \item Column header line begins with single \verb{#}
-\item Annotation fields stored in "Extra" column as key=value pairs
+\item Annotation fields are described under "Extra column keys"
 }
 
 \strong{VCF format} (\code{--vcf}):
 \itemize{
 \item Standard VCF headers with \verb{##} metadata
-\item CSQ (consequence) annotations stored in INFO field
-\item Field order defined in \verb{##INFO=<ID=CSQ,...>} header line
+\item Consequence annotations are stored in \code{INFO/CSQ}
+\item CSQ field order is declared in \verb{##INFO=<ID=CSQ,...>} header line
 }
 
-The returned structure is consistent across formats, with \code{annotations} being
-NULL for unannotated files.
+The returned structure is consistent across formats. If no annotation fields
+are found, \code{annotations} is returned as \code{NULL}.
 }
 \examples{
 \dontrun{
@@ -63,7 +64,7 @@ names(header$columns)
 names(header$annotations)
 
 # Get description for a specific annotation
-header$annotations["CLIN_SIG"]
+header$annotations[["CLIN_SIG"]]
 
 # Read header from VCF format VEP output
 header <- read_vep_header("variants.vep.vcf", format = "vcf")

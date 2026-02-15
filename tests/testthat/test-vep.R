@@ -117,3 +117,214 @@ test_that("read_vep_header validates format argument", {
 		"'arg' should be one of"
 	)
 })
+
+
+# read_vep() tests --------------------------------------------------------
+
+test_that("read_vep returns a tibble with correct structure", {
+	sample_file <- test_path("sample.vep.filtered")
+	df <- read_vep_data(sample_file, format = "tab")
+
+	# Should be a tibble
+	expect_s3_class(df, "tbl_df")
+
+	# Should have rows
+	expect_gt(nrow(df), 0)
+
+	# Should have columns
+	expect_gt(ncol(df), 0)
+
+	# Should have attributes
+	expect_true(!is.null(attr(df, "vep_header")))
+	expect_true(!is.null(attr(df, "source_file")))
+})
+
+
+test_that("read_vep_data parses Extra column into individual columns", {
+	sample_file <- test_path("sample.vep.filtered")
+	df <- read_vep_data(sample_file, format = "tab", parse_extra = TRUE)
+
+	# Extra column should be removed
+	expect_false("Extra" %in% names(df))
+
+	# Should have parsed annotation columns
+	expect_true("SYMBOL" %in% names(df))
+	expect_true("IMPACT" %in% names(df))
+	expect_true("REF_ALLELE" %in% names(df))
+	expect_true("VARIANT_CLASS" %in% names(df))
+
+	# Check some values
+	expect_true(all(!is.na(df$SYMBOL)))
+	expect_true("PRDM16" %in% df$SYMBOL)
+})
+
+
+test_that("read_vep_data with parse_extra = FALSE keeps Extra column", {
+	sample_file <- test_path("sample.vep.filtered")
+	df <- read_vep_data(sample_file, format = "tab", parse_extra = FALSE)
+
+	# Extra column should still be present
+	expect_true("Extra" %in% names(df))
+
+	# Extra should be character
+	expect_type(df$Extra, "character")
+
+	# Extra should contain semicolon-delimited data
+	expect_true(grepl(";", df$Extra[1]))
+})
+
+
+test_that("read_vep_data replaces dashes with NA", {
+	sample_file <- test_path("sample.vep.filtered")
+	df <- read_vep_data(sample_file, format = "tab")
+
+	# Character columns that were "-" should now be NA
+	# Check cDNA_position which often has "-" for non-coding
+	if ("cDNA_position" %in% names(df)) {
+		expect_true(any(is.na(df$cDNA_position)))
+		expect_false(any(df$cDNA_position == "-", na.rm = TRUE))
+	}
+
+	# Check Protein_position
+	if ("Protein_position" %in% names(df)) {
+		expect_true(any(is.na(df$Protein_position)))
+		expect_false(any(df$Protein_position == "-", na.rm = TRUE))
+	}
+})
+
+
+test_that("read_vep_data column selection works", {
+	sample_file <- test_path("sample.vep.filtered")
+
+	# Select only specific columns
+	cols <- c("Uploaded_variation", "Gene", "SYMBOL", "IMPACT")
+	df <- read_vep_data(sample_file, format = "tab", columns = cols)
+
+	# Should only have the requested columns
+	expect_equal(sort(names(df)), sort(cols))
+
+	# Should still have data
+	expect_gt(nrow(df), 0)
+})
+
+
+test_that("read_vep_data column selection warns on missing columns", {
+	sample_file <- test_path("sample.vep.filtered")
+
+	# Request some valid and some invalid columns
+	cols <- c("Gene", "SYMBOL", "NONEXISTENT_COLUMN", "ANOTHER_FAKE")
+
+	expect_warning(
+		df <- read_vep_data(sample_file, format = "tab", columns = cols),
+		"Requested columns not found"
+	)
+
+	# Should still return the valid columns
+	expect_true("Gene" %in% names(df))
+	expect_true("SYMBOL" %in% names(df))
+	expect_false("NONEXISTENT_COLUMN" %in% names(df))
+})
+
+
+test_that("read_vep_data errors when no requested columns found", {
+	sample_file <- test_path("sample.vep.filtered")
+
+	expect_error(
+		read_vep_data(sample_file, format = "tab", columns = c("FAKE1", "FAKE2")),
+		"None of the requested columns found"
+	)
+})
+
+
+test_that("read_vep_data_data preserves header metadata", {
+	sample_file <- test_path("sample.vep.filtered")
+	df <- read_vep_data(sample_file, format = "tab")
+
+	header <- attr(df, "vep_header")
+
+	# Should have header structure
+	expect_type(header, "list")
+	expect_named(header, c("meta", "columns", "annotations"))
+
+	# Meta should have expected fields
+	expect_equal(header$meta$vep_version, "v115.2")
+	expect_equal(header$meta$assembly, "GRCh38.p14")
+	expect_equal(header$meta$format, "tab")
+})
+
+
+test_that("read_vep_data handles annotation fields correctly", {
+	sample_file <- test_path("sample.vep.filtered")
+	df <- read_vep_data(sample_file, format = "tab")
+
+	# Check for common annotation fields
+	expect_true("IMPACT" %in% names(df))
+	expect_true("SYMBOL" %in% names(df))
+	expect_true("BIOTYPE" %in% names(df))
+
+	# IMPACT should have valid values
+	expect_true(all(df$IMPACT %in% c("HIGH", "MODERATE", "LOW", "MODIFIER", NA)))
+
+	# Check for allele frequency fields
+	if ("gnomADe_AF" %in% names(df)) {
+		# Should be character (not yet converted to numeric)
+		expect_type(df$gnomADe_AF, "character")
+	}
+})
+
+
+test_that("read_vep_data handles LoF annotations", {
+	sample_file <- test_path("sample.vep.filtered")
+	df <- read_vep_data(sample_file, format = "tab")
+
+	# Check for LoF-related columns
+	expected_lof_cols <- c("LoF", "LoF_filter", "LoF_flags", "LoF_info")
+	present_lof_cols <- intersect(expected_lof_cols, names(df))
+
+	# At least LoF should be present (from header)
+	expect_true("LoF" %in% names(df))
+})
+
+
+test_that("read_vep_data errors on missing file", {
+	expect_error(
+		read_vep_data("nonexistent_file.vep"),
+		"File not found"
+	)
+})
+
+
+test_that("read_vep_data validates format argument", {
+	sample_file <- test_path("sample.vep.filtered")
+
+	expect_error(
+		read_vep_data(sample_file, format = "invalid"),
+		"'arg' should be one of"
+	)
+})
+
+
+test_that("read_vep_data handles flags without values in Extra column", {
+	sample_file <- test_path("sample.vep.filtered")
+	df <- read_vep_data(sample_file, format = "tab")
+
+	# CANONICAL is often a flag (present/absent)
+	# When present, it should be converted to "YES"
+	if ("CANONICAL" %in% names(df)) {
+		canonical_values <- unique(df$CANONICAL)
+		canonical_values <- canonical_values[!is.na(canonical_values)]
+		# Should only have "YES" or NA (flags are converted to "YES")
+		expect_true(all(canonical_values == "YES"))
+	}
+})
+
+
+test_that("read_vep_data preserves source file path", {
+	sample_file <- test_path("sample.vep.filtered")
+	df <- read_vep_data(sample_file, format = "tab")
+
+	source <- attr(df, "source_file")
+	expect_type(source, "character")
+	expect_true(file.exists(source))
+	expect_true(grepl("sample\\.vep\\.filtered", source))
+})
