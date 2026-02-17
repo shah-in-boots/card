@@ -2,19 +2,21 @@
 % Please edit documentation in R/vep.R
 \name{.extract_column_definitions}
 \alias{.extract_column_definitions}
-\title{Extract Column Definitions from Tab Format}
+\title{Extract Column Definitions from Tab Format Header}
 \usage{
 .extract_column_definitions(metadata, column_line)
 }
 \arguments{
-\item{metadata}{Character vector of metadata lines}
+\item{metadata}{Character vector of \verb{##}-prefixed metadata lines.}
 
-\item{column_line}{The column header line}
+\item{column_line}{The single-\verb{#} column header line, or NULL if absent.}
 }
 \value{
-Named character vector of column descriptions
+Named character vector where names are column names and values are
+descriptions (NA if no description found for a column).
 }
 \description{
-Extract Column Definitions from Tab Format
+Parses the "Column descriptions" section of a tab-format VEP header to
+produce a named character vector mapping column names to their descriptions.
 }
 \keyword{internal}

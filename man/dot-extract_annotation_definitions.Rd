@@ -2,18 +2,19 @@
 % Please edit documentation in R/vep.R
 \name{.extract_annotation_definitions}
 \alias{.extract_annotation_definitions}
-\title{Extract Annotation Field Definitions from Tab Format}
+\title{Extract Annotation Field Definitions from Tab Format Header}
 \usage{
 .extract_annotation_definitions(metadata)
 }
 \arguments{
-\item{metadata}{Character vector of metadata lines}
+\item{metadata}{Character vector of \verb{##}-prefixed metadata lines.}
 }
 \value{
 Named list where names are annotation field names and values are
-their definitions, or NULL if no annotations found
+their descriptions, or NULL if no annotations found.
 }
 \description{
-Extract Annotation Field Definitions from Tab Format
+Parses the "Extra column keys" section of a tab-format VEP header to extract
+annotation field names and their descriptions.
 }
 \keyword{internal}

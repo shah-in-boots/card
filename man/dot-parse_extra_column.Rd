@@ -2,18 +2,19 @@
 % Please edit documentation in R/vep.R
 \name{.parse_extra_column}
 \alias{.parse_extra_column}
-\title{Parse VEP Extra Column (Internal)}
+\title{Parse VEP Extra Column}
 \usage{
 .parse_extra_column(extra_col)
 }
 \arguments{
-\item{extra_col}{Character vector of Extra column values}
+\item{extra_col}{Character vector of Extra column values.}
 }
 \value{
-Data frame with one column per unique key
+Data frame with one column per unique key found across all rows.
 }
 \description{
-Parses the semicolon-delimited Extra column into individual columns.
-Handles key=value format where not all keys are present in every row.
+Parses the semicolon-delimited Extra column from tab-format VEP output into
+individual columns. Handles \code{key=value} pairs and standalone flags (converted
+to \code{"YES"}). Not all keys are present in every row.
 }
 \keyword{internal}

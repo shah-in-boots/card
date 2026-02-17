@@ -2,19 +2,26 @@
 % Please edit documentation in R/vep.R
 \name{.parse_csq_field}
 \alias{.parse_csq_field}
-\title{Parse VCF CSQ Field (Internal)}
+\title{Parse VCF CSQ Field}
 \usage{
 .parse_csq_field(info_col, csq_fields)
 }
 \arguments{
-\item{info_col}{Character vector of INFO column values}
+\item{info_col}{Character vector of INFO column values.}
 
-\item{csq_fields}{Character vector of CSQ field names (from header)}
+\item{csq_fields}{Character vector of CSQ field names (from header).}
 }
 \value{
-Data frame with one column per CSQ field
+Data frame with one column per CSQ field.
 }
 \description{
-Extracts and parses CSQ (Consequence) field from VCF INFO column.
+Extracts and parses the CSQ (Consequence) annotation from the VCF INFO
+column. Values are pipe-delimited and mapped positionally to field names
+from the CSQ header.
+}
+\note{
+If a VCF record contains multiple CSQ entries (comma-separated), only
+the first entry is parsed. This keeps behavior predictable for single-
+transcript workflows.
 }
 \keyword{internal}

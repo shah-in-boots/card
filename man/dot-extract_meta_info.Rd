@@ -2,17 +2,19 @@
 % Please edit documentation in R/vep.R
 \name{.extract_meta_info}
 \alias{.extract_meta_info}
-\title{Extract Meta Information from Header}
+\title{Extract Meta Information from VEP Header}
 \usage{
 .extract_meta_info(metadata)
 }
 \arguments{
-\item{metadata}{Character vector of metadata lines}
+\item{metadata}{Character vector of \verb{##}-prefixed metadata lines.}
 }
 \value{
-List of meta information
+Named list with elements \code{vep_version}, \code{assembly}, \code{command}, and
+\code{raw} (the original metadata lines).
 }
 \description{
-Extract Meta Information from Header
+Parses VEP version, genome assembly, and command line from header metadata.
+Works for both tab-delimited and VCF format headers.
 }
 \keyword{internal}

@@ -7,13 +7,14 @@
 .extract_csq_fields(metadata)
 }
 \arguments{
-\item{metadata}{Character vector of VCF metadata lines}
+\item{metadata}{Character vector of VCF \verb{##}-prefixed metadata lines.}
 }
 \value{
 Named list where names are CSQ field names and values are NA (VCF
-format doesn't include field descriptions), or NULL if not found
+format doesn't include field descriptions), or NULL if no CSQ header found.
 }
 \description{
-Extract CSQ Fields from VCF INFO Header
+Parses the \verb{##INFO=<ID=CSQ,...>} line from a VCF header to extract the
+ordered list of consequence annotation field names.
 }
 \keyword{internal}

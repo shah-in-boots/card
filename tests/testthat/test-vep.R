@@ -286,6 +286,39 @@ test_that("read_vep_data handles LoF annotations", {
 })
 
 
+test_that("empty VEP file returns 1-row NA tibble with message", {
+	sample_file <- test_path("sample.vep.filtered")
+
+	# Read a populated file
+	df_full <- read_vep_data(sample_file, format = "tab", parse_extra = FALSE)
+
+	# Create a temp file with only header lines (no data rows)
+	lines <- readLines(sample_file)
+	header_lines <- lines[grepl("^##|^#", lines)]
+	tmp <- tempfile(fileext = ".vep")
+	writeLines(header_lines, tmp)
+	on.exit(unlink(tmp))
+
+	# Read the empty file — should message and return 1-row NA tibble
+	expect_message(
+		df_empty <- read_vep_data(tmp, format = "tab", parse_extra = FALSE),
+		"No data rows found"
+	)
+
+	expect_s3_class(df_empty, "tbl_df")
+	expect_equal(nrow(df_empty), 1)
+
+	# All columns should be character with NA values
+	col_types <- vapply(df_empty, typeof, character(1))
+	expect_true(all(col_types == "character"))
+	expect_true(all(is.na(df_empty[1, ])))
+
+	# bind_rows should work without error
+	combined <- dplyr::bind_rows(df_full, df_empty)
+	expect_equal(nrow(combined), nrow(df_full) + 1)
+})
+
+
 test_that("read_vep_data errors on missing file", {
 	expect_error(
 		read_vep_data("nonexistent_file.vep"),
