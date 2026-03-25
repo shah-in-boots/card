@@ -651,6 +651,13 @@ maude_fda_api_call <- function(
 
 # MAUDE Narrative Evaluation with LLMs ----
 
+#' Adjudicate MAUDE adverse event narratives using a large language model (LLM)
+#' 
+#' @export
+adjudicate_maude_event <- function() {
+
+}
+
 #' Evaluate MAUDE Adverse Event Narratives with an LLM
 #'
 #' @description Uses a large language model to adjudicate whether patient
@@ -723,7 +730,7 @@ maude_fda_api_call <- function(
 #' }
 #'
 #' @export
-evaluate_maude_event <- function(
+evaluate_maude_event_2 <- function(
   event_type = c("clinical", "impact"),
   problem_code,
   event_text,
