@@ -800,3 +800,555 @@ ablation_complications <- list(
     )
   )
 )
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MAUDE Code-to-Complication Ontology
+# ─────────────────────────────────────────────────────────────────────────────
+
+#' Ontology Mapping MAUDE Annex Codes to AF Ablation Complication Categories
+#'
+#' A named list that maps each complication category in
+#' [ablation_complications] to the IMDRF codes from FDA MAUDE Annexes A
+#' (device problems), E (clinical signs/symptoms), and F (health impact) that
+#' are clinically relevant to that complication.
+#'
+#' This ontology is designed to minimize the number of complication definitions
+#' an LLM must consider when adjudicating a MAUDE adverse event narrative.
+#' Given a report's patient problem codes and device problem codes, the
+#' workflow is:
+#' \enumerate{
+#'   \item Look up each reported code in this ontology to identify which
+#'     complication categories are potentially relevant.
+#'   \item Retrieve the full definitions only for those matched categories
+#'     from [ablation_complications].
+#'   \item Pass the narrowed set of definitions plus the event narrative to the
+#'     LLM for adjudication.
+#' }
+#'
+#' @format A named list with one element per complication category (matching
+#'   the names in [ablation_complications]). Each element is a named list with
+#'   up to three character vectors:
+#'   \describe{
+#'     \item{annex_e}{IMDRF codes from Annex E (clinical signs, symptoms, or
+#'       conditions) relevant to this complication.}
+#'     \item{annex_f}{IMDRF codes from Annex F (health impact) relevant to
+#'       this complication.}
+#'     \item{annex_a}{IMDRF codes from Annex A (device problems) relevant to
+#'       this complication.}
+#'   }
+#'
+#' @details
+#' **Code selection rationale.** Codes were selected to cast a clinically
+#' appropriate net for AF catheter ablation adverse events. Each complication
+#' category includes:
+#' \itemize{
+#'   \item **Primary codes** that directly name the complication (e.g., E0605
+#'     Cardiac Tamponade maps to `pericardial`).
+#'   \item **Secondary codes** for signs, symptoms, or sequelae strongly
+#'     associated with the complication in the ablation context (e.g., E0717
+#'     Dyspnea maps to `phrenic` because dyspnea is the cardinal symptom of
+#'     phrenic nerve palsy post-ablation).
+#'   \item **Health impact codes** (Annex F) that describe the clinical
+#'     consequence pattern typical of the complication.
+#'   \item **Device problem codes** (Annex A) only where relevant (primarily
+#'     for `device_malfunction`).
+#' }
+#'
+#' Some codes appear in multiple categories when clinically appropriate (e.g.,
+#' E0602 Cardiac Arrest maps to both `arrhythmia` and `death`).
+#'
+#' @examples
+#' # Which complication categories should be evaluated for a report
+#' # with patient problem codes E0605 (Cardiac Tamponade) and E0619
+#' # (Pericardial Effusion)?
+#' reported_codes <- c("E0605", "E0619")
+#' matched <- vapply(complication_ontology, function(cat) {
+#'   any(reported_codes %in% cat$annex_e)
+#' }, logical(1))
+#' names(which(matched))
+#' # Returns: "pericardial"
+#'
+#' # Retrieve only the relevant complication definitions for LLM prompting
+#' relevant_definitions <- ablation_complications[names(which(matched))]
+#'
+#' @seealso [ablation_complications] for the full complication definitions,
+#'   [load_maude_codes()] to load the annex code tables with full metadata.
+#'
+#' @source
+#' FDA MDR Adverse Event Codes (Annexes A, E, F):
+#' \url{https://www.fda.gov/medical-devices/mdr-adverse-event-codes/coding-resources-medical-device-reports}
+"complication_ontology"
+
+complication_ontology <- list(
+
+  # ─── 1. PERICARDIAL EFFUSION / TAMPONADE / PERICARDITIS ───────────────────
+  pericardial = list(
+    annex_e = c(
+      "E0619",   # Pericardial Effusion
+      "E0605",   # Cardiac Tamponade
+      "E0620",   # Pericarditis
+      "E0604",   # Cardiac Perforation
+      "E0627",   # Intraoperative Cardiac Injury
+      "E233001", # Chest Pain
+      "E2321",   # Low Blood Pressure / Hypotension
+      "E2343"    # Hemodynamic instability
+    ),
+    annex_f = c(
+      "F19",     # Surgical Intervention
+      "F1901",   # Additional Surgery
+      "F2306",   # Resuscitation
+      "F08",     # Hospitalization or Prolonged Hospitalization
+      "F0801",   # Intensive Care
+      "F1203",   # Life Threatening Illness or Injury
+      "F2303"    # Medication Required
+    )
+  ),
+
+  # ─── 2. CEREBROVASCULAR EVENT ─────────────────────────────────────────────
+  stroke = list(
+    annex_e = c(
+      "E0133",   # Stroke/CVA
+      "E013301", # Hemorrhagic Stroke
+      "E013302", # Ischemia Stroke
+      "E0137",   # Transient Ischemic Attack
+      "E0503",   # Embolism/Embolus
+      "E050301", # Air Embolism
+      "E050302", # Foreign Body Embolism
+      "E050304", # Thromboembolism
+      "E0118",   # Intracranial Hemorrhage
+      "E0102",   # Brain Injury
+      "E0103",   # Cerebral Edema
+      "E0119",   # Loss of consciousness
+      "E011901", # Coma
+      "E012202", # Paralysis
+      "E012204", # Paresis
+      "E0113",   # Dysphasia
+      "E011301", # Aphonia
+      "E0839",   # Visual Impairment
+      "E083901", # Blurred Vision
+      "E083902", # Loss of Vision
+      "E0107",   # Cognitive Changes
+      "E010701", # Confusion / Disorientation
+      "E0509"    # Ischemia
+    ),
+    annex_f = c(
+      "F02",     # Death
+      "F03",     # Brain Death
+      "F12",     # Serious Injury / Illness / Impairment
+      "F1203",   # Life Threatening Illness or Injury
+      "F1204",   # Permanent Impairment
+      "F1205",   # Temporary Impairment
+      "F1202",   # Disability
+      "F08",     # Hospitalization or Prolonged Hospitalization
+      "F0801"    # Intensive Care
+    )
+  ),
+
+  # ─── 3. VASCULAR ACCESS COMPLICATION ──────────────────────────────────────
+  vascular = list(
+    annex_e = c(
+      "E0505",   # Hematoma
+      "E0506",   # Hemorrhage/Blood Loss/Bleeding
+      "E050601", # Ecchymosis
+      "E050602", # Exsanguination
+      "E0513",   # Pseudoaneurysm
+      "E0501",   # Aneurysm
+      "E050101", # Ruptured Aneurysm
+      "E0514",   # Thrombosis/Thrombus
+      "E050303", # Pulmonary Embolism
+      "E1027",   # Retroperitoneal Hemorrhage
+      "E0511",   # Perforation of Vessels
+      "E051101", # Great Vessel Perforation
+      "E2338",   # Swelling / Edema
+      "E233801", # Peripheral Edema
+      "E1002",   # Abdominal Pain
+      "E2321",   # Low Blood Pressure / Hypotension
+      "E0301",   # Anemia
+      "E2343"    # Hemodynamic instability
+    ),
+    annex_f = c(
+      "F2302",   # Blood Transfusion
+      "F19",     # Surgical Intervention
+      "F1901",   # Additional Surgery
+      "F08",     # Hospitalization or Prolonged Hospitalization
+      "F11",     # Minor Injury / Illness / Impairment
+      "F12"      # Serious Injury / Illness / Impairment
+    )
+  ),
+
+  # ─── 4. PULMONARY VEIN STENOSIS ──────────────────────────────────────────
+  pv_stenosis = list(
+    annex_e = c(
+      "E2337",   # Stenosis
+      "E233701", # Restenosis
+      "E0717",   # Dyspnea
+      "E0721",   # Hemoptysis
+      "E0733",   # Pneumonia
+      "E0735",   # Pulmonary Dysfunction
+      "E0737",   # Pulmonary Hypertension
+      "E0743"    # Respiratory Insufficiency
+    ),
+    annex_f = c(
+      "F19",     # Surgical Intervention
+      "F2203",   # Imaging Required
+      "F08",     # Hospitalization or Prolonged Hospitalization
+      "F15"      # Recognised Device or Procedural Complication
+    )
+  ),
+
+  # ─── 5. ESOPHAGEAL INJURY ────────────────────────────────────────────────
+  esophageal = list(
+    annex_e = c(
+      "E1022",   # Perforation of Esophagus
+      "E1018",   # Laceration(s) of Esophagus
+      "E1029",   # Stenosis of the esophagus
+      "E1009",   # Dysphagia / Odynophagia
+      "E1013",   # Gastroesophageal Burn
+      "E2339",   # Ulcer
+      "E2314",   # Fistula
+      "E233001", # Chest Pain
+      "E1020",   # Nausea
+      "E1032",   # Vomiting
+      "E230101", # Fever
+      "E0306",   # Sepsis (septic embolism from AEF)
+      "E0133",   # Stroke/CVA (air embolism from AEF)
+      "E050301"  # Air Embolism (from AEF)
+    ),
+    annex_f = c(
+      "F02",     # Death
+      "F19",     # Surgical Intervention
+      "F1901",   # Additional Surgery
+      "F0801",   # Intensive Care
+      "F1203",   # Life Threatening Illness or Injury
+      "F2303"    # Medication Required
+    )
+  ),
+
+  # ─── 6. PHRENIC NERVE INJURY ─────────────────────────────────────────────
+  phrenic = list(
+    annex_e = c(
+      "E0123",   # Nerve Damage
+      "E0128",   # Peripheral Nervous Injury
+      "E012202", # Paralysis
+      "E012204", # Paresis
+      "E0717",   # Dyspnea
+      "E0743",   # Respiratory Insufficiency
+      "E0138"    # Undesired Nerve Stimulation
+    ),
+    annex_f = c(
+      "F11",     # Minor Injury / Illness / Impairment
+      "F12",     # Serious Injury / Illness / Impairment
+      "F1204",   # Permanent Impairment
+      "F1205",   # Temporary Impairment
+      "F15",     # Recognised Device or Procedural Complication
+      "F2203"    # Imaging Required
+    )
+  ),
+
+  # ─── 7. PROCEDURE-RELATED ARRHYTHMIA ─────────────────────────────────────
+  arrhythmia = list(
+    annex_e = c(
+      "E0601",   # Arrhythmia
+      "E060101", # Asystole
+      "E060102", # Atrial Fibrillation
+      "E060103", # Atrial Flutter
+      "E060104", # Bradycardia
+      "E060105", # Ectopic Heartbeat
+      "E060106", # Heart Block
+      "E060107", # Idioventricular Rhythm
+      "E060108", # Irregular Pulse
+      "E060109", # Tachycardia
+      "E060110", # Ventricular Fibrillation
+      "E0602",   # Cardiac Arrest
+      "E0618"    # Non specific EKG/ECG Changes
+    ),
+    annex_f = c(
+      "F2306",   # Resuscitation
+      "F2303",   # Medication Required
+      "F2307",   # Reprogramming of Device
+      "F19",     # Surgical Intervention (device implant)
+      "F15"      # Recognised Device or Procedural Complication
+    )
+  ),
+
+  # ─── 8. CORONARY ARTERY INJURY / SPASM ───────────────────────────────────
+  coronary = list(
+    annex_e = c(
+      "E0521",   # Coronary obstruction/occlusion
+      "E0612",   # Ischemic Heart Disease
+      "E061201", # Angina
+      "E061202", # Myocardial Infarction
+      "E0516",   # Vasoconstriction
+      "E0509",   # Ischemia
+      "E0618",   # Non specific EKG/ECG Changes
+      "E0603",   # Cardiac Enzyme Elevation
+      "E0602",   # Cardiac Arrest
+      "E2321",   # Low Blood Pressure / Hypotension
+      "E2343",   # Hemodynamic instability
+      "E233001"  # Chest Pain
+    ),
+    annex_f = c(
+      "F02",     # Death
+      "F19",     # Surgical Intervention (emergent PCI)
+      "F1901",   # Additional Surgery
+      "F0801",   # Intensive Care
+      "F1203",   # Life Threatening Illness or Injury
+      "F2303"    # Medication Required (nitroglycerin)
+    )
+  ),
+
+  # ─── 9. HEMOLYSIS / ACUTE KIDNEY INJURY ──────────────────────────────────
+  hemolysis = list(
+    annex_e = c(
+      "E0303",   # Hemolysis
+      "E030101", # Hemolytic Anemia
+      "E0301",   # Anemia
+      "E1305",   # Renal Impairment
+      "E130501", # Renal Failure
+      "E2204",   # Lactate Dehydrogenase Increased
+      "E1302",   # Hematuria
+      "E1309",   # Urinary Retention
+      "E2320",   # High Blood Pressure / Hypertension
+      "E0516"    # Vasoconstriction (NO scavenging)
+    ),
+    annex_f = c(
+      "F12",     # Serious Injury / Illness / Impairment
+      "F08",     # Hospitalization or Prolonged Hospitalization
+      "F2303",   # Medication Required
+      "F23"      # Unexpected Medical Intervention
+    )
+  ),
+
+  # ─── 10. RESPIRATORY / PULMONARY COMPLICATION ────────────────────────────
+  respiratory = list(
+    annex_e = c(
+      "E0734",   # Pneumothorax
+      "E0722",   # Hemothorax
+      "E0721",   # Hemoptysis
+      "E0736",   # Pulmonary Edema
+      "E0717",   # Dyspnea
+      "E0731",   # Pleural Effusion
+      "E0741",   # Respiratory Arrest
+      "E0742",   # Respiratory Failure
+      "E0743",   # Respiratory Insufficiency
+      "E0707",   # Bronchial Hemorrhage
+      "E0726",   # Hypoxia
+      "E0701",   # Adult Respiratory Distress Syndrome
+      "E0735",   # Pulmonary Dysfunction
+      "E0733",   # Pneumonia
+      "E073301", # Bronchopneumonia
+      "E0738",   # Pulmonary Infarction
+      "E2203"    # Low Oxygen Saturation
+    ),
+    annex_f = c(
+      "F19",     # Surgical Intervention (chest tube)
+      "F1901",   # Additional Surgery
+      "F08",     # Hospitalization or Prolonged Hospitalization
+      "F0801",   # Intensive Care
+      "F12"      # Serious Injury / Illness / Impairment
+    )
+  ),
+
+  # ─── 11. PROCEDURE-RELATED INFECTION ─────────────────────────────────────
+  infection = list(
+    annex_e = c(
+      "E0306",   # Sepsis
+      "E233605", # Septic Shock
+      "E0610",   # Endocarditis
+      "E1901",   # Bacterial Infection
+      "E190101", # Drug Resistant Bacterial Infection
+      "E190102", # Pyogenic Infection
+      "E1906",   # Unspecified Infection
+      "E172001", # Abscess
+      "E172002", # Cellulitis
+      "E2012",   # Wound Infection
+      "E2115",   # Post Operative Wound Infection
+      "E2205",   # Bacteremia
+      "E0733",   # Pneumonia
+      "E1310",   # Urinary Tract Infection
+      "E2123",   # Medical device site infection
+      "E230101", # Fever
+      "E0311"    # High White Blood Cell Count
+    ),
+    annex_f = c(
+      "F02",     # Death
+      "F1007",   # Exposure to Contaminated Device / Risk of Infection
+      "F08",     # Hospitalization or Prolonged Hospitalization
+      "F0801",   # Intensive Care
+      "F12",     # Serious Injury / Illness / Impairment
+      "F1203",   # Life Threatening Illness or Injury
+      "F2303"    # Medication Required (antibiotics)
+    )
+  ),
+
+  # ─── 12. PROCEDURE-RELATED DEATH ─────────────────────────────────────────
+  death = list(
+    annex_e = c(
+      "E0602",   # Cardiac Arrest
+      "E060101", # Asystole
+      "E050602", # Exsanguination
+      "E2342"    # Multiple Organ Dysfunction Syndrome
+    ),
+    annex_f = c(
+      "F02",     # Death
+      "F0201",   # Intrauterine Fetal Death
+      "F03",     # Brain Death
+      "F16",     # Reduction in Life Expectancy
+      "F29"      # Death not related to reported adverse event
+    )
+  ),
+
+  # ─── 13. DEVICE / EQUIPMENT MALFUNCTION ──────────────────────────────────
+  device_malfunction = list(
+    annex_e = c(
+      "E2104",   # Electric Shock
+      "E210401", # Shock from Patient Lead(s)
+      "E2103"    # Device Overstimulation of Tissue
+    ),
+    annex_f = c(
+      "F26",     # No Health Consequences or Impact
+      "F2601",   # Problem identified before clinical use/exposure
+      "F05",     # Delay to Treatment / Therapy
+      "F14",     # Prolonged Episode of Care
+      "F25"      # Unanticipated Adverse Device Effect
+    ),
+    annex_a = c(
+      # Material Integrity
+      "A04",     # Material Integrity Problem
+      "A0401",   # Break
+      "A040101", # Fracture
+      "A040102", # Loss of or Failure to Bond
+      "A040103", # Material Fragmentation
+      "A0408",   # Material Disintegration
+      "A0412",   # Material Rupture
+      "A0413",   # Material Separation
+      "A0414",   # Material Split, Cut or Torn
+      # Mechanical
+      "A05",     # Mechanical Problem
+      "A0501",   # Detachment of Device or Device Component
+      "A0504",   # Leak/Splash
+      "A050401", # Fluid/Blood Leak
+      "A0511",   # Structural Problem
+      "A051201", # Device Dislodged or Dislocated
+      # Electrical / Electronic
+      "A07",     # Electrical / Electronic Property Problem
+      "A0701",   # Capturing Problem
+      "A070101", # Failure to Capture
+      "A0705",   # Battery Problem
+      "A070504", # Premature Discharge of Battery
+      "A0708",   # Power Problem
+      "A070801", # Complete Loss of Power
+      "A0709",   # Device Sensing Problem
+      "A070908", # Failure to Sense
+      "A070909", # Over-Sensing
+      "A070910", # Under-Sensing
+      "A0722",   # Impedance Problem
+      "A072201", # High impedance
+      "A072202", # Low impedance
+      "A0718",   # Failure to Shut Off
+      "A0719",   # Unexpected Shutdown
+      # Output / Energy
+      "A09",     # Output Problem
+      "A0904",   # Energy Output Problem
+      "A090402", # Failure to Deliver Energy
+      "A090403", # Intermittent Energy Output
+      "A090404", # Output above Specifications
+      "A090405", # Output below Specifications
+      "A0907",   # No Device Output
+      "A0908",   # Incorrect, Inadequate or Imprecise Result or Readings
+      # Software
+      "A11",     # Computer Software Problem
+      "A1102",   # Application Program Problem
+      "A110201", # Application Program Freezes
+      # Temperature
+      "A10",     # Temperature Problem
+      "A1002",   # Excessive Heating
+      "A1005",   # Overheating of Device
+      # Connection
+      "A12",     # Connection Problem
+      "A1203",   # Disconnection
+      "A1205",   # Loose or Intermittent Connection
+      "A1206",   # Misconnection
+      # Infusion / Flow (irrigation)
+      "A14",     # Infusion or Flow Problem
+      "A1408",   # No Flow
+      "A140803", # Inability to Irrigate
+      # Activation / Positioning
+      "A15",     # Activation, Positioning or Separation Problem
+      "A150101", # Activation Failure
+      "A150201", # Positioning Failure
+      # Alarm / Safety
+      "A16",     # Protective Measures Problem
+      "A1601",   # Device Alarm System
+      "A160106"  # Defective Alarm
+    )
+  ),
+
+  # ─── 14. NO PATIENT HARM ─────────────────────────────────────────────────
+  no_harm = list(
+    annex_e = c(
+      "E2403"    # No Clinical Signs, Symptoms or Conditions
+    ),
+    annex_f = c(
+      "F26",     # No Health Consequences or Impact
+      "F2601",   # Problem identified before clinical use/exposure
+      "F27"      # Problem identified during non-clinical procedure
+    )
+  ),
+
+  # ─── 15. OTHER COMPLICATION ──────────────────────────────────────────────
+  other = list(
+    annex_e = c(
+      # Valve injury
+      "E0621",   # Valvular Insufficiency / Regurgitation
+      "E062102", # Mitral Valve Insufficiency / Regurgitation
+      "E062104", # Tricuspid Valve Insufficiency / Regurgitation
+      "E0624",   # Intraoperative Cardiac Valve Injury
+      "E0608",   # Cusp Tear
+      # Septal defect
+      "E0625",   # Cardiac Septal Defect Residual Shunt
+      # Autonomic / vasovagal
+      "E060104", # Bradycardia
+      "E060101", # Asystole
+      "E011903", # Syncope / Fainting
+      "E011902", # Presyncope
+      "E2321",   # Low Blood Pressure / Hypotension
+      # Allergic / anaphylaxis
+      "E0402",   # Hypersensitivity / Allergic reaction
+      "E040201", # Anaphylactic Shock
+      "E040202", # Anaphylactoid / Anaphylaxis
+      # Anesthesia-related
+      "E0704",   # Aspiration / Inhalation
+      "E0705",   # Aspiration Pneumonitis
+      "E2102",   # Awareness during Anaesthesia
+      "E2113",   # Oversedation
+      # Cardiogenic shock / heart failure
+      "E233601", # Cardiogenic Shock
+      "E0611",   # Heart Failure / Congestive Heart Failure
+      "E0613",   # Low Cardiac Output
+      # Skin / radiation
+      "E1704",   # Burn(s)
+      "E170403", # Radiation Burn
+      "E2119",   # Unintended Radiation Exposure
+      # Musculoskeletal (PFA-related)
+      "E1605",   # Cramp(s) / Muscle Spasm(s)
+      "E2103",   # Device Overstimulation of Tissue
+      "E2104",   # Electric Shock
+      # Urinary retention
+      "E1309",   # Urinary Retention
+      # General
+      "E2336",   # Shock
+      "E2330",   # Pain
+      "E2326"    # Inflammation
+    ),
+    annex_f = c(
+      "F07",     # Exacerbation of Existing Condition
+      "F11",     # Minor Injury / Illness / Impairment
+      "F12",     # Serious Injury / Illness / Impairment
+      "F15",     # Recognised Device or Procedural Complication
+      "F17",     # Sedation
+      "F25",     # Unanticipated Adverse Device Effect
+      "F28"      # Appropriate Term/Code Not Available
+    )
+  )
+)

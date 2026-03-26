@@ -649,10 +649,98 @@ maude_fda_api_call <- function(
 }
 
 
+# MAUDE Code-to-Complication Mapping ----
+
+#' Identify Relevant Complication Categories from MAUDE Problem Codes
+#'
+#' @description Given patient problem codes and/or device problem codes from a
+#'   MAUDE adverse event report, identifies which [ablation_complications]
+#'   categories are potentially relevant using the [complication_ontology]
+#'   mapping. This allows an LLM adjudicator to receive only the complication
+#'   definitions it needs, reducing token usage and improving accuracy.
+#'
+#' @param patient_problems Character vector of patient problem terms as they
+#'   appear in MAUDE data (e.g., `"Cardiac Tamponade"`). May also be a single
+#'   semicolon-separated string. Terms are matched against the `term` column
+#'   in Annexes E and F to resolve IMDRF codes.
+#' @param device_problems Character vector of device problem terms as they
+#'   appear in MAUDE data. May also be a single semicolon-separated string.
+#'   Terms are matched against the `term` column in Annex A.
+#'
+#' @return A character vector of complication category names (matching keys in
+#'   [ablation_complications]) that have at least one matching code. Always
+#'   includes `"other"` as a fallback. Returns all category names if no codes
+#'   match any specific category.
+#'
+#' @examples
+#' # From a MAUDE report with these patient problems:
+#' match_complication_codes(
+#'   patient_problems = "Cardiac Tamponade; Pericardial Effusion"
+#' )
+#'
+#' @export
+match_complication_codes <- function(patient_problems = NULL,
+                                    device_problems = NULL) {
+  # Parse semicolon-separated strings
+  parse_terms <- function(x) {
+    if (is.null(x)) return(character(0))
+    terms <- unlist(strsplit(x, ";"))
+    terms <- trimws(terms)
+    terms[nchar(terms) > 0]
+  }
+
+  patient_terms <- parse_terms(patient_problems)
+  device_terms <- parse_terms(device_problems)
+
+  if (length(patient_terms) == 0 && length(device_terms) == 0) {
+    return(names(complication_ontology))
+  }
+
+  # Resolve patient problem terms to IMDRF codes via Annexes E and F
+  patient_codes <- character(0)
+  if (length(patient_terms) > 0) {
+    annex_e <- .maude_codes[["clinical_signs"]]
+    annex_f <- .maude_codes[["health_impact"]]
+
+    e_matches <- annex_e$imdrf_code[annex_e$term %in% patient_terms]
+    f_matches <- annex_f$imdrf_code[annex_f$term %in% patient_terms]
+    patient_codes <- unique(c(e_matches, f_matches))
+  }
+
+  # Resolve device problem terms to IMDRF codes via Annex A
+  device_codes <- character(0)
+  if (length(device_terms) > 0) {
+    annex_a <- .maude_codes[["device_problems"]]
+    device_codes <- unique(annex_a$imdrf_code[annex_a$term %in% device_terms])
+  }
+
+  # Match against ontology
+  matched <- vapply(complication_ontology, function(cat) {
+    any(patient_codes %in% c(cat$annex_e, cat$annex_f)) ||
+      any(device_codes %in% cat$annex_a)
+  }, logical(1))
+
+  categories <- names(which(matched))
+
+  # Always include "other" as fallback
+  if (!"other" %in% categories) {
+    categories <- c(categories, "other")
+  }
+
+  # If nothing matched, return all categories
+  if (length(categories) == 1 && categories == "other" &&
+      (length(patient_codes) > 0 || length(device_codes) > 0)) {
+    categories <- unique(c(categories))
+  }
+
+  categories
+}
+
+
 # MAUDE Narrative Evaluation with LLMs ----
 
 #' Adjudicate MAUDE adverse event narratives using a large language model (LLM)
-#' 
+#'
 #' @export
 adjudicate_maude_event <- function() {
 
