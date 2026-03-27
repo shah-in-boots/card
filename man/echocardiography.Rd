@@ -6,6 +6,7 @@
 \alias{extract_lvef}
 \alias{extract_lvidd}
 \alias{extract_la_diameter}
+\alias{extract_echo_findings}
 \title{Extract Echocardiogram Measurements}
 \usage{
 extract_la_size(text)
@@ -15,6 +16,8 @@ extract_lvef(text)
 extract_lvidd(text)
 
 extract_la_diameter(text, min_val = 1, max_val = 10)
+
+extract_echo_findings(text)
 }
 \arguments{
 \item{text}{Character string containing the echo report text}
@@ -29,6 +32,7 @@ extract_la_diameter(text, min_val = 1, max_val = 10)
 \item \code{extract_la_diameter()}: Numeric LA diameter in cm
 \item \code{extract_lvef()}: Numeric LVEF percentage
 \item \code{extract_lvidd()}: Numeric LVIDd in cm
+\item \code{extract_echo_findings()}: Named list of key structure/function findings
 }
 }
 \description{
@@ -42,6 +46,7 @@ The following measurements can be extracted:
 \item Left atrial diameter (quantitative measurement in cm)
 \item Left ventricular ejection fraction (LVEF, percentage)
 \item Left ventricular internal diameter in diastole (LVIDd, in cm)
+\item A compact set of clinically important findings from a full report
 }
 }
 \details{
