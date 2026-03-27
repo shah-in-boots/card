@@ -1,0 +1,1354 @@
+#' Complication Taxonomy for AF Ablation Adverse Event Adjudication
+#'
+#' A structured reference of complication categories for adjudicating adverse
+#' event narratives from catheter ablation of atrial fibrillation. Applicable to
+#' radiofrequency ablation (RFA), cryoballoon ablation (CBA), and pulsed field
+#' ablation (PFA).
+#'
+#' Derived from:
+#' - 2024 EHRA/HRS/APHRS/LAHRS Expert Consensus Statement on Catheter and
+#'   Surgical Ablation of AF (Tzeis et al., Europace 2024;26:euae043)
+#' - Procedure-Related Complications of Catheter Ablation for AF
+#'   (Tzeis et al., JACC 2023;82:1524-1536)
+#' - 2023 ACC/AHA/ACCP/HRS Guideline for Diagnosis and Management of AF
+#'   (Joglar et al., JACC 2024;83:109-279)
+#' - MANIFEST-17K: Multinational Survey on Safety of Postapproval Clinical Use
+#'   of Pulsed Field Ablation (Ekanem et al., Circulation 2024)
+#' - Considerations Regarding Safety with PFA for AF
+#'   (Heart Rhythm O2, 2024;5:e01169)
+#'
+#' @format A named list of 15 complication categories. Each element is a list
+#'   with three components:
+#'   \describe{
+#'     \item{title}{Character. The full clinical name of the complication.}
+#'     \item{definition}{Character. A clinical definition written for use by
+#'       an LLM or human adjudicator to identify the complication in adverse
+#'       event narrative text.}
+#'     \item{severity}{A named character vector. Names are short severity
+#'       codes; values are definitions of each severity level. Severity levels
+#'       are NOT necessarily mutually exclusive within a single event. Every
+#'       category includes an \code{"insufficient_info"} level for narratives
+#'       that lack sufficient detail to grade severity.}
+#'   }
+#'
+#' @examples
+#' # Access a single complication
+#' ablation_complications$pericardial$title
+#' ablation_complications$pericardial$definition
+#' names(ablation_complications$pericardial$severity)
+#'
+#' # List all complication category names
+#' names(ablation_complications)
+#'
+#' # Get all titles
+#' vapply(ablation_complications, \(x) x$title, character(1))
+#'
+#' @source
+#' Tzeis S, Gerstenfeld EP, Kalman J, et al. 2024 European Heart Rhythm
+#' Association/Heart Rhythm Society/Asia Pacific Heart Rhythm Society/Latin
+#' American Heart Rhythm Society expert consensus statement on catheter and
+#' surgical ablation of atrial fibrillation. Europace. 2024;26(4):euae043.
+"ablation_complications"
+
+ablation_complications <- list(
+  # ───────────────────────────────────────────────────────────────────────────
+  # 1. PERICARDIAL EFFUSION / TAMPONADE / PERICARDITIS
+  # ───────────────────────────────────────────────────────────────────────────
+  pericardial = list(
+    title = "Pericardial Effusion / Cardiac Tamponade / Pericarditis",
+
+    definition = paste(
+      "Any pericardial complication occurring during or after catheter",
+      "ablation of atrial fibrillation. Includes accumulation of fluid",
+      "(blood or serous) in the pericardial space, frank cardiac",
+      "tamponade, and post-ablation pericarditis with or without",
+      "associated effusion. Mechanisms include direct mechanical",
+      "perforation of the atrial wall by catheter or transseptal needle,",
+      "thermal injury with delayed rupture, excessive anticoagulation,",
+      "and post-procedural inflammatory pericarditis. The narrative may",
+      "describe hypotension, pulsus paradoxus, pleuritic chest pain,",
+      "pericardial friction rub, echocardiographic findings of effusion,",
+      "pericardiocentesis, surgical drainage, or treatment with NSAIDs",
+      "or colchicine. Includes both acute intraprocedural events and",
+      "delayed presentations hours to days after ablation."
+    ),
+
+    severity = c(
+      pericarditis_without_effusion = paste(
+        "Post-ablation pericarditis presenting with pleuritic chest pain",
+        "and possibly a friction rub, without a clinically significant",
+        "pericardial effusion. Managed with NSAIDs, colchicine, or",
+        "observation."
+      ),
+      trivial_effusion = paste(
+        "Small or trace pericardial effusion identified at the end of",
+        "the case or on post-procedure imaging. No hemodynamic",
+        "compromise. No drainage required. Managed with observation,",
+        "with or without anti-inflammatory therapy."
+      ),
+      moderate_no_intervention = paste(
+        "Moderate pericardial effusion causing symptoms such as chest",
+        "pain, dyspnea, or tachycardia, but managed conservatively",
+        "without pericardiocentesis or surgical drainage. May include",
+        "holding or reversing anticoagulation and medical therapy."
+      ),
+      tamponade_pericardiocentesis = paste(
+        "Hemodynamically significant pericardial effusion or frank",
+        "cardiac tamponade requiring percutaneous pericardiocentesis.",
+        "Includes cases with hypotension, pulsus paradoxus, or",
+        "echocardiographic evidence of chamber collapse that prompted",
+        "emergent drainage."
+      ),
+      tamponade_surgical = paste(
+        "Cardiac tamponade or perforation requiring surgical",
+        "intervention, including pericardial window, thoracotomy,",
+        "sternotomy, or surgical repair of the atrial wall."
+      ),
+      insufficient_info = paste(
+        "The narrative mentions pericardial effusion, tamponade,",
+        "pericarditis, or related terms but does not provide enough",
+        "detail to determine whether intervention was required or what",
+        "management was performed."
+      )
+    )
+  ),
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # 2. CEREBROVASCULAR EVENT
+  # ───────────────────────────────────────────────────────────────────────────
+  stroke = list(
+    title = "Cerebrovascular Event",
+
+    definition = paste(
+      "Any ischemic stroke, hemorrhagic stroke, transient ischemic",
+      "attack (TIA), or systemic thromboembolism occurring during or",
+      "after catheter ablation of atrial fibrillation. Mechanisms",
+      "include thrombus formation on catheters or sheaths, air embolism",
+      "during transseptal puncture or catheter exchange, char embolism",
+      "from overheated tissue, and dislodgement of pre-existing left",
+      "atrial thrombus. The narrative may describe focal neurologic",
+      "deficits (weakness, speech difficulty, visual changes), altered",
+      "mental status, cerebral imaging findings (CT or MRI), or",
+      "systemic embolism to other vascular beds. Includes both",
+      "clinically apparent events and silent cerebral lesions detected",
+      "on post-procedure MRI."
+    ),
+
+    severity = c(
+      tia = paste(
+        "Transient neurologic deficit resolving completely within 24",
+        "hours with no evidence of cerebral infarction on imaging.",
+        "Full recovery to neurologic baseline."
+      ),
+      minor_stroke = paste(
+        "Ischemic or hemorrhagic stroke with mild residual neurologic",
+        "deficit at discharge or last follow-up. Includes events",
+        "described as 'minor stroke' or with NIHSS score of 3 or less.",
+        "Also includes silent cerebral lesions detected on post-",
+        "procedure MRI if reported."
+      ),
+      major_stroke = paste(
+        "Stroke with significant persistent neurologic deficit",
+        "requiring ICU-level care, resulting in lasting functional",
+        "disability, or requiring neurosurgical intervention. Includes",
+        "large-territory infarction and symptomatic intracranial",
+        "hemorrhage."
+      ),
+      fatal_stroke = paste(
+        "Cerebrovascular event that directly caused or substantially",
+        "contributed to the patient's death."
+      ),
+      systemic_embolism = paste(
+        "Thromboembolism to a non-cerebral vascular territory (e.g.,",
+        "mesenteric, renal, or peripheral arterial embolism) occurring",
+        "in the peri-procedural period."
+      ),
+      insufficient_info = paste(
+        "The narrative describes a cerebrovascular or embolic event",
+        "but does not provide enough detail to determine the severity",
+        "of deficit, duration of symptoms, or clinical outcome."
+      )
+    )
+  ),
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # 3. VASCULAR ACCESS COMPLICATION
+  # ───────────────────────────────────────────────────────────────────────────
+  vascular = list(
+    title = "Vascular Access Complication",
+
+    definition = paste(
+      "Complications arising from percutaneous vascular access for",
+      "catheter ablation, typically at the femoral venous or arterial",
+      "puncture site. The narrative may describe groin hematoma,",
+      "swelling, pain at the access site, pseudoaneurysm, arteriovenous",
+      "(AV) fistula, retroperitoneal hemorrhage, or significant bleeding",
+      "requiring transfusion. Also includes venous thrombosis (DVT) or",
+      "pulmonary embolism related to venous access and vascular injury",
+      "from catheter or sheath manipulation. Does NOT include bleeding",
+      "complications at non-access sites."
+    ),
+
+    severity = c(
+      minor_hematoma = paste(
+        "Groin hematoma or minor bleeding at the access site managed",
+        "with manual compression, observation, or prolonged bed rest",
+        "only. No transfusion or procedural intervention required."
+      ),
+      major_hematoma_transfusion = paste(
+        "Access-site hematoma or bleeding requiring blood transfusion",
+        "but not surgical or interventional repair. Includes significant",
+        "hematomas causing hemoglobin drop of 2 g/dL or more."
+      ),
+      pseudoaneurysm = paste(
+        "Femoral pseudoaneurysm at the access site requiring",
+        "intervention such as ultrasound-guided thrombin injection,",
+        "compression, or surgical repair."
+      ),
+      av_fistula = paste(
+        "Arteriovenous fistula at the access site. May be managed with",
+        "observation, compression, or surgical repair depending on size",
+        "and symptoms."
+      ),
+      retroperitoneal = paste(
+        "Retroperitoneal hemorrhage from femoral vessel injury.",
+        "Typically presents with flank or abdominal pain, hemodynamic",
+        "instability, and hemoglobin drop. May require transfusion, IR",
+        "embolization, or surgical repair."
+      ),
+      vte = paste(
+        "Venous thromboembolism (deep vein thrombosis or pulmonary",
+        "embolism) related to venous access or catheter manipulation."
+      ),
+      insufficient_info = paste(
+        "The narrative describes a vascular access complication but",
+        "lacks enough detail to classify the specific type or severity."
+      )
+    )
+  ),
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # 4. PULMONARY VEIN STENOSIS
+  # ───────────────────────────────────────────────────────────────────────────
+  pv_stenosis = list(
+    title = "Pulmonary Vein Stenosis",
+
+    definition = paste(
+      "Narrowing of one or more pulmonary veins resulting from catheter",
+      "ablation within or at the ostium of the pulmonary veins. The",
+      "incidence has decreased substantially with the shift from ostial",
+      "to antral isolation strategies. Primarily associated with",
+      "radiofrequency and cryoballoon ablation; not typically seen with",
+      "pulsed field ablation due to tissue selectivity. The narrative",
+      "may describe dyspnea, hemoptysis, recurrent pulmonary infections,",
+      "or CT/MRI findings of PV narrowing. Symptoms may present weeks",
+      "to months after ablation."
+    ),
+
+    severity = c(
+      asymptomatic = paste(
+        "Pulmonary vein narrowing detected on follow-up imaging (CT,",
+        "MRI, or TEE) but the patient is asymptomatic. Includes mild",
+        "stenosis (less than 50% luminal reduction) and moderate stenosis",
+        "(50-70%) without symptoms."
+      ),
+      symptomatic_medical = paste(
+        "Symptomatic PV stenosis (dyspnea, hemoptysis, recurrent",
+        "pneumonia, or reduced exercise tolerance) managed with medical",
+        "therapy or observation without procedural intervention."
+      ),
+      intervention_required = paste(
+        "PV stenosis requiring procedural intervention such as balloon",
+        "angioplasty or stent placement. Typically involves severe",
+        "stenosis (greater than 70% luminal reduction) with limiting",
+        "symptoms."
+      ),
+      complete_occlusion = paste(
+        "Complete occlusion of one or more pulmonary veins documented",
+        "on imaging. May be asymptomatic if collateral drainage is",
+        "adequate but represents the most severe anatomic finding."
+      ),
+      insufficient_info = paste(
+        "The narrative mentions PV stenosis or related symptoms but",
+        "does not provide enough detail on imaging findings, symptom",
+        "severity, or management to determine the degree of stenosis."
+      )
+    )
+  ),
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # 5. ESOPHAGEAL INJURY
+  # ───────────────────────────────────────────────────────────────────────────
+  esophageal = list(
+    title = "Esophageal Injury",
+
+    definition = paste(
+      "Injury to the esophagus caused by energy delivery on the",
+      "posterior left atrial wall, which lies in close anatomic",
+      "proximity to the anterior esophageal wall. Ranges from",
+      "superficial mucosal injury to the catastrophic and often fatal",
+      "atrioesophageal fistula (AEF). Applies to all energy modalities,",
+      "though PFA appears to have lower risk of direct esophageal",
+      "thermal injury due to tissue selectivity. The narrative may",
+      "describe chest pain radiating to the back, dysphagia,",
+      "odynophagia, fever, endoscopic findings of erythema or",
+      "ulceration, CT findings of mediastinal air, or neurologic",
+      "symptoms from air embolism through a fistula. Also includes",
+      "gastroparesis from injury to the periesophageal vagal plexus,",
+      "which manifests as nausea, vomiting, early satiety, and bloating."
+    ),
+
+    severity = c(
+      mucosal = paste(
+        "Superficial esophageal injury limited to mucosal erythema,",
+        "erosion, or shallow ulceration found on endoscopy. Managed",
+        "conservatively with proton pump inhibitors and dietary",
+        "modification. No perforation or fistula."
+      ),
+      deep_ulceration = paste(
+        "Deep esophageal ulceration extending beyond the mucosa",
+        "without fistula formation. Requires extended medical",
+        "management, possibly including sucralfate, IV PPI, and close",
+        "surveillance imaging."
+      ),
+      atrioesophageal_fistula = paste(
+        "Atrioesophageal fistula (AEF) confirmed on imaging (CT with",
+        "air in the mediastinum or left atrium) or at surgery. A life-",
+        "threatening complication typically presenting 2-5 weeks post-",
+        "ablation with fever, neurologic symptoms from air or septic",
+        "embolism, hematemesis, or sepsis."
+      ),
+      gastroparesis = paste(
+        "Symptomatic gastroparesis (nausea, vomiting, early satiety,",
+        "abdominal bloating, delayed gastric emptying) resulting from",
+        "injury to the periesophageal vagal plexus during posterior",
+        "wall ablation. Severity ranges from self-limited to",
+        "debilitating."
+      ),
+      insufficient_info = paste(
+        "The narrative describes esophageal symptoms, findings, or",
+        "concern for esophageal injury but does not provide enough",
+        "detail to classify the depth of injury or clinical outcome."
+      )
+    )
+  ),
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # 6. PHRENIC NERVE INJURY
+  # ───────────────────────────────────────────────────────────────────────────
+  phrenic = list(
+    title = "Phrenic Nerve Injury",
+
+    definition = paste(
+      "Injury to the right or left phrenic nerve during catheter",
+      "ablation, resulting in diaphragmatic paresis or paralysis. The",
+      "right phrenic nerve is most commonly affected due to its",
+      "proximity to the right superior pulmonary vein and superior vena",
+      "cava. Most frequently associated with cryoballoon ablation of",
+      "the right superior PV but can also occur with RFA and has been",
+      "reported rarely with PFA. The narrative may describe loss of",
+      "diaphragmatic excursion during the procedure (fluoroscopic or",
+      "pacing-monitored), post-procedure dyspnea, elevated",
+      "hemidiaphragm on chest X-ray, or reduced inspiratory effort."
+    ),
+
+    severity = c(
+      intraprocedural_only = paste(
+        "Phrenic nerve capture was lost or diminished diaphragmatic",
+        "excursion was noted during the procedure, prompting immediate",
+        "cessation of ablation. Phrenic function recovered before the",
+        "end of the procedure or by the time of discharge."
+      ),
+      transient = paste(
+        "Phrenic nerve palsy persisting beyond the procedure but",
+        "recovering fully within 12 months. Includes patients with",
+        "elevated hemidiaphragm on chest X-ray at discharge who",
+        "subsequently recovered."
+      ),
+      persistent = paste(
+        "Phrenic nerve palsy still present at 12 months or later, or",
+        "described as permanent. Patient may have chronic dyspnea on",
+        "exertion and persistent hemidiaphragm elevation."
+      ),
+      insufficient_info = paste(
+        "The narrative describes phrenic nerve injury or elevated",
+        "hemidiaphragm but does not provide enough follow-up",
+        "information to determine whether recovery occurred."
+      )
+    )
+  ),
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # 7. PROCEDURE-RELATED ARRHYTHMIA
+  # ───────────────────────────────────────────────────────────────────────────
+  arrhythmia = list(
+    title = "Procedure-Related Arrhythmia",
+
+    definition = paste(
+      "A new arrhythmia caused by the ablation procedure itself,",
+      "distinct from recurrence of the patient's original atrial",
+      "fibrillation. Includes iatrogenic left atrial macro-reentrant",
+      "tachycardia or atypical flutter from gaps in linear lesion sets,",
+      "new-onset AV block from septal ablation or catheter trauma to",
+      "the conduction system, inappropriate sinus tachycardia from",
+      "autonomic modulation, and proarrhythmia (new ventricular",
+      "arrhythmia or organized atrial arrhythmia not present before",
+      "ablation). Does NOT include recurrence of the patient's pre-",
+      "existing AF or early reconnection arrhythmias within the",
+      "blanking period that are expected."
+    ),
+
+    severity = c(
+      self_terminating = paste(
+        "Iatrogenic arrhythmia that terminated spontaneously or with",
+        "brief pacing maneuvers during the procedure, with no",
+        "recurrence and no additional intervention required."
+      ),
+      cardioversion_or_medical = paste(
+        "Iatrogenic arrhythmia requiring electrical cardioversion,",
+        "antiarrhythmic drug treatment, or rate-control medication.",
+        "Includes persistent atrial tachycardia or flutter managed",
+        "medically without repeat ablation."
+      ),
+      repeat_ablation = paste(
+        "Iatrogenic arrhythmia requiring a repeat ablation procedure",
+        "to address (e.g., mapping and ablation of a gap-related",
+        "macro-reentrant atrial tachycardia or flutter circuit)."
+      ),
+      device_implant = paste(
+        "Arrhythmia or conduction disturbance requiring implantation",
+        "of a permanent pacemaker or ICD. Includes complete AV block",
+        "from septal ablation or catheter trauma requiring permanent",
+        "pacing."
+      ),
+      insufficient_info = paste(
+        "The narrative describes a new arrhythmia related to the",
+        "ablation but does not provide enough detail on the type of",
+        "arrhythmia, management, or outcome."
+      )
+    )
+  ),
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # 8. CORONARY ARTERY INJURY / SPASM
+  # ───────────────────────────────────────────────────────────────────────────
+  coronary = list(
+    title = "Coronary Artery Injury / Spasm",
+
+    definition = paste(
+      "Coronary artery spasm, occlusion, or direct vascular injury",
+      "caused by ablation energy delivery in proximity to the coronary",
+      "arteries. Most commonly reported with pulsed field ablation",
+      "(PFA), where the high-voltage electric field can stimulate",
+      "vascular smooth muscle contraction. Focal spasm of the left",
+      "circumflex artery during mitral isthmus ablation and of the",
+      "right coronary artery during cavotricuspid isthmus ablation are",
+      "the most recognized patterns. Delayed diffuse coronary spasm,",
+      "possibly mediated by hemolysis-related nitric oxide depletion,",
+      "has also been described with PFA. The narrative may describe",
+      "ST-segment changes, chest pain, hemodynamic instability,",
+      "coronary angiography findings, or nitroglycerin administration",
+      "during the procedure. Can also occur rarely with RFA,",
+      "particularly during epicardial ablation."
+    ),
+
+    severity = c(
+      transient_spasm = paste(
+        "Coronary artery spasm during ablation that resolved promptly",
+        "with cessation of energy delivery and/or administration of",
+        "intracoronary or intravenous nitroglycerin. No evidence of",
+        "myocardial injury (normal troponin). No lasting ischemic",
+        "consequence."
+      ),
+      sustained_spasm = paste(
+        "Coronary spasm requiring prolonged vasodilator therapy,",
+        "occurring remotely from energy delivery (delayed spasm), or",
+        "recurring after initial resolution. May include troponin",
+        "elevation without meeting criteria for myocardial infarction."
+      ),
+      myocardial_infarction = paste(
+        "Acute myocardial infarction from coronary occlusion or",
+        "sustained spasm. Includes ST-elevation MI, non-ST-elevation",
+        "MI with significant troponin rise and ischemic symptoms or",
+        "ECG changes, and coronary occlusion requiring emergent PCI."
+      ),
+      coronary_stenosis = paste(
+        "Coronary artery narrowing or vascular remodeling detected on",
+        "follow-up angiography or OCT, attributed to ablation-induced",
+        "vascular injury. A recently described finding with PFA near",
+        "coronary vessels."
+      ),
+      insufficient_info = paste(
+        "The narrative describes coronary symptoms, ST changes, or",
+        "concern for coronary injury but does not provide enough",
+        "detail to determine the mechanism, severity, or outcome."
+      )
+    )
+  ),
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # 9. HEMOLYSIS / ACUTE KIDNEY INJURY
+  # ───────────────────────────────────────────────────────────────────────────
+  hemolysis = list(
+    title = "Hemolysis / Acute Kidney Injury",
+
+    definition = paste(
+      "Intravascular hemolysis caused by electroporation of red blood",
+      "cells, predominantly associated with pulsed field ablation",
+      "(PFA). High-voltage pulsed electric fields generate a",
+      "transmembrane potential in erythrocytes, leading to membrane",
+      "pore formation, colloid osmotic swelling, and cell rupture.",
+      "Manifests as elevated plasma free hemoglobin, elevated LDH,",
+      "hemoglobinuria (dark or discolored urine), and in severe cases,",
+      "acute kidney injury (AKI) from heme-mediated proximal tubular",
+      "damage. Free hemoglobin also scavenges nitric oxide, which may",
+      "contribute to smooth muscle dysfunction (urinary retention,",
+      "coronary spasm, hypertension). Risk correlates with the total",
+      "number of PFA applications and catheter-tissue contact quality."
+    ),
+
+    severity = c(
+      laboratory_only = paste(
+        "Evidence of hemolysis on laboratory testing (elevated free",
+        "hemoglobin, elevated LDH, hemoglobinuria) without clinically",
+        "significant renal dysfunction or other end-organ effects.",
+        "Self-resolving within 24-48 hours."
+      ),
+      aki_no_dialysis = paste(
+        "Acute kidney injury from hemolysis-induced tubular damage,",
+        "defined as a significant rise in serum creatinine, managed",
+        "conservatively with IV hydration without requiring renal",
+        "replacement therapy."
+      ),
+      aki_dialysis = paste(
+        "Severe hemolysis-induced AKI requiring temporary or sustained",
+        "renal replacement therapy (hemodialysis)."
+      ),
+      insufficient_info = paste(
+        "The narrative mentions hemolysis, dark urine, elevated LDH,",
+        "or renal dysfunction potentially related to hemolysis but",
+        "does not provide enough detail to characterize the severity."
+      )
+    )
+  ),
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # 10. RESPIRATORY / PULMONARY COMPLICATION
+  # ───────────────────────────────────────────────────────────────────────────
+  respiratory = list(
+    title = "Respiratory / Pulmonary Complication",
+
+    definition = paste(
+      "Pulmonary or thoracic complications of catheter ablation NOT",
+      "related to pulmonary vein stenosis (see pv_stenosis) or phrenic",
+      "nerve injury (see phrenic). Includes pneumothorax (from",
+      "subclavian or internal jugular access, or epicardial access),",
+      "hemothorax, pulmonary hemorrhage or hemoptysis (reported with",
+      "PFA), bronchial injury, post-procedure pulmonary edema, and",
+      "pulmonary infection. The narrative may describe dyspnea, chest",
+      "pain, reduced breath sounds, chest tube placement, or chest",
+      "imaging findings."
+    ),
+
+    severity = c(
+      mild = paste(
+        "Minor respiratory complication managed conservatively, such",
+        "as small pneumothorax on imaging that resolved without chest",
+        "tube, transient hemoptysis, or mild pulmonary edema treated",
+        "with diuretics."
+      ),
+      moderate_intervention = paste(
+        "Respiratory complication requiring procedural intervention,",
+        "such as chest tube placement for pneumothorax or hemothorax,",
+        "or significant pulmonary hemorrhage requiring bronchoscopy."
+      ),
+      severe = paste(
+        "Respiratory complication requiring ICU care, mechanical",
+        "ventilation, surgical intervention, or resulting in prolonged",
+        "hospitalization."
+      ),
+      insufficient_info = paste(
+        "The narrative describes a respiratory or pulmonary",
+        "complication but does not provide enough detail to grade",
+        "severity."
+      )
+    )
+  ),
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # 11. PROCEDURE-RELATED INFECTION
+  # ───────────────────────────────────────────────────────────────────────────
+  infection = list(
+    title = "Procedure-Related Infection",
+
+    definition = paste(
+      "Infection attributable to the catheter ablation procedure.",
+      "Includes vascular access site infection (cellulitis, abscess),",
+      "endocarditis from catheter-introduced organisms, bacteremia or",
+      "sepsis from intravascular instrumentation, mediastinitis (which",
+      "may be associated with esophageal injury), and post-procedure",
+      "pneumonia. The narrative may describe fever, elevated white",
+      "blood cell count, positive blood cultures, wound erythema or",
+      "drainage, or antibiotic administration for a suspected",
+      "procedure-related source. Does NOT include infections unrelated",
+      "to the procedure."
+    ),
+
+    severity = c(
+      local = paste(
+        "Localized infection at the access site (cellulitis,",
+        "superficial wound infection) managed with oral antibiotics",
+        "without hospitalization."
+      ),
+      systemic_iv_antibiotics = paste(
+        "Systemic infection (bacteremia, pneumonia, UTI) requiring IV",
+        "antibiotics or hospitalization but without hemodynamic",
+        "instability or end-organ damage."
+      ),
+      sepsis = paste(
+        "Sepsis or septic shock from a procedure-related source.",
+        "Includes endocarditis, mediastinitis, or septic embolism.",
+        "Requires ICU-level care, vasopressors, or surgical source",
+        "control."
+      ),
+      insufficient_info = paste(
+        "The narrative describes infection or related findings but",
+        "does not provide enough detail to determine the source,",
+        "extent, or severity."
+      )
+    )
+  ),
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # 12. PROCEDURE-RELATED DEATH
+  # ───────────────────────────────────────────────────────────────────────────
+  death = list(
+    title = "Procedure-Related Death",
+
+    definition = paste(
+      "Death occurring during or after catheter ablation of atrial",
+      "fibrillation that is judged to be related to the procedure or",
+      "one of its complications. Death from AF ablation is",
+      "multifactorial and may result from cardiac tamponade,",
+      "atrioesophageal fistula, massive stroke, anesthesia-related",
+      "events, coronary occlusion, or other procedural causes. The",
+      "overall incidence is approximately 0.05-0.1%. The narrative may",
+      "explicitly state that the patient died, or may describe a",
+      "clinical course leading to death (e.g., refractory cardiac",
+      "arrest, withdrawal of care). This category captures death as",
+      "the final outcome; the underlying mechanism may also warrant",
+      "assignment to another complication category (e.g., pericardial,",
+      "stroke, esophageal)."
+    ),
+
+    severity = c(
+      intraprocedural = paste(
+        "Death occurring during the ablation procedure itself, in the",
+        "electrophysiology laboratory or operating room."
+      ),
+      periprocedural = paste(
+        "Death occurring within 30 days of the ablation procedure,",
+        "outside the procedural setting but attributed to a procedural",
+        "complication."
+      ),
+      delayed = paste(
+        "Death occurring more than 30 days after ablation but",
+        "attributed to a procedural complication (e.g., late",
+        "atrioesophageal fistula or late PV stenosis with pulmonary",
+        "consequences)."
+      ),
+      insufficient_info = paste(
+        "The narrative indicates the patient died but does not provide",
+        "enough detail to determine the timing or cause of death",
+        "relative to the procedure."
+      )
+    )
+  ),
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # 13. DEVICE / EQUIPMENT MALFUNCTION
+  # ───────────────────────────────────────────────────────────────────────────
+  device_malfunction = list(
+    title = "Device / Equipment Malfunction",
+
+    definition = paste(
+      "Failure or malfunction of the ablation catheter, energy",
+      "generator, mapping system, or ancillary procedural equipment",
+      "(sheaths, transseptal needles, irrigation pump, recording",
+      "system) that is reported as part of the adverse event. This",
+      "category captures problems with the device itself, regardless",
+      "of whether the malfunction led to patient injury. In MAUDE,",
+      "many reports are filed under the 'Malfunction' event type with",
+      "Annex A device problem codes. The narrative may describe",
+      "catheter fracture, tip detachment, generator error codes,",
+      "impedance faults, software or firmware failures, irrigation",
+      "failures, mapping system crashes, or inability to deliver",
+      "energy. If the malfunction also caused a clinical complication,",
+      "both this category and the relevant clinical complication",
+      "category may be assigned."
+    ),
+
+    severity = c(
+      no_procedure_impact = paste(
+        "Device malfunction that was identified and resolved without",
+        "impact on the ablation procedure. The procedure was completed",
+        "as planned using the same or replacement equipment."
+      ),
+      procedure_altered = paste(
+        "Device malfunction that required a change in procedural",
+        "strategy, use of backup equipment, or premature termination",
+        "of the procedure, but did not result in direct patient injury."
+      ),
+      patient_injury = paste(
+        "Device malfunction that directly caused or contributed to a",
+        "patient injury. The specific injury should also be classified",
+        "under the appropriate clinical complication category."
+      ),
+      insufficient_info = paste(
+        "The narrative describes a device malfunction but does not",
+        "provide enough detail to determine whether the procedure or",
+        "patient was affected."
+      )
+    )
+  ),
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # 14. NO PATIENT HARM
+  # ───────────────────────────────────────────────────────────────────────────
+  no_harm = list(
+    title = "No Patient Harm",
+
+    definition = paste(
+      "The adverse event report describes a device problem, procedural",
+      "deviation, near-miss event, or other reportable occurrence, but",
+      "explicitly states that no patient injury, adverse clinical",
+      "outcome, or harm occurred. This category exists to account for",
+      "reports that are filed to satisfy regulatory reporting",
+      "obligations but do not represent a clinical complication. The",
+      "narrative may state 'no patient harm,' 'no adverse outcome,'",
+      "'no clinical consequence,' 'no impact to the patient,' or",
+      "similar language. This category should only be assigned when",
+      "the narrative affirmatively indicates absence of harm, not",
+      "merely when harm is not mentioned."
+    ),
+
+    severity = c(
+      confirmed_no_harm = paste(
+        "The narrative explicitly and clearly states that no patient",
+        "harm occurred as a result of the reported event."
+      ),
+      probable_no_harm = paste(
+        "The narrative strongly suggests no patient harm occurred",
+        "based on the described circumstances, but does not contain",
+        "an explicit statement confirming absence of harm."
+      ),
+      insufficient_info = paste(
+        "The narrative does not provide enough information to",
+        "determine whether patient harm occurred or not."
+      )
+    )
+  ),
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # 15. OTHER COMPLICATION
+  # ───────────────────────────────────────────────────────────────────────────
+  other = list(
+    title = "Other Complication",
+
+    definition = paste(
+      "A procedure-related adverse event that does not fit any of the",
+      "preceding complication categories. This is a residual category",
+      "for clinically significant events that are real complications",
+      "but are uncommon enough to not warrant a dedicated category.",
+      "Examples include: cardiac valve injury (mitral or tricuspid",
+      "valve damage from catheter manipulation, chordal entanglement,",
+      "new or worsened valvular regurgitation), vasovagal or autonomic",
+      "responses (profound bradycardia, asystole, or hypotension",
+      "during energy delivery, particularly with PFA near ganglionated",
+      "plexi), atrial septal defect from transseptal puncture requiring",
+      "closure, stiff left atrium syndrome, radiation-related skin",
+      "injury, contrast or dye allergy or anaphylaxis, anesthesia-",
+      "related complications (aspiration, airway injury, medication",
+      "reaction), cardiogenic shock not from tamponade, acute heart",
+      "failure exacerbation, urinary retention, skin burns, and",
+      "musculoskeletal injury from patient positioning or PFA-induced",
+      "skeletal muscle stimulation. The adjudicator should use this",
+      "category only when the event clearly does not fit a more",
+      "specific category above."
+    ),
+
+    severity = c(
+      minor = paste(
+        "Complication that was self-limited or managed with minimal",
+        "intervention, did not prolong hospitalization, and resolved",
+        "without lasting sequelae."
+      ),
+      moderate = paste(
+        "Complication requiring additional treatment, prolonged",
+        "hospitalization, or a secondary procedure, but without",
+        "lasting disability or life-threatening consequence."
+      ),
+      severe = paste(
+        "Complication that was life-threatening, caused lasting",
+        "disability, required major intervention, or significantly",
+        "altered the patient's clinical course."
+      ),
+      insufficient_info = paste(
+        "The narrative describes a complication in this category but",
+        "does not provide enough detail to grade its severity."
+      )
+    )
+  )
+)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MAUDE Code-to-Complication Ontology
+# ─────────────────────────────────────────────────────────────────────────────
+
+#' Ontology Mapping MAUDE Annex Codes to AF Ablation Complication Categories
+#'
+#' A named list that maps each complication category in
+#' [ablation_complications] to the IMDRF codes from FDA MAUDE Annexes A
+#' (device problems), E (clinical signs/symptoms), and F (health impact) that
+#' are clinically relevant to that complication.
+#'
+#' This ontology is designed to minimize the number of complication definitions
+#' an LLM must consider when adjudicating a MAUDE adverse event narrative.
+#' Given a report's patient problem codes and device problem codes, the
+#' workflow is:
+#' \enumerate{
+#'   \item Look up each reported code in this ontology to identify which
+#'     complication categories are potentially relevant.
+#'   \item Retrieve the full definitions only for those matched categories
+#'     from [ablation_complications].
+#'   \item Pass the narrowed set of definitions plus the event narrative to the
+#'     LLM for adjudication.
+#' }
+#'
+#' @format A named list with one element per complication category (matching
+#'   the names in [ablation_complications]). Each element is a named list with
+#'   up to three character vectors:
+#'   \describe{
+#'     \item{annex_e}{IMDRF codes from Annex E (clinical signs, symptoms, or
+#'       conditions) relevant to this complication.}
+#'     \item{annex_f}{IMDRF codes from Annex F (health impact) relevant to
+#'       this complication.}
+#'     \item{annex_a}{IMDRF codes from Annex A (device problems) relevant to
+#'       this complication.}
+#'   }
+#'
+#' @details
+#' **Code selection rationale.** Codes were selected to cast a clinically
+#' appropriate net for AF catheter ablation adverse events. Each complication
+#' category includes:
+#' \itemize{
+#'   \item **Primary codes** that directly name the complication (e.g., E0605
+#'     Cardiac Tamponade maps to `pericardial`).
+#'   \item **Secondary codes** for signs, symptoms, or sequelae strongly
+#'     associated with the complication in the ablation context (e.g., E0717
+#'     Dyspnea maps to `phrenic` because dyspnea is the cardinal symptom of
+#'     phrenic nerve palsy post-ablation).
+#'   \item **Health impact codes** (Annex F) that describe the clinical
+#'     consequence pattern typical of the complication.
+#'   \item **Device problem codes** (Annex A) only where relevant (primarily
+#'     for `device_malfunction`).
+#' }
+#'
+#' Some codes appear in multiple categories when clinically appropriate (e.g.,
+#' E0602 Cardiac Arrest maps to both `arrhythmia` and `death`).
+#'
+#' @examples
+#' # Which complication categories should be evaluated for a report
+#' # with patient problem codes E0605 (Cardiac Tamponade) and E0619
+#' # (Pericardial Effusion)?
+#' reported_codes <- c("E0605", "E0619")
+#' matched <- vapply(complication_ontology, function(cat) {
+#'   any(reported_codes %in% cat$annex_e)
+#' }, logical(1))
+#' names(which(matched))
+#' # Returns: "pericardial"
+#'
+#' # Retrieve only the relevant complication definitions for LLM prompting
+#' relevant_definitions <- ablation_complications[names(which(matched))]
+#'
+#' @seealso [ablation_complications] for the full complication definitions,
+#'   [load_maude_codes()] to load the annex code tables with full metadata.
+#'
+#' @source
+#' FDA MDR Adverse Event Codes (Annexes A, E, F):
+#' \url{https://www.fda.gov/medical-devices/mdr-adverse-event-codes/coding-resources-medical-device-reports}
+"complication_ontology"
+
+complication_ontology <- list(
+
+  # ─── 1. PERICARDIAL EFFUSION / TAMPONADE / PERICARDITIS ───────────────────
+  pericardial = list(
+    annex_e = c(
+      "E0619",   # Pericardial Effusion
+      "E0605",   # Cardiac Tamponade
+      "E0620",   # Pericarditis
+      "E0604",   # Cardiac Perforation
+      "E0627",   # Intraoperative Cardiac Injury
+      "E233001", # Chest Pain
+      "E2321",   # Low Blood Pressure / Hypotension
+      "E2343"    # Hemodynamic instability
+    ),
+    annex_f = c(
+      "F19",     # Surgical Intervention
+      "F1901",   # Additional Surgery
+      "F2306",   # Resuscitation
+      "F08",     # Hospitalization or Prolonged Hospitalization
+      "F0801",   # Intensive Care
+      "F1203",   # Life Threatening Illness or Injury
+      "F2303"    # Medication Required
+    )
+  ),
+
+  # ─── 2. CEREBROVASCULAR EVENT ─────────────────────────────────────────────
+  stroke = list(
+    annex_e = c(
+      "E0133",   # Stroke/CVA
+      "E013301", # Hemorrhagic Stroke
+      "E013302", # Ischemia Stroke
+      "E0137",   # Transient Ischemic Attack
+      "E0503",   # Embolism/Embolus
+      "E050301", # Air Embolism
+      "E050302", # Foreign Body Embolism
+      "E050304", # Thromboembolism
+      "E0118",   # Intracranial Hemorrhage
+      "E0102",   # Brain Injury
+      "E0103",   # Cerebral Edema
+      "E0119",   # Loss of consciousness
+      "E011901", # Coma
+      "E012202", # Paralysis
+      "E012204", # Paresis
+      "E0113",   # Dysphasia
+      "E011301", # Aphonia
+      "E0839",   # Visual Impairment
+      "E083901", # Blurred Vision
+      "E083902", # Loss of Vision
+      "E0107",   # Cognitive Changes
+      "E010701", # Confusion / Disorientation
+      "E0509"    # Ischemia
+    ),
+    annex_f = c(
+      "F02",     # Death
+      "F03",     # Brain Death
+      "F12",     # Serious Injury / Illness / Impairment
+      "F1203",   # Life Threatening Illness or Injury
+      "F1204",   # Permanent Impairment
+      "F1205",   # Temporary Impairment
+      "F1202",   # Disability
+      "F08",     # Hospitalization or Prolonged Hospitalization
+      "F0801"    # Intensive Care
+    )
+  ),
+
+  # ─── 3. VASCULAR ACCESS COMPLICATION ──────────────────────────────────────
+  vascular = list(
+    annex_e = c(
+      "E0505",   # Hematoma
+      "E0506",   # Hemorrhage/Blood Loss/Bleeding
+      "E050601", # Ecchymosis
+      "E050602", # Exsanguination
+      "E0513",   # Pseudoaneurysm
+      "E0501",   # Aneurysm
+      "E050101", # Ruptured Aneurysm
+      "E0514",   # Thrombosis/Thrombus
+      "E050303", # Pulmonary Embolism
+      "E1027",   # Retroperitoneal Hemorrhage
+      "E0511",   # Perforation of Vessels
+      "E051101", # Great Vessel Perforation
+      "E2338",   # Swelling / Edema
+      "E233801", # Peripheral Edema
+      "E1002",   # Abdominal Pain
+      "E2321",   # Low Blood Pressure / Hypotension
+      "E0301",   # Anemia
+      "E2343"    # Hemodynamic instability
+    ),
+    annex_f = c(
+      "F2302",   # Blood Transfusion
+      "F19",     # Surgical Intervention
+      "F1901",   # Additional Surgery
+      "F08",     # Hospitalization or Prolonged Hospitalization
+      "F11",     # Minor Injury / Illness / Impairment
+      "F12"      # Serious Injury / Illness / Impairment
+    )
+  ),
+
+  # ─── 4. PULMONARY VEIN STENOSIS ──────────────────────────────────────────
+  pv_stenosis = list(
+    annex_e = c(
+      "E2337",   # Stenosis
+      "E233701", # Restenosis
+      "E0717",   # Dyspnea
+      "E0721",   # Hemoptysis
+      "E0733",   # Pneumonia
+      "E0735",   # Pulmonary Dysfunction
+      "E0737",   # Pulmonary Hypertension
+      "E0743"    # Respiratory Insufficiency
+    ),
+    annex_f = c(
+      "F19",     # Surgical Intervention
+      "F2203",   # Imaging Required
+      "F08",     # Hospitalization or Prolonged Hospitalization
+      "F15"      # Recognised Device or Procedural Complication
+    )
+  ),
+
+  # ─── 5. ESOPHAGEAL INJURY ────────────────────────────────────────────────
+  esophageal = list(
+    annex_e = c(
+      "E1022",   # Perforation of Esophagus
+      "E1018",   # Laceration(s) of Esophagus
+      "E1029",   # Stenosis of the esophagus
+      "E1009",   # Dysphagia / Odynophagia
+      "E1013",   # Gastroesophageal Burn
+      "E2339",   # Ulcer
+      "E2314",   # Fistula
+      "E233001", # Chest Pain
+      "E1020",   # Nausea
+      "E1032",   # Vomiting
+      "E230101", # Fever
+      "E0306",   # Sepsis (septic embolism from AEF)
+      "E0133",   # Stroke/CVA (air embolism from AEF)
+      "E050301"  # Air Embolism (from AEF)
+    ),
+    annex_f = c(
+      "F02",     # Death
+      "F19",     # Surgical Intervention
+      "F1901",   # Additional Surgery
+      "F0801",   # Intensive Care
+      "F1203",   # Life Threatening Illness or Injury
+      "F2303"    # Medication Required
+    )
+  ),
+
+  # ─── 6. PHRENIC NERVE INJURY ─────────────────────────────────────────────
+  phrenic = list(
+    annex_e = c(
+      "E0123",   # Nerve Damage
+      "E0128",   # Peripheral Nervous Injury
+      "E012202", # Paralysis
+      "E012204", # Paresis
+      "E0717",   # Dyspnea
+      "E0743",   # Respiratory Insufficiency
+      "E0138"    # Undesired Nerve Stimulation
+    ),
+    annex_f = c(
+      "F11",     # Minor Injury / Illness / Impairment
+      "F12",     # Serious Injury / Illness / Impairment
+      "F1204",   # Permanent Impairment
+      "F1205",   # Temporary Impairment
+      "F15",     # Recognised Device or Procedural Complication
+      "F2203"    # Imaging Required
+    )
+  ),
+
+  # ─── 7. PROCEDURE-RELATED ARRHYTHMIA ─────────────────────────────────────
+  arrhythmia = list(
+    annex_e = c(
+      "E0601",   # Arrhythmia
+      "E060101", # Asystole
+      "E060102", # Atrial Fibrillation
+      "E060103", # Atrial Flutter
+      "E060104", # Bradycardia
+      "E060105", # Ectopic Heartbeat
+      "E060106", # Heart Block
+      "E060107", # Idioventricular Rhythm
+      "E060108", # Irregular Pulse
+      "E060109", # Tachycardia
+      "E060110", # Ventricular Fibrillation
+      "E0602",   # Cardiac Arrest
+      "E0618"    # Non specific EKG/ECG Changes
+    ),
+    annex_f = c(
+      "F2306",   # Resuscitation
+      "F2303",   # Medication Required
+      "F2307",   # Reprogramming of Device
+      "F19",     # Surgical Intervention (device implant)
+      "F15"      # Recognised Device or Procedural Complication
+    )
+  ),
+
+  # ─── 8. CORONARY ARTERY INJURY / SPASM ───────────────────────────────────
+  coronary = list(
+    annex_e = c(
+      "E0521",   # Coronary obstruction/occlusion
+      "E0612",   # Ischemic Heart Disease
+      "E061201", # Angina
+      "E061202", # Myocardial Infarction
+      "E0516",   # Vasoconstriction
+      "E0509",   # Ischemia
+      "E0618",   # Non specific EKG/ECG Changes
+      "E0603",   # Cardiac Enzyme Elevation
+      "E0602",   # Cardiac Arrest
+      "E2321",   # Low Blood Pressure / Hypotension
+      "E2343",   # Hemodynamic instability
+      "E233001"  # Chest Pain
+    ),
+    annex_f = c(
+      "F02",     # Death
+      "F19",     # Surgical Intervention (emergent PCI)
+      "F1901",   # Additional Surgery
+      "F0801",   # Intensive Care
+      "F1203",   # Life Threatening Illness or Injury
+      "F2303"    # Medication Required (nitroglycerin)
+    )
+  ),
+
+  # ─── 9. HEMOLYSIS / ACUTE KIDNEY INJURY ──────────────────────────────────
+  hemolysis = list(
+    annex_e = c(
+      "E0303",   # Hemolysis
+      "E030101", # Hemolytic Anemia
+      "E0301",   # Anemia
+      "E1305",   # Renal Impairment
+      "E130501", # Renal Failure
+      "E2204",   # Lactate Dehydrogenase Increased
+      "E1302",   # Hematuria
+      "E1309",   # Urinary Retention
+      "E2320",   # High Blood Pressure / Hypertension
+      "E0516"    # Vasoconstriction (NO scavenging)
+    ),
+    annex_f = c(
+      "F12",     # Serious Injury / Illness / Impairment
+      "F08",     # Hospitalization or Prolonged Hospitalization
+      "F2303",   # Medication Required
+      "F23"      # Unexpected Medical Intervention
+    )
+  ),
+
+  # ─── 10. RESPIRATORY / PULMONARY COMPLICATION ────────────────────────────
+  respiratory = list(
+    annex_e = c(
+      "E0734",   # Pneumothorax
+      "E0722",   # Hemothorax
+      "E0721",   # Hemoptysis
+      "E0736",   # Pulmonary Edema
+      "E0717",   # Dyspnea
+      "E0731",   # Pleural Effusion
+      "E0741",   # Respiratory Arrest
+      "E0742",   # Respiratory Failure
+      "E0743",   # Respiratory Insufficiency
+      "E0707",   # Bronchial Hemorrhage
+      "E0726",   # Hypoxia
+      "E0701",   # Adult Respiratory Distress Syndrome
+      "E0735",   # Pulmonary Dysfunction
+      "E0733",   # Pneumonia
+      "E073301", # Bronchopneumonia
+      "E0738",   # Pulmonary Infarction
+      "E2203"    # Low Oxygen Saturation
+    ),
+    annex_f = c(
+      "F19",     # Surgical Intervention (chest tube)
+      "F1901",   # Additional Surgery
+      "F08",     # Hospitalization or Prolonged Hospitalization
+      "F0801",   # Intensive Care
+      "F12"      # Serious Injury / Illness / Impairment
+    )
+  ),
+
+  # ─── 11. PROCEDURE-RELATED INFECTION ─────────────────────────────────────
+  infection = list(
+    annex_e = c(
+      "E0306",   # Sepsis
+      "E233605", # Septic Shock
+      "E0610",   # Endocarditis
+      "E1901",   # Bacterial Infection
+      "E190101", # Drug Resistant Bacterial Infection
+      "E190102", # Pyogenic Infection
+      "E1906",   # Unspecified Infection
+      "E172001", # Abscess
+      "E172002", # Cellulitis
+      "E2012",   # Wound Infection
+      "E2115",   # Post Operative Wound Infection
+      "E2205",   # Bacteremia
+      "E0733",   # Pneumonia
+      "E1310",   # Urinary Tract Infection
+      "E2123",   # Medical device site infection
+      "E230101", # Fever
+      "E0311"    # High White Blood Cell Count
+    ),
+    annex_f = c(
+      "F02",     # Death
+      "F1007",   # Exposure to Contaminated Device / Risk of Infection
+      "F08",     # Hospitalization or Prolonged Hospitalization
+      "F0801",   # Intensive Care
+      "F12",     # Serious Injury / Illness / Impairment
+      "F1203",   # Life Threatening Illness or Injury
+      "F2303"    # Medication Required (antibiotics)
+    )
+  ),
+
+  # ─── 12. PROCEDURE-RELATED DEATH ─────────────────────────────────────────
+  death = list(
+    annex_e = c(
+      "E0602",   # Cardiac Arrest
+      "E060101", # Asystole
+      "E050602", # Exsanguination
+      "E2342"    # Multiple Organ Dysfunction Syndrome
+    ),
+    annex_f = c(
+      "F02",     # Death
+      "F0201",   # Intrauterine Fetal Death
+      "F03",     # Brain Death
+      "F16",     # Reduction in Life Expectancy
+      "F29"      # Death not related to reported adverse event
+    )
+  ),
+
+  # ─── 13. DEVICE / EQUIPMENT MALFUNCTION ──────────────────────────────────
+  device_malfunction = list(
+    annex_e = c(
+      "E2104",   # Electric Shock
+      "E210401", # Shock from Patient Lead(s)
+      "E2103"    # Device Overstimulation of Tissue
+    ),
+    annex_f = c(
+      "F26",     # No Health Consequences or Impact
+      "F2601",   # Problem identified before clinical use/exposure
+      "F05",     # Delay to Treatment / Therapy
+      "F14",     # Prolonged Episode of Care
+      "F25"      # Unanticipated Adverse Device Effect
+    ),
+    annex_a = c(
+      # Material Integrity
+      "A04",     # Material Integrity Problem
+      "A0401",   # Break
+      "A040101", # Fracture
+      "A040102", # Loss of or Failure to Bond
+      "A040103", # Material Fragmentation
+      "A0408",   # Material Disintegration
+      "A0412",   # Material Rupture
+      "A0413",   # Material Separation
+      "A0414",   # Material Split, Cut or Torn
+      # Mechanical
+      "A05",     # Mechanical Problem
+      "A0501",   # Detachment of Device or Device Component
+      "A0504",   # Leak/Splash
+      "A050401", # Fluid/Blood Leak
+      "A0511",   # Structural Problem
+      "A051201", # Device Dislodged or Dislocated
+      # Electrical / Electronic
+      "A07",     # Electrical / Electronic Property Problem
+      "A0701",   # Capturing Problem
+      "A070101", # Failure to Capture
+      "A0705",   # Battery Problem
+      "A070504", # Premature Discharge of Battery
+      "A0708",   # Power Problem
+      "A070801", # Complete Loss of Power
+      "A0709",   # Device Sensing Problem
+      "A070908", # Failure to Sense
+      "A070909", # Over-Sensing
+      "A070910", # Under-Sensing
+      "A0722",   # Impedance Problem
+      "A072201", # High impedance
+      "A072202", # Low impedance
+      "A0718",   # Failure to Shut Off
+      "A0719",   # Unexpected Shutdown
+      # Output / Energy
+      "A09",     # Output Problem
+      "A0904",   # Energy Output Problem
+      "A090402", # Failure to Deliver Energy
+      "A090403", # Intermittent Energy Output
+      "A090404", # Output above Specifications
+      "A090405", # Output below Specifications
+      "A0907",   # No Device Output
+      "A0908",   # Incorrect, Inadequate or Imprecise Result or Readings
+      # Software
+      "A11",     # Computer Software Problem
+      "A1102",   # Application Program Problem
+      "A110201", # Application Program Freezes
+      # Temperature
+      "A10",     # Temperature Problem
+      "A1002",   # Excessive Heating
+      "A1005",   # Overheating of Device
+      # Connection
+      "A12",     # Connection Problem
+      "A1203",   # Disconnection
+      "A1205",   # Loose or Intermittent Connection
+      "A1206",   # Misconnection
+      # Infusion / Flow (irrigation)
+      "A14",     # Infusion or Flow Problem
+      "A1408",   # No Flow
+      "A140803", # Inability to Irrigate
+      # Activation / Positioning
+      "A15",     # Activation, Positioning or Separation Problem
+      "A150101", # Activation Failure
+      "A150201", # Positioning Failure
+      # Alarm / Safety
+      "A16",     # Protective Measures Problem
+      "A1601",   # Device Alarm System
+      "A160106"  # Defective Alarm
+    )
+  ),
+
+  # ─── 14. NO PATIENT HARM ─────────────────────────────────────────────────
+  no_harm = list(
+    annex_e = c(
+      "E2403"    # No Clinical Signs, Symptoms or Conditions
+    ),
+    annex_f = c(
+      "F26",     # No Health Consequences or Impact
+      "F2601",   # Problem identified before clinical use/exposure
+      "F27"      # Problem identified during non-clinical procedure
+    )
+  ),
+
+  # ─── 15. OTHER COMPLICATION ──────────────────────────────────────────────
+  other = list(
+    annex_e = c(
+      # Valve injury
+      "E0621",   # Valvular Insufficiency / Regurgitation
+      "E062102", # Mitral Valve Insufficiency / Regurgitation
+      "E062104", # Tricuspid Valve Insufficiency / Regurgitation
+      "E0624",   # Intraoperative Cardiac Valve Injury
+      "E0608",   # Cusp Tear
+      # Septal defect
+      "E0625",   # Cardiac Septal Defect Residual Shunt
+      # Autonomic / vasovagal
+      "E060104", # Bradycardia
+      "E060101", # Asystole
+      "E011903", # Syncope / Fainting
+      "E011902", # Presyncope
+      "E2321",   # Low Blood Pressure / Hypotension
+      # Allergic / anaphylaxis
+      "E0402",   # Hypersensitivity / Allergic reaction
+      "E040201", # Anaphylactic Shock
+      "E040202", # Anaphylactoid / Anaphylaxis
+      # Anesthesia-related
+      "E0704",   # Aspiration / Inhalation
+      "E0705",   # Aspiration Pneumonitis
+      "E2102",   # Awareness during Anaesthesia
+      "E2113",   # Oversedation
+      # Cardiogenic shock / heart failure
+      "E233601", # Cardiogenic Shock
+      "E0611",   # Heart Failure / Congestive Heart Failure
+      "E0613",   # Low Cardiac Output
+      # Skin / radiation
+      "E1704",   # Burn(s)
+      "E170403", # Radiation Burn
+      "E2119",   # Unintended Radiation Exposure
+      # Musculoskeletal (PFA-related)
+      "E1605",   # Cramp(s) / Muscle Spasm(s)
+      "E2103",   # Device Overstimulation of Tissue
+      "E2104",   # Electric Shock
+      # Urinary retention
+      "E1309",   # Urinary Retention
+      # General
+      "E2336",   # Shock
+      "E2330",   # Pain
+      "E2326"    # Inflammation
+    ),
+    annex_f = c(
+      "F07",     # Exacerbation of Existing Condition
+      "F11",     # Minor Injury / Illness / Impairment
+      "F12",     # Serious Injury / Illness / Impairment
+      "F15",     # Recognised Device or Procedural Complication
+      "F17",     # Sedation
+      "F25",     # Unanticipated Adverse Device Effect
+      "F28"      # Appropriate Term/Code Not Available
+    )
+  )
+)
