@@ -9,6 +9,7 @@
 #' - Left atrial diameter (quantitative measurement in cm)
 #' - Left ventricular ejection fraction (LVEF, percentage)
 #' - Left ventricular internal diameter in diastole (LVIDd, in cm)
+#' - A compact set of clinically important findings from a full report
 #'
 #' @param text Character string containing the echo report text
 #' @param min_val Minimum plausible value for measurements (default varies by function)
@@ -23,6 +24,7 @@
 #' - `extract_la_diameter()`: Numeric LA diameter in cm
 #' - `extract_lvef()`: Numeric LVEF percentage
 #' - `extract_lvidd()`: Numeric LVIDd in cm
+#' - `extract_echo_findings()`: Named list of key structure/function findings
 #'
 #' @examples
 #' report <- "The left atrium is mildly dilated. LVEF is 55%."
@@ -32,6 +34,15 @@
 #' @name echocardiography
 NULL
 
+# Internal helper to normalize report text
+.clean_echo_text <- function(text) {
+  text |>
+    tolower() |>
+    stringr::str_replace_all("\n", " ") |>
+    stringr::str_replace_all("\\s+", " ") |>
+    stringr::str_trim()
+}
+
 #' @rdname echocardiography
 #' @export
 extract_la_size <- function(text) {
@@ -39,12 +50,7 @@ extract_la_size <- function(text) {
   if (is.na(text) || is.null(text)) {
     NA_character_
   } else {
-    # Clean text
-    text <- text |>
-      tolower() |>
-      stringr::str_replace_all("\n", " ") |>
-      stringr::str_replace_all("\\s+", " ") |>
-      stringr::str_trim()
+    text <- .clean_echo_text(text)
 
     # Pattern for LA size descriptions
     pattern <- paste0(
@@ -70,19 +76,16 @@ extract_lvef <- function(text) {
   if (is.na(text) || is.null(text)) {
     NA_real_
   } else {
-    # Clean text
-    text <- text |>
-      tolower() |>
-      stringr::str_replace_all("\n", " ") |>
-      stringr::str_replace_all("\\s+", " ") |>
-      stringr::str_trim()
+    text <- .clean_echo_text(text)
 
     # Define common EF patterns
     patterns <- c(
       # EF/LVEF with optional colon, digits, maybe decimal, optional % sign
-      "(?:ef\\s*|lvef\\s*|ejection fraction\\s*)(:?\\s*)(\\d{1,2}\\.?\\d?)(?:\\s*%| percent)?",
+      "(?:ef\\s*|lvef\\s*|ejection fraction\\s*)(:?\\s*)(\\d{1,2}\\.?\\d?)(?:\\s*%|\\s*percent)?",
       # Simpson's EF pattern
-      "(?:simpson'?s?\\s*ef\\s*)(\\d{1,2}\\.?\\d?)(?:\\s*%| percent)?"
+      "(?:simpson'?s?\\s*ef\\s*)(\\d{1,2}\\.?\\d?)(?:\\s*%|\\s*percent)?",
+      # EF range pattern, use lower bound to avoid overcalling high end
+      "(?:ef\\s*|lvef\\s*|ejection fraction\\s*)[:]?\\s*(\\d{1,2})\\s*(?:-|to)\\s*(\\d{1,2})(?:\\s*%|\\s*percent)?"
     )
 
     # Try each pattern until we find a match
@@ -99,7 +102,7 @@ extract_lvef <- function(text) {
             !is.na(possible_val) && grepl("^\\d{1,2}(\\.\\d)?$", possible_val)
           ) {
             val <- suppressWarnings(as.numeric(possible_val))
-            if (!is.na(val)) return(val) # Explicit return for early exit
+            if (!is.na(val) && val >= 5 && val <= 90) return(val)
           }
         }
       }
@@ -117,12 +120,7 @@ extract_lvidd <- function(text) {
   if (is.na(text) || is.null(text)) {
     NA_real_
   } else {
-    # Clean text
-    text <- text |>
-      tolower() |>
-      stringr::str_replace_all("\n", " ") |>
-      stringr::str_replace_all("\\s+", " ") |>
-      stringr::str_trim()
+    text <- .clean_echo_text(text)
 
     # Define common LVIDd patterns
     patterns <- c(
@@ -158,11 +156,13 @@ extract_la_diameter <- function(text, min_val = 1, max_val = 10) {
   if (is.na(text) || is.null(text)) {
     NA_real_
   } else {
+    text <- .clean_echo_text(text)
+
     # Define high-priority patterns for structured sections
     priority_patterns <- list(
-      la_ap = "LA\\s*A/P:\\s*(\\d+\\.?\\d*)\\s*cm",
-      la_measure = "L\\.?\\s*Atrium\\s*\\(S\\)\\s*\\([^\\)]+\\):\\s*(\\d+\\.?\\d*)\\s*cm",
-      la_dim = "left\\s+atrial\\s+A/P\\s+dimension\\s+(?:is|of)\\s*(\\d+\\.?\\d*)\\s*cm"
+      la_ap = "la\\s*a/p:\\s*(\\d+\\.?\\d*)\\s*cm",
+      la_measure = "l\\.?\\s*atrium\\s*\\(s\\)\\s*\\([^\\)]+\\):\\s*(\\d+\\.?\\d*)\\s*cm",
+      la_dim = "left\\s+atrial\\s+a/p\\s+dimension\\s+(?:is|of)\\s*(\\d+\\.?\\d*)\\s*cm"
     )
 
     # Try priority patterns first
@@ -225,4 +225,103 @@ extract_la_diameter <- function(text, min_val = 1, max_val = 10) {
     # No valid matches found, defaults to NA
     NA_real_
   }
+}
+
+#' @rdname echocardiography
+#' @export
+extract_echo_findings <- function(text) {
+  if (is.na(text) || is.null(text)) {
+    return(list(
+      lvef = NA_real_,
+      lvef_category = NA_character_,
+      lvidd_cm = NA_real_,
+      la_size = NA_character_,
+      la_diameter_cm = NA_real_,
+      lv_diastolic_dysfunction = NA_character_,
+      wall_motion_abnormality = NA,
+      rv_dysfunction = NA_character_,
+      rvsp_mmhg = NA_real_,
+      pulmonary_hypertension = NA_character_,
+      mitral_regurgitation = NA_character_,
+      aortic_stenosis = NA_character_,
+      aortic_regurgitation = NA_character_,
+      tricuspid_regurgitation = NA_character_,
+      pericardial_effusion = NA_character_
+    ))
+  }
+
+  text <- .clean_echo_text(text)
+
+  extract_severity <- function(term) {
+    pattern <- paste0(
+      "(?:", term, ")[^\\.;:]{0,80}?",
+      "(none|trace|trivial|mild|mildly|moderate|moderately|severe|severely)"
+    )
+    m <- stringr::str_match(text, stringr::regex(pattern, ignore_case = TRUE))
+    if (all(is.na(m))) return(NA_character_)
+    sev <- m[1, 2]
+    sev <- dplyr::case_when(
+      is.na(sev) ~ NA_character_,
+      sev %in% c("mildly", "mild") ~ "mild",
+      sev %in% c("moderately", "moderate") ~ "moderate",
+      sev %in% c("severely", "severe") ~ "severe",
+      TRUE ~ sev
+    )
+    sev
+  }
+
+  lvef <- extract_lvef(text)
+  lvef_category <- dplyr::case_when(
+    is.na(lvef) ~ NA_character_,
+    lvef < 30 ~ "severe systolic dysfunction",
+    lvef < 40 ~ "moderate systolic dysfunction",
+    lvef < 50 ~ "mild systolic dysfunction",
+    TRUE ~ "preserved systolic function"
+  )
+
+  # Diastolic dysfunction often reported as grade I/II/III
+  dd_match <- stringr::str_match(
+    text,
+    "(?:diastolic dysfunction|diastolic function)[^\\.;:]{0,60}(grade\\s*[ivx]+|normal|indeterminate|impaired relaxation|pseudonormal|restrictive)"
+  )
+  lv_diastolic_dysfunction <- if (!all(is.na(dd_match))) dd_match[1, 2] else NA_character_
+
+  # Pulmonary pressure / RVSP
+  rvsp_match <- stringr::str_match(
+    text,
+    "(?:rvsp|right ventricular systolic pressure|pulmonary artery systolic pressure|pasp)\\D{0,20}(\\d{1,3}(?:\\.\\d+)?)\\s*mmhg"
+  )
+  rvsp_mmhg <- if (!all(is.na(rvsp_match))) as.numeric(rvsp_match[1, 2]) else NA_real_
+  pulmonary_hypertension <- dplyr::case_when(
+    is.na(rvsp_mmhg) ~ NA_character_,
+    rvsp_mmhg < 35 ~ "none",
+    rvsp_mmhg < 50 ~ "mild",
+    rvsp_mmhg < 60 ~ "moderate",
+    TRUE ~ "severe"
+  )
+
+  # WMA is frequently a major actionable finding
+  wall_motion_abnormality <- dplyr::case_when(
+    stringr::str_detect(text, "no regional wall motion abnormalit") ~ FALSE,
+    stringr::str_detect(text, "regional wall motion abnormalit|rwma|hypokinesis|akinesis|dyskinesis") ~ TRUE,
+    TRUE ~ NA
+  )
+
+  list(
+    lvef = lvef,
+    lvef_category = lvef_category,
+    lvidd_cm = extract_lvidd(text),
+    la_size = extract_la_size(text),
+    la_diameter_cm = extract_la_diameter(text),
+    lv_diastolic_dysfunction = lv_diastolic_dysfunction,
+    wall_motion_abnormality = wall_motion_abnormality,
+    rv_dysfunction = extract_severity("right ventricular function|rv function"),
+    rvsp_mmhg = rvsp_mmhg,
+    pulmonary_hypertension = pulmonary_hypertension,
+    mitral_regurgitation = extract_severity("mitral regurgitation|\\bmr\\b"),
+    aortic_stenosis = extract_severity("aortic stenosis|\\bas\\b"),
+    aortic_regurgitation = extract_severity("aortic regurgitation|\\bar\\b"),
+    tricuspid_regurgitation = extract_severity("tricuspid regurgitation|\\btr\\b"),
+    pericardial_effusion = extract_severity("pericardial effusion")
+  )
 }
