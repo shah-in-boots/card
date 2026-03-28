@@ -35,7 +35,8 @@
 NULL
 
 # Internal helper to normalize report text
-.clean_echo_text <- function(text) {
+# @keywords internal
+clean_echo_text <- function(text) {
   text |>
     tolower() |>
     stringr::str_replace_all("\n", " ") |>
@@ -50,7 +51,7 @@ extract_la_size <- function(text) {
   if (is.na(text) || is.null(text)) {
     NA_character_
   } else {
-    text <- .clean_echo_text(text)
+    text <- clean_echo_text(text)
 
     # Pattern for LA size descriptions
     pattern <- paste0(
@@ -76,7 +77,7 @@ extract_lvef <- function(text) {
   if (is.na(text) || is.null(text)) {
     NA_real_
   } else {
-    text <- .clean_echo_text(text)
+    text <- clean_echo_text(text)
 
     # Define common EF patterns
     patterns <- c(
@@ -120,7 +121,7 @@ extract_lvidd <- function(text) {
   if (is.na(text) || is.null(text)) {
     NA_real_
   } else {
-    text <- .clean_echo_text(text)
+    text <- clean_echo_text(text)
 
     # Define common LVIDd patterns
     patterns <- c(
@@ -156,7 +157,7 @@ extract_la_diameter <- function(text, min_val = 1, max_val = 10) {
   if (is.na(text) || is.null(text)) {
     NA_real_
   } else {
-    text <- .clean_echo_text(text)
+    text <- clean_echo_text(text)
 
     # Define high-priority patterns for structured sections
     priority_patterns <- list(
@@ -250,7 +251,7 @@ extract_echo_findings <- function(text) {
     ))
   }
 
-  text <- .clean_echo_text(text)
+  text <- clean_echo_text(text)
 
   extract_severity <- function(term) {
     pattern <- paste0(

@@ -125,7 +125,7 @@ annex_f <-
 
 # Dataset ----
 
-.maude_codes <- list(
+maude_annex_codes <- list(
   "device_problems" = annex_a,
   "clinical_signs" = annex_e,
   "health_impact" = annex_f
@@ -133,7 +133,7 @@ annex_f <-
 
 # Create dataset
 usethis::use_data(
-  .maude_codes, 
+  maude_annex_codes, 
   overwrite = TRUE,
   internal = TRUE
 )
