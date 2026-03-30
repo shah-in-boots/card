@@ -148,3 +148,21 @@
 #' @docType data
 #' @keywords datasets
 "complication_definitions"
+
+#' MAUDE Complication Index for Cardiovascular Procedure Adverse Events
+#'
+#' A named list of normalized MAUDE problem terms organized into the
+#' complication categories defined in `complication_definitions`, plus a
+#' residual `not_indexed` bucket. The list is maintained explicitly in
+#' `data-raw/complications.R` as hand-written term vectors. Overlap between
+#' categories is expected.
+#'
+#' @examples
+#' maude_complication_index$pericardial
+#' maude_complication_index$stroke
+#' maude_complication_index$device_malfunction
+#' maude_complication_index$not_indexed
+#'
+#' @docType data
+#' @keywords datasets
+"maude_complication_index"

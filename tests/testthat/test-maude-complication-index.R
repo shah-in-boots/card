@@ -1,0 +1,31 @@
+normalize_maude_test_term <- function(x) {
+  x <- tolower(x)
+  x <- gsub("[^a-z0-9]+", " ", x)
+  trimws(x)
+}
+
+test_that("maude_complication_index covers all MAUDE problem terms", {
+  source_terms <-
+    dplyr::bind_rows(
+      load_maude_codes("A"),
+      load_maude_codes("E"),
+      load_maude_codes("F")
+    ) |>
+    dplyr::distinct(annex, imdrf_code, .keep_all = TRUE) |>
+    dplyr::transmute(term = normalize_maude_test_term(term)) |>
+    dplyr::distinct(term) |>
+    dplyr::pull(term)
+
+  indexed_terms <- unique(unlist(maude_complication_index, use.names = FALSE))
+
+  expect_true("not_indexed" %in% names(maude_complication_index))
+  expect_true(length(maude_complication_index$not_indexed) > 0)
+  expect_setequal(indexed_terms, source_terms)
+})
+
+test_that("maude_complication_index includes expected clinical mappings", {
+  expect_true("cardiac tamponade" %in% maude_complication_index$pericardial)
+  expect_true("low blood pressure hypotension" %in% maude_complication_index$coronary)
+  expect_true("arrhythmia" %in% maude_complication_index$arrhythmia)
+  expect_true("no health consequences or impact" %in% maude_complication_index$no_harm)
+})
