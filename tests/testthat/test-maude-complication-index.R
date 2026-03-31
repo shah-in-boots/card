@@ -29,3 +29,36 @@ test_that("maude_complication_index includes expected clinical mappings", {
   expect_true("arrhythmia" %in% maude_complication_index$arrhythmia)
   expect_true("no health consequences or impact" %in% maude_complication_index$no_harm)
 })
+
+test_that("maude_term_to_complication groups terms and preserves originals", {
+  out <- maude_term_to_complication(c(
+    "Cardiac Tamponade",
+    "Low blood pressure / hypotension",
+    "No Health Consequences or Impact"
+  ),
+  complication_definitions = complication_definitions,
+  complication_index = maude_complication_index)
+
+  expect_equal(out$pericardial, c(
+    "Cardiac Tamponade",
+    "Low blood pressure / hypotension"
+  ))
+  expect_equal(out$coronary, "Low blood pressure / hypotension")
+  expect_equal(out$vascular, "Low blood pressure / hypotension")
+  expect_equal(out$no_harm, "No Health Consequences or Impact")
+})
+
+test_that("maude_term_to_complication validates custom index names", {
+  bad_index <- list(
+    unknown_complication = "cardiac tamponade"
+  )
+
+  expect_error(
+    maude_term_to_complication(
+      "cardiac tamponade",
+      complication_definitions = complication_definitions,
+      complication_index = bad_index
+    ),
+    "contains names not present"
+  )
+})

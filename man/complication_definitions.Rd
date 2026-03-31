@@ -12,11 +12,14 @@ three components:
 \item \strong{definition}: Character. A clinical definition written for use by
 an LLM or human adjudicator to identify the complication in adverse
 event narrative text.
-\item \strong{severity}: A named character vector. Names are short severity
-codes; values are definitions of each severity level. Severity levels
-are NOT necessarily mutually exclusive within a single event. Every
-category includes an \code{"insufficient_info"} level for narratives
-that lack sufficient detail to grade severity.
+\item \strong{classification}: A named character vector. Names are short
+classification codes; values are definitions of each classification.
+Codes may reflect subtype, acuity, intervention, or outcome. Within a
+selected category, classifications are not necessarily mutually
+exclusive. Categories may also be co-assigned when more than one
+mechanism or outcome is plausible from the narrative. Every category
+includes an \code{"insufficient_info"} level for narratives that lack
+sufficient detail to classify more specifically.
 }
 }
 \source{
@@ -29,12 +32,14 @@ surgical ablation of atrial fibrillation. Europace. 2024;26(4):euae043.
 complication_definitions
 }
 \description{
-A flat, procedure-agnostic list of complication categories for adjudicating
-adverse event narratives. Each entry represents a single complication type
-with a clinical definition and severity grading. Although the built-in
-definitions were derived from AF ablation literature, they can be used for
-any cardiac procedure by subsetting the list to the relevant categories.
-Users can also supply their own complication lists in the same format.
+A flat list of complication categories for adjudicating cardiac
+electrophysiology procedure adverse event narratives. Each entry represents
+a single complication type with a clinical definition and classification
+schema. The built-in definitions are written for catheter-based cardiac
+electrophysiology procedures and are most directly informed by AF ablation
+literature. Users can subset or replace categories to fit other cardiac
+procedures and can also supply their own complication lists in the same
+format.
 }
 \details{
 Derived from:
@@ -55,7 +60,7 @@ of Pulsed Field Ablation (Ekanem et al., Circulation 2024)
 # Access a single complication
 complication_definitions$pericardial$title
 complication_definitions$pericardial$definition
-names(complication_definitions$pericardial$severity)
+names(complication_definitions$pericardial$classification)
 
 # List all complication category names
 names(complication_definitions)
@@ -78,7 +83,7 @@ my_complications <- list(
       implant site, resulting in loss of capture, sensing failure, or
       change in pacing threshold. The narrative may describe lead
       repositioning, revision surgery, or new pacing parameters.",
-    severity = c(
+    classification = c(
       reprogrammed = "Lead dislodgement managed by device reprogramming
         without surgical intervention.",
       repositioned = "Lead surgically repositioned or replaced.",

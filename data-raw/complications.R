@@ -9,9 +9,7 @@ complication_definitions <- list(
   # Pericardial Effusion / Cardiac Tamponade / Pericarditis ----
   pericardial = list(
     title = "Pericardial Effusion / Cardiac Tamponade / Pericarditis",
-
     definition = "Any pericardial complication occurring during or after catheter ablation of atrial fibrillation. Includes accumulation of fluid (blood or serous) in the pericardial space, frank cardiac tamponade, and post-ablation pericarditis with or without associated effusion. Mechanisms include direct mechanical perforation of the atrial wall by catheter or transseptal needle, thermal injury with delayed rupture, excessive anticoagulation, and post-procedural inflammatory pericarditis. The narrative may describe hypotension, pulsus paradoxus, pleuritic chest pain, pericardial friction rub, echocardiographic findings of effusion, pericardiocentesis, surgical drainage, or treatment with NSAIDs or colchicine. Includes both acute intraprocedural events and delayed presentations hours to days after ablation.",
-
     severity = c(
       pericarditis_without_effusion = "Post-ablation pericarditis presenting with pleuritic chest pain and possibly a friction rub, without a clinically significant pericardial effusion. Managed with NSAIDs, colchicine, or observation.",
       trivial_effusion = "Small or trace pericardial effusion identified at the end of the case or on post-procedure imaging. No hemodynamic compromise. No drainage required. Managed with observation, with or without anti-inflammatory therapy.",
@@ -1117,9 +1115,15 @@ maude_all_terms <-
   dplyr::pull(term) |>
   sort()
 
-maude_indexed_terms <- sort(unique(unlist(maude_complication_index, use.names = FALSE)))
+maude_indexed_terms <- sort(unique(unlist(
+  maude_complication_index,
+  use.names = FALSE
+)))
 
-maude_complication_index$not_indexed <- setdiff(maude_all_terms, maude_indexed_terms)
+maude_complication_index$not_indexed <- setdiff(
+  maude_all_terms,
+  maude_indexed_terms
+)
 
 stopifnot(
   setequal(
