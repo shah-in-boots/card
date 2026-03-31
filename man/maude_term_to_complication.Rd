@@ -4,22 +4,26 @@
 \alias{maude_term_to_complication}
 \title{Matching MAUDE terms to complications}
 \usage{
-maude_term_to_complication(term, definitions, index)
+maude_term_to_complication(
+  term,
+  definitions = complication_definitions,
+  index = maude_complication_index,
+  ...
+)
 }
 \arguments{
 \item{term}{Character vector of MAUDE problem terms to group into
 complications.}
 
-\item{definitions}{Named list of complication definitions. Names
-should be complication identifiers, and each element must contain at least
-a \code{"definition"} entry. If you want to use the package defaults, pass
-\link{complication_definitions} explicitly.}
+\item{definitions}{Named list of complication definitions. Defaults to
+\link{complication_definitions}.}
 
-\item{index}{Named list mapping complication identifiers to
-normalized MAUDE problem terms. Names must be a subset of
-\code{complication_definitions}, with optional \code{"not_indexed"} allowed as a
-residual bucket. If you want to use the package defaults, pass
-\link{maude_complication_index} explicitly.}
+\item{index}{Named list mapping complication identifiers to normalized MAUDE
+problem terms. Defaults to \link{maude_complication_index}.}
+
+\item{...}{Reserved for backward compatibility. Older callers may pass
+\code{complication_definitions} and \code{complication_index} here; new code should
+use \code{definitions} and \code{index}.}
 }
 \value{
 A named list. Each list name is a complication identifier and each

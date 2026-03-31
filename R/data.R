@@ -73,7 +73,7 @@
 #'
 #' A flat list of complication categories for adjudicating cardiac
 #' electrophysiology procedure adverse event narratives. Each entry represents
-#' a single complication type with a clinical definition and classification
+#' a single complication type with a clinical definition and subcategory
 #' schema. The built-in definitions are written for catheter-based cardiac
 #' electrophysiology procedures and are most directly informed by AF ablation
 #' literature. Users can subset or replace categories to fit other cardiac
@@ -99,10 +99,12 @@
 #'   - **definition**: Character. A clinical definition written for use by
 #'     an LLM or human adjudicator to identify the complication in adverse
 #'     event narrative text.
-#'   - **classification**: A named character vector. Names are short
-#'     classification codes; values are definitions of each classification.
-#'     Codes may reflect subtype, acuity, intervention, or outcome. Within a
-#'     selected category, classifications are not necessarily mutually
+#'   - **classification**: A named character vector in the bundled data. Names are
+#'     short subcategory codes; values are definitions of each subcategory.
+#'     User-supplied definitions may instead use the more general field name
+#'     `classification`, which is treated equivalently by the adjudication
+#'     helpers. Codes may reflect subtype, acuity, intervention, or outcome.
+#'     Within a selected category, subcategories are not necessarily mutually
 #'     exclusive. Categories may also be co-assigned when more than one
 #'     mechanism or outcome is plausible from the narrative. Every category
 #'     includes an `"insufficient_info"` level for narratives that lack
@@ -112,7 +114,7 @@
 #' # Access a single complication
 #' complication_definitions$pericardial$title
 #' complication_definitions$pericardial$definition
-#' names(complication_definitions$pericardial$classification)
+#' names(complication_definitions$pericardial$severity)
 #'
 #' # List all complication category names
 #' names(complication_definitions)

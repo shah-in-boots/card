@@ -2,14 +2,11 @@
 % Please edit documentation in R/maude-adjudicate.R
 \name{validate_complication_index}
 \alias{validate_complication_index}
-\title{Validate Complication Index}
+\title{Internal helper to validate that a complication index is a
+named list of character vectors whose names are present in the supplied
+complication definitions, with optional \code{"not_indexed"} allowed.}
 \usage{
 validate_complication_index(index, index_names)
-}
-\arguments{
-\item{index}{Named complication index list.}
-
-\item{names}{Character vector of valid complication names.}
 }
 \description{
 Internal helper to validate that a complication index is a
