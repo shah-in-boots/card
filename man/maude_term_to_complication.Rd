@@ -7,8 +7,7 @@
 maude_term_to_complication(
   term,
   definitions = complication_definitions,
-  index = maude_complication_index,
-  ...
+  index = maude_complication_index
 )
 }
 \arguments{
@@ -20,10 +19,6 @@ complications.}
 
 \item{index}{Named list mapping complication identifiers to normalized MAUDE
 problem terms. Defaults to \link{maude_complication_index}.}
-
-\item{...}{Reserved for backward compatibility. Older callers may pass
-\code{complication_definitions} and \code{complication_index} here; new code should
-use \code{definitions} and \code{index}.}
 }
 \value{
 A named list. Each list name is a complication identifier and each

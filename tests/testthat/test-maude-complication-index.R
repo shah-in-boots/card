@@ -36,8 +36,8 @@ test_that("maude_term_to_complication groups terms and preserves originals", {
     "Low blood pressure / hypotension",
     "No Health Consequences or Impact"
   ),
-  complication_definitions = complication_definitions,
-  complication_index = maude_complication_index)
+  definitions = complication_definitions,
+  index = maude_complication_index)
 
   expect_equal(out$pericardial, c(
     "Cardiac Tamponade",
@@ -56,8 +56,8 @@ test_that("maude_term_to_complication validates custom index names", {
   expect_error(
     maude_term_to_complication(
       "cardiac tamponade",
-      complication_definitions = complication_definitions,
-      complication_index = bad_index
+      definitions = complication_definitions,
+      index = bad_index
     ),
     "contains names not present"
   )

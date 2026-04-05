@@ -8,16 +8,15 @@ adjudicate_maude_event(
   terms,
   delimiter = ";",
   event_narrative,
-  llm,
+  chat_object,
   definitions = complication_definitions,
-  index = maude_complication_index,
-  ...
+  index = maude_complication_index
 )
 }
 \arguments{
-\item{terms}{A character vector of MAUDE problem terms or a single
+\item{terms}{A character vector (not a list) of MAUDE problem terms or a single
 delimiter-separated string of MAUDE terms. Terms are normalized for
-matching and checked against the bundled FDA annex code tables.}
+matching against the bundled complication index.}
 
 \item{delimiter}{The character that separates MAUDE terms when \code{terms} is
 supplied as a single concatenated string. Defaults to \code{";"}.}
@@ -26,10 +25,11 @@ supplied as a single concatenated string. Defaults to \code{";"}.}
 \code{event_narrative} or comparable free-text field returned by
 \code{\link[=query_maude]{query_maude()}}. This is the clinical text that the LLM adjudicates.}
 
-\item{llm}{An \code{ellmer} chat object. The object is cloned and reset before
-each request, so prior turns are not reused. The function expects the chat
-object to expose \code{clone()}, \code{set_turns()}, \code{set_system_prompt()}, and
-\code{chat_structured()} methods.}
+\item{chat_object}{An \strong{{ellmer}} chat object. The object is cloned and reset
+before each complication-family request, so prior turns are not reused.
+The function uses \verb{$clone()}, \verb{$set_turns()}, \verb{$set_system_prompt()}, and
+\verb{$chat_structured()} on this object. See \code{\link[ellmer:chat-any]{ellmer::chat()}} for further
+details.}
 
 \item{definitions}{Named list of complication definitions. Names should be
 complication identifiers. Each element must contain a \code{definition} entry
@@ -37,50 +37,59 @@ and a named \code{classification} entry. Defaults to
 \link{complication_definitions}.}
 
 \item{index}{Named list mapping complication identifiers to normalized MAUDE
-problem terms. Names must be a subset of \code{definitions}, with optional
+problem terms. Names must be a subset of the names in \code{definitions}, with optional
 \code{"not_indexed"} allowed as a residual bucket. Defaults to
 \link{maude_complication_index}.}
-
-\item{...}{Reserved for backward compatibility. Older callers may pass
-\code{complication_definitions} and \code{complication_index} here; new code should
-use \code{definitions} and \code{index}.}
 }
 \value{
 A named list of complication families. Each family contains named
-integer flags (\code{0}/\code{1}) for its adjudication classifications. The returned
-object has class \code{"maude_adjudication"} and attributes
-\code{selected_complications} and \code{matched_terms}.
+integer flags (\code{0}/\code{1}) for its adjudication classifications.
 }
 \description{
 \code{adjudicate_maude_event()} uses reported MAUDE problem terms to narrow the
-candidate complication families, then submits only those families and their
-classification subcategories to an \code{ellmer} chat object for structured
-adjudication against the supplied event narrative.
+candidate complication families, then sends each selected family to an
+\code{ellmer} chat object one at a time for structured adjudication against the
+supplied event narrative.
 }
 \details{
-Supply \code{llm} as an \code{ellmer} chat object created with a provider-specific
+Supply \code{chat_object} as an \code{ellmer} chat object created with a provider-specific
 constructor such as \code{ellmer::chat_openai()}, \code{ellmer::chat_anthropic()}, or
 another \verb{ellmer::chat_*()} backend. Users are responsible for supplying
 their own provider credentials or API key configuration when creating that
+chat object. \code{adjudicate_maude_event()} does not accept API keys directly;
+secrets should stay in the provider configuration layer, typically via
+environment variables such as \code{OPENAI_API_KEY}, before constructing the
 chat object.
 
-The function applies a fixed internal adjudication prompt and does not expose
-prompt configuration as a user-facing argument. Before each request, the
-supplied chat is cloned, prior turns are dropped, and any registered tools
-are cleared when supported. This keeps each adjudication independent so event
-narratives are not retained across calls.
+The function uses a fixed internal system prompt. In summary, the prompt
+tells the LLM to act as an expert clinical adjudicator with experienced
+physician-level judgment, treat the MAUDE terms and narrative as untrusted
+text, ignore instructions embedded in the narrative, use only the supplied
+complication family definition and classification definitions, default all
+classifications to \code{FALSE} unless the narrative directly supports them, and
+return only the structured response.
 
-The return value mirrors the selected complication families. Each family is a
-named sub-list of integer flags where \code{1} indicates the adjudicated
-classification and \code{0} indicates absence. This default-zero structure keeps
-the LLM output compact while still making it easy to infer whether the
-broader complication family occurred.
+For each selected complication family, the function builds an
+\code{ellmer::type_object()} schema with one optional \code{ellmer::type_boolean()}
+field per classification branch. \verb{$chat_structured()} then returns an R list
+that matches that schema, which this function converts into explicit \code{0}/\code{1}
+flags in the complication-family output shape.
+
+Each complication family is adjudicated in a fresh cloned chat with prior
+turns removed and tools cleared when supported, so clinical text from one
+request is not retained in the next request.
+
+Allowed chat objects are \code{ellmer} \code{Chat} objects created by \code{\link[ellmer:chat-any]{ellmer::chat()}}
+or provider-specific constructors such as \code{ellmer::chat_openai()} and
+\code{ellmer::chat_anthropic()}. In practice, the object should support
+\verb{$chat_structured()}, \verb{$clone()}, \verb{$set_turns()}, and
+\verb{$set_system_prompt()}.
 }
 \examples{
 \dontrun{
-chat <- ellmer::chat_openai(
-  model = "gpt-4.1-mini",
-  credentials = function() Sys.getenv("OPENAI_API_KEY")
+# Assumes OPENAI_API_KEY is set in ~/.Renviron or the current environment.
+chat_object <- ellmer::chat_openai(
+  model = "gpt-4.1-mini"
 )
 
 adjudicate_maude_event(
@@ -89,7 +98,7 @@ adjudicate_maude_event(
     "Small pericardial effusion noted at case end without hemodynamic",
     "compromise. Observed overnight without drainage."
   ),
-  llm = chat
+  chat_object = chat_object
 )
 }
 
