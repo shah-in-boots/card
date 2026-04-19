@@ -18,4 +18,4 @@
 ^CRAN-SUBMISSION$
 ^vignettes/\.quarto$
 ^vignettes/*_files$
-^*\.Renviron$
+^.*[.]Renviron$
