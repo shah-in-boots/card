@@ -552,84 +552,148 @@ maude_fda_api_call <- function(
   # Transform each API result record into a standardized tibble row.
   # purrr::map_dfr iterates over results and row-binds the individual tibbles.
   # Parsed results are very nested
-  purrr::map_dfr(results, function(rec) {
-    # Extract the first device entry from the record.
-    # Each MDR report can contain multiple devices, but we extract the primary
-    # device (index 1) for the main device fields. The full device list is
-    # accessed separately for device_problem_codes.
-    device <- purrr::pluck(rec, "device", 1, .default = list())
+  purrr::map_dfr(results, flatten_maude_record)
+}
 
-    # Helper function to extract and collapse nested array fields.
-    # Many MAUDE fields (patient_problems, device_problem_codes) are stored as
-    # arrays of objects, where each object may contain an array of values.
-    # This helper navigates that structure and collapses all values into a
-    # single "; " separated string suitable for a data frame column.
-    # Example input structure for patient_problems:
-    #   [{"patient_problems": ["Arrhythmia", "Chest Pain"]}, ...]
-    # Example output: "Arrhythmia; Chest Pain"
-    collapse_field <- function(items, field) {
-      vals <- purrr::map_chr(
-        items,
-        ~ {
-          x <- purrr::pluck(.x, field, .default = NULL)
-          if (is.null(x)) NA_character_ else paste(unlist(x), collapse = "; ")
-        }
-      )
-      out <- paste(stats::na.omit(vals), collapse = "; ")
-      if (out == "") NA_character_ else out
+# OpenFDA MAUDE API helpers ----
+
+#' Collect a named field from nested openFDA MAUDE structures
+#'
+#' @description Internal helper used by `flatten_maude_record()` to normalize
+#'   openFDA MAUDE fields that may arrive as nested lists, list-columns, or
+#'   data frames. It walks the structure recursively and returns all non-empty
+#'   character values stored under `field`.
+#'
+#' @param x Nested MAUDE field content.
+#' @param field Scalar character string naming the field to collect.
+#'
+#' @return A character vector of non-missing values found for `field`.
+#'
+#' @keywords internal
+#' @noRd
+collect_maude_field_values <- function(x, field) {
+  normalize_character <- function(value) {
+    if (is.null(value) || length(value) == 0) {
+      return(character(0))
     }
 
-    # Extract and combine all narrative text entries.
-    # MDR reports contain multiple text blocks in mdr_text (e.g., event
-    # description from manufacturer, additional info, etc.). We combine all
-    # text entries with " | " as a delimiter to preserve all narrative content
-    # while keeping it in a single column.
-    texts <- purrr::map_chr(
-      purrr::pluck(rec, "mdr_text", .default = list()),
-      ~ purrr::pluck(.x, "text", .default = NA_character_)
-    )
-    event_desc <- paste(stats::na.omit(texts), collapse = " | ")
+    vals <- as.character(unlist(value, use.names = FALSE))
+    vals <- vals[!is.na(vals)]
+    if (!length(vals)) {
+      return(character(0))
+    }
 
-    # Build the standardized output tibble with selected fields.
-    # Field selection focuses on the most commonly needed data for adverse
-    # event analysis. Additional fields from the raw API response can be
-    # accessed by modifying this function or using the API directly.
-    tibble::tibble(
-      report_number = purrr::pluck(
-        rec,
-        "report_number",
-        .default = NA_character_
-      ),
-      event_type = purrr::pluck(rec, "event_type", .default = NA_character_),
-      date_received = purrr::pluck(
-        rec,
-        "date_received",
-        .default = NA_character_
-      ),
-      device_generic_name = purrr::pluck(
-        device,
-        "generic_name",
-        .default = NA_character_
-      ),
-      device_brand_name = purrr::pluck(
-        device,
-        "brand_name",
-        .default = NA_character_
-      ),
-      manufacturer_name = purrr::pluck(
-        device,
-        "manufacturer_d_name",
-        .default = NA_character_
-      ),
-      event_description = if (event_desc == "") NA_character_ else event_desc,
-      patient_problem = collapse_field(
-        purrr::pluck(rec, "patient", .default = list()),
-        "patient_problems"
-      ),
-      device_problem = collapse_field(
-        purrr::pluck(rec, "device", .default = list()),
-        "device_problem_codes"
-      )
+    vals <- trimws(vals)
+    vals[nzchar(vals)]
+  }
+
+  if (is.null(x) || length(x) == 0) {
+    return(character(0))
+  }
+
+  if (is.data.frame(x)) {
+    if (!(field %in% names(x))) {
+      return(character(0))
+    }
+    return(normalize_character(x[[field]]))
+  }
+
+  if (!is.list(x)) {
+    return(character(0))
+  }
+
+  out <- character(0)
+
+  if (!is.null(names(x)) && field %in% names(x)) {
+    out <- c(out, normalize_character(x[[field]]))
+  }
+
+  nested <- unlist(
+    lapply(x, function(entry) {
+      if (is.list(entry) || is.data.frame(entry)) {
+        collect_maude_field_values(entry, field)
+      } else {
+        character(0)
+      }
+    }),
+    use.names = FALSE
+  )
+
+  c(out, nested)
+}
+
+#' Flatten one openFDA MAUDE record into the package's output schema
+#'
+#' @description Internal helper used by `maude_fda_api_call()` to convert a
+#'   single parsed MAUDE API record into the standard tibble row returned by
+#'   `query_maude()`. This centralizes the logic for preserving event narrative
+#'   text and normalizing variable nested shapes from the API response.
+#'
+#' @param rec A single parsed MAUDE record from the openFDA API response.
+#'
+#' @return A one-row tibble in the `query_maude()` output format.
+#'
+#' @keywords internal
+#' @noRd
+flatten_maude_record <- function(rec) {
+  first_value <- function(x) {
+    vals <- as.character(unlist(x, use.names = FALSE))
+    vals <- vals[!is.na(vals)]
+    if (!length(vals)) {
+      return(NA_character_)
+    }
+
+    vals <- trimws(vals)
+    vals <- vals[nzchar(vals)]
+    if (!length(vals)) {
+      return(NA_character_)
+    }
+
+    vals[[1]]
+  }
+
+  collapse_field <- function(x, field, delimiter = "; ") {
+    vals <- collect_maude_field_values(x, field)
+    if (!length(vals)) {
+      return(NA_character_)
+    }
+
+    paste(vals, collapse = delimiter)
+  }
+
+  devices <- purrr::pluck(rec, "device", .default = list())
+
+  tibble::tibble(
+    report_number = first_value(
+      purrr::pluck(rec, "report_number", .default = NULL)
+    ),
+    event_type = first_value(
+      purrr::pluck(rec, "event_type", .default = NULL)
+    ),
+    date_received = first_value(
+      purrr::pluck(rec, "date_received", .default = NULL)
+    ),
+    device_generic_name = first_value(
+      collect_maude_field_values(devices, "generic_name")
+    ),
+    device_brand_name = first_value(
+      collect_maude_field_values(devices, "brand_name")
+    ),
+    manufacturer_name = first_value(
+      collect_maude_field_values(devices, "manufacturer_d_name")
+    ),
+    event_description = collapse_field(
+      purrr::pluck(rec, "mdr_text", .default = list()),
+      "text",
+      delimiter = " | "
+    ),
+    patient_problem = collapse_field(
+      purrr::pluck(rec, "patient", .default = list()),
+      "patient_problems"
+    ),
+    device_problem = collapse_field(
+      devices,
+      "device_problem_codes"
     )
-  })
+  )
 }

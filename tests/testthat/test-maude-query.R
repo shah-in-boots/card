@@ -22,3 +22,75 @@ test_that("load_maude_codes returns annex A (device problems)", {
 test_that("load_maude_codes rejects invalid annex", {
   expect_error(load_maude_codes("Z"), "Invalid annex")
 })
+
+test_that("flatten_maude_record keeps all narrative text blocks", {
+  rec <- list(
+    report_number = "RPT-1",
+    event_type = "Malfunction",
+    date_received = "20260115",
+    device = list(list(
+      generic_name = "Mapping Catheter",
+      brand_name = "Alpha",
+      manufacturer_d_name = "Acme",
+      device_problem_codes = c("Detachment", "Migration")
+    )),
+    patient = list(list(
+      patient_problems = c("Pain", "Bleeding")
+    )),
+    mdr_text = list(
+      list(text_type_code = "B5", text = "First narrative block."),
+      list(text_type_code = "H10", text = "Second narrative block.")
+    )
+  )
+
+  out <- getFromNamespace("flatten_maude_record", "card")(rec)
+
+  expect_identical(out$report_number, "RPT-1")
+  expect_identical(
+    out$event_description,
+    "First narrative block. | Second narrative block."
+  )
+  expect_identical(out$patient_problem, "Pain; Bleeding")
+  expect_identical(out$device_problem, "Detachment; Migration")
+})
+
+test_that("flatten_maude_record preserves narrative text from simplified shapes", {
+  device <- data.frame(
+    generic_name = "Ablation Catheter",
+    brand_name = "Bravo",
+    manufacturer_d_name = "Example Devices",
+    stringsAsFactors = FALSE
+  )
+  device$device_problem_codes <- I(list(c("Failure to Fire", "Arcing")))
+
+  patient <- list(
+    patient_problems = c("Arrhythmia", "Hypotension")
+  )
+
+  mdr_text <- data.frame(
+    text_type_code = c("B5", "H10"),
+    text = c("Narrative from manufacturer.", "Follow-up narrative."),
+    stringsAsFactors = FALSE
+  )
+
+  rec <- list(
+    report_number = "RPT-2",
+    event_type = "Injury",
+    date_received = "20260201",
+    device = device,
+    patient = patient,
+    mdr_text = mdr_text
+  )
+
+  out <- getFromNamespace("flatten_maude_record", "card")(rec)
+
+  expect_identical(out$device_generic_name, "Ablation Catheter")
+  expect_identical(out$device_brand_name, "Bravo")
+  expect_identical(out$manufacturer_name, "Example Devices")
+  expect_identical(
+    out$event_description,
+    "Narrative from manufacturer. | Follow-up narrative."
+  )
+  expect_identical(out$patient_problem, "Arrhythmia; Hypotension")
+  expect_identical(out$device_problem, "Failure to Fire; Arcing")
+})
