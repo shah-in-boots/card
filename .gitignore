@@ -12,6 +12,7 @@ tests/.DS_Store
 
 # User-specific files
 .Ruserdata
+*.Renviron
 
 # Example code in package build process
 *-Ex.R
