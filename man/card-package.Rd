@@ -19,5 +19,10 @@ Useful links:
 \author{
 \strong{Maintainer}: Anish S. Shah \email{shah.in.boots@gmail.com} (\href{https://orcid.org/0000-0002-9729-1558}{ORCID}) [copyright holder]
 
+Other contributors:
+\itemize{
+  \item Reese Fuller \email{reese@ss4medical.com} [contributor]
+}
+
 }
 \keyword{internal}

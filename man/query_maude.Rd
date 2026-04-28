@@ -19,6 +19,7 @@ query_maude(
   date_start = NULL,
   date_end = NULL,
   api_key = NULL,
+  fill_descriptions_from_web = FALSE,
   verbose = interactive()
 )
 
@@ -79,6 +80,12 @@ by \code{query_maude()}.}
 \item{api_key}{Optional character string containing your openFDA API key.
 Not required, but recommended for heavy usage to avoid rate limiting.
 Register at: \url{https://open.fda.gov/apis/authentication/}}
+
+\item{fill_descriptions_from_web}{Logical. If \code{TRUE}, after the API call
+\code{query_maude()} scrapes the FDA MAUDE detail page for any rows whose
+\code{event_description} is missing and fills them in. Disabled by default
+because the fallback adds one HTTP request per missing report. Requires
+the \code{rvest} and \code{xml2} packages.}
 
 \item{verbose}{Logical. If \code{TRUE}, prints progress messages for pagination,
 retries, and total records retrieved. Defaults to \code{interactive()}.}

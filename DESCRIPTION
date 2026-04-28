@@ -2,12 +2,17 @@ Package: card
 Type: Package
 Title: Cardiovascular Applications in Research Data
 Version: 0.1.1
-Authors@R: 
+Authors@R: c(
     person(given = "Anish S.",
            family = "Shah",
            role = c("aut", "cre", "cph"),
            email = "shah.in.boots@gmail.com",
-           comment = c(ORCID = "0000-0002-9729-1558"))
+           comment = c(ORCID = "0000-0002-9729-1558")),
+    person(given = "Reese",
+        family = "Fuller",
+        role = "ctb",
+        email = "reese@ss4medical.com")
+    )
 Description: A collection of cardiovascular research datasets and analytical
 		tools, including methods for cardiovascular procedural data, such as 
 		electrocardiography, echocardiography, and catheterization data. Additional
@@ -20,7 +25,7 @@ LazyData: true
 RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 Depends:
-		R (>= 4.1),
+		R (>= 4.1)
 Imports:
     stats,
     generics,
@@ -34,7 +39,7 @@ Imports:
     parsnip,
     hardhat,
     readr,
-    vroom,
+    vroom
 Suggests:
     ellmer (>= 0.1.0),
     knitr,
@@ -43,5 +48,7 @@ Suggests:
     broom.mixed,
     ggrepel,
     rmarkdown,
-    quarto
+    quarto,
+    rvest,
+    xml2
 VignetteBuilder: knitr, quarto

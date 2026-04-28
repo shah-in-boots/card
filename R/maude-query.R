@@ -171,6 +171,12 @@ load_maude_codes <- function(annex) {
 #'   Not required, but recommended for heavy usage to avoid rate limiting.
 #'   Register at: <https://open.fda.gov/apis/authentication/>
 #'
+#' @param fill_descriptions_from_web Logical. If `TRUE`, after the API call
+#'   `query_maude()` scrapes the FDA MAUDE detail page for any rows whose
+#'   `event_description` is missing and fills them in. Disabled by default
+#'   because the fallback adds one HTTP request per missing report. Requires
+#'   the `rvest` and `xml2` packages.
+#'
 #' @param verbose Logical. If `TRUE`, prints progress messages for pagination,
 #'   retries, and total records retrieved. Defaults to `interactive()`.
 #'
@@ -237,6 +243,7 @@ query_maude <- function(
     date_start = NULL,
     date_end = NULL,
     api_key = NULL,
+    fill_descriptions_from_web = FALSE,
     verbose = interactive()
 ) {
   parse_date_arg <- function(x, arg_name) {
@@ -329,6 +336,11 @@ query_maude <- function(
   if (!is.logical(verbose) || length(verbose) != 1 || is.na(verbose)) {
     stop("'verbose' must be TRUE or FALSE")
   }
+  if (!is.logical(fill_descriptions_from_web) ||
+      length(fill_descriptions_from_web) != 1 ||
+      is.na(fill_descriptions_from_web)) {
+    stop("'fill_descriptions_from_web' must be TRUE or FALSE")
+  }
 
   if (!is.null(date_start) && !is.null(date_end) && date_start > date_end) {
     stop(
@@ -383,7 +395,7 @@ query_maude <- function(
   query <- paste(clauses, collapse = "+AND+")
 
   # Paginate if limit > 1000 (openFDA max per request).
-  max_per_request <- 1000
+  max_per_request <- 999
   sort <- "date_received:desc"
   if (limit <= max_per_request) {
     result <- maude_fda_api_call(
@@ -434,6 +446,10 @@ query_maude <- function(
     } else {
       message("Retrieved ", nrow(result), " adverse event report(s)")
     }
+  }
+
+  if (fill_descriptions_from_web && nrow(result) > 0) {
+    result <- get_maude_web_descriptions(result, quiet = !verbose)
   }
 
   result
@@ -622,7 +638,7 @@ collect_maude_field_values <- function(x, field) {
   c(out, nested)
 }
 
-#' Flatten one openFDA MAUDE record into the package's output schema
+#' Flatten one openFDA MAUDE record into the correct output schema
 #'
 #' @description Internal helper used by `maude_fda_api_call()` to convert a
 #'   single parsed MAUDE API record into the standard tibble row returned by
@@ -699,545 +715,219 @@ flatten_maude_record <- function(rec) {
   )
 }
 
-#' Fill missing MAUDE event descriptions using FDA narrative text files
+# FDA MAUDE web fallback ----
+
+#' Fill missing MAUDE descriptions from FDA detail pages
 #'
-#' @description Helper function that supplements the output of
-#'   `query_maude()` by filling in missing `event_description` values.
-#'   For records where the openFDA API does not return narrative text,
-#'   this function retrieves the corresponding text from the FDA MAUDE
-#'   downloadable narrative text files and joins it back using
-#'   `mdr_report_key`.
+#' @description Internal helper used by `query_maude()` when
+#'   `fill_descriptions_from_web = TRUE`. It looks up missing
+#'   `event_description` values by `mdr_report_key` on the FDA MAUDE detail
+#'   pages. Existing API-provided descriptions are never overwritten.
 #'
-#'   This function is designed as a best-effort backfill utility. It does
-#'   not modify or overwrite existing `event_description` values returned
-#'   by `query_maude()`, and only fills values that are missing or empty.
-#'
-#'   The function relies on FDA-provided bulk text files, which are
-#'   periodically updated and may not include complete coverage for the
-#'   current year. As a result, some records may remain unfilled even after
-#'   this function is applied.
-#'
-#'   This function may download MAUDE text files from the FDA website and
-#'   cache them locally in `cache_dir`. File availability, structure, and
-#'   naming conventions are determined by the FDA and may change over time.
-#'
-#' @param events A tibble returned by `query_maude()`, including
-#'   `mdr_report_key`, `event_description`, and `date_received`.
-#' @param key_col Name of the column containing the MDR report key.
-#' @param desc_col Name of the column containing event descriptions.
-#' @param date_col Name of the column containing event dates.
-#' @param cache_dir Directory used to store downloaded MAUDE text files.
-#' @param quiet Logical; if `FALSE`, prints progress messages.
-#'
-#' @return A tibble with missing `event_description` values filled where possible.
-#'
-#' @keywords internal
-fill_maude_event_descriptions <- function(
-		events,
-		key_col = "mdr_report_key",
-		desc_col = "event_description",
-		date_col = "date_received",
-		cache_dir = file.path(tempdir(), "maude_text_cache"),
-		quiet = FALSE
-) {
-	needed <- c("dplyr", "readr", "purrr", "tibble")
-	missing_pkgs <- needed[!vapply(needed, requireNamespace, logical(1), quietly = TRUE)]
-	if (length(missing_pkgs) > 0) {
-		stop("Please install required packages: ", paste(missing_pkgs, collapse = ", "))
-	}
-
-	if (!is.data.frame(events)) {
-		stop("'events' must be a data.frame or tibble")
-	}
-
-	for (nm in c(key_col, desc_col, date_col)) {
-		if (!nm %in% names(events)) {
-			stop("Column not found in events: ", nm)
-		}
-	}
-
-	normalize_date <- function(x) {
-		if (inherits(x, "Date")) return(x)
-
-		x <- as.character(x)
-		x <- trimws(x)
-		x[x == ""] <- NA_character_
-
-		out <- as.Date(x, format = "%Y%m%d")
-
-		bad <- is.na(out) & !is.na(x)
-		if (any(bad)) {
-			out[bad] <- as.Date(x[bad])
-		}
-
-		out
-	}
-
-	clean_utf8 <- function(x) {
-		x <- as.character(x)
-		x <- iconv(x, from = "", to = "UTF-8", sub = "")
-		x[is.na(x)] <- ""
-		x
-	}
-
-	events[[date_col]] <- normalize_date(events[[date_col]])
-
-	need_fill <- is.na(events[[desc_col]]) | trimws(as.character(events[[desc_col]])) == ""
-	if (!any(need_fill)) {
-		if (!quiet) message("No missing event descriptions found.")
-		return(events)
-	}
-
-	keys_needed <- unique(as.character(events[[key_col]][need_fill]))
-	keys_needed <- keys_needed[!is.na(keys_needed) & nzchar(keys_needed)]
-
-	if (length(keys_needed) == 0) {
-		stop("No usable MDR report key values found for rows with missing descriptions.")
-	}
-
-	yrs <- unique(format(stats::na.omit(events[[date_col]][need_fill]), "%Y"))
-	yrs <- yrs[!is.na(yrs) & nzchar(yrs)]
-
-	if (length(yrs) == 0) {
-		stop("Could not determine year(s) from ", date_col)
-	}
-
-	if (!dir.exists(cache_dir)) {
-		dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
-	}
-
-	get_text_sources <- function(year) {
-		year <- as.character(year)
-		current_year <- format(Sys.Date(), "%Y")
-
-		if (year <= "1995") {
-			return("foitextthru1995.zip")
-		}
-
-		if (year < current_year) {
-			return(sprintf("foitext%s.zip", year))
-		}
-
-		if (year == current_year) {
-			return(c("foitextadd.zip", "foitextchange.zip"))
-		}
-
-		stop("Year ", year, " is in the future or not yet available from FDA")
-	}
-
-	maude_text_url <- function(file_name) {
-		sprintf("https://www.accessdata.fda.gov/MAUDE/ftparea/%s", file_name)
-	}
-
-	get_text_file <- function(file_name) {
-		zip_path <- file.path(cache_dir, file_name)
-		out_dir <- file.path(cache_dir, tools::file_path_sans_ext(file_name))
-
-		if (!file.exists(zip_path)) {
-			if (!quiet) message("Downloading MAUDE text file: ", file_name, " ...")
-
-			download_ok <- tryCatch(
-				{
-					utils::download.file(
-						maude_text_url(file_name),
-						destfile = zip_path,
-						mode = "wb",
-						quiet = quiet
-					)
-					TRUE
-				},
-				error = function(e) {
-					if (!quiet) {
-						message("Failed to download MAUDE text file: ", file_name)
-						message("Reason: ", conditionMessage(e))
-						message("This file will be skipped.")
-					}
-					FALSE
-				}
-			)
-
-			if (!download_ok || !file.exists(zip_path)) {
-				return(NULL)
-			}
-		}
-
-		if (!dir.exists(out_dir)) {
-			unzip_ok <- tryCatch(
-				{
-					dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-					utils::unzip(zip_path, exdir = out_dir)
-					TRUE
-				},
-				error = function(e) {
-					if (!quiet) {
-						message("Failed to unzip MAUDE text file: ", file_name)
-						message("Reason: ", conditionMessage(e))
-						message("This file will be skipped.")
-					}
-					FALSE
-				}
-			)
-
-			if (!unzip_ok) {
-				return(NULL)
-			}
-		}
-
-		txts <- list.files(
-			out_dir,
-			pattern = "\\.txt$",
-			full.names = TRUE,
-			ignore.case = TRUE
-		)
-
-		if (length(txts) == 0) {
-			if (!quiet) {
-				message("No .txt file found after unzipping MAUDE file: ", file_name)
-				message("This file will be skipped.")
-			}
-			return(NULL)
-		}
-
-		txts[1]
-	}
-
-	read_text_file <- function(path) {
-		dat <- readr::read_delim(
-			file = path,
-			delim = "|",
-			col_names = FALSE,
-			show_col_types = FALSE,
-			progress = FALSE,
-			quote = ""
-		)
-
-		if (ncol(dat) < 6) {
-			stop("Unexpected MAUDE text file structure in: ", path)
-		}
-
-		names(dat)[1:6] <- c(
-			"mdr_report_key",
-			"mdr_text_key",
-			"text_type_code",
-			"patient_sequence_number",
-			"date_report",
-			"text"
-		)
-
-		dat |>
-			dplyr::mutate(
-				mdr_report_key = as.character(.data$mdr_report_key),
-				text_type_code = as.character(.data$text_type_code),
-				text = clean_utf8(.data$text)
-			) |>
-			dplyr::select(.data$mdr_report_key, .data$text_type_code, .data$text)
-	}
-
-	files_needed <- unique(unlist(lapply(yrs, get_text_sources)))
-
-	skipped_files <- character(0)
-
-	text_rows <- purrr::map_dfr(files_needed, function(f) {
-		txt <- get_text_file(f)
-
-		if (is.null(txt)) {
-			skipped_files <<- c(skipped_files, f)
-			return(tibble::tibble())
-		}
-
-		dat <- tryCatch(
-			read_text_file(txt),
-			error = function(e) {
-				if (!quiet) {
-					message("Failed to read MAUDE text file: ", f)
-					message("Reason: ", conditionMessage(e))
-					message("This file will be skipped.")
-				}
-				skipped_files <<- c(skipped_files, f)
-				tibble::tibble()
-			}
-		)
-
-		if (nrow(dat) == 0) {
-			return(tibble::tibble())
-		}
-
-		dat |>
-			dplyr::filter(.data$mdr_report_key %in% keys_needed)
-	})
-
-	if (length(skipped_files) > 0 && !quiet) {
-		message(
-			"Skipped ",
-			length(unique(skipped_files)),
-			" MAUDE text file(s): ",
-			paste(unique(skipped_files), collapse = ", ")
-		)
-	}
-
-	if (nrow(text_rows) == 0) {
-		if (!quiet) message("No matching text rows found in available MAUDE text files.")
-		return(events)
-	}
-
-	text_rows$text <- clean_utf8(text_rows$text)
-
-	text_join <- text_rows |>
-		dplyr::filter(trimws(.data$text) != "") |>
-		dplyr::group_by(.data$mdr_report_key) |>
-		dplyr::summarise(
-			mdr_text_file_description = paste(unique(.data$text), collapse = " | "),
-			.groups = "drop"
-		)
-
-	out <- events |>
-		dplyr::left_join(
-			text_join,
-			by = stats::setNames("mdr_report_key", key_col)
-		) |>
-		dplyr::mutate(
-			!!desc_col := dplyr::if_else(
-				is.na(.data[[desc_col]]) | trimws(as.character(.data[[desc_col]])) == "",
-				.data$mdr_text_file_description,
-				.data[[desc_col]]
-			)
-		) |>
-		dplyr::select(-mdr_text_file_description)
-
-	if (!quiet) {
-		before_n <- sum(is.na(events[[desc_col]]) | trimws(as.character(events[[desc_col]])) == "")
-		after_n  <- sum(is.na(out[[desc_col]]) | trimws(as.character(out[[desc_col]])) == "")
-		message("Filled ", before_n - after_n, " missing event description(s).")
-	}
-
-	out
-}
-
-#' Fill missing MAUDE event descriptions using MAUDE web pages
-#'
-#' @description Helper function that supplements the output of
-#'   `query_maude()` by filling in missing `event_description` values
-#'   using data scraped from individual MAUDE report web pages.
-#'   For records where neither the openFDA API nor FDA downloadable
-#'   text files provide narrative text, this function retrieves
-#'   narrative sections from the MAUDE web interface using
-#'   `mdr_report_key` and combines them into a single text field.
-#'
-#'   This function is designed as a best-effort fallback utility.
-#'   It does not modify or overwrite existing `event_description`
-#'   values returned by `query_maude()` or other backfill functions,
-#'   and only fills values that are missing or empty.
-#'
-#'   The function attempts to extract multiple narrative sections
-#'   (e.g., "Event or Problem Description", "Manufacturer Narrative",
-#'   "Additional Manufacturer Narrative") and concatenates them
-#'   into a single string. The availability and structure of these
-#'   sections are determined by the FDA MAUDE web interface and may
-#'   vary across reports.
-#'
-#'   This function relies on web scraping of FDA MAUDE pages and is
-#'   inherently more fragile than API- or file-based approaches.
-#'   Changes to the MAUDE website structure or section labels may
-#'   affect its ability to extract narrative text. Additionally,
-#'   some reports (e.g., older records) may not be available via
-#'   the web interface and will remain unfilled.
-#'
-#'   The function performs one web request per missing report and
-#'   includes a delay (`pause_seconds`) between requests to reduce
-#'   load on FDA servers.
-#'
-#' @param events A tibble returned by `query_maude()`, including
+#' @param events A data frame returned by `query_maude()`. Must contain
 #'   `mdr_report_key` and `event_description`.
-#' @param key_col Name of the column containing the MDR report key.
-#' @param desc_col Name of the column containing event descriptions.
-#' @param pause_seconds Numeric delay (in seconds) between web requests.
-#' @param quiet Logical; if `FALSE`, prints progress messages.
+#' @param pause_seconds Delay between FDA web page requests. This keeps the
+#'   fallback gentle because it makes one request per missing report.
+#' @param quiet Logical. If `FALSE`, prints progress messages.
 #'
-#' @return A tibble with missing `event_description` values filled where possible.
+#' @return The input data frame with missing `event_description` values filled
+#'   where FDA web pages provide narrative text.
 #'
+#' @author Reese Fuller
 #' @keywords internal
-fill_maude_descriptions_from_web <- function(
-		events,
-		key_col = "mdr_report_key",
-		desc_col = "event_description",
-		pause_seconds = 0.25,
-		quiet = FALSE
+#' @noRd
+get_maude_web_descriptions <- function(
+  events,
+  pause_seconds = 0.25,
+  quiet = FALSE
 ) {
-	needed <- c("rvest", "xml2", "dplyr", "purrr", "stringr", "tibble")
-	missing_pkgs <- needed[!vapply(needed, requireNamespace, logical(1), quietly = TRUE)]
+  # The fallback only knows how to update the standard query_maude() output.
+  if (!is.data.frame(events)) {
+    stop("'events' must be a data.frame or tibble")
+  }
+  for (col in c("mdr_report_key", "event_description")) {
+    if (!col %in% names(events)) {
+      stop("Column not found in events: ", col)
+    }
+  }
 
-	if (length(missing_pkgs) > 0) {
-		stop("Please install required packages: ", paste(missing_pkgs, collapse = ", "))
-	}
+  # The pause is user-adjustable, but it should never be negative.
+  if (!is.numeric(pause_seconds) || length(pause_seconds) != 1 ||
+      is.na(pause_seconds) || pause_seconds < 0) {
+    stop("'pause_seconds' must be a single non-negative number")
+  }
 
-	if (!key_col %in% names(events)) stop("Column not found: ", key_col)
-	if (!desc_col %in% names(events)) stop("Column not found: ", desc_col)
+  # Treat NA, empty strings, and whitespace-only strings as missing.
+  is_blank <- function(x) {
+    is.na(x) | !nzchar(trimws(as.character(x)))
+  }
 
-	clean_text <- function(x) {
-		x <- as.character(x)
-		x <- iconv(x, from = "", to = "UTF-8", sub = "")
-		x <- stringr::str_squish(x)
-		x[x == ""] <- NA_character_
-		x
-	}
+  # Only request pages for rows where openFDA did not return narrative text.
+  needs_fill <- is_blank(events$event_description)
+  keys <- unique(as.character(events$mdr_report_key[needs_fill]))
+  keys <- keys[!is_blank(keys)]
 
-	extract_all_sections_in_order <- function(page_text, section_labels, stop_labels) {
-		label_pattern <- paste(section_labels, collapse = "|")
-		locs <- stringr::str_locate_all(page_text, label_pattern)[[1]]
+  # If there is nothing to fill, return early without loading web packages.
+  if (length(keys) == 0) {
+    if (!quiet) message("No missing descriptions to fill from MAUDE web pages.")
+    return(events)
+  }
 
-		if (nrow(locs) == 0) {
-			return(character(0))
-		}
+  # These packages are only needed for the optional web fallback.
+  if (!requireNamespace("xml2", quietly = TRUE) ||
+      !requireNamespace("rvest", quietly = TRUE)) {
+    stop(
+      "Packages 'xml2' and 'rvest' are required when ",
+      "'fill_descriptions_from_web = TRUE'.",
+      call. = FALSE
+    )
+  }
 
-		pieces <- character(0)
+  # These labels are the only page-layout assumptions in the web fallback.
+  # If FDA changes the MAUDE detail page, update these labels first.
+  narrative_labels <- c(
+    "Event or Problem Description",
+    "Manufacturer Narrative",
+    "Additional Manufacturer Narrative",
+    "Manufacturer Evaluation",
+    "Manufacturer Evaluation Summary",
+    "Device Evaluation"
+  )
+  stop_labels <- c(
+    "Event Problem and Evaluation Codes",
+    "Brand Name",
+    "Common Device Name",
+    "Product Code",
+    "MDR Report Key",
+    "Search Alerts/Recalls"
+  )
 
-		for (i in seq_len(nrow(locs))) {
-			start <- locs[i, "end"] + 1
+  # Escape labels before putting them into one regular expression.
+  escape_regex <- function(x) {
+    gsub("([][{}()+*^$|\\\\?.])", "\\\\\\1", x, perl = TRUE)
+  }
 
-			next_section_start <- if (i < nrow(locs)) locs[i + 1, "start"] - 1 else nchar(page_text)
+  # Use word boundaries to avoid matching these labels inside narrative text.
+  label_pattern <- function(labels) {
+    paste0("\\b(?:", paste(escape_regex(labels), collapse = "|"), ")\\b")
+  }
 
-			section_text_raw <- substr(page_text, start, next_section_start)
+  # Normalize page text once so section matching is predictable.
+  clean_text <- function(x) {
+    if (is.null(x) || length(x) == 0 || is.na(x[[1]])) {
+      return(NA_character_)
+    }
 
-			# For the final section, prevent accidentally capturing the rest of the webpage.
-			stop_pattern <- paste(stop_labels, collapse = "|")
-			stop_loc <- stringr::str_locate(section_text_raw, stop_pattern)
+    x <- iconv(as.character(x[[1]]), from = "", to = "UTF-8", sub = "")
+    x <- gsub("[[:space:]]+", " ", x)
+    x <- trimws(x)
+    if (!nzchar(x)) {
+      return(NA_character_)
+    }
+    x
+  }
 
-			if (!all(is.na(stop_loc))) {
-				section_text_raw <- substr(section_text_raw, 1, stop_loc[1, "start"] - 1)
-			}
+  section_pattern <- label_pattern(narrative_labels)
+  stop_pattern <- label_pattern(stop_labels)
 
-			section_text <- clean_text(section_text_raw)
+  # The MDR report key is the same identifier used by the MAUDE detail page.
+  url_template <- paste0(
+    "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfMAUDE/detail.cfm",
+    "?mdrfoi__id=%s"
+  )
 
-			if (!is.na(section_text) && nzchar(section_text)) {
-				pieces <- c(pieces, section_text)
-			}
-		}
+  if (!quiet) {
+    message("Fetching MAUDE web narratives for ", length(keys), " report(s)...")
+  }
 
-		pieces
-	}
+  # Build a named lookup so duplicate keys in the result are filled together.
+  descriptions <- stats::setNames(
+    vapply(seq_along(keys), function(i) {
+      # Pause between requests to avoid hammering FDA pages.
+      if (i > 1L && pause_seconds > 0) {
+        Sys.sleep(pause_seconds)
+      }
 
-	extract_maude_web_narrative <- function(mdr_report_key) {
-		url <- paste0(
-			"https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfMAUDE/detail.cfm?mdrfoi__id=",
-			mdr_report_key
-		)
+      # Failed pages are not fatal; they simply remain unfilled.
+      page <- tryCatch(
+        xml2::read_html(sprintf(
+          url_template,
+          utils::URLencode(keys[[i]], reserved = TRUE)
+        )),
+        error = function(e) NULL
+      )
+      if (is.null(page)) {
+        return(NA_character_)
+      }
 
-		page <- tryCatch(
-			xml2::read_html(url),
-			error = function(e) NULL
-		)
+      # Work with visible body text instead of brittle HTML node paths.
+      page_text <- tryCatch(
+        rvest::html_text2(rvest::html_element(page, "body")),
+        error = function(e) NA_character_
+      )
+      page_text <- clean_text(page_text)
+      if (is.na(page_text)) {
+        return(NA_character_)
+      }
 
-		if (is.null(page)) return(NA_character_)
+      # Find each narrative heading on the page.
+      section_starts <- gregexpr(
+        section_pattern,
+        page_text,
+        ignore.case = TRUE,
+        perl = TRUE
+      )[[1]]
+      if (section_starts[[1]] == -1L) {
+        return(NA_character_)
+      }
 
-		page_text <- tryCatch(
-			page |>
-				rvest::html_element("body") |>
-				rvest::html_text2(),
-			error = function(e) NA_character_
-		)
+      # The narrative text starts after each heading.
+      section_ends <- section_starts + attr(section_starts, "match.length") - 1L
+      pieces <- vapply(seq_along(section_starts), function(j) {
+        start <- section_ends[[j]] + 1L
 
-		page_text <- clean_text(page_text)
-		if (is.na(page_text)) return(NA_character_)
+        # A narrative section ends at the next narrative heading, or the page end.
+        end <- if (j < length(section_starts)) {
+          section_starts[[j + 1L]] - 1L
+        } else {
+          nchar(page_text)
+        }
 
-		section_labels <- c(
-			"Event or Problem Description",
-			"Manufacturer Narrative",
-			"Additional Manufacturer Narrative",
-			"Manufacturer Evaluation",
-			"Manufacturer Evaluation Summary",
-			"Device Evaluation"
-		)
+        chunk <- substr(page_text, start, end)
 
-		stop_labels <- c(
-			"Event Problem and Evaluation Codes",
-			"Brand Name",
-			"Common Device Name",
-			"Product Code",
-			"Manufacturer",
-			"Reporter",
-			"Patient",
-			"Device",
-			"MDR Report Key",
-			"Search Alerts/Recalls"
-		)
+        # Stop labels keep the final narrative from swallowing the rest of page.
+        stop_start <- regexpr(
+          stop_pattern,
+          chunk,
+          ignore.case = TRUE,
+          perl = TRUE
+        )[[1]]
+        if (stop_start > 0) {
+          chunk <- substr(chunk, 1L, stop_start - 1L)
+        }
+        clean_text(chunk)
+      }, character(1))
 
-		pieces <- extract_all_sections_in_order(
-			page_text = page_text,
-			section_labels = section_labels,
-			stop_labels = stop_labels
-		)
+      # De-duplicate repeated sections and join them like the API text blocks.
+      pieces <- unique(pieces[!is_blank(pieces)])
+      if (!length(pieces)) {
+        return(NA_character_)
+      }
+      paste(pieces, collapse = " | ")
+    }, character(1)),
+    keys
+  )
 
-		if (length(pieces) == 0) return(NA_character_)
+  # Fill only rows that were blank before the web fallback.
+  out <- events
+  row_keys <- as.character(out$mdr_report_key)
+  matched <- match(row_keys, names(descriptions))
+  fill_rows <- needs_fill & !is.na(matched) & !is_blank(descriptions[matched])
+  out$event_description[fill_rows] <- unname(descriptions[matched[fill_rows]])
 
-		paste(pieces, collapse = " | ")
-	}
+  if (!quiet) {
+    message("Filled ", sum(fill_rows), " missing event description(s).")
+  }
 
-	need_fill <- is.na(events[[desc_col]]) | trimws(as.character(events[[desc_col]])) == ""
-
-	keys <- unique(as.character(events[[key_col]][need_fill]))
-	keys <- keys[!is.na(keys) & nzchar(keys)]
-
-	if (length(keys) == 0) {
-		if (!quiet) message("No missing descriptions to fill from MAUDE web pages.")
-		return(events)
-	}
-
-	if (!quiet) {
-		message("Attempting web fallback for ", length(keys), " MDR report key(s)...")
-	}
-
-	failed_keys <- character(0)
-
-	lookup <- purrr::map_dfr(keys, function(k) {
-		if (!quiet) message("Checking MDR report key: ", k)
-		Sys.sleep(pause_seconds)
-
-		narrative <- tryCatch(
-			extract_maude_web_narrative(k),
-			error = function(e) {
-				failed_keys <<- c(failed_keys, k)
-				if (!quiet) message("Skipping MDR report key ", k, ": ", conditionMessage(e))
-				NA_character_
-			}
-		)
-
-		if (is.na(narrative)) {
-			failed_keys <<- c(failed_keys, k)
-		}
-
-		tibble::tibble(
-			mdr_report_key = k,
-			web_event_description = narrative
-		)
-	})
-
-	out <- events |>
-		dplyr::left_join(
-			lookup,
-			by = stats::setNames("mdr_report_key", key_col)
-		) |>
-		dplyr::mutate(
-			!!desc_col := dplyr::if_else(
-				is.na(.data[[desc_col]]) | trimws(as.character(.data[[desc_col]])) == "",
-				.data$web_event_description,
-				.data[[desc_col]]
-			)
-		) |>
-		dplyr::select(-web_event_description)
-
-	if (!quiet) {
-		before_n <- sum(is.na(events[[desc_col]]) | trimws(as.character(events[[desc_col]])) == "")
-		after_n  <- sum(is.na(out[[desc_col]]) | trimws(as.character(out[[desc_col]])) == "")
-
-		message("Filled ", before_n - after_n, " missing description(s) from MAUDE web pages.")
-		message(
-			"Web lookup failures: ",
-			length(unique(failed_keys)),
-			" / ",
-			length(keys),
-			" report(s)."
-		)
-	}
-
-	out
+  out
 }

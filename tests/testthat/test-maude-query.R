@@ -23,6 +23,13 @@ test_that("load_maude_codes rejects invalid annex", {
   expect_error(load_maude_codes("Z"), "Invalid annex")
 })
 
+test_that("query_maude validates web description fill option", {
+  expect_error(
+    query_maude("pacemaker", fill_descriptions_from_web = NA),
+    "'fill_descriptions_from_web' must be TRUE or FALSE"
+  )
+})
+
 test_that("flatten_maude_record keeps all narrative text blocks", {
   rec <- list(
     report_number = "RPT-1",
@@ -93,4 +100,30 @@ test_that("flatten_maude_record preserves narrative text from simplified shapes"
   )
   expect_identical(out$patient_problem, "Arrhythmia; Hypotension")
   expect_identical(out$device_problem, "Failure to Fire; Arcing")
+})
+
+test_that("query_maude can handle larger limits", {
+
+  dat <- query_maude(search = "PFA", limit = 1000)
+  expect_s3_class(dat, "tbl_df")
+  expect_equal(nrow(dat), 1000)
+
+})
+
+test_that("can fill out blank descriptions from the web", {
+  # First get data and find missing. 
+  # Need to pull during testing so its the same
+  dat <- query_maude(search = "PFA", fill_descriptions_from_web = FALSE)
+  missing_desc <- dat |> 
+    dplyr::filter(is.na(event_description)) |> 
+    dplyr::pull(report_number)
+
+  # Now check if filling from web works
+  dat_filled <- query_maude(search = "PFA", fill_descriptions_from_web = TRUE)
+  filled_desc <- dat_filled |> 
+    dplyr::filter(report_number %in% missing_desc) |> 
+    dplyr::pull(event_description)
+
+  # Check to see if they are the same
+  expect_length(filled_desc, length(missing_desc))
 })
