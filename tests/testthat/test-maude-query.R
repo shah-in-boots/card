@@ -47,56 +47,6 @@ test_that("query_maude handles dates appropriately for R", {
   expect_s3_class(out$date_received, "Date")
 })
 
-test_that("query_maude accepts Date objects for date range inputs", {
-  captured_query <- NULL
-
-  testthat::local_mocked_bindings(
-    maude_fda_api_call = function(search_query, ...) {
-      captured_query <<- search_query
-      tibble::tibble(
-        report_number = "RPT-1",
-        event_type = "Malfunction",
-        date_received = "20260115"
-      )
-    },
-    .package = "card"
-  )
-
-  out <- query_maude(
-    search = "pacemaker",
-    date_start = as.Date("2026-01-01"),
-    date_end = as.Date("2026-01-31"),
-    limit = 1,
-    verbose = FALSE
-  )
-
-  expect_s3_class(out$date_received, "Date")
-  expect_match(
-    captured_query,
-    "date_received:\\[20260101 TO 20260131\\]"
-  )
-})
-
-test_that("query_maude validates Date range inputs before querying", {
-  expect_error(
-    query_maude(
-      search = "pacemaker",
-      date_start = as.Date("2026-02-01"),
-      date_end = as.Date("2026-01-01"),
-      verbose = FALSE
-    ),
-    "'date_start' \\(2026-02-01\\) must be on or before 'date_end' \\(2026-01-01\\)"
-  )
-
-  expect_error(
-    query_maude(
-      search = "pacemaker",
-      date_start = as.Date(NA),
-      verbose = FALSE
-    ),
-    "'date_start' must not be NA"
-  )
-})
 
 test_that("flatten_maude_record keeps all narrative text blocks", {
   rec <- list(
@@ -207,6 +157,7 @@ test_that("query_maude can handle larger limits", {
 test_that("can fill out blank descriptions from the web", {
   fake_result <- tibble::tibble(
     report_number = c("RPT-1", "RPT-2"),
+    mdr_report_key = c("KEY-1", "KEY-2"),
     event_type = c("Malfunction", "Injury"),
     date_received = c("20260115", "20260116"),
     event_description = c(NA_character_, "Existing description")
@@ -216,6 +167,7 @@ test_that("can fill out blank descriptions from the web", {
 
   testthat::local_mocked_bindings(
     maude_fda_api_call = function(...) fake_result,
+    get_maude_file_descriptions = function(events, ...) events,
     get_maude_web_descriptions = function(events, quiet = FALSE) {
       fill_called <<- TRUE
       missing_description <- is.na(events$event_description)

@@ -84,10 +84,14 @@ Not required, but recommended for heavy usage to avoid rate limiting.
 Register at: \url{https://open.fda.gov/apis/authentication/}}
 
 \item{descriptions_from_web}{Logical. If \code{TRUE}, after the API call
-\code{query_maude()} scrapes the FDA MAUDE detail page for any rows whose
-\code{event_description} is missing and fills them in. Disabled by default
-because the fallback adds one HTTP request per missing report. Requires
-the \code{rvest} and \code{xml2} packages.}
+\code{query_maude()} backfills missing \code{event_description} values in two
+passes: first from FDA's bulk MAUDE narrative archives
+(\verb{foitext\{YYYY\}.zip}, \code{foitextadd.zip}, \code{foitextchange.zip},
+\code{foitextthru1995.zip}), then by scraping the FDA MAUDE detail page for
+any rows still missing. Disabled by default because the web pass adds
+one HTTP request per remaining missing report. The bulk archives are
+downloaded once and cached locally. Requires the \code{rvest} and \code{xml2}
+packages for the web pass.}
 
 \item{verbose}{Logical. If \code{TRUE}, prints progress messages for pagination,
 retries, and total records retrieved. Defaults to \code{interactive()}.}

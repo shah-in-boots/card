@@ -174,10 +174,14 @@ load_maude_codes <- function(annex) {
 #'   Register at: <https://open.fda.gov/apis/authentication/>
 #'
 #' @param descriptions_from_web Logical. If `TRUE`, after the API call
-#'   `query_maude()` scrapes the FDA MAUDE detail page for any rows whose
-#'   `event_description` is missing and fills them in. Disabled by default
-#'   because the fallback adds one HTTP request per missing report. Requires
-#'   the `rvest` and `xml2` packages.
+#'   `query_maude()` backfills missing `event_description` values in two
+#'   passes: first from FDA's bulk MAUDE narrative archives
+#'   (`foitext{YYYY}.zip`, `foitextadd.zip`, `foitextchange.zip`,
+#'   `foitextthru1995.zip`), then by scraping the FDA MAUDE detail page for
+#'   any rows still missing. Disabled by default because the web pass adds
+#'   one HTTP request per remaining missing report. The bulk archives are
+#'   downloaded once and cached locally. Requires the `rvest` and `xml2`
+#'   packages for the web pass.
 #'
 #' @param verbose Logical. If `TRUE`, prints progress messages for pagination,
 #'   retries, and total records retrieved. Defaults to `interactive()`.
@@ -473,6 +477,7 @@ query_maude <- function(
   }
 
   if (descriptions_from_web && nrow(result) > 0) {
+    result <- get_maude_file_descriptions(result, quiet = !verbose)
     result <- get_maude_web_descriptions(result, quiet = !verbose)
   }
 
@@ -958,6 +963,288 @@ get_maude_web_descriptions <- function(
   )
 
   # Fill only rows that were blank before the web fallback.
+  out <- events
+  row_keys <- as.character(out$mdr_report_key)
+  matched <- match(row_keys, names(descriptions))
+  fill_rows <- needs_fill & !is.na(matched) & !is_blank(descriptions[matched])
+  out$event_description[fill_rows] <- unname(descriptions[matched[fill_rows]])
+
+  if (!quiet) {
+    message("Filled ", sum(fill_rows), " missing event description(s).")
+  }
+
+  out
+}
+
+# FDA MAUDE bulk text-archive fallback ----
+
+#' Fill missing MAUDE descriptions from FDA bulk narrative archives
+#'
+#' @description Internal helper used by `query_maude()` when
+#'   `descriptions_from_web = TRUE`. It looks up missing `event_description`
+#'   values by `mdr_report_key` in FDA's bulk pipe-delimited MAUDE narrative
+#'   archives (`foitext{YYYY}.zip`, `foitextadd.zip`, `foitextchange.zip`,
+#'   `foitextthru1995.zip`). Existing API-provided descriptions are never
+#'   overwritten. Downloaded archives are cached in `cache_dir` so subsequent
+#'   calls reuse them.
+#'
+#' @param events A data frame returned by `query_maude()`. Must contain
+#'   `mdr_report_key`, `event_description`, and `date_received`.
+#' @param cache_dir Directory used to store downloaded MAUDE text archives.
+#' @param quiet Logical. If `FALSE`, prints progress messages.
+#'
+#' @return The input data frame with missing `event_description` values filled
+#'   where FDA bulk narrative archives provide narrative text.
+#'
+#' @author Reese Fuller
+#' @keywords internal
+#' @noRd
+get_maude_file_descriptions <- function(
+  events,
+  cache_dir = file.path(tempdir(), "maude_text_cache"),
+  quiet = FALSE
+) {
+  if (!is.data.frame(events)) {
+    stop("'events' must be a data.frame or tibble")
+  }
+  for (col in c("mdr_report_key", "event_description", "date_received")) {
+    if (!col %in% names(events)) {
+      stop("Column not found in events: ", col)
+    }
+  }
+
+  # Treat NA, empty, and whitespace-only as missing (mirrors web fallback).
+  is_blank <- function(x) {
+    is.na(x) | !nzchar(trimws(as.character(x)))
+  }
+
+  needs_fill <- is_blank(events$event_description)
+  keys_needed <- unique(as.character(events$mdr_report_key[needs_fill]))
+  keys_needed <- keys_needed[!is_blank(keys_needed)]
+
+  # Skip the (potentially large) download work when nothing needs filling.
+  if (length(keys_needed) == 0) {
+    if (!quiet) {
+      message("No missing descriptions to fill from MAUDE text archives.")
+    }
+    return(events)
+  }
+
+  if (!requireNamespace("readr", quietly = TRUE)) {
+    stop(
+      "Package 'readr' is required for the MAUDE text-archive fallback.",
+      call. = FALSE
+    )
+  }
+
+  # FDA partitions narratives by year, so we only download archives covering
+  # the years where rows are actually missing descriptions.
+  date_received <- events$date_received[needs_fill]
+  # openFDA returns "YYYYMMDD" strings; query_maude() may have already coerced
+  # to Date. Try the compact format first, then fall back to ISO.
+  if (!inherits(date_received, "Date")) {
+    raw <- trimws(as.character(date_received))
+    raw[!nzchar(raw)] <- NA_character_
+    parsed <- suppressWarnings(as.Date(raw, format = "%Y%m%d"))
+    bad <- is.na(parsed) & !is.na(raw)
+    if (any(bad)) {
+      parsed[bad] <- suppressWarnings(as.Date(raw[bad]))
+    }
+    date_received <- parsed
+  }
+
+  yrs <- unique(format(stats::na.omit(date_received), "%Y"))
+  yrs <- yrs[!is.na(yrs) & nzchar(yrs)]
+  if (length(yrs) == 0) {
+    if (!quiet) {
+      message("Could not determine year(s) from 'date_received'; skipping.")
+    }
+    return(events)
+  }
+
+  # FDA archive naming: pre-1996 lumped into one file, prior years get their
+  # own annual zip, and the current year is split across rolling add/change
+  # files since it has not been finalized yet.
+  current_year <- format(Sys.Date(), "%Y")
+  archive_files_for_year <- function(year) {
+    if (year <= "1995") return("foitextthru1995.zip")
+    if (year < current_year) return(sprintf("foitext%s.zip", year))
+    if (year == current_year) return(c("foitextadd.zip", "foitextchange.zip"))
+    character(0)
+  }
+
+  files_needed <- unique(unlist(lapply(yrs, archive_files_for_year)))
+  if (length(files_needed) == 0) {
+    return(events)
+  }
+
+  if (!dir.exists(cache_dir)) {
+    dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+  }
+
+  archive_url <- function(file_name) {
+    sprintf("https://www.accessdata.fda.gov/MAUDE/ftparea/%s", file_name)
+  }
+
+  # Cache zip + extracted dir per archive so repeat calls in the same R
+  # session (or with a persistent cache_dir) skip the download/unzip.
+  fetch_archive <- function(file_name) {
+    zip_path <- file.path(cache_dir, file_name)
+    out_dir <- file.path(cache_dir, tools::file_path_sans_ext(file_name))
+
+    if (!file.exists(zip_path)) {
+      if (!quiet) message("Downloading MAUDE text file: ", file_name, " ...")
+      download_ok <- tryCatch(
+        {
+          utils::download.file(
+            archive_url(file_name),
+            destfile = zip_path,
+            mode = "wb",
+            quiet = quiet
+          )
+          TRUE
+        },
+        error = function(e) {
+          if (!quiet) {
+            message(
+              "Failed to download MAUDE text file: ",
+              file_name,
+              " (",
+              conditionMessage(e),
+              "); skipping."
+            )
+          }
+          FALSE
+        }
+      )
+      # A failed download is non-fatal; fall through to the web fallback.
+      if (!download_ok || !file.exists(zip_path)) return(NULL)
+    }
+
+    if (!dir.exists(out_dir)) {
+      unzip_ok <- tryCatch(
+        {
+          dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+          utils::unzip(zip_path, exdir = out_dir)
+          TRUE
+        },
+        error = function(e) {
+          if (!quiet) {
+            message(
+              "Failed to unzip MAUDE text file: ",
+              file_name,
+              " (",
+              conditionMessage(e),
+              "); skipping."
+            )
+          }
+          FALSE
+        }
+      )
+      if (!unzip_ok) return(NULL)
+    }
+
+    # Each FDA archive contains a single narrative .txt; take the first
+    # match defensively in case the archive layout ever changes.
+    txts <- list.files(
+      out_dir,
+      pattern = "\\.txt$",
+      full.names = TRUE,
+      ignore.case = TRUE
+    )
+    if (length(txts) == 0) return(NULL)
+    txts[[1]]
+  }
+
+  read_archive <- function(path) {
+    # Pipe-delimited, no header
+    # Quoting insite narrative could break (so disable)
+    dat <- readr::read_delim(
+      file = path,
+      delim = "|",
+      col_names = FALSE,
+      show_col_types = FALSE,
+      progress = FALSE,
+      quote = ""
+    )
+    if (ncol(dat) < 6) {
+      stop("Unexpected MAUDE text file structure in: ", path)
+    }
+    # Column order is documented by FDA
+    # Only the first 6 are needed.
+    names(dat)[1:6] <- c(
+      "mdr_report_key",
+      "mdr_text_key",
+      "text_type_code",
+      "patient_sequence_number",
+      "date_report",
+      "text"
+    )
+    dat$mdr_report_key <- as.character(dat$mdr_report_key)
+    # Narratives sometimes contain non-UTF-8 bytes -> strip
+    dat$text <- iconv(
+      as.character(dat$text),
+      from = "",
+      to = "UTF-8",
+      sub = ""
+    )
+    dat[, c("mdr_report_key", "text")]
+  }
+ 
+  # Filter each archive down to the keys we actually need 
+  # Avoids needing holding full dataset in memory 
+  text_rows <- list()
+  for (f in files_needed) {
+    txt <- fetch_archive(f)
+    if (is.null(txt)) next
+    dat <- tryCatch(
+      read_archive(txt),
+      error = function(e) {
+        if (!quiet) {
+          message(
+            "Failed to read MAUDE text file: ",
+            f,
+            " (",
+            conditionMessage(e),
+            "); skipping."
+          )
+        }
+        NULL
+      }
+    )
+    if (is.null(dat) || nrow(dat) == 0) next
+    text_rows[[length(text_rows) + 1L]] <- dat[
+      dat$mdr_report_key %in% keys_needed, ,
+      drop = FALSE
+    ]
+  }
+
+  if (length(text_rows) == 0) {
+    if (!quiet) {
+      message("No matching text rows found in MAUDE text archives.")
+    }
+    return(events)
+  }
+
+  text_rows <- do.call(rbind, text_rows)
+  text_rows <- text_rows[!is_blank(text_rows$text), , drop = FALSE]
+  if (nrow(text_rows) == 0) {
+    if (!quiet) {
+      message("No matching text rows found in MAUDE text archives.")
+    }
+    return(events)
+  }
+
+  # One report can have multiple narrative rows (initial + supplements);
+  # join them with " | " to match the web fallback's output format.
+  descriptions <- tapply(
+    text_rows$text,
+    text_rows$mdr_report_key,
+    function(x) paste(unique(x), collapse = " | ")
+  )
+
+  # Only fill rows that were blank to begin with
+  # API first if its available
   out <- events
   row_keys <- as.character(out$mdr_report_key)
   matched <- match(row_keys, names(descriptions))
