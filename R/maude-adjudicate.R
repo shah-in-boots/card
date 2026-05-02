@@ -163,8 +163,9 @@ adjudicate_maude_event <- function(
   # Creates the list of complication classifications with a default of 0L
   # Named after comp family. To be updated by the LLM structured output
   out <- lapply(selectedDefinitions, function(x) {
-    flags <- as.list(rep.int(0L, length(x$classification)))
-    names(flags) <- names(x$classification)
+    classification <- normalize_complication_classification(x$classification)
+    flags <- as.list(rep.int(0L, length(classification)))
+    names(flags) <- names(classification)
     flags
   })
   names(out) <- names(selectedDefinitions)
@@ -189,11 +190,12 @@ adjudicate_maude_event <- function(
 
   for (comp_name in names(selectedDefinitions)) {
     family <- selectedDefinitions[[comp_name]]
+    classification <- normalize_complication_classification(family$classification)
 
     # One optional boolean per classification, with the clinical definition as
     # the field description so the LLM knows what to evaluate. Optional fields
     # let the model omit branches; omitted branches stay at the default 0L.
-    field_types <- lapply(family$classification, function(cdef) {
+    field_types <- lapply(classification, function(cdef) {
       ellmer::type_boolean(
         description = unname(cdef),
         required = FALSE
@@ -226,8 +228,8 @@ adjudicate_maude_event <- function(
     }
 
     classification_lines <- paste0(
-      "- ", names(family$classification), ": ",
-      unname(family$classification),
+      "- ", names(classification), ": ",
+      unname(classification),
       collapse = "\n"
     )
 
@@ -341,6 +343,36 @@ normalize_maude_terms <- function(terms) {
   ))
 }
 
+#' Normalize complication classifications to a named character vector
+#' @keywords internal
+normalize_complication_classification <- function(classification) {
+  has_names <- !is.null(names(classification)) &&
+    !anyNA(names(classification)) &&
+    all(names(classification) != "")
+
+  if (is.character(classification) && has_names) {
+    return(classification)
+  }
+
+  if (is.list(classification) && has_names) {
+    values_are_scalar_strings <- vapply(
+      classification,
+      function(x) is.character(x) && length(x) == 1L && !is.na(x),
+      logical(1)
+    )
+
+    if (all(values_are_scalar_strings)) {
+      return(vapply(classification, function(x) x[[1]], character(1)))
+    }
+  }
+
+  stop(
+    "Each complication definition must have named values in",
+    " 'classification'",
+    call. = FALSE
+  )
+}
+
 #' Validate complication definitions
 #'
 #' @description Internal helper to validate that complication definitions are a
@@ -371,23 +403,10 @@ validate_complication_definitions <- function(definitions) {
     )
   }
 
-  classifications_are_named <- vapply(
+  invisible(lapply(
     definitions,
-    function(x) {
-      is.character(x$classification) &&
-        !is.null(names(x$classification)) &&
-        all(names(x$classification) != "")
-    },
-    logical(1)
-  )
-
-  if (!all(classifications_are_named)) {
-    stop(
-      "Each complication definition must have named values in",
-      " 'classification'",
-      call. = FALSE
-    )
-  }
+    function(x) normalize_complication_classification(x$classification)
+  ))
 }
 
 #' Internal helper to validate that a complication index is a

@@ -19,7 +19,7 @@ query_maude(
   date_start = NULL,
   date_end = NULL,
   api_key = NULL,
-  fill_descriptions_from_web = FALSE,
+  descriptions_from_web = FALSE,
   verbose = interactive()
 )
 
@@ -70,18 +70,20 @@ currently supports up to 26,000 records per call. For
 \code{maude_fda_api_call()}, maximum per request is 1000 per openFDA limits.}
 
 \item{date_start}{Optional start date for filtering by \code{date_received}.
-Accepts \code{Date}, POSIXt, \code{"YYYYMMDD"}, or \code{"YYYY-MM-DD"} formats. Only used
-by \code{query_maude()}.}
+Prefer a \code{Date} object, such as \code{as.Date("2026-01-01")}. POSIXt,
+\code{"YYYYMMDD"}, and \code{"YYYY-MM-DD"} values are also accepted and converted to
+\code{Date}. Only used by \code{query_maude()}.}
 
-\item{date_end}{Optional end date for filtering by \code{date_received}. Accepts
-\code{Date}, POSIXt, \code{"YYYYMMDD"}, or \code{"YYYY-MM-DD"} formats. Only used by
-\code{query_maude()}.}
+\item{date_end}{Optional end date for filtering by \code{date_received}. Prefer a
+\code{Date} object, such as \code{as.Date("2026-01-31")}. POSIXt, \code{"YYYYMMDD"}, and
+\code{"YYYY-MM-DD"} values are also accepted and converted to \code{Date}. Only used
+by \code{query_maude()}.}
 
 \item{api_key}{Optional character string containing your openFDA API key.
 Not required, but recommended for heavy usage to avoid rate limiting.
 Register at: \url{https://open.fda.gov/apis/authentication/}}
 
-\item{fill_descriptions_from_web}{Logical. If \code{TRUE}, after the API call
+\item{descriptions_from_web}{Logical. If \code{TRUE}, after the API call
 \code{query_maude()} scrapes the FDA MAUDE detail page for any rows whose
 \code{event_description} is missing and fills them in. Disabled by default
 because the fallback adds one HTTP request per missing report. Requires
@@ -152,8 +154,8 @@ Common patterns include:
 \itemize{
 \item Simple term: \code{"pacemaker"}
 \item Field-specific: \code{"device.generic_name:pacemaker"}
-\item Multiple terms: \code{"device.generic_name:pacemaker+AND+event_type:malfunction"}
-\item Date range: \code{"date_received:[20200101+TO+20201231]"}
+\item Multiple terms: \code{"device.generic_name:pacemaker AND event_type:malfunction"}
+\item Date range: \code{"date_received:[20200101 TO 20201231]"}
 \item Exact phrase: \verb{"device.brand_name:\\"Medtronic\\""}
 }
 
@@ -184,6 +186,14 @@ pacemaker_events <- query_maude("pacemaker", limit = 10)
 
 # Search by device generic name
 results <- query_maude(device_generic_name = "defibrillator", limit = 50)
+
+# Filter by received-date range using Date objects
+results <- query_maude(
+  search = "pacemaker",
+  date_start = as.Date("2026-01-01"),
+  date_end = as.Date("2026-01-31"),
+  limit = 50
+)
 
 # Add an extra searchable field via ...
 results <- query_maude(

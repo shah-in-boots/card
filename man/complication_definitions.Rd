@@ -12,11 +12,9 @@ three components:
 \item \strong{definition}: Character. A clinical definition written for use by
 an LLM or human adjudicator to identify the complication in adverse
 event narrative text.
-\item \strong{classification}: A named character vector in the bundled data. Names are
-short subcategory codes; values are definitions of each subcategory.
-User-supplied definitions may instead use the more general field name
-\code{classification}, which is treated equivalently by the adjudication
-helpers. Codes may reflect subtype, acuity, intervention, or outcome.
+\item \strong{classification}: A named list or named character vector. Names are
+short subcategory codes; values are scalar character definitions of each
+subcategory. Codes may reflect subtype, acuity, intervention, or outcome.
 Within a selected category, subcategories are not necessarily mutually
 exclusive. Categories may also be co-assigned when more than one
 mechanism or outcome is plausible from the narrative. Every category
@@ -62,7 +60,7 @@ of Pulsed Field Ablation (Ekanem et al., Circulation 2024)
 # Access a single complication
 complication_definitions$pericardial$title
 complication_definitions$pericardial$definition
-names(complication_definitions$pericardial$severity)
+names(complication_definitions$pericardial$classification)
 
 # List all complication category names
 names(complication_definitions)
@@ -85,7 +83,7 @@ my_complications <- list(
       implant site, resulting in loss of capture, sensing failure, or
       change in pacing threshold. The narrative may describe lead
       repositioning, revision surgery, or new pacing parameters.",
-    classification = c(
+    classification = list(
       reprogrammed = "Lead dislodgement managed by device reprogramming
         without surgical intervention.",
       repositioned = "Lead surgically repositioned or replaced.",

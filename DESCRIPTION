@@ -15,8 +15,7 @@ Authors@R: c(
     )
 Description: A collection of cardiovascular research datasets and analytical
 		tools, including methods for cardiovascular procedural data, such as 
-		electrocardiography, echocardiography, and catheterization data. Additional
-		methods exist for analysis of procedural billing codes.
+		electrocardiography, echocardiography, and catheterization data. Additional methods exist for analysis of procedural billing codes.
 License: MIT + file LICENSE
 URL: https://cran.r-project.org/package=card
 BugReports: https://github.com/shah-in-boots/card/issues

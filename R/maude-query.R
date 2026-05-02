@@ -90,8 +90,8 @@ load_maude_codes <- function(annex) {
 #' Common patterns include:
 #' - Simple term: `"pacemaker"`
 #' - Field-specific: `"device.generic_name:pacemaker"`
-#' - Multiple terms: `"device.generic_name:pacemaker+AND+event_type:malfunction"`
-#' - Date range: `"date_received:[20200101+TO+20201231]"`
+#' - Multiple terms: `"device.generic_name:pacemaker AND event_type:malfunction"`
+#' - Date range: `"date_received:[20200101 TO 20201231]"`
 #' - Exact phrase: `"device.brand_name:\"Medtronic\""`
 #'
 #' **Building Queries in `query_maude()`:** `query_maude()` is designed to help
@@ -152,12 +152,14 @@ load_maude_codes <- function(annex) {
 #'   `maude_fda_api_call()`, maximum per request is 1000 per openFDA limits.
 #'
 #' @param date_start Optional start date for filtering by `date_received`.
-#'   Accepts `Date`, POSIXt, `"YYYYMMDD"`, or `"YYYY-MM-DD"` formats. Only used
-#'   by `query_maude()`.
+#'   Prefer a `Date` object, such as `as.Date("2026-01-01")`. POSIXt,
+#'   `"YYYYMMDD"`, and `"YYYY-MM-DD"` values are also accepted and converted to
+#'   `Date`. Only used by `query_maude()`.
 #'
-#' @param date_end Optional end date for filtering by `date_received`. Accepts
-#'   `Date`, POSIXt, `"YYYYMMDD"`, or `"YYYY-MM-DD"` formats. Only used by
-#'   `query_maude()`.
+#' @param date_end Optional end date for filtering by `date_received`. Prefer a
+#'   `Date` object, such as `as.Date("2026-01-31")`. POSIXt, `"YYYYMMDD"`, and
+#'   `"YYYY-MM-DD"` values are also accepted and converted to `Date`. Only used
+#'   by `query_maude()`.
 #'
 #' @param skip Integer specifying the number of records to skip for pagination.
 #'   Only used by `maude_fda_api_call()`. Combined with `limit`, allows fetching
@@ -171,7 +173,7 @@ load_maude_codes <- function(annex) {
 #'   Not required, but recommended for heavy usage to avoid rate limiting.
 #'   Register at: <https://open.fda.gov/apis/authentication/>
 #'
-#' @param fill_descriptions_from_web Logical. If `TRUE`, after the API call
+#' @param descriptions_from_web Logical. If `TRUE`, after the API call
 #'   `query_maude()` scrapes the FDA MAUDE detail page for any rows whose
 #'   `event_description` is missing and fills them in. Disabled by default
 #'   because the fallback adds one HTTP request per missing report. Requires
@@ -216,6 +218,14 @@ load_maude_codes <- function(annex) {
 #' # Search by device generic name
 #' results <- query_maude(device_generic_name = "defibrillator", limit = 50)
 #'
+#' # Filter by received-date range using Date objects
+#' results <- query_maude(
+#'   search = "pacemaker",
+#'   date_start = as.Date("2026-01-01"),
+#'   date_end = as.Date("2026-01-31"),
+#'   limit = 50
+#' )
+#'
 #' # Add an extra searchable field via ...
 #' results <- query_maude(
 #'   device_generic_name = "infusion pump",
@@ -243,7 +253,7 @@ query_maude <- function(
     date_start = NULL,
     date_end = NULL,
     api_key = NULL,
-    fill_descriptions_from_web = FALSE,
+    descriptions_from_web = FALSE,
     verbose = interactive()
 ) {
   parse_date_arg <- function(x, arg_name) {
@@ -256,18 +266,26 @@ query_maude <- function(
     }
 
     if (inherits(x, "Date")) {
-      return(format(x, "%Y%m%d"))
+      if (is.na(x)) {
+        stop("'", arg_name, "' must not be NA")
+      }
+      return(x)
     }
 
     if (inherits(x, "POSIXt")) {
-      return(format(as.Date(x), "%Y%m%d"))
+      parsed <- as.Date(x)
+      if (is.na(parsed)) {
+        stop("'", arg_name, "' must not be NA")
+      }
+      return(parsed)
     }
 
     if (is.character(x)) {
       if (grepl("^\\d{8}$", x)) {
-        return(x)
+        parsed <- as.Date(x, format = "%Y%m%d")
+      } else {
+        parsed <- as.Date(x)
       }
-      parsed <- as.Date(x)
       if (is.na(parsed)) {
         stop(
           "'",
@@ -275,10 +293,14 @@ query_maude <- function(
           "' must be a Date, POSIXt, or YYYYMMDD/YYYY-MM-DD string"
         )
       }
-      return(format(parsed, "%Y%m%d"))
+      return(parsed)
     }
 
     stop("'", arg_name, "' must be a Date, POSIXt, or YYYYMMDD/YYYY-MM-DD string")
+  }
+
+  format_openfda_date <- function(x) {
+    format(x, "%Y%m%d")
   }
 
   build_field_terms <- function(field, values) {
@@ -306,7 +328,7 @@ query_maude <- function(
       return(paste0(field, ":", escaped))
     }
 
-    paste0(field, ":(", paste(escaped, collapse = "+OR+"), ")")
+    paste0(field, ":(", paste(escaped, collapse = " OR "), ")")
   }
 
   # Basic input validation.
@@ -336,10 +358,10 @@ query_maude <- function(
   if (!is.logical(verbose) || length(verbose) != 1 || is.na(verbose)) {
     stop("'verbose' must be TRUE or FALSE")
   }
-  if (!is.logical(fill_descriptions_from_web) ||
-      length(fill_descriptions_from_web) != 1 ||
-      is.na(fill_descriptions_from_web)) {
-    stop("'fill_descriptions_from_web' must be TRUE or FALSE")
+  if (!is.logical(descriptions_from_web) ||
+      length(descriptions_from_web) != 1 ||
+      is.na(descriptions_from_web)) {
+    stop("'descriptions_from_web' must be TRUE or FALSE")
   }
 
   if (!is.null(date_start) && !is.null(date_end) && date_start > date_end) {
@@ -383,8 +405,10 @@ query_maude <- function(
   clauses <- terms[!is.na(terms)]
   if (!is.null(date_start) || !is.null(date_end)) {
     ds <- if (is.null(date_start)) "19920101" else date_start
-    de <- if (is.null(date_end)) format(Sys.Date(), "%Y%m%d") else date_end
-    clauses <- c(clauses, paste0("date_received:[", ds, "+TO+", de, "]"))
+    de <- if (is.null(date_end)) Sys.Date() else date_end
+    ds <- if (inherits(ds, "Date")) format_openfda_date(ds) else ds
+    de <- if (inherits(de, "Date")) format_openfda_date(de) else de
+    clauses <- c(clauses, paste0("date_received:[", ds, " TO ", de, "]"))
   }
   if (length(clauses) == 0) {
     stop(
@@ -392,7 +416,7 @@ query_maude <- function(
       "to build a query"
     )
   }
-  query <- paste(clauses, collapse = "+AND+")
+  query <- paste(clauses, collapse = " AND ")
 
   # Paginate if limit > 1000 (openFDA max per request).
   max_per_request <- 999
@@ -448,8 +472,23 @@ query_maude <- function(
     }
   }
 
-  if (fill_descriptions_from_web && nrow(result) > 0) {
+  if (descriptions_from_web && nrow(result) > 0) {
     result <- get_maude_web_descriptions(result, quiet = !verbose)
+  }
+
+  if ("date_received" %in% names(result)) {
+    date_received <- as.character(result$date_received)
+    date_received <- trimws(date_received)
+    date_received[!nzchar(date_received)] <- NA_character_
+
+    ymd_compact <- !is.na(date_received) & grepl("^\\d{8}$", date_received)
+    if (any(ymd_compact)) {
+      date_received[ymd_compact] <- as.character(
+        as.Date(date_received[ymd_compact], format = "%Y%m%d")
+      )
+    }
+
+    result$date_received <- suppressWarnings(as.Date(date_received))
   }
 
   result
@@ -720,7 +759,7 @@ flatten_maude_record <- function(rec) {
 #' Fill missing MAUDE descriptions from FDA detail pages
 #'
 #' @description Internal helper used by `query_maude()` when
-#'   `fill_descriptions_from_web = TRUE`. It looks up missing
+#'   `descriptions_from_web = TRUE`. It looks up missing
 #'   `event_description` values by `mdr_report_key` on the FDA MAUDE detail
 #'   pages. Existing API-provided descriptions are never overwritten.
 #'
@@ -778,7 +817,7 @@ get_maude_web_descriptions <- function(
       !requireNamespace("rvest", quietly = TRUE)) {
     stop(
       "Packages 'xml2' and 'rvest' are required when ",
-      "'fill_descriptions_from_web = TRUE'.",
+      "'descriptions_from_web = TRUE'.",
       call. = FALSE
     )
   }

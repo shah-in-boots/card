@@ -188,6 +188,31 @@ test_that("adjudicate_maude_event accepts explicit definitions and index", {
   expect_identical(out$pericardial$insufficient_info, 1L)
 })
 
+test_that("complication definitions accept named vector and named list classifications", {
+  vector_definition <- list(
+    example = list(
+      definition = "Example complication.",
+      classification = c(
+        minor = "Minor event.",
+        insufficient_info = "Not enough detail."
+      )
+    )
+  )
+
+  list_definition <- list(
+    example = list(
+      definition = "Example complication.",
+      classification = list(
+        minor = "Minor event.",
+        insufficient_info = "Not enough detail."
+      )
+    )
+  )
+
+  expect_no_error(validate_complication_definitions(vector_definition))
+  expect_no_error(validate_complication_definitions(list_definition))
+})
+
 test_that("adjudicate_maude_event returns an empty result when no terms remain", {
   skip_if_not_installed("ellmer")
 

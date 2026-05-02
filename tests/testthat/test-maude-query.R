@@ -25,8 +25,76 @@ test_that("load_maude_codes rejects invalid annex", {
 
 test_that("query_maude validates web description fill option", {
   expect_error(
-    query_maude("pacemaker", fill_descriptions_from_web = NA),
-    "'fill_descriptions_from_web' must be TRUE or FALSE"
+    query_maude("pacemaker", descriptions_from_web = NA),
+    "'descriptions_from_web' must be TRUE or FALSE"
+  )
+})
+
+test_that("query_maude handles dates appropriately for R", {
+
+  # Check if returns dates appropriately
+  out <- query_maude(search = "pacemaker", limit = 3, verbose = FALSE)
+  expect_s3_class(out$date_received, "Date")
+
+  # Check if can input dates to query in date format (Date object)
+  out <- query_maude(
+    search = "pacemaker",
+    date_start = as.Date("2026-01-01"),
+    date_end = as.Date("2026-01-31"),
+    limit = 1,
+    verbose = FALSE
+  )
+  expect_s3_class(out$date_received, "Date")
+})
+
+test_that("query_maude accepts Date objects for date range inputs", {
+  captured_query <- NULL
+
+  testthat::local_mocked_bindings(
+    maude_fda_api_call = function(search_query, ...) {
+      captured_query <<- search_query
+      tibble::tibble(
+        report_number = "RPT-1",
+        event_type = "Malfunction",
+        date_received = "20260115"
+      )
+    },
+    .package = "card"
+  )
+
+  out <- query_maude(
+    search = "pacemaker",
+    date_start = as.Date("2026-01-01"),
+    date_end = as.Date("2026-01-31"),
+    limit = 1,
+    verbose = FALSE
+  )
+
+  expect_s3_class(out$date_received, "Date")
+  expect_match(
+    captured_query,
+    "date_received:\\[20260101 TO 20260131\\]"
+  )
+})
+
+test_that("query_maude validates Date range inputs before querying", {
+  expect_error(
+    query_maude(
+      search = "pacemaker",
+      date_start = as.Date("2026-02-01"),
+      date_end = as.Date("2026-01-01"),
+      verbose = FALSE
+    ),
+    "'date_start' \\(2026-02-01\\) must be on or before 'date_end' \\(2026-01-01\\)"
+  )
+
+  expect_error(
+    query_maude(
+      search = "pacemaker",
+      date_start = as.Date(NA),
+      verbose = FALSE
+    ),
+    "'date_start' must not be NA"
   )
 })
 
@@ -103,27 +171,70 @@ test_that("flatten_maude_record preserves narrative text from simplified shapes"
 })
 
 test_that("query_maude can handle larger limits", {
+  calls <- list()
 
-  dat <- query_maude(search = "PFA", limit = 1000)
+  testthat::local_mocked_bindings(
+    maude_fda_api_call = function(search_query, limit, skip, ...) {
+      calls[[length(calls) + 1L]] <<- list(
+        search_query = search_query,
+        limit = as.integer(limit),
+        skip = as.integer(skip)
+      )
+
+      tibble::tibble(
+        report_number = paste0("RPT-", skip + seq_len(limit)),
+        event_type = "Malfunction",
+        date_received = "20260115"
+      )
+    },
+    .package = "card"
+  )
+
+  dat <- query_maude(search = "PFA", limit = 1000, verbose = FALSE)
+
   expect_s3_class(dat, "tbl_df")
   expect_equal(nrow(dat), 1000)
+  expect_equal(vapply(calls, `[[`, integer(1), "limit"), c(999L, 1L))
+  expect_equal(vapply(calls, `[[`, integer(1), "skip"), c(0L, 999L))
+  expect_true(all(vapply(
+    calls,
+    function(x) grepl("PFA", x$search_query, fixed = TRUE),
+    logical(1)
+  )))
 
 })
 
 test_that("can fill out blank descriptions from the web", {
-  # First get data and find missing. 
-  # Need to pull during testing so its the same
-  dat <- query_maude(search = "PFA", fill_descriptions_from_web = FALSE)
-  missing_desc <- dat |> 
-    dplyr::filter(is.na(event_description)) |> 
-    dplyr::pull(report_number)
+  fake_result <- tibble::tibble(
+    report_number = c("RPT-1", "RPT-2"),
+    event_type = c("Malfunction", "Injury"),
+    date_received = c("20260115", "20260116"),
+    event_description = c(NA_character_, "Existing description")
+  )
 
-  # Now check if filling from web works
-  dat_filled <- query_maude(search = "PFA", fill_descriptions_from_web = TRUE)
-  filled_desc <- dat_filled |> 
-    dplyr::filter(report_number %in% missing_desc) |> 
-    dplyr::pull(event_description)
+  fill_called <- FALSE
 
-  # Check to see if they are the same
-  expect_length(filled_desc, length(missing_desc))
+  testthat::local_mocked_bindings(
+    maude_fda_api_call = function(...) fake_result,
+    get_maude_web_descriptions = function(events, quiet = FALSE) {
+      fill_called <<- TRUE
+      missing_description <- is.na(events$event_description)
+      events$event_description[missing_description] <- "Filled description"
+      events
+    },
+    .package = "card"
+  )
+
+  dat_filled <- query_maude(
+    search = "PFA",
+    descriptions_from_web = TRUE,
+    verbose = FALSE
+  )
+
+  expect_true(fill_called)
+  expect_equal(
+    dat_filled$event_description,
+    c("Filled description", "Existing description")
+  )
+  expect_s3_class(dat_filled$date_received, "Date")
 })
