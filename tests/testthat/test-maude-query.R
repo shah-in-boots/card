@@ -62,6 +62,7 @@ test_that("maude_query handles dates appropriately for R", {
     limit = 1,
     verbose = FALSE
   )
+
   expect_s3_class(out$date_received, "Date")
   expect_true(grepl(
     "date_received:[20260101 TO 20260131]",
