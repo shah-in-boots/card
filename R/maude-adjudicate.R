@@ -1,7 +1,7 @@
 #' Adjudicate MAUDE adverse events with a structured `ellmer` chat
 #'
 #' @description
-#' `adjudicate_maude_event()` uses reported MAUDE problem terms to narrow the
+#' `maude_adjudicate()` uses reported MAUDE problem terms to narrow the
 #' candidate complication families, then sends each selected family to an
 #' `ellmer` chat object one at a time for structured adjudication against the
 #' supplied event narrative.
@@ -11,7 +11,7 @@
 #' constructor such as `ellmer::chat_openai()`, `ellmer::chat_anthropic()`, or
 #' another `ellmer::chat_*()` backend. Users are responsible for supplying
 #' their own provider credentials or API key configuration when creating that
-#' chat object. `adjudicate_maude_event()` does not accept API keys directly;
+#' chat object. `maude_adjudicate()` does not accept API keys directly;
 #' secrets should stay in the provider configuration layer, typically via
 #' environment variables such as `OPENAI_API_KEY`, before constructing the
 #' chat object.
@@ -49,7 +49,7 @@
 #'
 #' @param event_narrative A single adverse-event narrative, usually the
 #'   `event_narrative` or comparable free-text field returned by
-#'   [query_maude()]. This is the clinical text that the LLM adjudicates.
+#'   [maude_query()]. This is the clinical text that the LLM adjudicates.
 #'
 #' @param chat_object An **{ellmer}** chat object. The object is cloned and reset
 #'   before each complication-family request, so prior turns are not reused.
@@ -77,7 +77,7 @@
 #'   model = "gpt-4.1-mini"
 #' )
 #'
-#' adjudicate_maude_event(
+#' maude_adjudicate(
 #'   terms = "Pericardial Effusion; Low blood pressure / hypotension",
 #'   event_narrative = paste(
 #'     "Small pericardial effusion noted at case end without hemodynamic",
@@ -88,7 +88,7 @@
 #' }
 #'
 #' @export
-adjudicate_maude_event <- function(
+maude_adjudicate <- function(
   terms,
   delimiter = ";",
   event_narrative,
@@ -100,7 +100,7 @@ adjudicate_maude_event <- function(
   # when this LLM-dependent workflow is actually used.
   if (!requireNamespace("ellmer", quietly = TRUE)) {
     stop(
-      "Package 'ellmer' must be installed to use 'adjudicate_maude_event()'",
+      "Package 'ellmer' must be installed to use 'maude_adjudicate()'",
       call. = FALSE
     )
   }

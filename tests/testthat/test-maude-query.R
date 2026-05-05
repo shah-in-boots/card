@@ -23,21 +23,39 @@ test_that("load_maude_codes rejects invalid annex", {
   expect_error(load_maude_codes("Z"), "Invalid annex")
 })
 
-test_that("query_maude validates web description fill option", {
+test_that("maude_query validates web description fill option", {
   expect_error(
-    query_maude("pacemaker", descriptions_from_web = NA),
+    maude_query("pacemaker", descriptions_from_web = NA),
     "'descriptions_from_web' must be TRUE or FALSE"
   )
 })
 
-test_that("query_maude handles dates appropriately for R", {
+test_that("maude_query handles dates appropriately for R", {
+  calls <- list()
+
+  testthat::local_mocked_bindings(
+    maude_fda_api_call = function(search_query, limit, skip, ...) {
+      calls[[length(calls) + 1L]] <<- list(
+        search_query = search_query,
+        limit = limit,
+        skip = skip
+      )
+
+      tibble::tibble(
+        report_number = paste0("RPT-", seq_len(limit)),
+        event_type = "Malfunction",
+        date_received = rep("20260115", limit)
+      )
+    },
+    .package = "card"
+  )
 
   # Check if returns dates appropriately
-  out <- query_maude(search = "pacemaker", limit = 3, verbose = FALSE)
+  out <- maude_query(search = "pacemaker", limit = 3, verbose = FALSE)
   expect_s3_class(out$date_received, "Date")
 
   # Check if can input dates to query in date format (Date object)
-  out <- query_maude(
+  out <- maude_query(
     search = "pacemaker",
     date_start = as.Date("2026-01-01"),
     date_end = as.Date("2026-01-31"),
@@ -45,8 +63,12 @@ test_that("query_maude handles dates appropriately for R", {
     verbose = FALSE
   )
   expect_s3_class(out$date_received, "Date")
+  expect_true(grepl(
+    "date_received:[20260101 TO 20260131]",
+    calls[[2]]$search_query,
+    fixed = TRUE
+  ))
 })
-
 
 test_that("flatten_maude_record keeps all narrative text blocks", {
   rec <- list(
@@ -120,7 +142,7 @@ test_that("flatten_maude_record preserves narrative text from simplified shapes"
   expect_identical(out$device_problem, "Failure to Fire; Arcing")
 })
 
-test_that("query_maude can handle larger limits", {
+test_that("maude_query can handle larger limits", {
   calls <- list()
 
   testthat::local_mocked_bindings(
@@ -140,7 +162,7 @@ test_that("query_maude can handle larger limits", {
     .package = "card"
   )
 
-  dat <- query_maude(search = "PFA", limit = 1000, verbose = FALSE)
+  dat <- maude_query(search = "PFA", limit = 1000, verbose = FALSE)
 
   expect_s3_class(dat, "tbl_df")
   expect_equal(nrow(dat), 1000)
@@ -177,7 +199,7 @@ test_that("can fill out blank descriptions from the web", {
     .package = "card"
   )
 
-  dat_filled <- query_maude(
+  dat_filled <- maude_query(
     search = "PFA",
     descriptions_from_web = TRUE,
     verbose = FALSE

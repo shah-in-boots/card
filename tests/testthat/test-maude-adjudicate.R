@@ -62,14 +62,14 @@ new_mock_maude_chat <- function(response) {
   chat
 }
 
-test_that("adjudicate_maude_event returns default-zero flags and resets chat state", {
+test_that("maude_adjudicate returns default-zero flags and resets chat state", {
   skip_if_not_installed("ellmer")
 
   chat <- new_mock_maude_chat(list(
     trivial_effusion = TRUE
   ))
 
-  out <- adjudicate_maude_event(
+  out <- maude_adjudicate(
     terms = "Pericardial Effusion",
     event_narrative = paste(
       "Small pericardial effusion noted at case end without hemodynamic",
@@ -115,7 +115,7 @@ test_that("adjudicate_maude_event returns default-zero flags and resets chat sta
   )
 })
 
-test_that("adjudicate_maude_event loops over complication families", {
+test_that("maude_adjudicate loops over complication families", {
   skip_if_not_installed("ellmer")
 
   chat <- new_mock_maude_chat(function(call) {
@@ -129,7 +129,7 @@ test_that("adjudicate_maude_event loops over complication families", {
     list()
   })
 
-  out <- adjudicate_maude_event(
+  out <- maude_adjudicate(
     terms = c("Pericardial Effusion", "Hematoma"),
     event_narrative = paste(
       "Small pericardial effusion noted at case end without hemodynamic",
@@ -147,14 +147,14 @@ test_that("adjudicate_maude_event loops over complication families", {
   expect_match(chat$clones[[2]]$last_call$prompt, "Complication family: vascular")
 })
 
-test_that("adjudicate_maude_event falls back to other for not-indexed MAUDE terms", {
+test_that("maude_adjudicate falls back to other for not-indexed MAUDE terms", {
   skip_if_not_installed("ellmer")
 
   chat <- new_mock_maude_chat(list(
     moderate = TRUE
   ))
 
-  out <- adjudicate_maude_event(
+  out <- maude_adjudicate(
     terms = "Abdominal Pain",
     event_narrative = paste(
       "After the procedure the patient had abdominal pain requiring",
@@ -170,14 +170,14 @@ test_that("adjudicate_maude_event falls back to other for not-indexed MAUDE term
   expect_true(all(unlist(out$other[remaining], use.names = FALSE) == 0L))
 })
 
-test_that("adjudicate_maude_event accepts explicit definitions and index", {
+test_that("maude_adjudicate accepts explicit definitions and index", {
   skip_if_not_installed("ellmer")
 
   chat <- new_mock_maude_chat(list(
     insufficient_info = TRUE
   ))
 
-  out <- adjudicate_maude_event(
+  out <- maude_adjudicate(
     terms = "Pericardial Effusion",
     event_narrative = "Pericardial effusion mentioned without more detail.",
     chat_object = chat,
@@ -213,13 +213,13 @@ test_that("complication definitions accept named vector and named list classific
   expect_no_error(validate_complication_definitions(list_definition))
 })
 
-test_that("adjudicate_maude_event returns an empty result when no terms remain", {
+test_that("maude_adjudicate returns an empty result when no terms remain", {
   skip_if_not_installed("ellmer")
 
   chat <- new_mock_maude_chat(list())
 
   expect_warning(
-    out <- adjudicate_maude_event(
+    out <- maude_adjudicate(
       terms = " ; ",
       event_narrative = "Narrative text.",
       chat_object = chat

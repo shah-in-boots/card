@@ -61,7 +61,7 @@ load_maude_codes <- function(annex) {
 #' Query the FDA MAUDE Database
 #'
 #' @description
-#' `query_maude()` queries the Manufacturer and User Facility Device Experience
+#' `maude_query()` queries the Manufacturer and User Facility Device Experience
 #' (MAUDE) database using the openFDA API. This is the recommended interface
 #' for most users, providing automatic pagination, date range handling, and
 #' input validation.
@@ -82,7 +82,7 @@ load_maude_codes <- function(annex) {
 #' a key. Large queries are automatically paginated in batches of up to 1000
 #' records.
 #'
-#' **Result Order:** `query_maude()` requests results sorted in reverse
+#' **Result Order:** `maude_query()` requests results sorted in reverse
 #' chronological order by `date_received` (`date_received:desc`). This provides
 #' deterministic pagination for large requests.
 #'
@@ -94,7 +94,7 @@ load_maude_codes <- function(annex) {
 #' - Date range: `"date_received:[20200101 TO 20201231]"`
 #' - Exact phrase: `"device.brand_name:\"Medtronic\""`
 #'
-#' **Building Queries in `query_maude()`:** `query_maude()` is designed to help
+#' **Building Queries in `maude_query()`:** `maude_query()` is designed to help
 #' you build a valid search string without writing the full query yourself.
 #' Use the common field arguments (e.g., `device_generic_name`, `event_type`)
 #' to add structured filters, and pass any additional fields through `...`.
@@ -105,7 +105,7 @@ load_maude_codes <- function(annex) {
 #' no results (rather than an empty array). Both functions handle this by
 #' returning an empty tibble instead of throwing an error.
 #'
-#' **When to use `maude_fda_api_call()`:** Most users should use `query_maude()`.
+#' **When to use `maude_fda_api_call()`:** Most users should use `maude_query()`.
 #' The lower-level `maude_fda_api_call()` is useful when you need:
 #' - Direct control over `skip` for custom pagination strategies
 #' - Pre-constructed query strings with complex *Elasticsearch* syntax
@@ -113,9 +113,9 @@ load_maude_codes <- function(annex) {
 #' - Full control over `search_query`, `sort`, and other openFDA parameters
 #'
 #' @param search Character string specifying the search query or `NULL`. For
-#'   `query_maude()`, this can be a simple term (e.g., `"pacemaker"`) or a
+#'   `maude_query()`, this can be a simple term (e.g., `"pacemaker"`) or a
 #'   field-specific query (e.g., `"device.generic_name:pacemaker"`). Use the
-#'   other `query_maude()` arguments to add additional filters.
+#'   other `maude_query()` arguments to add additional filters.
 #'
 #' @param search_query Fully constructed query string to send to the openFDA
 #'   API (advanced use). This should include any date or field filters that you
@@ -146,20 +146,20 @@ load_maude_codes <- function(annex) {
 #'   query. Names should match the openFDA searchable fields list.
 #'
 #' @param limit Integer specifying the maximum number of records to return.
-#'   For `query_maude()`, defaults to 100 and requests exceeding 1000 are
-#'   automatically paginated. Due to openFDA `skip` limits, `query_maude()`
+#'   For `maude_query()`, defaults to 100 and requests exceeding 1000 are
+#'   automatically paginated. Due to openFDA `skip` limits, `maude_query()`
 #'   currently supports up to 26,000 records per call. For
 #'   `maude_fda_api_call()`, maximum per request is 1000 per openFDA limits.
 #'
 #' @param date_start Optional start date for filtering by `date_received`.
 #'   Prefer a `Date` object, such as `as.Date("2026-01-01")`. POSIXt,
 #'   `"YYYYMMDD"`, and `"YYYY-MM-DD"` values are also accepted and converted to
-#'   `Date`. Only used by `query_maude()`.
+#'   `Date`. Only used by `maude_query()`.
 #'
 #' @param date_end Optional end date for filtering by `date_received`. Prefer a
 #'   `Date` object, such as `as.Date("2026-01-31")`. POSIXt, `"YYYYMMDD"`, and
 #'   `"YYYY-MM-DD"` values are also accepted and converted to `Date`. Only used
-#'   by `query_maude()`.
+#'   by `maude_query()`.
 #'
 #' @param skip Integer specifying the number of records to skip for pagination.
 #'   Only used by `maude_fda_api_call()`. Combined with `limit`, allows fetching
@@ -174,7 +174,7 @@ load_maude_codes <- function(annex) {
 #'   Register at: <https://open.fda.gov/apis/authentication/>
 #'
 #' @param descriptions_from_web Logical. If `TRUE`, after the API call
-#'   `query_maude()` backfills missing `event_description` values in two
+#'   `maude_query()` backfills missing `event_description` values in two
 #'   passes: first from FDA's bulk MAUDE narrative archives
 #'   (`foitext{YYYY}.zip`, `foitextadd.zip`, `foitextchange.zip`,
 #'   `foitextthru1995.zip`), then by scraping the FDA MAUDE detail page for
@@ -217,13 +217,13 @@ load_maude_codes <- function(annex) {
 #' @examples
 #' \dontrun{
 #' # Search for pacemaker-related adverse events
-#' pacemaker_events <- query_maude("pacemaker", limit = 10)
+#' pacemaker_events <- maude_query("pacemaker", limit = 10)
 #'
 #' # Search by device generic name
-#' results <- query_maude(device_generic_name = "defibrillator", limit = 50)
+#' results <- maude_query(device_generic_name = "defibrillator", limit = 50)
 #'
 #' # Filter by received-date range using Date objects
-#' results <- query_maude(
+#' results <- maude_query(
 #'   search = "pacemaker",
 #'   date_start = as.Date("2026-01-01"),
 #'   date_end = as.Date("2026-01-31"),
@@ -231,19 +231,19 @@ load_maude_codes <- function(annex) {
 #' )
 #'
 #' # Add an extra searchable field via ...
-#' results <- query_maude(
+#' results <- maude_query(
 #'   device_generic_name = "infusion pump",
 #'   device.product_code = "LVP",
 #'   limit = 50
 #' )
 #' }
 #'
-#' @name query_maude
+#' @name maude_query
 NULL
 
-#' @rdname query_maude
+#' @rdname maude_query
 #' @export
-query_maude <- function(
+maude_query <- function(
     search = NULL,
     device_generic_name = NULL,
     device_brand_name = NULL,
@@ -315,9 +315,6 @@ query_maude <- function(
     values <- values[!is.na(values)]
     if (!length(values)) {
       return(character(0))
-    }
-    if (!is.character(values)) {
-      stop("'", field, "' must be a character vector")
     }
 
     escaped <- gsub(
@@ -499,7 +496,7 @@ query_maude <- function(
   result
 }
 
-#' @rdname query_maude
+#' @rdname maude_query
 #' @export
 maude_fda_api_call <- function(
   search_query,
@@ -686,12 +683,12 @@ collect_maude_field_values <- function(x, field) {
 #'
 #' @description Internal helper used by `maude_fda_api_call()` to convert a
 #'   single parsed MAUDE API record into the standard tibble row returned by
-#'   `query_maude()`. This centralizes the logic for preserving event narrative
+#'   `maude_query()`. This centralizes the logic for preserving event narrative
 #'   text and normalizing variable nested shapes from the API response.
 #'
 #' @param rec A single parsed MAUDE record from the openFDA API response.
 #'
-#' @return A one-row tibble in the `query_maude()` output format.
+#' @return A one-row tibble in the `maude_query()` output format.
 #'
 #' @keywords internal
 #' @noRd
@@ -763,12 +760,12 @@ flatten_maude_record <- function(rec) {
 
 #' Fill missing MAUDE descriptions from FDA detail pages
 #'
-#' @description Internal helper used by `query_maude()` when
+#' @description Internal helper used by `maude_query()` when
 #'   `descriptions_from_web = TRUE`. It looks up missing
 #'   `event_description` values by `mdr_report_key` on the FDA MAUDE detail
 #'   pages. Existing API-provided descriptions are never overwritten.
 #'
-#' @param events A data frame returned by `query_maude()`. Must contain
+#' @param events A data frame returned by `maude_query()`. Must contain
 #'   `mdr_report_key` and `event_description`.
 #' @param pause_seconds Delay between FDA web page requests. This keeps the
 #'   fallback gentle because it makes one request per missing report.
@@ -785,7 +782,7 @@ get_maude_web_descriptions <- function(
   pause_seconds = 0.25,
   quiet = FALSE
 ) {
-  # The fallback only knows how to update the standard query_maude() output.
+  # The fallback only knows how to update the standard maude_query() output.
   if (!is.data.frame(events)) {
     stop("'events' must be a data.frame or tibble")
   }
@@ -980,7 +977,7 @@ get_maude_web_descriptions <- function(
 
 #' Fill missing MAUDE descriptions from FDA bulk narrative archives
 #'
-#' @description Internal helper used by `query_maude()` when
+#' @description Internal helper used by `maude_query()` when
 #'   `descriptions_from_web = TRUE`. It looks up missing `event_description`
 #'   values by `mdr_report_key` in FDA's bulk pipe-delimited MAUDE narrative
 #'   archives (`foitext{YYYY}.zip`, `foitextadd.zip`, `foitextchange.zip`,
@@ -988,7 +985,7 @@ get_maude_web_descriptions <- function(
 #'   overwritten. Downloaded archives are cached in `cache_dir` so subsequent
 #'   calls reuse them.
 #'
-#' @param events A data frame returned by `query_maude()`. Must contain
+#' @param events A data frame returned by `maude_query()`. Must contain
 #'   `mdr_report_key`, `event_description`, and `date_received`.
 #' @param cache_dir Directory used to store downloaded MAUDE text archives.
 #' @param quiet Logical. If `FALSE`, prints progress messages.
@@ -1040,7 +1037,7 @@ get_maude_file_descriptions <- function(
   # FDA partitions narratives by year, so we only download archives covering
   # the years where rows are actually missing descriptions.
   date_received <- events$date_received[needs_fill]
-  # openFDA returns "YYYYMMDD" strings; query_maude() may have already coerced
+  # openFDA returns "YYYYMMDD" strings; maude_query() may have already coerced
   # to Date. Try the compact format first, then fall back to ISO.
   if (!inherits(date_received, "Date")) {
     raw <- trimws(as.character(date_received))
