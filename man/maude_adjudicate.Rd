@@ -28,7 +28,7 @@ supplied as a single concatenated string. Defaults to \code{";"}.}
 \item{chat_object}{An \strong{{ellmer}} chat object. The object is cloned and reset
 before each complication-family request, so prior turns are not reused.
 The function uses \verb{$clone()}, \verb{$set_turns()}, \verb{$set_system_prompt()}, and
-\verb{$chat_structured()} on this object. See \code{\link[ellmer:chat-any]{ellmer::chat()}} for further
+\verb{$chat_structured()} on this object. See \code{\link[ellmer:chat]{ellmer::chat()}} for further
 details.}
 
 \item{definitions}{Named list of complication definitions. Names should be
@@ -79,7 +79,7 @@ Each complication family is adjudicated in a fresh cloned chat with prior
 turns removed and tools cleared when supported, so clinical text from one
 request is not retained in the next request.
 
-Allowed chat objects are \code{ellmer} \code{Chat} objects created by \code{\link[ellmer:chat-any]{ellmer::chat()}}
+Allowed chat objects are \code{ellmer} \code{Chat} objects created by \code{\link[ellmer:chat]{ellmer::chat()}}
 or provider-specific constructors such as \code{ellmer::chat_openai()} and
 \code{ellmer::chat_anthropic()}. In practice, the object should support
 \verb{$chat_structured()}, \verb{$clone()}, \verb{$set_turns()}, and

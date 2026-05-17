@@ -48,6 +48,20 @@ test_that("maude_term_to_complication groups terms and preserves originals", {
   expect_equal(out$no_harm, "No Health Consequences or Impact")
 })
 
+test_that("maude_term_to_complication preserves unmatched terms as not_indexed", {
+  out <- maude_term_to_complication(
+    c("Pericardial Effusion", "Unlisted MAUDE term from a future code table"),
+    definitions = complication_definitions["pericardial"],
+    index = list(pericardial = "pericardial effusion")
+  )
+
+  expect_equal(out$pericardial, "Pericardial Effusion")
+  expect_equal(
+    out$not_indexed,
+    "Unlisted MAUDE term from a future code table"
+  )
+})
+
 test_that("maude_term_to_complication validates custom index names", {
   bad_index <- list(
     unknown_complication = "cardiac tamponade"

@@ -170,6 +170,47 @@ test_that("maude_adjudicate falls back to other for not-indexed MAUDE terms", {
   expect_true(all(unlist(out$other[remaining], use.names = FALSE) == 0L))
 })
 
+test_that("maude_adjudicate drops missing terms before matching", {
+  skip_if_not_installed("ellmer")
+
+  chat <- new_mock_maude_chat(list(
+    trivial_effusion = TRUE
+  ))
+
+  out <- maude_adjudicate(
+    terms = c(NA_character_, "Pericardial Effusion"),
+    event_narrative = "Small pericardial effusion without compromise.",
+    chat_object = chat
+  )
+
+  expect_identical(names(out), "pericardial")
+  expect_identical(out$pericardial$trivial_effusion, 1L)
+  expect_match(
+    chat$last_clone$last_call$prompt,
+    "MAUDE problem terms: Pericardial Effusion",
+    fixed = TRUE
+  )
+})
+
+test_that("maude_adjudicate sends unrecognized terms to other", {
+  skip_if_not_installed("ellmer")
+
+  chat <- new_mock_maude_chat(list(
+    moderate = TRUE
+  ))
+
+  out <- maude_adjudicate(
+    terms = "Unlisted MAUDE term from a future code table",
+    event_narrative = "The patient required additional observation.",
+    chat_object = chat,
+    definitions = complication_definitions[c("pericardial", "other")],
+    index = list(pericardial = "pericardial effusion")
+  )
+
+  expect_identical(names(out), "other")
+  expect_identical(out$other$moderate, 1L)
+})
+
 test_that("maude_adjudicate accepts explicit definitions and index", {
   skip_if_not_installed("ellmer")
 
@@ -231,4 +272,15 @@ test_that("maude_adjudicate returns an empty result when no terms remain", {
     out,
     list()
   )
+
+  expect_warning(
+    out <- maude_adjudicate(
+      terms = NA_character_,
+      event_narrative = "Narrative text.",
+      chat_object = chat
+    ),
+    "No MAUDE terms matched any complication families",
+    fixed = TRUE
+  )
+  expect_identical(out, list())
 })

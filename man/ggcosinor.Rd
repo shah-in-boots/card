@@ -14,7 +14,7 @@ variable is similar in scale.}
 
 \item{labels}{Logical value if annotations should be placed on plot, default
 = TRUE. The labels depend on the type of plot. The labels are attempted to
-be placed "smartly" using the \code{\link[ggrepel:geom_text_repel]{ggrepel::geom_label_repel()}} function.}
+be placed "smartly" using the \code{\link[ggrepel:geom_label_repel]{ggrepel::geom_label_repel()}} function.}
 
 \item{...}{For extensibility. This function will use different
 implementations based on the type of model (single or multiple component).
@@ -56,8 +56,8 @@ ggcosinor(m2)
 ggcosinor(list(single = m1, multiple = m2))
 }
 \seealso{
-Other cosinor: 
-\code{\link{augment.cosinor}()},
-\code{\link{cosinor}()}
+Other cosinor:
+\code{\link[=augment.cosinor]{augment.cosinor()}},
+\code{\link[=cosinor]{cosinor()}}
 }
 \concept{cosinor}

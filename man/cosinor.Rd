@@ -93,8 +93,8 @@ model <- cosinor(rDYX ~ hour, twins, tau = 24)
 
 }
 \seealso{
-Other cosinor: 
-\code{\link{augment.cosinor}()},
-\code{\link{ggcosinor}()}
+Other cosinor:
+\code{\link[=augment.cosinor]{augment.cosinor()}},
+\code{\link[=ggcosinor]{ggcosinor()}}
 }
 \concept{cosinor}

@@ -21,9 +21,10 @@ complications.}
 problem terms. Defaults to \link{maude_complication_index}.}
 }
 \value{
-A named list. Each list name is a complication identifier and each
-element is a character vector of the original input terms that matched that
-complication. Empty complication groups are omitted.
+A named list. Each list name is a complication identifier, or
+\code{"not_indexed"} for unmatched terms, and each element is a character vector
+of the original input terms that matched that complication. Empty
+complication groups are omitted.
 }
 \description{
 \code{maude_term_to_complication()} groups MAUDE problem terms into the
@@ -34,6 +35,7 @@ punctuation, and spacing do not affect the result.
 A term may appear in more than one complication category if the underlying
 MAUDE index overlaps across categories. Returned values preserve the original
 user-supplied terms rather than the normalized versions used for matching.
+Terms that do not match any index entry are returned under \code{"not_indexed"}.
 }
 \examples{
 maude_term_to_complication(c(

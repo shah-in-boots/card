@@ -112,17 +112,16 @@ maude_adjudicate <- function(
   if (!is.null(delimiter)) {
     # Apply string split to each terms element and then flatten result back to a
     # character vector
-    terms <- unlist(strsplit(terms, split = delimiter, fixed = TRUE))
+    terms <- unlist(
+      strsplit(terms, split = delimiter, fixed = TRUE),
+      use.names = FALSE
+    )
   }
 
   # Clean up terms after
   # They will be normalized when passed to the matching function below
-  parsedTerms <-
-    terms |>
-    trimws() |>
-    (
-      \(.x) {.x[nzchar(.x)]}
-    )() 
+  parsedTerms <- trimws(terms)
+  parsedTerms <- parsedTerms[!is.na(parsedTerms) & nzchar(parsedTerms)]
 
 
   # Select the matched terms for the complication families.
@@ -275,6 +274,7 @@ maude_adjudicate <- function(
 #' A term may appear in more than one complication category if the underlying
 #' MAUDE index overlaps across categories. Returned values preserve the original
 #' user-supplied terms rather than the normalized versions used for matching.
+#' Terms that do not match any index entry are returned under `"not_indexed"`.
 #'
 #' @param term Character vector of MAUDE problem terms to group into
 #'   complications.
@@ -285,9 +285,10 @@ maude_adjudicate <- function(
 #' @param index Named list mapping complication identifiers to normalized MAUDE
 #'   problem terms. Defaults to [maude_complication_index].
 #'
-#' @return A named list. Each list name is a complication identifier and each
-#'   element is a character vector of the original input terms that matched that
-#'   complication. Empty complication groups are omitted.
+#' @return A named list. Each list name is a complication identifier, or
+#'   `"not_indexed"` for unmatched terms, and each element is a character vector
+#'   of the original input terms that matched that complication. Empty
+#'   complication groups are omitted.
 #'
 #' @examples
 #' maude_term_to_complication(c(
@@ -324,11 +325,22 @@ maude_term_to_complication <- function(
   # Matching on normalized text prevents trivial punctuation or casing
   # differences from changing the complication family assignment.
   normalized_terms <- normalize_maude_terms(term)
-  matches <- lapply(index, function(x) {
-    term[normalized_terms %in% normalize_maude_terms(x)]
+  normalized_index <- lapply(index, normalize_maude_terms)
+  term_matches <- lapply(normalized_index, function(x) {
+    normalized_terms %in% x
   })
 
-  matches[lengths(matches) > 0]
+  matches <- lapply(term_matches, function(x) term[x])
+  matches <- matches[lengths(matches) > 0]
+
+  matched <- Reduce(`|`, term_matches, init = rep(FALSE, length(term)))
+  unmatched <- term[!matched]
+
+  if (length(unmatched) > 0L) {
+    matches$not_indexed <- unique(c(matches$not_indexed, unmatched))
+  }
+
+  matches
 }
 
 # MAUDE helper functions -------------------------------------------------------
