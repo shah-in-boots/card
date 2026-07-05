@@ -9,14 +9,14 @@ complication_definitions <- list(
   # Pericardial Effusion / Cardiac Tamponade / Pericarditis ----
   pericardial = list(
     title = "Pericardial Effusion / Cardiac Tamponade / Pericarditis",
-    definition = "Any pericardial complication occurring during or after catheter ablation of atrial fibrillation. Includes accumulation of fluid (blood or serous) in the pericardial space, frank cardiac tamponade, and post-ablation pericarditis with or without associated effusion. Mechanisms include direct mechanical perforation of the atrial wall by catheter or transseptal needle, thermal injury with delayed rupture, excessive anticoagulation, and post-procedural inflammatory pericarditis. The narrative may describe hypotension, pulsus paradoxus, pleuritic chest pain, pericardial friction rub, echocardiographic findings of effusion, pericardiocentesis, surgical drainage, or treatment with NSAIDs or colchicine. Includes both acute intraprocedural events and delayed presentations hours to days after ablation.",
+    definition = "Pericardial complication during or after AF catheter ablation: effusion (blood or serous), frank tamponade, or post-ablation pericarditis (with or without effusion). Mechanisms: atrial wall or transseptal-needle perforation, thermal injury with delayed rupture, over-anticoagulation, inflammatory pericarditis. Cues: hypotension, pulsus paradoxus, pleuritic chest pain, friction rub, effusion on echo, pericardiocentesis, surgical drainage, NSAIDs/colchicine. Includes acute intraprocedural and delayed (hours to days) presentations.",
     classification = list(
-      pericarditis_without_effusion = "Post-ablation pericarditis presenting with pleuritic chest pain and possibly a friction rub, without a clinically significant pericardial effusion. Managed with NSAIDs, colchicine, or observation.",
-      trivial_effusion = "Small or trace pericardial effusion identified at the end of the case or on post-procedure imaging. No hemodynamic compromise. No drainage required. Managed with observation, with or without anti-inflammatory therapy.",
-      moderate_no_intervention = "Moderate pericardial effusion causing symptoms such as chest pain, dyspnea, or tachycardia, but managed conservatively without pericardiocentesis or surgical drainage. May include holding or reversing anticoagulation and medical therapy.",
-      tamponade_pericardiocentesis = "Hemodynamically significant pericardial effusion or frank cardiac tamponade requiring percutaneous pericardiocentesis. Includes cases with hypotension, pulsus paradoxus, or echocardiographic evidence of chamber collapse that prompted emergent drainage.",
-      tamponade_surgical = "Cardiac tamponade or perforation requiring surgical intervention, including pericardial window, thoracotomy, sternotomy, or surgical repair of the atrial wall.",
-      insufficient_info = "The narrative mentions pericardial effusion, tamponade, pericarditis, or related terms but does not provide enough detail to determine whether intervention was required or what management was performed."
+      pericarditis_without_effusion = "Pericarditis (pleuritic chest pain, possible friction rub) without significant effusion. Managed with NSAIDs, colchicine, or observation.",
+      trivial_effusion = "Small or trace effusion at end of case or on post-procedure imaging. No hemodynamic compromise, no drainage. Observation with or without anti-inflammatories.",
+      moderate_no_intervention = "Moderate effusion with symptoms (chest pain, dyspnea, tachycardia) but no drainage. May include holding or reversing anticoagulation and medical therapy.",
+      tamponade_pericardiocentesis = "Hemodynamically significant effusion or tamponade requiring percutaneous pericardiocentesis. Hypotension, pulsus paradoxus, or chamber collapse prompting emergent drainage.",
+      tamponade_surgical = "Tamponade or perforation requiring surgery: pericardial window, thoracotomy, sternotomy, or atrial wall repair.",
+      insufficient_info = "Pericardial effusion, tamponade, or pericarditis mentioned but detail insufficient to determine intervention or management."
     )
   ),
 
@@ -24,15 +24,15 @@ complication_definitions <- list(
   stroke = list(
     title = "Cerebrovascular Event",
 
-    definition = "Any ischemic stroke, hemorrhagic stroke, transient ischemic attack (TIA), or systemic thromboembolism occurring during or after catheter ablation of atrial fibrillation. Mechanisms include thrombus formation on catheters or sheaths, air embolism during transseptal puncture or catheter exchange, char embolism from overheated tissue, and dislodgement of pre-existing left atrial thrombus. The narrative may describe focal neurologic deficits (weakness, speech difficulty, visual changes), altered mental status, cerebral imaging findings (CT or MRI), or systemic embolism to other vascular beds. Includes both clinically apparent events and silent cerebral lesions detected on post-procedure MRI.",
+    definition = "Ischemic stroke, hemorrhagic stroke, transient ischemic attack (TIA), or systemic thromboembolism during or after AF ablation. Mechanisms: thrombus on catheters or sheaths, air embolism (transseptal puncture, catheter exchange), char embolism, dislodged pre-existing left atrial thrombus. Cues: focal deficit (weakness, aphasia, visual change), altered mental status, infarct or hemorrhage on CT/MRI, systemic embolism. Includes clinically apparent events and silent (asymptomatic) cerebral lesions on post-procedure DWI-MRI.",
 
     classification = list(
-      tia = "Transient neurologic deficit resolving completely within 24 hours with no evidence of cerebral infarction on imaging. Full recovery to neurologic baseline.",
-      minor_stroke = "Ischemic or hemorrhagic stroke with mild residual neurologic deficit at discharge or last follow-up. Includes events described as 'minor stroke' or with NIHSS score of 3 or less. Also includes silent cerebral lesions detected on post- procedure MRI if reported.",
-      major_stroke = "Stroke with significant persistent neurologic deficit requiring ICU-level care, resulting in lasting functional disability, or requiring neurosurgical intervention. Includes large-territory infarction and symptomatic intracranial hemorrhage.",
-      fatal_stroke = "Cerebrovascular event that directly caused or substantially contributed to the patient's death.",
-      systemic_embolism = "Thromboembolism to a non-cerebral vascular territory (e.g., mesenteric, renal, or peripheral arterial embolism) occurring in the peri-procedural period.",
-      insufficient_info = "The narrative describes a cerebrovascular or embolic event but does not provide enough detail to determine the severity of deficit, duration of symptoms, or clinical outcome."
+      tia = "Transient focal deficit fully resolving within 24 hours with no infarct on imaging. Return to neurologic baseline.",
+      minor_stroke = "Non-disabling stroke: mild residual deficit at discharge or follow-up (modified Rankin scale <2, or NIHSS <=3), or labeled 'minor stroke.' Also silent cerebral lesions on post-procedure MRI, if reported.",
+      major_stroke = "Disabling stroke: persistent deficit with lasting functional disability (modified Rankin scale >=2 attributable to the event), ICU-level care, or neurosurgical intervention. Includes large-territory infarction and symptomatic intracranial hemorrhage.",
+      fatal_stroke = "Cerebrovascular event that directly caused or substantially contributed to death.",
+      systemic_embolism = "Thromboembolism to a non-cerebral territory (mesenteric, renal, or peripheral arterial) in the peri-procedural period.",
+      insufficient_info = "Cerebrovascular or embolic event described but deficit severity, symptom duration, or outcome unclear."
     )
   ),
 
@@ -40,16 +40,16 @@ complication_definitions <- list(
   vascular = list(
     title = "Vascular Access Complication",
 
-    definition = "Complications arising from percutaneous vascular access for catheter ablation typically at the femoral venous or arterial puncture site. The narrative may describe groin hematoma, swelling, pain at the access site, pseudoaneurysm, arteriovenous (AV) fistula, retroperitoneal hemorrhage, or significant bleeding requiring transfusion. Also includes venous thrombosis (DVT) or pulmonary embolism related to venous access and vascular injury from catheter or sheath manipulation. Does NOT include bleeding complications at non-access sites.",
+    definition = "Complication of percutaneous vascular access, usually at the femoral venous or arterial puncture site. Cues: groin hematoma, swelling, access-site pain, pseudoaneurysm, arteriovenous (AV) fistula, retroperitoneal hemorrhage, or bleeding requiring transfusion. Also access-related deep vein thrombosis or pulmonary embolism and catheter/sheath vascular injury. EXCLUDES bleeding at non-access sites.",
 
     classification = list(
-      minor_hematoma = "Groin hematoma or minor bleeding at the access site managed with manual compression, observation, or prolonged bed rest only. No transfusion or procedural intervention required.",
-      major_hematoma_transfusion = "Access-site hematoma or bleeding requiring blood transfusion but not surgical or interventional repair. Includes significant hematomas causing hemoglobin drop of 2 g/dL or more.",
-      pseudoaneurysm = "Femoral pseudoaneurysm at the access site requiring intervention such as ultrasound-guided thrombin injection, compression, or surgical repair.",
-      av_fistula = "Arteriovenous fistula at the access site. May be managed with observation, compression, or surgical repair depending on size and symptoms.",
-      retroperitoneal = "Retroperitoneal hemorrhage from femoral vessel injury. Typically presents with flank or abdominal pain, hemodynamic instability, and hemoglobin drop. May require transfusion, IR embolization, or surgical repair.",
-      vte = "Venous thromboembolism (deep vein thrombosis or pulmonary embolism) related to venous access or catheter manipulation.",
-      insufficient_info = "The narrative describes a vascular access complication but lacks enough detail to classify the specific type or severity."
+      minor_hematoma = "Groin hematoma or minor access-site bleeding managed with compression, observation, or bed rest only. No transfusion or procedural repair.",
+      major_hematoma_transfusion = "Access-site hematoma or bleeding requiring transfusion but not surgical or interventional repair. Includes hemoglobin drop of 2 g/dL or more.",
+      pseudoaneurysm = "Femoral pseudoaneurysm requiring intervention: ultrasound-guided thrombin injection, compression, or surgical repair.",
+      av_fistula = "Access-site arteriovenous fistula. Managed by observation, compression, or surgical repair per size and symptoms.",
+      retroperitoneal = "Retroperitoneal hemorrhage from femoral vessel injury. Flank or abdominal pain, hemodynamic instability, hemoglobin drop. May require transfusion, embolization, or surgery.",
+      vte = "Access- or catheter-related deep vein thrombosis or pulmonary embolism.",
+      insufficient_info = "Vascular access complication described but type or severity unclear."
     )
   ),
 
@@ -57,14 +57,14 @@ complication_definitions <- list(
   pv_stenosis = list(
     title = "Pulmonary Vein Stenosis",
 
-    definition = "Narrowing of one or more pulmonary veins resulting from catheter ablation within or at the ostium of the pulmonary veins. The incidence has decreased substantially with the shift from ostial to antral isolation strategies. Primarily associated with radiofrequency and cryoballoon ablation; not typically seen with pulsed field ablation due to tissue selectivity. The narrative may describe dyspnea, hemoptysis, recurrent pulmonary infections, or CT/MRI findings of PV narrowing. Symptoms may present weeks to months after ablation.",
+    definition = "Narrowing of one or more pulmonary veins from ablation within or at the PV ostium. Incidence fell substantially with the shift from ostial to antral isolation. Seen with radiofrequency and cryoballoon; rare with pulsed field ablation (tissue selectivity). Cues: dyspnea, hemoptysis, recurrent pulmonary infection, PV narrowing on CT/MRI. Onset often weeks to months after ablation.",
 
     classification = list(
-      asymptomatic = "Pulmonary vein narrowing detected on follow-up imaging (CT, MRI, or TEE) but the patient is asymptomatic. Includes mild stenosis (less than 50% luminal reduction) and moderate stenosis (50-70%) without symptoms.",
-      symptomatic_medical = "Symptomatic PV stenosis (dyspnea, hemoptysis, recurrent pneumonia, or reduced exercise tolerance) managed with medical therapy or observation without procedural intervention.",
-      intervention_required = "PV stenosis requiring procedural intervention such as balloon angioplasty or stent placement. Typically involves severe stenosis (greater than 70% luminal reduction) with limiting symptoms.",
-      complete_occlusion = "Complete occlusion of one or more pulmonary veins documented on imaging. May be asymptomatic if collateral drainage is adequate but represents the most severe anatomic finding.",
-      insufficient_info = "The narrative mentions PV stenosis or related symptoms but does not provide enough detail on imaging findings, symptom severity, or management to determine the degree of stenosis."
+      asymptomatic = "PV narrowing on follow-up imaging (CT, MRI, or TEE), patient asymptomatic. Includes mild (<50% luminal reduction) and moderate (50-70%) stenosis without symptoms.",
+      symptomatic_medical = "Symptomatic PV stenosis (dyspnea, hemoptysis, recurrent pneumonia, reduced exercise tolerance) managed medically or by observation without intervention.",
+      intervention_required = "PV stenosis requiring balloon angioplasty or stent. Usually severe (>70% luminal reduction) with limiting symptoms.",
+      complete_occlusion = "Complete occlusion of one or more pulmonary veins on imaging. May be asymptomatic with adequate collaterals; most severe anatomic finding.",
+      insufficient_info = "PV stenosis or related symptoms mentioned but imaging, severity, or management insufficient to grade."
     )
   ),
 
@@ -72,14 +72,14 @@ complication_definitions <- list(
   esophageal = list(
     title = "Esophageal Injury",
 
-    definition = "Injury to the esophagus caused by energy delivery on the posterior left atrial wall, which lies in close anatomic proximity to the anterior esophageal wall. Ranges from superficial mucosal injury to the catastrophic and often fatal atrioesophageal fistula (AEF). Applies to all energy modalities, though PFA appears to have lower risk of direct esophageal thermal injury due to tissue selectivity. The narrative may describe chest pain radiating to the back, dysphagia, odynophagia, fever, endoscopic findings of erythema or ulceration, CT findings of mediastinal air, or neurologic symptoms from air embolism through a fistula. Also includes gastroparesis from injury to the periesophageal vagal plexus, which manifests as nausea, vomiting, early satiety, and bloating.",
+    definition = "Esophageal injury from energy delivery on the posterior left atrial wall (adjacent to the anterior esophagus). Spectrum: superficial mucosal injury to the catastrophic, often fatal atrioesophageal fistula (AEF). All energy modalities; lower thermal risk with PFA (tissue selectivity). Cues: chest or back pain, dysphagia, odynophagia, fever, endoscopic erythema or ulceration, mediastinal air on CT, neurologic symptoms from air embolism via fistula. Also periesophageal vagal injury causing gastroparesis: nausea, vomiting, early satiety, bloating.",
 
     classification = list(
-      mucosal = "Superficial esophageal injury limited to mucosal erythema, erosion, or shallow ulceration found on endoscopy. Managed conservatively with proton pump inhibitors and dietary modification. No perforation or fistula.",
-      deep_ulceration = "Deep esophageal ulceration extending beyond the mucosa without fistula formation. Requires extended medical management, possibly including sucralfate, IV PPI, and close surveillance imaging.",
-      atrioesophageal_fistula = "Atrioesophageal fistula (AEF) confirmed on imaging (CT with air in the mediastinum or left atrium) or at surgery. A life- threatening complication typically presenting 2-5 weeks post- ablation with fever, neurologic symptoms from air or septic embolism, hematemesis, or sepsis.",
-      gastroparesis = "Symptomatic gastroparesis (nausea, vomiting, early satiety, abdominal bloating, delayed gastric emptying) resulting from injury to the periesophageal vagal plexus during posterior wall ablation. Severity ranges from self-limited to debilitating.",
-      insufficient_info = "The narrative describes esophageal symptoms, findings, or concern for esophageal injury but does not provide enough detail to classify the depth of injury or clinical outcome."
+      mucosal = "Superficial injury limited to mucosal erythema, erosion, or shallow ulcer on endoscopy. Managed with proton pump inhibitors and diet. No perforation or fistula.",
+      deep_ulceration = "Deep ulceration beyond the mucosa without fistula. Extended medical management (sucralfate, IV PPI) and surveillance imaging.",
+      atrioesophageal_fistula = "AEF confirmed on imaging (mediastinal or left atrial air on CT) or at surgery. Life-threatening; typically 2-5 weeks post-ablation with fever, neurologic symptoms from air or septic embolism, hematemesis, or sepsis.",
+      gastroparesis = "Symptomatic gastroparesis (nausea, vomiting, early satiety, bloating, delayed gastric emptying) from periesophageal vagal injury during posterior wall ablation. Self-limited to debilitating.",
+      insufficient_info = "Esophageal symptoms, findings, or concern described but injury depth or outcome unclear."
     )
   ),
 
@@ -87,13 +87,13 @@ complication_definitions <- list(
   phrenic = list(
     title = "Phrenic Nerve Injury",
 
-    definition = "Injury to the right or left phrenic nerve during catheter ablation resulting in diaphragmatic paresis or paralysis. The right phrenic nerve is most commonly affected due to its proximity to the right superior pulmonary vein and superior vena cava. Most frequently associated with cryoballoon ablation of the right superior PV but can also occur with RFA and has been reported rarely with PFA. The narrative may describe loss of diaphragmatic excursion during the procedure (fluoroscopic or pacing-monitored), post-procedure dyspnea, elevated hemidiaphragm on chest X-ray, or reduced inspiratory effort.",
+    definition = "Right or left phrenic nerve injury during ablation causing diaphragmatic paresis or paralysis. Right nerve most affected (proximity to right superior PV and superior vena cava). Most common with cryoballoon of the right superior PV; also radiofrequency, rarely PFA. Cues: loss of diaphragmatic excursion during the procedure (fluoroscopic or pacing-monitored), post-procedure dyspnea, elevated hemidiaphragm on chest X-ray, reduced inspiratory effort.",
 
     classification = list(
-      intraprocedural_only = "Phrenic nerve capture was lost or diminished diaphragmatic excursion was noted during the procedure, prompting immediate cessation of ablation. Phrenic function recovered before the end of the procedure or by the time of discharge.",
-      transient = "Phrenic nerve palsy persisting beyond the procedure but recovering fully within 12 months. Includes patients with elevated hemidiaphragm on chest X-ray at discharge who subsequently recovered.",
-      persistent = "Phrenic nerve palsy still present at 12 months or later, or described as permanent. Patient may have chronic dyspnea on exertion and persistent hemidiaphragm elevation.",
-      insufficient_info = "The narrative describes phrenic nerve injury or elevated hemidiaphragm but does not provide enough follow-up information to determine whether recovery occurred."
+      intraprocedural_only = "Phrenic capture lost or reduced diaphragmatic excursion noted intraprocedurally, prompting ablation cessation. Function recovered before end of case or by discharge.",
+      transient = "Palsy persisting beyond the procedure but recovering fully within 12 months. Includes elevated hemidiaphragm at discharge with later recovery.",
+      persistent = "Palsy still present at 12 months or later, or described as permanent. May have chronic exertional dyspnea and persistent hemidiaphragm elevation.",
+      insufficient_info = "Phrenic injury or elevated hemidiaphragm described but follow-up insufficient to determine recovery."
     )
   ),
 
@@ -101,14 +101,14 @@ complication_definitions <- list(
   arrhythmia = list(
     title = "Procedure-Related Arrhythmia",
 
-    definition = "A new arrhythmia caused by the ablation procedure itself distinct from recurrence of the patient's original atrial fibrillation. Includes iatrogenic left atrial macro-reentrant tachycardia or atypical flutter from gaps in linear lesion sets, new-onset AV block from septal ablation or catheter trauma to the conduction system, inappropriate sinus tachycardia from autonomic modulation, and proarrhythmia (new ventricular arrhythmia or organized atrial arrhythmia not present before ablation). Does NOT include recurrence of the patient's pre- existing AF or early reconnection arrhythmias within the blanking period that are expected.",
+    definition = "New arrhythmia caused by the ablation itself, distinct from recurrence of the original AF. Includes iatrogenic left atrial macro-reentrant tachycardia or atypical flutter from lesion-set gaps, new AV block from septal ablation or conduction-system trauma, inappropriate sinus tachycardia from autonomic modulation, and new ventricular or organized atrial proarrhythmia. EXCLUDES recurrent pre-existing AF and expected blanking-period reconnection arrhythmias.",
 
     classification = list(
-      self_terminating = "Iatrogenic arrhythmia that terminated spontaneously or with brief pacing maneuvers during the procedure, with no recurrence and no additional intervention required.",
-      cardioversion_or_medical = "Iatrogenic arrhythmia requiring electrical cardioversion, antiarrhythmic drug treatment, or rate-control medication. Includes persistent atrial tachycardia or flutter managed medically without repeat ablation.",
-      repeat_ablation = "Iatrogenic arrhythmia requiring a repeat ablation procedure to address (e.g., mapping and ablation of a gap-related macro-reentrant atrial tachycardia or flutter circuit).",
-      device_implant = "Arrhythmia or conduction disturbance requiring implantation of a permanent pacemaker or ICD. Includes complete AV block from septal ablation or catheter trauma requiring permanent pacing.",
-      insufficient_info = "The narrative describes a new arrhythmia related to the ablation but does not provide enough detail on the type of arrhythmia, management, or outcome."
+      self_terminating = "Iatrogenic arrhythmia terminating spontaneously or with brief pacing maneuvers, no recurrence, no added intervention.",
+      cardioversion_or_medical = "Requires electrical cardioversion, antiarrhythmic, or rate-control drugs. Includes persistent atrial tachycardia or flutter managed medically without repeat ablation.",
+      repeat_ablation = "Requires a repeat ablation (e.g., mapping and ablation of a gap-related macro-reentrant tachycardia or flutter circuit).",
+      device_implant = "Requires a permanent pacemaker or ICD. Includes complete AV block from septal ablation or catheter trauma needing permanent pacing.",
+      insufficient_info = "New ablation-related arrhythmia described but type, management, or outcome unclear."
     )
   ),
 
@@ -116,14 +116,14 @@ complication_definitions <- list(
   coronary = list(
     title = "Coronary Artery Injury / Spasm",
 
-    definition = "Coronary artery spasm, occlusion, or direct vascular injury caused by ablation energy delivery in proximity to the coronary arteries. Most commonly reported with pulsed field ablation (PFA), where the high-voltage electric field can stimulate vascular smooth muscle contraction. Focal spasm of the left circumflex artery during mitral isthmus ablation and of the right coronary artery during cavotricuspid isthmus ablation are the most recognized patterns. Delayed diffuse coronary spasm possibly mediated by hemolysis-related nitric oxide depletion has also been described with PFA. The narrative may describe ST-segment changes, chest pain, hemodynamic instability, coronary angiography findings, or nitroglycerin administration during the procedure. Can also occur rarely with RFA particularly during epicardial ablation.",
+    definition = "Coronary artery spasm, occlusion, or injury from ablation energy near the coronaries. Most reported with pulsed field ablation (PFA), whose high-voltage field can stimulate vascular smooth muscle: focal left circumflex spasm during mitral isthmus ablation and right coronary spasm during cavotricuspid isthmus ablation are the recognized patterns. Delayed diffuse spasm (possibly hemolysis-related nitric oxide depletion) also described with PFA. Cues: ST-segment changes, chest pain, hemodynamic instability, angiography findings, intraprocedural nitroglycerin. Rare with radiofrequency, mainly epicardial ablation.",
 
     classification = list(
-      transient_spasm = "Coronary artery spasm during ablation that resolved promptly with cessation of energy delivery and/or administration of intracoronary or intravenous nitroglycerin. No evidence of myocardial injury (normal troponin). No lasting ischemic consequence.",
-      sustained_spasm = "Coronary spasm requiring prolonged vasodilator therapy, occurring remotely from energy delivery (delayed spasm), or recurring after initial resolution. May include troponin elevation without meeting criteria for myocardial infarction.",
-      myocardial_infarction = "Acute myocardial infarction from coronary occlusion or sustained spasm. Includes ST-elevation MI, non-ST-elevation MI with significant troponin rise and ischemic symptoms or ECG changes, and coronary occlusion requiring emergent PCI.",
-      coronary_stenosis = "Coronary artery narrowing or vascular remodeling detected on follow-up angiography or OCT, attributed to ablation-induced vascular injury. A recently described finding with PFA near coronary vessels.",
-      insufficient_info = "The narrative describes coronary symptoms, ST changes, or concern for coronary injury but does not provide enough detail to determine the mechanism, severity, or outcome."
+      transient_spasm = "Spasm resolving promptly with cessation of energy and/or intracoronary or IV nitroglycerin. No myocardial injury (normal troponin). No lasting ischemia.",
+      sustained_spasm = "Spasm requiring prolonged vasodilators, occurring remote/delayed from energy delivery, or recurring after resolution. May include troponin rise not meeting MI criteria.",
+      myocardial_infarction = "Acute MI from occlusion or sustained spasm. Includes STEMI, NSTEMI with significant troponin rise plus ischemic symptoms or ECG changes, and occlusion requiring emergent PCI.",
+      coronary_stenosis = "Coronary narrowing or remodeling on follow-up angiography or OCT attributed to ablation injury. Recently described with PFA near coronary vessels.",
+      insufficient_info = "Coronary symptoms, ST changes, or concern described but mechanism, severity, or outcome unclear."
     )
   ),
 
@@ -131,13 +131,13 @@ complication_definitions <- list(
   hemolysis = list(
     title = "Hemolysis / Acute Kidney Injury",
 
-    definition = "Intravascular hemolysis caused by electroporation of red blood cells predominantly associated with pulsed field ablation (PFA). High-voltage pulsed electric fields generate a transmembrane potential in erythrocytes, leading to membrane pore formation, colloid osmotic swelling, and cell rupture. Manifests as elevated plasma free hemoglobin, elevated LDH, hemoglobinuria (dark or discolored urine), and in severe cases, acute kidney injury (AKI) from heme-mediated proximal tubular damage. Free hemoglobin also scavenges nitric oxide, which may contribute to smooth muscle dysfunction (urinary retention, coronary spasm, hypertension). Risk correlates with the total number of PFA applications and catheter-tissue contact quality.",
+    definition = "Intravascular hemolysis from electroporation of red blood cells, predominantly with pulsed field ablation (PFA). High-voltage pulsed fields rupture erythrocytes (transmembrane pore formation, osmotic swelling). Cues: elevated plasma free hemoglobin, elevated LDH, hemoglobinuria (dark urine), and in severe cases acute kidney injury (AKI) from heme-mediated proximal tubular damage. Free hemoglobin also scavenges nitric oxide (may contribute to urinary retention, coronary spasm, hypertension). Risk rises with number of PFA applications and catheter-tissue contact. Severe AKI requiring dialysis is rare (~0.03%, MANIFEST-17K).",
 
     classification = list(
-      laboratory_only = "Evidence of hemolysis on laboratory testing (elevated free hemoglobin, elevated LDH, hemoglobinuria) without clinically significant renal dysfunction or other end-organ effects. Self-resolving within 24-48 hours.",
-      aki_no_dialysis = "Acute kidney injury from hemolysis-induced tubular damage, defined as a significant rise in serum creatinine, managed conservatively with IV hydration without requiring renal replacement therapy.",
+      laboratory_only = "Lab evidence of hemolysis (elevated free hemoglobin, LDH, hemoglobinuria) without significant renal dysfunction or other end-organ effect. Self-resolving within 24-48 hours.",
+      aki_no_dialysis = "Hemolysis-induced AKI (significant serum creatinine rise) managed conservatively with IV hydration, no renal replacement.",
       aki_dialysis = "Severe hemolysis-induced AKI requiring temporary or sustained renal replacement therapy (hemodialysis).",
-      insufficient_info = "The narrative mentions hemolysis, dark urine, elevated LDH, or renal dysfunction potentially related to hemolysis but does not provide enough detail to characterize the severity."
+      insufficient_info = "Hemolysis, dark urine, elevated LDH, or renal dysfunction mentioned but severity unclear."
     )
   ),
 
@@ -145,13 +145,13 @@ complication_definitions <- list(
   respiratory = list(
     title = "Respiratory / Pulmonary Complication",
 
-    definition = "Pulmonary or thoracic complications of catheter ablation NOT related to pulmonary vein stenosis (see pv_stenosis) or phrenic nerve injury (see phrenic). Includes pneumothorax (from subclavian or internal jugular access, or epicardial access), hemothorax, pulmonary hemorrhage or hemoptysis (reported with PFA), bronchial injury, post-procedure pulmonary edema, and pulmonary infection. The narrative may describe dyspnea, chest pain, reduced breath sounds, chest tube placement, or chest imaging findings.",
+    definition = "Pulmonary or thoracic complication NOT from pulmonary vein stenosis (see pv_stenosis) or phrenic nerve injury (see phrenic). Includes pneumothorax (subclavian, internal jugular, or epicardial access), hemothorax, pulmonary hemorrhage or hemoptysis (reported with PFA), bronchial injury, pulmonary edema, and pulmonary infection. Cues: dyspnea, chest pain, reduced breath sounds, chest tube placement, chest imaging findings.",
 
     classification = list(
-      mild = "Minor respiratory complication managed conservatively, such as small pneumothorax on imaging that resolved without chest tube, transient hemoptysis, or mild pulmonary edema treated with diuretics.",
-      moderate_intervention = "Respiratory complication requiring procedural intervention, such as chest tube placement for pneumothorax or hemothorax, or significant pulmonary hemorrhage requiring bronchoscopy.",
-      severe = "Respiratory complication requiring ICU care, mechanical ventilation, surgical intervention, or resulting in prolonged hospitalization.",
-      insufficient_info = "The narrative describes a respiratory or pulmonary complication but does not provide enough detail to grade severity."
+      mild = "Minor, managed conservatively: small pneumothorax resolving without chest tube, transient hemoptysis, or mild pulmonary edema treated with diuretics.",
+      moderate_intervention = "Requires procedure: chest tube for pneumothorax or hemothorax, or significant pulmonary hemorrhage requiring bronchoscopy.",
+      severe = "Requires ICU care, mechanical ventilation, surgery, or prolonged hospitalization.",
+      insufficient_info = "Respiratory or pulmonary complication described but severity unclear."
     )
   ),
 
@@ -159,13 +159,13 @@ complication_definitions <- list(
   infection = list(
     title = "Procedure-Related Infection",
 
-    definition = "Infection attributable to the catheter ablation procedure. Includes vascular access site infection (cellulitis, abscess), endocarditis from catheter-introduced organisms, bacteremia or sepsis from intravascular instrumentation, mediastinitis (which may be associated with esophageal injury), and post-procedure pneumonia. The narrative may describe fever, elevated white blood cell count, positive blood cultures, wound erythema or drainage, or antibiotic administration for a suspected procedure-related source. Does NOT include infections unrelated to the procedure.",
+    definition = "Infection attributable to the ablation. Includes access-site infection (cellulitis, abscess), endocarditis from catheter-introduced organisms, bacteremia or sepsis from intravascular instrumentation, mediastinitis (may accompany esophageal injury), and post-procedure pneumonia. Cues: fever, elevated white blood cell count, positive blood cultures, wound erythema or drainage, antibiotics for a suspected procedure-related source. EXCLUDES infections unrelated to the procedure.",
 
     classification = list(
-      local = "Localized infection at the access site (cellulitis, superficial wound infection) managed with oral antibiotics without hospitalization.",
-      systemic_iv_antibiotics = "Systemic infection (bacteremia, pneumonia, UTI) requiring IV antibiotics or hospitalization but without hemodynamic instability or end-organ damage.",
-      sepsis = "Sepsis or septic shock from a procedure-related source. Includes endocarditis, mediastinitis, or septic embolism. Requires ICU-level care, vasopressors, or surgical source control.",
-      insufficient_info = "The narrative describes infection or related findings but does not provide enough detail to determine the source, extent, or severity."
+      local = "Localized access-site infection (cellulitis, superficial wound) managed with oral antibiotics, no hospitalization.",
+      systemic_iv_antibiotics = "Systemic infection (bacteremia, pneumonia, UTI) requiring IV antibiotics or hospitalization, without hemodynamic instability or end-organ damage.",
+      sepsis = "Sepsis or septic shock from a procedure-related source (endocarditis, mediastinitis, septic embolism). Requires ICU-level care, vasopressors, or surgical source control.",
+      insufficient_info = "Infection or related findings described but source, extent, or severity unclear."
     )
   ),
 
@@ -173,13 +173,13 @@ complication_definitions <- list(
   death = list(
     title = "Procedure-Related Death",
 
-    definition = "Death occurring during or after catheter ablation of atrial fibrillation that is judged to be related to the procedure or one of its complications. Death from AF ablation is multifactorial and may result from cardiac tamponade, atrioesophageal fistula, massive stroke, anesthesia-related events, coronary occlusion, or other procedural causes. The overall incidence is approximately 0.05-0.1%. The narrative may explicitly state that the patient died or may describe a clinical course leading to death (e.g., refractory cardiac arrest, withdrawal of care). This category captures death as the final outcome; the underlying mechanism may also warrant assignment to another complication category (e.g., pericardial, stroke, esophageal).",
+    definition = "Death during or after AF ablation judged related to the procedure or one of its complications. Multifactorial: cardiac tamponade, atrioesophageal fistula, massive stroke, anesthesia event, coronary occlusion, or other procedural causes. Overall incidence ~0.05-0.1%. Narrative may state death outright or describe a course leading to it (refractory cardiac arrest, withdrawal of care). Captures death as the final outcome; the underlying mechanism may also warrant another category (pericardial, stroke, esophageal).",
 
     classification = list(
-      intraprocedural = "Death occurring during the ablation procedure itself, in the electrophysiology laboratory or operating room.",
-      periprocedural = "Death occurring within 30 days of the ablation procedure, outside the procedural setting but attributed to a procedural complication.",
-      delayed = "Death occurring more than 30 days after ablation but attributed to a procedural complication (e.g., late atrioesophageal fistula or late PV stenosis with pulmonary consequences).",
-      insufficient_info = "The narrative indicates the patient died but does not provide enough detail to determine the timing or cause of death relative to the procedure."
+      intraprocedural = "Death during the procedure itself, in the electrophysiology laboratory or operating room.",
+      periprocedural = "Death within 30 days, outside the procedural setting, attributed to a procedural complication.",
+      delayed = "Death more than 30 days post-ablation attributed to a procedural complication (late atrioesophageal fistula, late PV stenosis with pulmonary consequences).",
+      insufficient_info = "Death indicated but timing or cause relative to the procedure unclear."
     )
   ),
 
@@ -187,13 +187,13 @@ complication_definitions <- list(
   device_malfunction = list(
     title = "Device / Equipment Malfunction",
 
-    definition = "Failure or malfunction of the ablation catheter, energy generator, mapping system, or ancillary procedural equipment (sheaths, transseptal needles, irrigation pump, recording system) that is reported as part of the adverse event. This category captures problems with the device itself, regardless of whether the malfunction led to patient injury. In MAUDE, many reports are filed under the 'Malfunction' event type with Annex A device problem codes. The narrative may describe catheter fracture, tip detachment, generator error codes, impedance faults, software or firmware failures, irrigation failures, mapping system crashes, or inability to deliver energy. If the malfunction also caused a clinical complication, both this category and the relevant clinical complication category may be assigned.",
+    definition = "Failure or malfunction of the ablation catheter, energy generator, mapping system, or ancillary equipment (sheaths, transseptal needles, irrigation pump, recording system), regardless of whether it caused patient injury. In MAUDE often filed under the 'Malfunction' event type with Annex A device-problem codes. Cues: catheter fracture, tip detachment, generator error codes, impedance faults, software or firmware failure, irrigation failure, mapping-system crash, inability to deliver energy. If it also caused a clinical complication, co-assign the relevant clinical category.",
 
     classification = list(
-      no_procedure_impact = "Device malfunction that was identified and resolved without impact on the ablation procedure. The procedure was completed as planned using the same or replacement equipment.",
-      procedure_altered = "Device malfunction that required a change in procedural strategy, use of backup equipment, or premature termination of the procedure, but did not result in direct patient injury.",
-      patient_injury = "Device malfunction that directly caused or contributed to a patient injury. The specific injury should also be classified under the appropriate clinical complication category.",
-      insufficient_info = "The narrative describes a device malfunction but does not provide enough detail to determine whether the procedure or patient was affected."
+      no_procedure_impact = "Malfunction identified and resolved without impact; procedure completed with the same or replacement equipment.",
+      procedure_altered = "Malfunction required a change in strategy, backup equipment, or premature termination, but no direct patient injury.",
+      patient_injury = "Malfunction directly caused or contributed to a patient injury. Also classify the injury under the appropriate clinical category.",
+      insufficient_info = "Device malfunction described but procedure or patient impact unclear."
     )
   ),
 
@@ -201,12 +201,12 @@ complication_definitions <- list(
   no_harm = list(
     title = "No Patient Harm",
 
-    definition = "The adverse event report describes a device problem, procedural deviation, near-miss event, or other reportable occurrence, but explicitly states that no patient injury, adverse clinical outcome, or harm occurred. This category exists to account for reports that are filed to satisfy regulatory reporting obligations but do not represent a clinical complication. The narrative may state 'no patient harm,' 'no adverse outcome,' 'no clinical consequence,' 'no impact to the patient,' or similar language. This category should only be assigned when the narrative affirmatively indicates absence of harm, not merely when harm is not mentioned.",
+    definition = "Report describes a device problem, procedural deviation, near-miss, or other reportable occurrence but explicitly states no patient injury or harm occurred. Accounts for reports filed to satisfy regulatory obligations that do not represent a clinical complication. Cues: 'no patient harm,' 'no adverse outcome,' 'no clinical consequence,' 'no impact to the patient.' Assign only when absence of harm is affirmatively stated, not merely when harm is unmentioned.",
 
     classification = list(
-      confirmed_no_harm = "The narrative explicitly and clearly states that no patient harm occurred as a result of the reported event.",
-      probable_no_harm = "The narrative strongly suggests no patient harm occurred based on the described circumstances, but does not contain an explicit statement confirming absence of harm.",
-      insufficient_info = "The narrative does not provide enough information to determine whether patient harm occurred or not."
+      confirmed_no_harm = "Narrative explicitly and clearly states no patient harm occurred.",
+      probable_no_harm = "Circumstances strongly suggest no harm, but no explicit confirming statement.",
+      insufficient_info = "Insufficient information to determine whether patient harm occurred."
     )
   ),
 
@@ -214,13 +214,13 @@ complication_definitions <- list(
   other = list(
     title = "Other Complication",
 
-    definition = "A procedure-related adverse event that does not fit any of the preceding complication categories. This is a residual category for clinically significant events that are real complications but are uncommon enough to not warrant a dedicated category. Examples include: cardiac valve injury (mitral or tricuspid valve damage from catheter manipulation, chordal entanglement, new or worsened valvular regurgitation), vasovagal or autonomic responses (profound bradycardia, asystole, or hypotension during energy delivery, particularly with PFA near ganglionated plexi), atrial septal defect from transseptal puncture requiring closure, stiff left atrium syndrome, radiation-related skin injury, contrast or dye allergy or anaphylaxis, anesthesia- related complications (aspiration, airway injury, medication reaction), cardiogenic shock not from tamponade, acute heart failure exacerbation, urinary retention, skin burns, and musculoskeletal injury from patient positioning or PFA-induced skeletal muscle stimulation. The adjudicator should use this category only when the event clearly does not fit a more specific category above.",
+    definition = "Procedure-related adverse event not fitting any preceding category; a residual for real but uncommon complications. Examples: cardiac valve injury (mitral or tricuspid damage from catheter manipulation, chordal entanglement, new or worsened regurgitation), vasovagal or autonomic response (profound bradycardia, asystole, or hypotension during energy delivery, especially PFA near ganglionated plexi), iatrogenic atrial septal defect from transseptal puncture needing closure, stiff left atrium syndrome, radiation skin injury, contrast allergy or anaphylaxis, anesthesia complications (aspiration, airway injury, drug reaction), cardiogenic shock not from tamponade, acute heart failure, urinary retention, skin burns, musculoskeletal injury from positioning or PFA skeletal-muscle stimulation. Use only when no more specific category fits.",
 
     classification = list(
-      minor = "Complication that was self-limited or managed with minimal intervention, did not prolong hospitalization, and resolved without lasting sequelae.",
-      moderate = "Complication requiring additional treatment, prolonged hospitalization, or a secondary procedure, but without lasting disability or life-threatening consequence.",
-      severe = "Complication that was life-threatening, caused lasting disability, required major intervention, or significantly altered the patient's clinical course.",
-      insufficient_info = "The narrative describes a complication in this category but does not provide enough detail to grade its severity."
+      minor = "Self-limited or minimal intervention; no prolonged hospitalization; resolved without lasting sequelae.",
+      moderate = "Requires additional treatment, prolonged hospitalization, or a secondary procedure, without lasting disability or life-threatening consequence.",
+      severe = "Life-threatening, lasting disability, major intervention, or significantly altered clinical course.",
+      insufficient_info = "Complication in this category described but severity insufficient to grade."
     )
   )
 )
