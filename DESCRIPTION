@@ -33,6 +33,7 @@ Imports:
     purrr,
     tibble,
     rlang,
+    stringr,
     httr,
     parsnip,
     hardhat,

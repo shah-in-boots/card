@@ -1,5 +1,15 @@
 # card {development version}
 
+## Updates
+
+* The `extract_*()` echocardiogram functions are now vectorized over `text` and return one element per report. `extract_echo_findings()` accordingly returns a tibble with one row per report instead of a list.
+
+* `extract_la_size()` gains a `range` argument for graded descriptions such as "mildly to moderately dilated", defaulting to the upper end of the range. Grades are normalized (`"mildly"` becomes `"mild"`), and `"not well seen"` is now reported as a missing size plus a separate `la_not_visualized` flag rather than being returned as if it were a size.
+
+* `extract_lvef()` now captures values written with an inequality, such as `<20%`, and tolerates phrasing between the term and the value ("ejection fraction by visual estimate is 55%"). `extract_echo_findings()` reports the inequality in a new `lvef_qualifier` column.
+
+* Severity and diastolic dysfunction grades in `extract_echo_findings()` are now found whether the grade precedes or follows the structure ("mild mitral regurgitation" as well as "mitral regurgitation is mild"), take the upper end of graded ranges, and match valve-inclusive terms such as "mitral valve regurgitation". The ambiguous `as` and `ar` abbreviations were dropped, as they matched ordinary English.
+
 ## Next Steps
 
 * `cosinor()` to be expanded upon to include prediction, and integration into the __tidymodels__ approach in the `parsnip` package

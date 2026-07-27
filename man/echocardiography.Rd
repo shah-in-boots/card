@@ -9,7 +9,7 @@
 \alias{extract_echo_findings}
 \title{Extract Echocardiogram Measurements}
 \usage{
-extract_la_size(text)
+extract_la_size(text, range = c("upper", "lower"))
 
 extract_lvef(text)
 
@@ -20,7 +20,11 @@ extract_la_diameter(text, min_val = 1, max_val = 10)
 extract_echo_findings(text)
 }
 \arguments{
-\item{text}{Character string containing the echo report text}
+\item{text}{Character vector of echo report text}
+
+\item{range}{Which end of a graded range such as \code{"mildly to moderately dilated"} to report. Defaults to \code{"upper"}, since a report describing such a
+range is asserting the higher grade is present, and the conservative reading
+is the one that does not under-call disease.}
 
 \item{min_val}{Minimum plausible value for measurements (default varies by function)}
 
@@ -28,11 +32,11 @@ extract_echo_findings(text)
 }
 \value{
 \itemize{
-\item \code{extract_la_size()}: Character string describing LA size ("normal", "mild", etc.)
+\item \code{extract_la_size()}: Character vector of LA size (\code{"normal"}, \code{"mild"}, etc.)
 \item \code{extract_la_diameter()}: Numeric LA diameter in cm
 \item \code{extract_lvef()}: Numeric LVEF percentage
 \item \code{extract_lvidd()}: Numeric LVIDd in cm
-\item \code{extract_echo_findings()}: Named list of key structure/function findings
+\item \code{extract_echo_findings()}: Tibble of key structure/function findings, one row per report
 }
 }
 \description{
@@ -53,10 +57,16 @@ The following measurements can be extracted:
 These functions use regular expressions to parse unstructured text from
 echo reports. They handle common variations in terminology and units. Measurements
 outside plausible ranges are returned as NA.
+
+All functions are vectorized over \code{text} and return one element (or row) per
+report. Qualitative grades are normalized to \code{"none"}, \code{"trace"}, \code{"trivial"},
+\code{"mild"}, \code{"moderate"}, and \code{"severe"} so they can be used directly as an
+ordered factor.
 }
 \examples{
-report <- "The left atrium is mildly dilated. LVEF is 55\%."
-extract_la_size(report)      # Returns "mild"
-extract_lvef(report)         # Returns 55
+report <- "The left atrium is mildly to moderately dilated. LVEF is 55\%."
+extract_la_size(report) # Returns "moderate"
+extract_la_size(report, range = "lower") # Returns "mild"
+extract_lvef(report) # Returns 55
 
 }
