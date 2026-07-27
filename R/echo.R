@@ -18,12 +18,23 @@
 #'   range is asserting the higher grade is present, and the conservative reading
 #'   is the one that does not under-call disease.
 #'
-#' @param min_val Minimum plausible value for measurements (default varies by function)
-#' @param max_val Maximum plausible value for measurements (default varies by function)
+#' @param min_val,max_val Plausible range for the measurement, outside of which a
+#'   match is discarded. The defaults are `1` to `10` cm for
+#'   `extract_la_diameter()` and `extract_lvidd()`, and `5` to `90` percent for
+#'   `extract_lvef()`.
 #'
 #' @details These functions use regular expressions to parse unstructured text from
 #' echo reports. They handle common variations in terminology and units. Measurements
 #' outside plausible ranges are returned as NA.
+#'
+#' A measurement is only read from the same clause as the term that names it, so
+#' a value belonging to a neighboring structure is not attributed to the wrong
+#' one. Where several candidate values appear, the first one inside `min_val` to
+#' `max_val` is taken, which skips stray digits such as the "2d" in "LVEF by 2D
+#' Simpson is 55%". Linear dimensions written in millimeters are converted to
+#' centimeters; a value given without units is read as centimeters, so a
+#' millimeter value with the units omitted falls outside the plausible range and
+#' is returned as `NA` rather than being guessed at.
 #'
 #' All functions are vectorized over `text` and return one element (or row) per
 #' report. Qualitative grades are normalized to `"none"`, `"trace"`, `"trivial"`,
@@ -212,37 +223,46 @@ extract_la_size <- function(text, range = c("upper", "lower")) {
 
 #' @rdname echocardiography
 #' @export
-extract_lvef <- function(text) {
-  match_lvef(text)$value
+extract_lvef <- function(text, min_val = 5, max_val = 90) {
+  match_lvef(text, min_val = min_val, max_val = max_val)$value
 }
 
 #' @rdname echocardiography
 #' @export
-extract_lvidd <- function(text) {
+extract_lvidd <- function(text, min_val = 1, max_val = 10) {
   text <- clean_echo_text(text)
 
-  # Define common LVIDd patterns
-  patterns <- c(
-    # Various ways to write LVIDd with units
-    "(?:lv diameter in diastole|lvidd|lv edd|lv end diastolic dimension|lvid\\(d\\))\\D*(\\d+(?:\\.\\d+)?)(?:\\s*(mm|cm))?",
-    "(?:lv diastolic dimension|lv internal dimension diastole)\\D*(\\d+(?:\\.\\d+)?)(?:\\s*(mm|cm))?"
+  term <- paste0(
+    "\\b(?:lv diameter in diastole|lvidd|lv edd|lv end diastolic dimension|",
+    "lvid\\(d\\)|lv diastolic dimension|lv internal dimension diastole)\\s*:?"
+  )
+  # The filler allows for phrasing such as "lv edd by 2d is", while stopping at
+  # a clause break so a measurement belonging to another structure is not
+  # attributed to the ventricle. The left atrium is excluded by name as well,
+  # since its plausible range is the same as the ventricle's and a stray match
+  # would silently make the two measurements the same number
+  filler <- "(?:(?!la a/p|la dimension|la diameter|la size|left atri)[^\\.;:]){0,60}"
+  # The lookbehind keeps the filler from consuming the leading digits of the
+  # value, which would turn "lvidd 52 mm" into 2 mm
+  pattern <- paste0(term, filler, "(?<![0-9])(\\d+(?:\\.\\d+)?)\\s*(mm|cm)?")
+
+  match <- stringr::str_match_all(
+    text,
+    stringr::regex(pattern, ignore_case = TRUE)
   )
 
-  out <- rep(NA_real_, length(text))
-
-  # Try each pattern on the reports that are still missing a value
-  for (pat in patterns) {
-    todo <- which(is.na(out))
-    if (length(todo) == 0) break
-
-    match <- stringr::str_match(text[todo], pat)
-    val <- suppressWarnings(as.numeric(match[, 2]))
+  # First plausible value wins, skipping stray digits such as "2d"
+  purrr::map_dbl(match, function(x) {
+    if (nrow(x) == 0) {
+      return(NA_real_)
+    }
+    val <- suppressWarnings(as.numeric(x[, 2]))
     # Check for units and convert if needed
-    is_mm <- !is.na(match[, 3]) & match[, 3] == "mm"
-    out[todo] <- ifelse(is_mm, val / 10, val)
-  }
-
-  out
+    is_mm <- !is.na(x[, 3]) & x[, 3] == "mm"
+    val <- ifelse(is_mm, val / 10, val)
+    val <- val[!is.na(val) & val >= min_val & val <= max_val]
+    if (length(val) > 0) val[1] else NA_real_
+  })
 }
 
 #' @rdname echocardiography

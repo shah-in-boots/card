@@ -11,9 +11,9 @@
 \usage{
 extract_la_size(text, range = c("upper", "lower"))
 
-extract_lvef(text)
+extract_lvef(text, min_val = 5, max_val = 90)
 
-extract_lvidd(text)
+extract_lvidd(text, min_val = 1, max_val = 10)
 
 extract_la_diameter(text, min_val = 1, max_val = 10)
 
@@ -26,9 +26,10 @@ extract_echo_findings(text)
 range is asserting the higher grade is present, and the conservative reading
 is the one that does not under-call disease.}
 
-\item{min_val}{Minimum plausible value for measurements (default varies by function)}
-
-\item{max_val}{Maximum plausible value for measurements (default varies by function)}
+\item{min_val, max_val}{Plausible range for the measurement, outside of which a
+match is discarded. The defaults are \code{1} to \code{10} cm for
+\code{extract_la_diameter()} and \code{extract_lvidd()}, and \code{5} to \code{90} percent for
+\code{extract_lvef()}.}
 }
 \value{
 \itemize{
@@ -57,6 +58,15 @@ The following measurements can be extracted:
 These functions use regular expressions to parse unstructured text from
 echo reports. They handle common variations in terminology and units. Measurements
 outside plausible ranges are returned as NA.
+
+A measurement is only read from the same clause as the term that names it, so
+a value belonging to a neighboring structure is not attributed to the wrong
+one. Where several candidate values appear, the first one inside \code{min_val} to
+\code{max_val} is taken, which skips stray digits such as the "2d" in "LVEF by 2D
+Simpson is 55\%". Linear dimensions written in millimeters are converted to
+centimeters; a value given without units is read as centimeters, so a
+millimeter value with the units omitted falls outside the plausible range and
+is returned as \code{NA} rather than being guessed at.
 
 All functions are vectorized over \code{text} and return one element (or row) per
 report. Qualitative grades are normalized to \code{"none"}, \code{"trace"}, \code{"trivial"},

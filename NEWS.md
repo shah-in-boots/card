@@ -8,6 +8,10 @@
 
 * `extract_lvef()` now captures values written with an inequality, such as `<20%`, and tolerates phrasing between the term and the value ("ejection fraction by visual estimate is 55%"). `extract_echo_findings()` reports the inequality in a new `lvef_qualifier` column.
 
+* `extract_lvidd()` no longer reads a measurement belonging to another structure. It previously took the first number to follow the term no matter how far away, so a report such as "LVIDd: not measured. LA A/P 4.3 cm" was given the left atrial diameter. It now reads only within the same clause, excludes the left atrium by name, and skips stray digits, which also makes the millimeter conversion reliable ("LVIDd 52 mm" is 5.2 cm).
+
+* `extract_lvef()` and `extract_lvidd()` gain the `min_val` and `max_val` arguments that `extract_la_diameter()` already had, so the plausible range for each measurement can be set by the caller. `extract_lvidd()` now applies such a range at all, defaulting to 1 to 10 cm.
+
 * Severity and diastolic dysfunction grades in `extract_echo_findings()` are now found whether the grade precedes or follows the structure ("mild mitral regurgitation" as well as "mitral regurgitation is mild"), take the upper end of graded ranges, and match valve-inclusive terms such as "mitral valve regurgitation". The ambiguous `as` and `ar` abbreviations were dropped, as they matched ordinary English.
 
 ## Next Steps

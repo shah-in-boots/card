@@ -102,6 +102,58 @@ test_that("diastolic dysfunction grade is found in either direction", {
   )
 })
 
+test_that("LVIDd reads only the ventricle's own measurement", {
+  expect_equal(extract_lvidd("lvidd 5.2 cm"), 5.2)
+  expect_equal(extract_lvidd("lvid(d): 4.9 cm"), 4.9)
+  expect_equal(extract_lvidd("lv end diastolic dimension (2d, plax) 5.4 cm"), 5.4)
+
+  # Millimeters are converted, and the units must not be split off the value
+  expect_equal(extract_lvidd("lvidd 52 mm"), 5.2)
+
+  # Phrasing between the term and the value is tolerated
+  expect_equal(
+    extract_lvidd("lv end diastolic dimension measured from the parasternal long axis is 5.2 cm"),
+    5.2
+  )
+  expect_equal(extract_lvidd("lvidd, indexed to body surface area, 5.1 cm"), 5.1)
+
+  # A measurement in a later clause belongs to another structure
+  expect_true(is.na(extract_lvidd("lvidd: not measured. la a/p 4.3 cm")))
+  expect_true(is.na(extract_lvidd("lvidd normal; la a/p 4.3 cm")))
+  expect_equal(
+    extract_lvidd("left ventricle: normal. lvidd 5.1 cm. la a/p: 4.3 cm"),
+    5.1
+  )
+
+  # The atrium is excluded by name, since an LA diameter is a plausible LVIDd
+  # and the two would silently become the same number
+  expect_true(is.na(extract_lvidd("lvidd normal with la a/p 4.3 cm")))
+  expect_true(is.na(extract_lvidd("lvidd not measured, la a/p 4.3 cm")))
+  expect_equal(extract_lvidd("lvidd: 5.2 cm la a/p: 4.3 cm"), 5.2)
+
+  # The ventricle and the atrium stay independent across a report
+  findings <- extract_echo_findings("lvidd: 5.2 cm la a/p: 4.3 cm")
+  expect_equal(findings$lvidd_cm, 5.2)
+  expect_equal(findings$la_diameter_cm, 4.3)
+
+  # Stray digits should not be mistaken for the value
+  expect_equal(extract_lvidd("lv edd by 2d is 4.8 cm"), 4.8)
+
+  # Implausible values are dropped, including millimeters written without units
+  expect_true(is.na(extract_lvidd("lvidd 52")))
+  expect_true(is.na(extract_lvidd("lvidd 0.2 cm")))
+})
+
+test_that("plausible ranges are exposed on the numeric extractors", {
+  expect_true(is.na(extract_lvef("lvef 55%", max_val = 50)))
+  expect_equal(extract_lvef("ef 95%", max_val = 99), 95)
+
+  expect_true(is.na(extract_lvidd("lvidd 5.2 cm", max_val = 4)))
+  expect_equal(extract_lvidd("lvidd 52", max_val = 100), 52)
+
+  expect_true(is.na(extract_la_diameter("la a/p: 4.3 cm", max_val = 4)))
+})
+
 test_that("extractors are vectorized over reports", {
   reports <- c(
     "the left atrium is mildly dilated. lvef: 55%. la a/p: 4.3 cm. lvidd 5.2 cm.",
