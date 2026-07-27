@@ -63,10 +63,16 @@ A measurement is only read from the same clause as the term that names it, so
 a value belonging to a neighboring structure is not attributed to the wrong
 one. Where several candidate values appear, the first one inside \code{min_val} to
 \code{max_val} is taken, which skips stray digits such as the "2d" in "LVEF by 2D
-Simpson is 55\%". Linear dimensions written in millimeters are converted to
-centimeters; a value given without units is read as centimeters, so a
-millimeter value with the units omitted falls outside the plausible range and
-is returned as \code{NA} rather than being guessed at.
+Simpson is 55\%". Linear dimensions are returned in centimeters. A report that
+writes the units has them taken at face value; where the units are omitted,
+as structured measurement fields often do, they are inferred from \code{min_val}
+and \code{max_val} by reading the value as centimeters when that is plausible and
+as millimeters when only the millimeter reading is. The two readings cannot
+both be plausible for a chamber dimension, so \code{"LVIDd: 52"} resolves to 5.2
+cm. This inference only applies where the surrounding text names the
+measurement; the fallback search used by \code{extract_la_diameter()} matches on a
+nearby keyword alone, and there the units are what mark a number as a
+measurement at all, so they remain required.
 
 All functions are vectorized over \code{text} and return one element (or row) per
 report. Qualitative grades are normalized to \code{"none"}, \code{"trace"}, \code{"trivial"},
@@ -78,5 +84,9 @@ report <- "The left atrium is mildly to moderately dilated. LVEF is 55\%."
 extract_la_size(report) # Returns "moderate"
 extract_la_size(report, range = "lower") # Returns "mild"
 extract_lvef(report) # Returns 55
+
+# Units are inferred where a report leaves them out
+extract_lvidd("LVIDd: 52") # Returns 5.2, as no ventricle is 52 cm across
+extract_lvidd("LVIDd: 5.2") # Returns 5.2
 
 }

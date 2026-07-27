@@ -31,10 +31,16 @@
 #' a value belonging to a neighboring structure is not attributed to the wrong
 #' one. Where several candidate values appear, the first one inside `min_val` to
 #' `max_val` is taken, which skips stray digits such as the "2d" in "LVEF by 2D
-#' Simpson is 55%". Linear dimensions written in millimeters are converted to
-#' centimeters; a value given without units is read as centimeters, so a
-#' millimeter value with the units omitted falls outside the plausible range and
-#' is returned as `NA` rather than being guessed at.
+#' Simpson is 55%". Linear dimensions are returned in centimeters. A report that
+#' writes the units has them taken at face value; where the units are omitted,
+#' as structured measurement fields often do, they are inferred from `min_val`
+#' and `max_val` by reading the value as centimeters when that is plausible and
+#' as millimeters when only the millimeter reading is. The two readings cannot
+#' both be plausible for a chamber dimension, so `"LVIDd: 52"` resolves to 5.2
+#' cm. This inference only applies where the surrounding text names the
+#' measurement; the fallback search used by `extract_la_diameter()` matches on a
+#' nearby keyword alone, and there the units are what mark a number as a
+#' measurement at all, so they remain required.
 #'
 #' All functions are vectorized over `text` and return one element (or row) per
 #' report. Qualitative grades are normalized to `"none"`, `"trace"`, `"trivial"`,
@@ -54,6 +60,10 @@
 #' extract_la_size(report, range = "lower") # Returns "mild"
 #' extract_lvef(report) # Returns 55
 #'
+#' # Units are inferred where a report leaves them out
+#' extract_lvidd("LVIDd: 52") # Returns 5.2, as no ventricle is 52 cm across
+#' extract_lvidd("LVIDd: 5.2") # Returns 5.2
+#'
 #' @name echocardiography
 NULL
 
@@ -65,6 +75,30 @@ clean_echo_text <- function(text) {
     stringr::str_replace_all("\n", " ") |>
     stringr::str_replace_all("\\s+", " ") |>
     stringr::str_trim()
+}
+
+# Internal helper to resolve a linear measurement to centimeters, given the
+# matched unit (`NA` when the report wrote none). An explicit unit is taken at
+# its word. A value written without one is read as centimeters when that is
+# plausible, and as millimeters when only the millimeter reading is, which is
+# unambiguous because the two ranges do not overlap for a cardiac chamber: a
+# structured field such as "LVIDd: 52" can only be 52 mm. Anything left
+# implausible under both readings is dropped.
+# @keywords internal
+resolve_cm <- function(value, unit, min_val, max_val) {
+  plausible <- function(x) !is.na(x) & x >= min_val & x <= max_val
+
+  cm <- dplyr::case_when(
+    is.na(value) ~ NA_real_,
+    !is.na(unit) & unit == "mm" ~ value / 10,
+    !is.na(unit) ~ value,
+    plausible(value) ~ value,
+    plausible(value / 10) ~ value / 10,
+    TRUE ~ NA_real_
+  )
+
+  cm[!plausible(cm)] <- NA_real_
+  cm
 }
 
 # Internal helper for LA size, returning both the grade and whether the atrium
@@ -167,7 +201,9 @@ match_lvef <- function(text, min_val = 5, max_val = 90) {
 # Internal helper to search report chunks for a single LA measurement
 # @keywords internal
 match_la_chunks <- function(text, min_val, max_val) {
-  chunks <- unlist(strsplit(text, "[\\.!:\\n]+"))
+  # A period only ends a clause when a digit does not follow it, so that a
+  # decimal is not split away from the keyword naming it and lost
+  chunks <- unlist(strsplit(text, "(?:[!:\\n]|\\.(?![0-9]))+", perl = TRUE))
 
   # Define LA keywords
   la_keywords <- c(
@@ -181,8 +217,11 @@ match_la_chunks <- function(text, min_val, max_val) {
     "left atrium"
   )
 
-  # Pattern for numeric values in cm
-  numeric_pattern <- "(\\d+(?:\\.\\d+)?)\\s*cm"
+  # Pattern for numeric values with a unit. Unlike the structured patterns
+  # above, this fallback only knows that the chunk mentions the atrium
+  # somewhere, so the unit is what distinguishes a measurement from any other
+  # number in the sentence and is required here
+  numeric_pattern <- "(\\d+(?:\\.\\d+)?)\\s*(mm|cm)"
 
   # Check each chunk
   for (chunk in chunks) {
@@ -204,8 +243,9 @@ match_la_chunks <- function(text, min_val, max_val) {
     # Look for measurement
     m <- stringr::str_match(chunk_clean, numeric_pattern)
     if (!is.na(m[1, 2])) {
-      val <- as.numeric(m[1, 2])
-      if (!is.na(val) && val >= min_val && val <= max_val) {
+      val <- suppressWarnings(as.numeric(m[1, 2]))
+      val <- resolve_cm(val, m[1, 3], min_val, max_val)
+      if (!is.na(val)) {
         return(val) # Explicit return for early exit
       }
     }
@@ -257,10 +297,8 @@ extract_lvidd <- function(text, min_val = 1, max_val = 10) {
       return(NA_real_)
     }
     val <- suppressWarnings(as.numeric(x[, 2]))
-    # Check for units and convert if needed
-    is_mm <- !is.na(x[, 3]) & x[, 3] == "mm"
-    val <- ifelse(is_mm, val / 10, val)
-    val <- val[!is.na(val) & val >= min_val & val <= max_val]
+    val <- resolve_cm(val, x[, 3], min_val, max_val)
+    val <- val[!is.na(val)]
     if (length(val) > 0) val[1] else NA_real_
   })
 }
@@ -270,11 +308,13 @@ extract_lvidd <- function(text, min_val = 1, max_val = 10) {
 extract_la_diameter <- function(text, min_val = 1, max_val = 10) {
   text <- clean_echo_text(text)
 
-  # Define high-priority patterns for structured sections
+  # Define high-priority patterns for structured sections. These name the field
+  # explicitly enough that the number following it is the measurement, so the
+  # unit is optional and inferred when the report omits it
   priority_patterns <- list(
-    la_ap = "la\\s*a/p:\\s*(\\d+\\.?\\d*)\\s*cm",
-    la_measure = "l\\.?\\s*atrium\\s*\\(s\\)\\s*\\([^\\)]+\\):\\s*(\\d+\\.?\\d*)\\s*cm",
-    la_dim = "left\\s+atrial\\s+a/p\\s+dimension\\s+(?:is|of)\\s*(\\d+\\.?\\d*)\\s*cm"
+    la_ap = "la\\s*a/p:\\s*(\\d+\\.?\\d*)\\s*(mm|cm)?",
+    la_measure = "l\\.?\\s*atrium\\s*\\(s\\)\\s*\\([^\\)]+\\):\\s*(\\d+\\.?\\d*)\\s*(mm|cm)?",
+    la_dim = "left\\s+atrial\\s+a/p\\s+dimension\\s+(?:is|of)\\s*(\\d+\\.?\\d*)\\s*(mm|cm)?"
   )
 
   out <- rep(NA_real_, length(text))
@@ -284,9 +324,9 @@ extract_la_diameter <- function(text, min_val = 1, max_val = 10) {
     todo <- which(is.na(out))
     if (length(todo) == 0) break
 
-    val <- suppressWarnings(as.numeric(stringr::str_match(text[todo], pat)[, 2]))
-    val[!is.na(val) & (val < min_val | val > max_val)] <- NA_real_
-    out[todo] <- val
+    m <- stringr::str_match(text[todo], pat)
+    val <- suppressWarnings(as.numeric(m[, 2]))
+    out[todo] <- resolve_cm(val, m[, 3], min_val, max_val)
   }
 
   # If no priority matches, try more general approach

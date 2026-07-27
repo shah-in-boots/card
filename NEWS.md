@@ -12,6 +12,10 @@
 
 * `extract_lvef()` and `extract_lvidd()` gain the `min_val` and `max_val` arguments that `extract_la_diameter()` already had, so the plausible range for each measurement can be set by the caller. `extract_lvidd()` now applies such a range at all, defaulting to 1 to 10 cm.
 
+* Linear dimensions written without units are now resolved against that range instead of being assumed to be centimeters. Structured fields frequently omit the units, and a chamber dimension cannot be plausible in both centimeters and millimeters, so `"LVIDd: 52"` and `"LA A/P: 43"` resolve to 5.2 cm and 4.3 cm. Units the report does write are still taken at face value, so `"LVIDd 52 cm"` remains missing rather than being quietly reinterpreted.
+
+* `extract_la_diameter()` no longer loses a measurement to its own decimal point. Its fallback keyword search split report text on `.`, which also split "4.5" in two and left neither piece holding both the keyword and the value, so that search could only ever match whole numbers. It also now recognizes measurements written in millimeters.
+
 * Severity and diastolic dysfunction grades in `extract_echo_findings()` are now found whether the grade precedes or follows the structure ("mild mitral regurgitation" as well as "mitral regurgitation is mild"), take the upper end of graded ranges, and match valve-inclusive terms such as "mitral valve regurgitation". The ambiguous `as` and `ar` abbreviations were dropped, as they matched ordinary English.
 
 ## Next Steps

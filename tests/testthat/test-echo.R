@@ -139,9 +139,55 @@ test_that("LVIDd reads only the ventricle's own measurement", {
   # Stray digits should not be mistaken for the value
   expect_equal(extract_lvidd("lv edd by 2d is 4.8 cm"), 4.8)
 
-  # Implausible values are dropped, including millimeters written without units
-  expect_true(is.na(extract_lvidd("lvidd 52")))
+  # Implausible values are dropped
+  expect_true(is.na(extract_lvidd("lvidd: 520")))
   expect_true(is.na(extract_lvidd("lvidd 0.2 cm")))
+})
+
+test_that("units are inferred when a report omits them", {
+  # Only the millimeter reading is plausible, so that is the one taken
+  expect_equal(extract_lvidd("lvidd 52"), 5.2)
+  expect_equal(extract_lvidd("lvidd: 48"), 4.8)
+  expect_equal(extract_la_diameter("la a/p: 43"), 4.3)
+  expect_equal(extract_la_diameter("left atrial a/p dimension is 38"), 3.8)
+
+  # A plausible centimeter value is left alone
+  expect_equal(extract_lvidd("lvidd: 5.2"), 5.2)
+  expect_equal(extract_la_diameter("la a/p: 4.3"), 4.3)
+
+  # Units the report does write are taken at face value, not second-guessed
+  expect_equal(extract_lvidd("lvidd 52 mm"), 5.2)
+  expect_true(is.na(extract_lvidd("lvidd 52 cm")))
+  expect_true(is.na(extract_lvidd("lvidd 4 mm")))
+  expect_true(is.na(extract_la_diameter("the left atrium is dilated at 45 cm")))
+
+  # Neither reading plausible means no measurement
+  expect_true(is.na(extract_lvidd("lvidd: 520")))
+  expect_true(is.na(extract_la_diameter("la a/p: 430")))
+
+  # The inference follows the caller's range rather than a fixed one
+  expect_equal(extract_lvidd("lvidd 52", max_val = 100), 52)
+})
+
+test_that("LA diameter survives the decimal point in the fallback search", {
+  # Chunking on "." used to split "4.5" apart from the keyword naming it, so
+  # the keyword search could only ever match whole numbers
+  expect_equal(extract_la_diameter("the left atrium is dilated at 4.5 cm"), 4.5)
+  expect_equal(extract_la_diameter("la diameter 4.5 cm"), 4.5)
+  expect_equal(extract_la_diameter("la size is 4.26 cm"), 4.26)
+  expect_equal(extract_la_diameter("la diameter 45 mm"), 4.5)
+
+  # Sentence boundaries still separate structures
+  expect_true(is.na(
+    extract_la_diameter("left atrium is normal. the aortic root is 3.2 cm")
+  ))
+  expect_true(is.na(
+    extract_la_diameter("left atrium: mildly dilated. lvidd 5.2 cm")
+  ))
+
+  # The fallback still requires a unit, since a bare number near the keyword
+  # need not be a measurement
+  expect_true(is.na(extract_la_diameter("the left atrium is mildly dilated, grade 2")))
 })
 
 test_that("plausible ranges are exposed on the numeric extractors", {
