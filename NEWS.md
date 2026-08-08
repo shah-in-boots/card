@@ -1,5 +1,39 @@
 # card {development version}
 
+## Bugs
+
+* `cosinor_reg()` can be fitted through __parsnip__ again. The engine registration never called `parsnip::set_encoding()`, and since `parsnip::get_encoding()` returns `NULL` for a missing table rather than raising an error, the defaults it would otherwise have supplied never applied and the fit failed inside __vctrs__ with a message naming neither the model nor the engine. A specification still built and printed correctly, so nothing was visibly wrong until something was fitted with it. The registration is also no longer skipped wholesale once the model exists -- only `set_new_model()` is guarded now, the remaining setters being idempotent -- so an incomplete registration repairs itself on the next load instead of persisting for the life of the session. The documented example now fits rather than stopping at the specification, and the test for it is no longer skipped.
+
+* `confint()` on a population-mean cosinor no longer reports amplitude and acrophase intervals that are too wide by a factor of the square root of the number of subjects. The mesor variance was divided by the subject count while the amplitude and acrophase variances were not, so the 95% interval for the amplitude of the 24-hour rhythm in `twins` came back as -0.399 to 0.975 -- an interval covering zero, and impossible values below it, for a rhythm measured across 741 subjects. It is 0.263 to 0.313.
+
+* The acrophase standard error carried the wrong sign on its cross term. The delta method gives the amplitude a negative cross term and the acrophase a positive one, and both were written negative. The error is invisible whenever time is sampled evenly across whole cycles, since it acts only through the covariance of the two regression coefficients, which is why the bundled data never showed it; on an unevenly sampled design it inflated the standard error by around 37%.
+
+* `cosinor_zero_amplitude()` now scales with the number of components. It fixed the numerator at 2 degrees of freedom and the denominator at `N - 3` whatever `tau` was given, so a two-component model on `twins` reported `F = 707` on 2 and 16383 degrees of freedom where the test is `F = 354` on 4 and 16381. It also returns a p-value.
+
+* Fitted values and residuals from a population-mean cosinor are now aligned with the rows they came from. They were returned in subject order while the outcome stayed in input order, so both were correct only when the data happened to arrive sorted by subject.
+
+* `cosinor()` now accepts non-numeric subject identifiers in `population`. The insufficient-observations filter coerced the subject names with `as.numeric()`, which made every one of them `NA` for character identifiers, so no subject was dropped and the per-subject fit then failed on a singular matrix.
+
+* `cosinor_features()` no longer scrambles the components of a multiple-component population model when reconstructing its fitted curve, and its harmonic check now considers every period rather than only the longest and shortest, so `tau = c(24, 5, 12)` is correctly reported as non-harmonic.
+
+## Features
+
+* `cosinor()` objects gain the standard extractor methods -- `coef()`, `vcov()`, `sigma()`, `nobs()`, `df.residual()` and `logLik()`, and through the last of these `AIC()` and `BIC()`. Every statistic the package reports is now derived from `vcov()` rather than rebuilding the covariance matrix in each function, which is what let the acrophase sign error survive next to a correct copy of the same formula. `coef()` and `vcov()` take a `type` argument for either the regression coefficients or the amplitude and acrophase parameterisation.
+
+* `confint()` returns a matrix and honours `parm`, as the `stats` generic requires, rather than a list of intervals and standard errors. An unrecognised `parm` is an error naming the parameters the model does carry, instead of a silent `NA` row. Standard errors now come from `vcov()`. This is a breaking change to the return shape, made without a deprecation window because the values it returned for the acrophase and for every population amplitude were wrong.
+
+* `confint()` gains `method = "ellipse"`, giving the conservative limits derived from the joint confidence region for each component rather than a symmetric interval around the estimate. These respect the parameter space: an amplitude bound cannot fall below zero, and where the region covers the pole the acrophase is reported as unidentifiable rather than as an interval. `cosinor_area()` now returns those limits and a `covers_pole` flag, having previously computed them and returned only the plotting coordinates, and takes a `component` argument instead of always describing the first.
+
+* `anova()` on a `cosinor` tests each component for a non-zero amplitude on 2 degrees of freedom, which is the question a multiple-component model raises and the package had no way to answer -- a user fitting `tau = c(24, 12)` could read off a 12-hour amplitude but not ask whether it was distinguishable from noise. Given several models it compares them sequentially. `glance()` summarises a fit in one row.
+
+* `cosinor_order()` fits a nested family of harmonic models and reports the sequential F test and the information criteria for each, so the number of components can be chosen rather than assumed.
+
+* `tidy()` gains `statistic` and `p.value` columns. The statistic is the per-component F test, so a component's amplitude and acrophase share it: the null being tested is that both regression coefficients are zero, and an acrophase has no meaning under it.
+
+* `cosinor()` now refuses periods it cannot fit -- duplicated, non-positive, non-finite, or more parameters than observations -- and warns when the periods given cannot be separated by the data, reporting the design condition number. `tau = c(24, 23.5)` on `twins` returns amplitudes of 7.4 and 7.1 against a single-component amplitude of 0.30, because two near-collinear components can grow without bound so long as they cancel; this previously happened silently. See `?cosinor_identifiability` for why the condition number is used in preference to the usual spectral resolution criterion, which rejects the package's own `tau = c(24, 12)` example on folded clock time.
+
+* `cosinor_goodness_of_fit()` and `cosinor_area()` now refuse population-mean models rather than returning a statistic with a note that it may be inaccurate. Neither quantity is defined for a pooled per-subject fit, and both would have printed a plausible number.
+
 ## Updates
 
 * The `extract_*()` echocardiogram functions are now vectorized over `text` and return one element per report. `extract_echo_findings()` accordingly returns a tibble with one row per report instead of a list.
@@ -22,9 +56,8 @@
 
 * `cosinor()` to be expanded upon to include prediction, and integration into the __tidymodels__ approach in the `parsnip` package
 	* Evaluation of plotting functions for cosinor models
-	* Confidence interval methods to be improved upon
 
-* Population cosinor analysis to be reworked for correct predictions and confidence interval estimates
+* Intervals reported after `cosinor_order()` has chosen the harmonic order are anticonservative, since the selection looked at the same data. This is an open problem in the cosinor literature rather than something the package currently solves.
 
 ## Deprecations
 

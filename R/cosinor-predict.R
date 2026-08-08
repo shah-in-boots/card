@@ -54,9 +54,6 @@ get_predict_function <- function(type) {
 
 # Numeric prediction
 predict_cosinor_numeric <- function(object, predictors) {
-  predictions <- rep(1L, times = nrow(predictors))
-  hardhat::spruce_numeric(predictions)
-
   # Basic coefs
   coefs <- object$coefficients
   names(coefs) <- object$coef_names
@@ -65,7 +62,9 @@ predict_cosinor_numeric <- function(object, predictors) {
   tau <- object$tau
   p <- length(tau)
   t <- predictors
-  mesor <- coefs[1]
+  # Unnamed, so the single mesor does not hand its name to `data.frame()` below
+  # as a row name and draw a warning on every prediction
+  mesor <- unname(coefs[1])
 
   # Assign to environemntal variables the values of coefficients
   for (i in 1:p) {

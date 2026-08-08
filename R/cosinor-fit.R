@@ -83,6 +83,23 @@ cosinor_impl <- function(predictors, outcomes, tau) {
   xmat <- stats::model.matrix(f, m)
   ymat <- as.matrix(y)
 
+  # Refused before `solve()` reaches it, so the message names the shortfall
+  # rather than reporting an exactly singular system
+  if (nrow(xmat) < 2 * p + 1) {
+    stop(
+      "A ",
+      p,
+      "-component cosinor needs at least ",
+      2 * p + 1,
+      " observations to estimate its ",
+      2 * p + 1,
+      " parameters; only ",
+      nrow(xmat),
+      " were given.",
+      call. = FALSE
+    )
+  }
+
   ### Solving for coefficients
 
   # Solve for coefficients, including amplitude and acrophase
@@ -151,6 +168,16 @@ cosinor_impl <- function(predictors, outcomes, tau) {
   fitted.values <- yhat
   residuals <- y - yhat
 
+  ### Covariance parts
+
+  # Computed here, where `n` and `xmat` are both in scope and consistent, rather
+  # than recomputed by each statistical method. `stats::model.frame()` drops
+  # incomplete rows, so `nrow(xmat)` is the count the covariance is built on and
+  # `nrow(model)` is not.
+  nobs <- nrow(xmat)
+  dfResidual <- nobs - (2 * p + 1)
+  RSS <- sum(residuals[seq_len(nobs)]^2)
+
   # List to return
   list(
     # Raw coefficients
@@ -165,7 +192,17 @@ cosinor_impl <- function(predictors, outcomes, tau) {
     model = model,
 
     # Matrices used
-    xmat = xmat
+    xmat = xmat,
+
+    # Parts every downstream statistic needs
+    parts = list(
+      XtXinv = solve(t(xmat) %*% xmat),
+      RSS = RSS,
+      sigma = sqrt(RSS / dfResidual),
+      nobs = nobs,
+      df.residual = dfResidual,
+      kappa = cosinor_condition(xmat)
+    )
   )
 }
 
@@ -194,10 +231,13 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   # Create data frame for split/apply approach
   df <- stats::na.omit(data.frame(predictors, outcomes, population))
 
-  # Remove patients with only p observations (will cause a det ~ 0 error)
+  # Remove patients with only p observations (will cause a det ~ 0 error).
+  # Compared as character throughout: coercing the names with `as.numeric()`
+  # turned every non-numeric subject identifier into NA, so the filter dropped
+  # nobody and the per-subject `solve()` then died on a singular matrix.
   counts <- by(df, df[, "population"], nrow)
-  lowCounts <- as.numeric(names(counts[counts <= 2 * p + 1]))
-  df <- subset(df, !(population %in% lowCounts))
+  lowCounts <- names(counts)[counts <= 2 * p + 1]
+  df <- subset(df, !(as.character(population) %in% lowCounts))
 
   # Message about population count removal
   if (length(lowCounts) != 0) {
@@ -230,13 +270,16 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
     population
   )
 
-  # Create matrix that we can apply cosinor to subgroups
-  kCosinors <- with(
+  # Create matrix that we can apply cosinor to subgroups. A poorly conditioned
+  # design would warn once per subject here, so it is collected and reported
+  # once by the bridge instead.
+  df$.row <- seq_len(nrow(df))
+  kCosinors <- suppressWarnings(with(
     df,
     by(df, population, function(.x) {
       cosinor_impl(.x$predictors, .x$outcomes, tau)
     })
-  )
+  ))
 
   ### Coefficients
 
@@ -246,10 +289,19 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   if (inherits(kfits, "matrix")) {
     kfits <- as.data.frame(kfits)
   }
-  fits <- data.frame(
-    population = rep(names(kfits), sapply(kfits, length)),
-    yhat = unlist(kfits)
+
+  # `by()` walks the groups in sorted order, so concatenating the per-subject
+  # fits gives a vector ordered by subject while `y` and `model` stay in input
+  # order. Scattering through the row index each group carried keeps the fitted
+  # values and residuals aligned with the rows they belong to; before this, both
+  # were correct only when the input happened to be sorted by subject.
+  rowOrder <- unlist(
+    by(df, df$population, function(.x) .x$.row),
+    use.names = FALSE
   )
+  fittedByRow <- numeric(nrow(df))
+  fittedByRow[rowOrder] <- unlist(kfits, use.names = FALSE)
+  df$.row <- NULL
 
   # Coefficient table
   tbl <- sapply(kCosinors, stats::coef, USE.NAMES = TRUE)
@@ -307,7 +359,29 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
   # Individual fits
 
   # Overall model
-  yhat <- fits$yhat
+  yhat <- fittedByRow
+
+  ### Covariance parts
+
+  # The population estimator is a mean over subjects, so the subject is the
+  # random unit and the covariance is the between-subject one divided by k. The
+  # amplitude and acrophase columns of `xmat` are functions of beta and gamma
+  # and carry no additional information, so the free parameters are the same
+  # 2p + 1 as for an individual fit.
+  linearNames <- cosinor_par_names(p, type = "linear")
+  popNames <- c("mesor", paste0(rep(c("beta", "gamma"), p), rep(1:p, each = 2)))
+
+  V <- stats::cov(xmat[, popNames, drop = FALSE], use = "complete.obs") / k
+  dimnames(V) <- list(linearNames, linearNames)
+
+  # One condition number per subject would be k warnings, so they are summarised
+  # instead. The median is what gets tested: a single sparsely sampled subject
+  # among hundreds has a badly conditioned design of its own but contributes
+  # 1/k of the mean, which is not a reason to distrust the population estimate.
+  # The count of affected subjects is carried alongside, since that is the
+  # number a user can act on.
+  kappas <- vapply(kCosinors, function(.x) .x$parts$kappa, numeric(1))
+  threshold <- getOption("card.cosinor.kappa", 30)
 
   # List of values to return (must be same as cosinor_impl)
   list(
@@ -323,358 +397,83 @@ cosinor_pop_impl <- function(predictors, outcomes, tau, population) {
     model = model,
 
     # Matrices used (for population cosinor, is the coefficient matrix)
-    xmat = xmat
+    xmat = xmat,
+
+    # Parts every downstream statistic needs
+    parts = list(
+      V = V,
+      nobs = n,
+      nsubjects = k,
+      nsubjects_dropped = length(lowCounts),
+      df.residual = k - 1,
+      kappa = stats::median(kappas, na.rm = TRUE),
+      kappa_max = max(kappas, na.rm = TRUE),
+      nsubjects_ill_conditioned = sum(kappas > threshold, na.rm = TRUE)
+    )
   )
 }
 
 # Statistical Methods ----
 
-## Confidence Intervals
-
-#' @description Generic confidence interval method
-#' @param object model of class `cosinor`
-#' @param level the confidence level required
-#' @param parm specification of which parameters (not currently used)
-#' @param ... arguments to pass on
-#' @noRd
-#' @export
-confint.cosinor <- function(object, parm, level = 0.95, ...) {
-  # Confidence level
-  a <- 1 - level
-
-  # Parameters
-  y <- object$model[, "y"]
-  t <- object$model[, "t"]
-  n <- length(t)
-  p <- length(object$tau)
-
-  # Create null variables
-  mesor <- NULL
-  for (i in 1:p) {
-    assign(paste0("x", i), NULL)
-    assign(paste0("z", i), NULL)
-    assign(paste("amp", i), NULL)
-    assign(paste("phi", i), NULL)
-    assign(paste("beta", i), NULL)
-    assign(paste("gamma", i), NULL)
-  }
-
-  for (i in 1:p) {
-    assign(paste0("x", i), object$model[, paste0("x", i)])
-    assign(paste0("z", i), object$model[, paste0("z", i)])
-  }
-
-  xmat <- object$xmat
-  yhat <- object$fitted.values
-  coefs <- object$coefficients
-  names(coefs) <- object$coef_names
-  for (i in 1:length(coefs)) {
-    assign(names(coefs)[i], unname(coefs[i]))
-  }
-
-  switch(
-    object$type,
-    Population = {
-      # Message
-      message(
-        "Confidence intervals for amplitude and acrophase for population-mean cosinor use the methods described by Fernandez et al. 2004."
-      )
-
-      # Number of individuals
-      k <- nrow(xmat)
-
-      varCovMat <- stats::cov(xmat)
-
-      # Degrees of freedom
-      degreesFreedom <- k - 1
-
-      # Initialize data structures for output
-      ciMatrix <- matrix(nrow = 0, ncol = 2)
-      colnames(ciMatrix) <- c(
-        sprintf("%.1f%%", a / 2 * 100),
-        sprintf("%.1f%%", (1 - a / 2) * 100)
-      )
-
-      seVector <- numeric()
-      names(seVector) <- character()
-
-      # MESOR confidence interval
-      seMesor <- sqrt(varCovMat["mesor", "mesor"] / k)
-      tValue <- stats::qt(1 - a / 2, degreesFreedom)
-      ciMesor <- c(
-        coefs["mesor"] - tValue * seMesor,
-        coefs["mesor"] + tValue * seMesor
-      )
-
-      # Add MESOR to outputs
-      ciMatrix <- rbind(ciMatrix, ciMesor)
-      rownames(ciMatrix)[nrow(ciMatrix)] <- "mesor"
-
-      seVector <- c(seVector, seMesor)
-      names(seVector)[length(seVector)] <- "mesor"
-
-      # For each component
-      for (i in 1:p) {
-        # Get the beta and gamma values from the parameters
-        betaVal <- xmat[, paste0("beta", i)]
-        gammaVal <- xmat[, paste0("gamma", i)]
-
-        # Compute sample means
-        betaBar <- mean(betaVal)
-        gammaBar <- mean(gammaVal)
-
-        # Compute covariance matrix for beta and gamma
-        covMat <- stats::cov(cbind(betaVal, gammaVal))
-
-        # Compute standard errors for beta and gamma
-        betaSE <- sqrt(stats::var(betaVal) / k)
-        gammaSE <- sqrt(stats::var(gammaVal) / k)
-
-        # Compute t-value for beta and gamma
-        tValueBetaGamma <- stats::qt(1 - a / 2, degreesFreedom)
-
-        # Confidence intervals for beta and gamma
-        betaLower <- betaBar - tValueBetaGamma * betaSE
-        betaUpper <- betaBar + tValueBetaGamma * betaSE
-
-        gammaLower <- gammaBar - tValueBetaGamma * gammaSE
-        gammaUpper <- gammaBar + tValueBetaGamma * gammaSE
-
-        # Add beta to outputs
-        ciMatrix <- rbind(ciMatrix, c(betaLower, betaUpper))
-        rownames(ciMatrix)[nrow(ciMatrix)] <- paste0("beta", i)
-
-        seVector <- c(seVector, betaSE)
-        names(seVector)[length(seVector)] <- paste0("beta", i)
-
-        # Add gamma to outputs
-        ciMatrix <- rbind(ciMatrix, c(gammaLower, gammaUpper))
-        rownames(ciMatrix)[nrow(ciMatrix)] <- paste0("gamma", i)
-
-        seVector <- c(seVector, gammaSE)
-        names(seVector)[length(seVector)] <- paste0("gamma", i)
-
-        # Delta method for confidence intervals
-        # Start with amplitude
-        dAmpBeta <- coefs[[paste0("beta", i)]] / coefs[[paste0("amp", i)]]
-        dAmpGamma <- coefs[[paste0("gamma", i)]] / coefs[[paste0("amp", i)]]
-        ampVar <-
-          dAmpBeta^2 *
-          varCovMat[paste0("beta", i), paste0("beta", i)] +
-          2 *
-            dAmpBeta *
-            dAmpGamma *
-            varCovMat[paste0("beta", i), paste0("gamma", i)] +
-          dAmpGamma^2 * varCovMat[paste0("gamma", i), paste0("gamma", i)]
-        ampSE <- sqrt(ampVar)
-
-        # Calculate acrophase SE using delta method as well
-        denom <- coefs[[paste0("beta", i)]]^2 + coefs[[paste0("gamma", i)]]^2
-        dPhiBeta <- coefs[[paste0("gamma", i)]] / denom
-        dPhiGamma <- -coefs[[paste0("beta", i)]] / denom
-        phiVar <-
-          dPhiBeta^2 *
-          varCovMat[paste0("beta", i), paste0("beta", i)] +
-          2 *
-            dPhiBeta *
-            dPhiGamma *
-            varCovMat[paste0("beta", i), paste0("gamma", i)] +
-          dPhiGamma^2 * varCovMat[paste0("gamma", i), paste0("gamma", i)]
-        phiSE <- sqrt(phiVar)
-
-        # Calculate confidence intervals
-        zCrit <- stats::qnorm(1 - a / 2)
-
-        # Confidence intervals for amplitude
-        ampLower <- coefs[[paste0("amp", i)]] - zCrit * ampSE
-        ampUpper <- coefs[[paste0("amp", i)]] + zCrit * ampSE
-
-        # Confidence intervals for acrophase
-        # This requires making sure within the radian circle however
-        phiLower <- coefs[[paste0("phi", i)]] - zCrit * phiSE
-        phiUpper <- coefs[[paste0("phi", i)]] + zCrit * phiSE
-
-        # Add amplitude to outputs
-        ciMatrix <- rbind(ciMatrix, c(ampLower, ampUpper))
-        rownames(ciMatrix)[nrow(ciMatrix)] <- paste0("amp", i)
-
-        # Standard error for amplitude
-        seVector <- c(seVector, ampSE)
-        names(seVector)[length(seVector)] <- paste0("amp", i)
-
-        # Add acrophase to outputs
-        ciMatrix <- rbind(ciMatrix, c(phiLower, phiUpper))
-        rownames(ciMatrix)[nrow(ciMatrix)] <- paste0("phi", i)
-
-        seVector <- c(seVector, phiSE)
-        names(seVector)[length(seVector)] <- paste0("phi", i)
-      }
-
-      # Name the columns of ciMatrix according to confidence levels
-      colnames(ciMatrix) <- c(
-        sprintf("%.1f%%", a / 2 * 100),
-        sprintf("%.1f%%", (1 - a / 2) * 100)
-      )
-
-      # Return the output as a list
-      return(list(ci = ciMatrix, se = seVector))
-    },
-    Individual = {
-      # Nummber of parameters
-      k <- 2 * p + 1
-
-      # Matrix to get standard errors and confidence intervals
-      xmat <- t(object$xmat) %*% object$xmat
-      s <- solve(xmat)
-
-      # Residual sum of squared errors
-      RSS <- sum((y - yhat)^2)
-      sigma <- sqrt(RSS / (n - k))
-
-      # Standard error for MESOR
-      SE_mesor <- unname(sigma * sqrt(s[1, 1]))
-
-      # Standard error for Amplitude and Phi
-      for (i in 1:p) {
-        # Amplitudes
-        amp <- sigma *
-          sqrt(
-            s[paste0("x", i), paste0("x", i)] *
-              cos(get(paste0("phi", i)))^2 -
-              2 *
-                s[paste0("x", i), paste0("z", i)] *
-                sin(get(paste0("phi", i))) *
-                cos(get(paste0("phi", i))) +
-              s[paste0("z", i), paste0("z", i)] * sin(get(paste0("phi", i)))^2
-          )
-
-        assign(paste0("SE_amp", i), amp)
-
-        # Acrophase
-        phi <- sigma *
-          sqrt(
-            s[paste0("x", i), paste0("x", i)] *
-              sin(get(paste0("phi", i)))^2 -
-              2 *
-                s[paste0("x", i), paste0("z", i)] *
-                sin(get(paste0("phi", i))) *
-                cos(get(paste0("phi", i))) +
-              s[paste0("z", i), paste0("z", i)] * cos(get(paste0("phi", i)))^2
-          ) /
-          get(paste0("amp", i))
-
-        assign(paste0("SE_phi", i), phi)
-      }
-
-      # Save SE
-      se <- list()
-      for (i in 1:p) {
-        se[[i]] <- c(paste0("SE_amp", i), paste0("SE_phi", i))
-      }
-      se <- c(SE_mesor, unlist(mget(unlist(se))))
-      names(se)[1] <- "SE_mesor"
-      names(se) <- gsub("SE_", "", names(se))
-
-      # Confidence intervals
-      tdist <- stats::qt(1 - a / 2, df = n - k)
-
-      confints <- list()
-      for (i in 1:p) {
-        confints[[i]] <-
-          c(
-            # Amp
-            get(paste0("amp", i)) - tdist * get(paste0("SE_amp", i)),
-            get(paste0("amp", i)) + tdist * get(paste0("SE_amp", i)),
-            # Phi
-            get(paste0("phi", i)) - tdist * get(paste0("SE_phi", i)),
-            get(paste0("phi", i)) + tdist * get(paste0("SE_phi", i))
-          )
-      }
-
-      df <- rbind(
-        c(mesor - tdist * SE_mesor, mesor + tdist * SE_mesor),
-        matrix(unlist(confints), ncol = 2, byrow = TRUE)
-      )
-      rnames <- list()
-      for (i in 1:p) {
-        rnames[[i]] <- c(paste0("amp", i), paste0("phi", i))
-      }
-      rownames(df) <- c("mesor", unlist(rnames))
-      colnames(df) <- c(
-        paste0(100 * (a / 2), "%"),
-        paste0(100 * (1 - a / 2), "%")
-      )
-
-      # Returned
-      estimates <- list(
-        ci = df,
-        se = se
-      )
-      return(estimates)
-    }
-  )
-}
-
-
 ## Zero Amplitude Test
 
 #' @title Zero Amplitude Test
-#' @description Zero amplitude test assesses how well the circadian pattern fits
-#'   the data, essentially detecting the present of a rhythm to the data.
+#'
+#' @description Tests the null hypothesis that every component of a [cosinor]
+#'   model has zero amplitude, which is the test for whether the data carry a
+#'   rhythm at all.
+#'
+#' @details The null is \eqn{H_0: \beta_j = \gamma_j = 0} for all `j`, so a
+#'   `p`-component model contributes `2p` parameters to the numerator:
+#'
+#'   \deqn{F = \frac{MSS / 2p}{RSS / (N - 2p - 1)}}
+#'
+#'   compared against \eqn{F_{1-\alpha}(2p, N - 2p - 1)}.
+#'
+#'   Earlier versions of this function fixed the numerator at 2 degrees of
+#'   freedom and the denominator at `N - 3` whatever `tau` was given, so a
+#'   two-component model on the `twins` data reported `F = 707` on `(2, 16383)`
+#'   where the test is `F = 354` on `(4, 16381)`. The statistic was inflated in
+#'   proportion to the number of components.
+#'
+#'   For a population-mean cosinor the same expression is evaluated against the
+#'   between-subject covariance on \eqn{k - 1} degrees of freedom, giving the
+#'   Hotelling \eqn{T^{2}} test of Bingham et al. (1982).
+#'
 #' @param object model of class `cosinor`
-#' @param level confidence level
-#' @return Returns a list of test statistics, as well prints out a report of
-#'   analysis.
+#'
+#' @param level confidence level used for the reported critical value
+#'
+#' @return A list with the `fstat` observed, the `fdist` critical value at
+#'   `level`, the numerator and denominator degrees of freedom `df1` and `df2`,
+#'   and the `p.value`.
+#'
+#' @examples
+#' data(twins)
+#' model <- cosinor(rDYX ~ hour, twins, tau = c(24, 12))
+#' cosinor_zero_amplitude(model)
+#'
+#' @references Cornelissen G. Cosinor-based rhythmometry. *Theoretical Biology
+#'   and Medical Modelling* 2014;11:16. \doi{10.1186/1742-4682-11-16}
+#'
+#' @seealso [anova.cosinor()] for the same test applied one component at a time
+#'
 #' @export
 cosinor_zero_amplitude <- function(object, level = 0.95) {
-  if (object$type == "Population") {
-    message(
-      "Zero amplitude test may not be accurate for population-mean cosinor method."
-    )
-  }
-
-  ### Confidence level of fstatistic
-
-  # Create null variables
   p <- length(object$tau)
-  mesor <- NULL
-  for (i in 1:p) {
-    assign(paste0("x", i), NULL)
-    assign(paste0("z", i), NULL)
-    assign(paste("amp", i), NULL)
-    assign(paste("phi", i), NULL)
-    assign(paste("beta", i), NULL)
-    assign(paste("gamma", i), NULL)
-  }
 
-  # Model objects
-  y <- object$model[, "y"]
-  yhat <- object$fitted.values
-  ybar <- mean(y)
+  # H0: beta_j = gamma_j = 0 for every component, so every non-mesor parameter
+  # enters the numerator. For least squares this Wald form is algebraically
+  # identical to comparing residual sums of squares against the mesor-only fit.
+  parm <- setdiff(cosinor_par_names(p, "linear"), "mesor")
+  test <- cosinor_wald(object, parm)
 
-  # Confidence level
-  alpha <- 1 - level
-
-  # Degrees of freedom
-  n <- length(y)
-  k <- 3 # Number of parameters
-  fdist <- stats::qf(1 - alpha, df1 = k - 1, df2 = n - k)
-
-  ### Total sum of squares = model sum of squares + residual sum of squares
-  # TSS = sum(y - ybar)^2
-  # MSS = sum(yhat - ybar)^2
-  # RSS = sum(y - yhat)^2
-  TSS <- sum((y - ybar)^2)
-  MSS <- sum((yhat - ybar)^2)
-  RSS <- sum((y - yhat)^2)
-
-  # Statistical significance by F test
-  fstat <- (MSS / 2) / (RSS / (n - 3))
-
-  # Return
   list(
-    fstat = fstat,
-    fdist = fdist
+    fstat = test$statistic,
+    fdist = stats::qf(level, df1 = test$df1, df2 = test$df2),
+    df1 = test$df1,
+    df2 = test$df2,
+    p.value = test$p.value
   )
 }
 
@@ -700,9 +499,16 @@ cosinor_zero_amplitude <- function(object, level = 0.95) {
 #' @return f-statistic as result of goodness of fit
 #' @export
 cosinor_goodness_of_fit <- function(object, level = 0.95, ...) {
+  # Refused rather than warned about: the partition of the residual sum of
+  # squares into lack of fit and pure error assumes one fit against replicate
+  # observations at shared time points, which a pooled per-subject fit does not
+  # give. The F statistic would still print, and would still be wrong.
   if (object$type == "Population") {
-    message(
-      "Goodness of fit may not be accurate for population-mean cosinor method."
+    stop(
+      "`cosinor_goodness_of_fit()` is not defined for a population-mean ",
+      "cosinor, whose residuals come from one fit per subject rather than from ",
+      "a single model. Fit an individual cosinor to test lack of fit.",
+      call. = FALSE
     )
   }
 
@@ -791,158 +597,141 @@ cosinor_goodness_of_fit <- function(object, level = 0.95, ...) {
 
 ## Confidence Area of Ellipse
 
-#' @title Area of Ellipse
-#' @description Formulas for creating the area of the ellipse to identify
-#'   confidence intervals, direction, and graphing purposes.
+#' @title Confidence Ellipse For A Cosinor Component
+#'
+#' @description The joint confidence region for a component's `(beta, gamma)`
+#'   pair, together with the conservative amplitude and acrophase limits derived
+#'   from it.
+#'
+#' @details Under Gaussian errors \eqn{(\hat\beta_j, \hat\gamma_j)} is exactly
+#'   bivariate normal, so the joint region is an ellipse rather than a rectangle
+#'   of marginal intervals. Conservative limits follow from sweeping its boundary:
+#'   the smallest and largest distance from the pole give the amplitude, the
+#'   tangent radii give the acrophase (Bingham et al. 1982; Cornelissen 2014).
+#'
+#'   These respect the parameter space where a symmetric Wald interval does not.
+#'   When the region covers the pole the rhythm is not distinguishable from zero
+#'   amplitude, the amplitude lower limit is zero and the acrophase is not
+#'   identifiable at all - reported as `NA` rather than as an interval, because
+#'   the honest answer is the whole circle.
+#'
+#'   Earlier versions computed these limits and then returned only the plotting
+#'   coordinates, so none of it reached the caller.
+#'
 #' @param object Model of class `cosinor`
+#'
 #' @param level Confidence level requested
+#'
+#' @param component Which component to describe, for a multiple-component model.
+#'   Defaults to the first.
+#'
 #' @param ... Not currently used, but required for extensibility.
-#' @return Area of potential cosinor for graphical analysis as matrix stored in
-#'   a list.
+#'
+#' @return A list with `area`, the boundary coordinates used for plotting;
+#'   `limits`, a matrix of amplitude and acrophase confidence limits;
+#'   `covers_pole`, whether the region includes the origin; and `component`.
+#'
+#' @examples
+#' data(twins)
+#' model <- cosinor(rDYX ~ hour, twins, tau = c(24, 12))
+#' cosinor_area(model, component = 2)$limits
+#'
+#' @references Bingham C, Arbogast B, Cornelissen G, Lee J, Halberg F.
+#'   Inferential statistical methods for estimating and comparing cosinor
+#'   parameters. *Chronobiologia* 1982;9(4):397-439.
+#'
+#'   Cornelissen G. Cosinor-based rhythmometry. *Theoretical Biology and Medical
+#'   Modelling* 2014;11:16. \doi{10.1186/1742-4682-11-16}
+#'
+#' @seealso [confint.cosinor()] with `method = "ellipse"`, [ggellipse()]
+#'
 #' @export
-cosinor_area <- function(object, level = 0.95, ...) {
+cosinor_area <- function(object, level = 0.95, component = 1, ...) {
   if (object$type == "Population") {
-    message(
-      "Area calculations may not be accurate for population-mean cosinor method."
-    )
-  }
-  if (length(object$tau) > 1) {
-    message(
-      "Area calculations currently use only the principal amplitude and acrophase in multiple-component cosinor method."
+    stop(
+      "`cosinor_area()` is not defined for a population-mean cosinor. The ",
+      "ellipse is built from the residual covariance of a single fit, which a ",
+      "pooled per-subject model does not have.",
+      call. = FALSE
     )
   }
 
-  # Confidence level
-  a <- 1 - level
-
-  # Parameters
-  y <- object$model[, "y"]
-  t <- object$model[, "t"]
-  n <- length(t)
   p <- length(object$tau)
-
-  # Create null variables
-  mesor <- NULL
-  for (i in 1:p) {
-    assign(paste0("x", i), NULL)
-    assign(paste0("z", i), NULL)
-    assign(paste("amp", i), NULL)
-    assign(paste("phi", i), NULL)
-    assign(paste("beta", i), NULL)
-    assign(paste("gamma", i), NULL)
-  }
-  x1 <- z1 <- beta1 <- gamma1 <- amp1 <- phi1 <- NULL
-
-  for (i in 1:p) {
-    assign(paste0("x", i), object$model[, paste0("x", i)])
-    assign(paste0("z", i), object$model[, paste0("z", i)])
-  }
-
-  xmat <- object$xmat
-  yhat <- object$fitted.values
-  coefs <- object$coefficients
-  names(coefs) <- object$coef_names
-  for (i in 1:length(coefs)) {
-    assign(names(coefs)[i], unname(coefs[i]))
-  }
-
-  # Stats
-  k <- 2 * p + 1 # number of parameters
-  RSS <- sum((y - yhat)^2)
-  sigma <- sqrt(RSS / (n - k))
-  fdist <- stats::qf(1 - a, df1 = k - 1, df2 = n - k)
-
-  # Correction of sum of squares for each parameter
-  xc <- 1 / n * sum((x1 - mean(x1))^2)
-  zc <- 1 / n * sum((z1 - mean(z1))^2)
-  tc <- 1 / n * sum((x1 - mean(x1)) * (z1 - mean(z1)))
-
-  # Find beta and gamma CI region
-
-  # Quadratic/ellipse formula setup
-  a <- xc
-  b <- 2 * tc
-  c <- zc
-  d <- -2 * xc * beta1 - 2 * tc * gamma1
-  e <- -2 * tc * beta1 - 2 * zc * gamma1
-  f <-
-    xc *
-    beta1^2 +
-    2 * tc * beta1 * gamma1 +
-    zc * gamma1^2 -
-    (2 / n) * sigma^2 * fdist
-  gmax <- -(2 * a * e - d * b) / (4 * a * c - b^2)
-
-  # Identify parameters for ellipses
-  gseq <- seq(from = gmax - amp1 * 2, to = gmax + amp1 * 2, by = amp1 / 1000)
-  bs1 <- (-(b * gseq + d) +
-    sqrt(
-      as.complex((b * gseq + d)^2 - 4 * a * (c * gseq^2 + e * gseq + f))
-    )) /
-    (2 * a)
-  bs2 <- (-(b * gseq + d) -
-    sqrt(
-      as.complex((b * gseq + d)^2 - 4 * a * (c * gseq^2 + e * gseq + f))
-    )) /
-    (2 * a)
-
-  # Isolate the elliptical region (non imaginary)
-  index <- which(Re(bs1) != Re(bs2))
-  gseq <- gseq[index]
-  bs1 <- Re(bs1[index])
-  bs2 <- Re(bs2[index])
-
-  # Determine if ellipse regions overlap the pole (if overlap, cannot get CI)
   if (
-    (diff(range(gseq)) >= max(gseq)) &
-      ((diff(range(bs1)) >= max(bs1)) | (diff(range(bs2)) >= max(bs2)))
+    !is.numeric(component) ||
+      length(component) != 1 ||
+      !component %in% seq_len(p)
   ) {
-    message(
-      "Confidence regions overlap the poles. Confidence intervals for amplitude and acrophase cannot be determined."
+    stop(
+      "`component` must be a single number between 1 and ",
+      p,
+      "; it was given as ",
+      paste(component, collapse = ", "),
+      ".",
+      call. = FALSE
     )
-  } else {
-    # CI for Amplitude
-    ampUpper <- max(c(sqrt(bs1^2 + gseq^2), sqrt(bs2^2 + gseq^2)))
-    ampLower <- min(c(sqrt(bs1^2 + gseq^2), sqrt(bs2^2 + gseq^2)))
-
-    # CI for Acrophase
-    theta <- c(atan(abs(gseq / bs1)), atan(abs(gseq / bs2)))
-    sa <- sign(c(bs1, bs2))
-    sb <- sign(c(gseq, gseq)) * 3
-    sc <- sa + sb
-    tmp <- sc
-    phiConf <- vector(mode = "double", length = length(theta))
-
-    # Place theta in correct quadrant for phi
-    for (i in 1:length(sc)) {
-      if (sc[i] == 4 | sc[i] == 3) {
-        phiConf[i] <- -theta[i]
-        sc[i] <- 1
-      } else if (sc[i] == 2 || sc[i] == -1) {
-        phiConf[i] <- -pi + theta[i]
-        sc[i] <- 2
-      } else if (sc[i] == -4 || sc[i] == -3) {
-        phiConf[i] <- -pi - theta[i]
-        sc[i] <- 3
-      } else if (sc[i] == -2 || sc[i] == -1) {
-        phiConf[i] <- -2 * pi + theta[i]
-        sc[i] <- 4
-      }
-    }
-
-    # Get max and min values for phi / acrophase
-    if (max(sc) - min(sc) == 3) {
-      phiUpper <- min(phiConf[sc == 1])
-      phiLower <- max(phiConf[sc == 4])
-    } else {
-      phiUpper <- max(phiConf)
-      phiLower <- min(phiConf)
-    }
   }
 
-  # Return
+  parts <- cosinor_vcov_parts(object)
+  co <- cosinor_coefficients(object, type = "linear")
+  nms <- paste0(c("beta", "gamma"), component)
+  centre <- co[nms]
+  V <- parts$V[nms, nms, drop = FALSE]
+
+  # The region is (bhat - b)' V^-1 (bhat - b) <= 2 * F(2, df). Boundary points
+  # are centre + sqrt(crit) * R' u for R'R = V and |u| = 1, which traces the
+  # ellipse exactly rather than solving the conic for one axis at a time.
+  crit <- 2 * stats::qf(level, df1 = 2, df2 = parts$df.residual)
+  angles <- seq(0, 2 * pi, length.out = 2048)
+  R <- chol(V)
+  boundary <- sqrt(crit) * cbind(cos(angles), sin(angles)) %*% R
+  boundary[, 1] <- boundary[, 1] + centre[[1]]
+  boundary[, 2] <- boundary[, 2] + centre[[2]]
+
+  # Evaluating the same quadratic form at the pole is the component's own
+  # zero-amplitude test, so the geometry and the F test cannot disagree
+  coversPole <- drop(t(centre) %*% solve(V) %*% centre) <= crit
+
+  # `ggellipse()` draws the region as two curves of beta against a shared
+  # gamma, so the closed boundary is cut at its extremes in gamma into the two
+  # branches and both are interpolated onto one grid
+  gam <- boundary[, 2]
+  bet <- boundary[, 1]
+  idx <- seq_along(gam)
+  lo <- which.min(gam)
+  hi <- which.max(gam)
+  first <- if (lo <= hi) idx[lo:hi] else c(idx[lo:length(idx)], idx[1:hi])
+  second <- setdiff(idx, first)
+
+  gseq <- seq(min(gam), max(gam), length.out = 512)
+  bs1 <- stats::approx(gam[first], bet[first], xout = gseq, rule = 2)$y
+  bs2 <- stats::approx(gam[second], bet[second], xout = gseq, rule = 2)$y
+
+  limits <- suppressWarnings(
+    stats::confint(
+      object,
+      parm = paste0(c("amp", "phi"), component),
+      level = level,
+      method = "ellipse"
+    )
+  )
+
+  if (coversPole) {
+    warning(
+      "The confidence region for component ",
+      component,
+      " covers the pole, so its acrophase is not identifiable and its limits ",
+      "are returned as NA. The rhythm is not distinguishable from zero ",
+      "amplitude at this level.",
+      call. = FALSE
+    )
+  }
+
   list(
-    area = cbind(gseq, bs1, bs2)
+    area = cbind(gseq = gseq, bs1 = bs1, bs2 = bs2),
+    limits = limits,
+    covers_pole = coversPole,
+    component = component
   )
 }
 
@@ -1010,8 +799,15 @@ cosinor_features <- function(object, population = TRUE, ...) {
   }
   models <- NULL
 
-  # Is multiple component and harmonic?
-  harmonic <- ifelse(length(tau) > 1 & max(tau) %% min(tau) == 0, TRUE, FALSE)
+  # Is multiple component and harmonic? Every period must divide the
+  # fundamental, not just the shortest one: comparing only the extremes called
+  # `c(24, 5, 12)` non-harmonic on account of the 5 while missing that it also
+  # misjudges sets where the extremes happen to divide but an inner period does
+  # not. Compared on a tolerance because 24/3 is not exactly representable.
+  fundamental <- max(tau)
+  ratios <- fundamental / tau
+  harmonic <- length(tau) > 1 &&
+    all(abs(ratios - round(ratios)) < sqrt(.Machine$double.eps))
   if (harmonic) {
     message(
       "This is a harmonic multiple-component cosinor object. The orthophase, bathyphase, and global amplitude were calculated."
@@ -1068,9 +864,13 @@ cosinor_features <- function(object, population = TRUE, ...) {
     df <- if (p == 1) {
       data.frame(cbind(mesor = coefs["mesor"], pars = unlist(pars)))
     } else if (p > 1) {
+      # byrow = FALSE, matching `cosinor_impl()` and `predict_cosinor_numeric()`.
+      # Filling by row interleaved the components across observations, so the
+      # peak and trough of a multiple-component population fit were taken from a
+      # curve that was not the fitted one.
       data.frame(
         mesor = coefs["mesor"],
-        matrix(unlist(pars), ncol = length(pars), byrow = TRUE)
+        matrix(unlist(pars), ncol = length(pars), byrow = FALSE)
       )
     }
     yhat <- rowSums(df)

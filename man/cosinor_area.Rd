@@ -2,22 +2,60 @@
 % Please edit documentation in R/cosinor-fit.R
 \name{cosinor_area}
 \alias{cosinor_area}
-\title{Area of Ellipse}
+\title{Confidence Ellipse For A Cosinor Component}
 \usage{
-cosinor_area(object, level = 0.95, ...)
+cosinor_area(object, level = 0.95, component = 1, ...)
 }
 \arguments{
 \item{object}{Model of class \code{cosinor}}
 
 \item{level}{Confidence level requested}
 
+\item{component}{Which component to describe, for a multiple-component model.
+Defaults to the first.}
+
 \item{...}{Not currently used, but required for extensibility.}
 }
 \value{
-Area of potential cosinor for graphical analysis as matrix stored in
-a list.
+A list with \code{area}, the boundary coordinates used for plotting;
+\code{limits}, a matrix of amplitude and acrophase confidence limits;
+\code{covers_pole}, whether the region includes the origin; and \code{component}.
 }
 \description{
-Formulas for creating the area of the ellipse to identify
-confidence intervals, direction, and graphing purposes.
+The joint confidence region for a component's \verb{(beta, gamma)}
+pair, together with the conservative amplitude and acrophase limits derived
+from it.
+}
+\details{
+Under Gaussian errors \eqn{(\hat\beta_j, \hat\gamma_j)} is exactly
+bivariate normal, so the joint region is an ellipse rather than a rectangle
+of marginal intervals. Conservative limits follow from sweeping its boundary:
+the smallest and largest distance from the pole give the amplitude, the
+tangent radii give the acrophase (Bingham et al. 1982; Cornelissen 2014).
+
+These respect the parameter space where a symmetric Wald interval does not.
+When the region covers the pole the rhythm is not distinguishable from zero
+amplitude, the amplitude lower limit is zero and the acrophase is not
+identifiable at all - reported as \code{NA} rather than as an interval, because
+the honest answer is the whole circle.
+
+Earlier versions computed these limits and then returned only the plotting
+coordinates, so none of it reached the caller.
+}
+\examples{
+data(twins)
+model <- cosinor(rDYX ~ hour, twins, tau = c(24, 12))
+cosinor_area(model, component = 2)$limits
+
+}
+\references{
+Bingham C, Arbogast B, Cornelissen G, Lee J, Halberg F.
+Inferential statistical methods for estimating and comparing cosinor
+parameters. \emph{Chronobiologia} 1982;9(4):397-439.
+
+Cornelissen G. Cosinor-based rhythmometry. \emph{Theoretical Biology and Medical
+Modelling} 2014;11:16. \doi{10.1186/1742-4682-11-16}
+}
+\seealso{
+\code{\link[=confint.cosinor]{confint.cosinor()}} with \code{method = "ellipse"}, \code{\link[=ggellipse]{ggellipse()}}
 }

@@ -15,9 +15,8 @@
 #' @import ggplot2
 #' @export
 ggellipse <- function(object, level = 0.95, ...) {
-  if (object$type == "Population") {
-    message("Ellipse may not be accurate for population-mean cosinor method.")
-  }
+  # Population models are refused by `cosinor_area()` itself, with a message
+  # that says why, so there is nothing to warn about here
 
   # Area
   area <- cosinor_area(object, level = level)$area

@@ -52,3 +52,4 @@ Suggests:
     xml2
 VignetteBuilder: knitr, quarto
 Config/roxygen2/version: 8.0.0
+Config/testthat/edition: 3

@@ -148,17 +148,27 @@ summary(m)
 #>         Estimate  Std. Error
 #> mesor  2.8586510 0.006062639
 #> amp1   0.2964114 0.008702368
+#> phi1  -2.6542757 0.028468900
 #> amp2   0.1302012 0.008542526
-#> phi1  -2.6542757 0.028911445
-#> phi2  -3.6636921 0.065235427
+#> phi2  -3.6636921 0.065919951
+#> 
+#> Zero-amplitude test: F = 353.599 on 4 and 16381 DF, p-value = < 2.2e-16
+#> Design condition number: 1.5
 ggcosinor(m)
 #> This is a harmonic multiple-component cosinor object. The orthophase, bathyphase, and global amplitude were calculated.
 #> Warning in regularize.values(x, y, ties, missing(ties)): collapsing to unique
 #> 'x' values
+#> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+#> ℹ Please use `linewidth` instead.
+#> ℹ The deprecated feature was likely used in the card package.
+#>   Please report the issue at <https://github.com/shah-in-boots/card/issues>.
+#> This warning is displayed once per session.
+#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+#> generated.
 #> `geom_smooth()` using formula = 'y ~ s(x, bs = "cs")'
 ```
 
-<img src="man/figures/unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/unnamed-chunk-6-1.png" alt="" width="100%" />
 
 ``` r
 

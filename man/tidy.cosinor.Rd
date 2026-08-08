@@ -27,8 +27,15 @@ Tidy summarizes information about the components of a \code{cosinor}
 model.
 }
 \details{
-\code{cosinor} objects do not necessarily have a T-statistic as the
-standard error is not based on a mean value, but form a joint-confidence
-interval. The standard error is generated using Taylor series expansion as
-the object is a subspecies of harmonic regressions.
+The standard error is obtained by the delta method from the
+covariance of the regression coefficients, since the amplitude and acrophase
+are a nonlinear function of them. See \code{\link[=confint.cosinor]{confint.cosinor()}} for where that
+approximation stops applying.
+
+The \code{statistic} column reports each component's F test against zero
+amplitude, on 2 and \eqn{N - 2p - 1} degrees of freedom. It is a
+per-component test rather than a per-parameter one, so the amplitude and
+acrophase of a given component share a statistic and a p-value: the null
+being tested is \eqn{\beta_j = \gamma_j = 0}, and an acrophase has no
+meaning under it. The mesor is tested separately by a t statistic.
 }

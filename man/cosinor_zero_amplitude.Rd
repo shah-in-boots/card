@@ -9,13 +9,46 @@ cosinor_zero_amplitude(object, level = 0.95)
 \arguments{
 \item{object}{model of class \code{cosinor}}
 
-\item{level}{confidence level}
+\item{level}{confidence level used for the reported critical value}
 }
 \value{
-Returns a list of test statistics, as well prints out a report of
-analysis.
+A list with the \code{fstat} observed, the \code{fdist} critical value at
+\code{level}, the numerator and denominator degrees of freedom \code{df1} and \code{df2},
+and the \code{p.value}.
 }
 \description{
-Zero amplitude test assesses how well the circadian pattern fits
-the data, essentially detecting the present of a rhythm to the data.
+Tests the null hypothesis that every component of a \link{cosinor}
+model has zero amplitude, which is the test for whether the data carry a
+rhythm at all.
+}
+\details{
+The null is \eqn{H_0: \beta_j = \gamma_j = 0} for all \code{j}, so a
+\code{p}-component model contributes \verb{2p} parameters to the numerator:
+
+\deqn{F = \frac{MSS / 2p}{RSS / (N - 2p - 1)}}
+
+compared against \eqn{F_{1-\alpha}(2p, N - 2p - 1)}.
+
+Earlier versions of this function fixed the numerator at 2 degrees of
+freedom and the denominator at \code{N - 3} whatever \code{tau} was given, so a
+two-component model on the \code{twins} data reported \code{F = 707} on \verb{(2, 16383)}
+where the test is \code{F = 354} on \verb{(4, 16381)}. The statistic was inflated in
+proportion to the number of components.
+
+For a population-mean cosinor the same expression is evaluated against the
+between-subject covariance on \eqn{k - 1} degrees of freedom, giving the
+Hotelling \eqn{T^{2}} test of Bingham et al. (1982).
+}
+\examples{
+data(twins)
+model <- cosinor(rDYX ~ hour, twins, tau = c(24, 12))
+cosinor_zero_amplitude(model)
+
+}
+\references{
+Cornelissen G. Cosinor-based rhythmometry. \emph{Theoretical Biology
+and Medical Modelling} 2014;11:16. \doi{10.1186/1742-4682-11-16}
+}
+\seealso{
+\code{\link[=anova.cosinor]{anova.cosinor()}} for the same test applied one component at a time
 }

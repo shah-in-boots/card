@@ -136,6 +136,10 @@ cosinor.recipe <- function(t, data, tau, population = NULL, ...) {
 #'   needed.
 #' @noRd
 cosinor_bridge <- function(processed, tau, population, data, ...) {
+  # Validated here, where the argument is written, so a bad period is reported
+  # against `tau` rather than surfacing later as a singular matrix
+  validate_cosinor_tau(tau)
+
   ### Create call ----
   # Formal equation
   # y(t) = M + A*cos(2*pi*t/period + phi)
@@ -181,6 +185,19 @@ cosinor_bridge <- function(processed, tau, population, data, ...) {
 
   ## New Cosinor ----
 
+  # Raised once here rather than once per subject inside the population loop.
+  # For a population fit the median subject is what is tested; see
+  # `cosinor_pop_impl()` for why.
+  warn_cosinor_condition(
+    fit$parts$kappa,
+    tau,
+    n_subjects = if (type == "Population") {
+      fit$parts$nsubjects_ill_conditioned
+    } else {
+      NULL
+    }
+  )
+
   # Constructor function receives from implemented function
   new_cosinor(
     coefficients = fit$coefficients,
@@ -191,6 +208,7 @@ cosinor_bridge <- function(processed, tau, population, data, ...) {
     tau = tau,
     model = fit$model,
     xmat = fit$xmat,
+    parts = fit$parts, # Covariance parts, computed once at fit time
     type = type, # Made at bridge, labels type of cosinor object
     blueprint = processed$blueprint # Made from hardhat, not from fit
   )
@@ -209,6 +227,7 @@ new_cosinor <- function(
   tau,
   model,
   xmat,
+  parts,
   type,
   blueprint
 ) {
@@ -227,6 +246,11 @@ new_cosinor <- function(
     stop("`coefficients` and `coef_names` must have same length.")
   }
 
+  # Covariance parts check
+  if (!is.list(parts)) {
+    stop("`parts` should be a list of covariance components.", call. = FALSE)
+  }
+
   # Fit outputs need to match here
   hardhat::new_model(
     coefficients = coefficients,
@@ -237,6 +261,7 @@ new_cosinor <- function(
     tau = tau,
     model = model,
     xmat = xmat,
+    parts = parts,
     type = type,
     blueprint = blueprint,
     class = "cosinor"
@@ -246,61 +271,92 @@ new_cosinor <- function(
 # Cosinor Parsnip Methods ----
 
 # Wrapper function to load parsnip model
+#
+# Only `set_new_model()` is guarded. Every other setter is idempotent - calling
+# them twice leaves the registration tables at one row apiece - so they run on
+# every load. Guarding the whole block, as this used to, meant a registration
+# that was incomplete for any reason could never repair itself: `cosinor_reg`
+# was already in the model environment, so a reload skipped the fix along with
+# everything else. That is how the missing encoding survived several releases.
 make_cosinor_reg <- function() {
   # Check to see if already loaded
   current <- parsnip::get_model_env()
 
-  # If not loaded, then set up model
+  # Start making new model
   if (!any(current$models == "cosinor_reg")) {
-    # Start making new model
     parsnip::set_new_model("cosinor_reg")
-
-    # Add parsnip models to another package
-    parsnip::set_model_mode(model = "cosinor_reg", mode = "regression")
-    parsnip::set_model_engine("cosinor_reg", mode = "regression", eng = "card")
-    parsnip::set_dependency("cosinor_reg", eng = "card", pkg = "card")
-
-    # Arguments
-    parsnip::set_model_arg(
-      model = "cosinor_reg",
-      eng = "card",
-      parsnip = "period",
-      original = "tau",
-      func = list(pkg = "card", fun = "cosinor"),
-      has_submodel = FALSE
-    )
-
-    # Fit
-    parsnip::set_fit(
-      model = "cosinor_reg",
-      eng = "card",
-      mode = "regression",
-      value = list(
-        interface = "formula",
-        protect = c("formula", "data"),
-        func = c(pkg = "card", fun = "cosinor"),
-        defaults = list()
-      )
-    )
-
-    # Prediction
-    parsnip::set_pred(
-      model = "cosinor_reg",
-      eng = "card",
-      mode = "regression",
-      type = "numeric",
-      value = list(
-        pre = NULL,
-        post = NULL,
-        func = c(fun = "predict"),
-        args = list(
-          object = quote(object$fit),
-          new_data = quote(new_data),
-          type = "numeric"
-        )
-      )
-    )
   }
+
+  # Add parsnip models to another package
+  parsnip::set_model_mode(model = "cosinor_reg", mode = "regression")
+  parsnip::set_model_engine("cosinor_reg", mode = "regression", eng = "card")
+  parsnip::set_dependency("cosinor_reg", eng = "card", pkg = "card")
+
+  # Arguments
+  parsnip::set_model_arg(
+    model = "cosinor_reg",
+    eng = "card",
+    parsnip = "period",
+    original = "tau",
+    func = list(pkg = "card", fun = "cosinor"),
+    has_submodel = FALSE
+  )
+
+  # Fit
+  parsnip::set_fit(
+    model = "cosinor_reg",
+    eng = "card",
+    mode = "regression",
+    value = list(
+      interface = "formula",
+      protect = c("formula", "data"),
+      func = c(pkg = "card", fun = "cosinor"),
+      defaults = list()
+    )
+  )
+
+  # Encoding
+  #
+  # Required, not optional: `parsnip:::form_form()` reads this table on every
+  # fit and slices it with `vctrs::vec_slice()`. Without it `get_encoding()`
+  # returns NULL rather than raising an error, so the fallback that would have
+  # supplied defaults never fires and the slice fails on a NULL. Registering a
+  # model without an encoding therefore produces a specification that builds and
+  # prints correctly and errors only when something is fitted with it.
+  #
+  # `cosinor()` builds its own design matrix of cosine and sine terms through
+  # `hardhat::mold()`, taking the time index as a raw numeric column, so parsnip
+  # must not preprocess the formula first. The mesor is the intercept and is
+  # added internally.
+  parsnip::set_encoding(
+    model = "cosinor_reg",
+    eng = "card",
+    mode = "regression",
+    options = list(
+      predictor_indicators = "none",
+      compute_intercept = FALSE,
+      remove_intercept = FALSE,
+      allow_sparse_x = FALSE
+    )
+  )
+
+  # Prediction
+  parsnip::set_pred(
+    model = "cosinor_reg",
+    eng = "card",
+    mode = "regression",
+    type = "numeric",
+    value = list(
+      pre = NULL,
+      post = NULL,
+      func = c(fun = "predict"),
+      args = list(
+        object = quote(object$fit),
+        new_data = quote(new_data),
+        type = "numeric"
+      )
+    )
+  )
 }
 
 
@@ -309,10 +365,15 @@ make_cosinor_reg <- function() {
 #' @param mode A character string that describes the type of model. In this case, it only supports type of "regression".
 #' @param period A non-negative number or vector of numbers that represent the expected periodicity of the data to be analyzed.
 #' @examples
-#' library(parsnip)
+#' data(twins)
+#'
+#' # The example fits deliberately rather than stopping at the specification.
+#' # A specification builds and prints correctly even when the engine is
+#' # registered incompletely, so only a fit exercises the registration.
 #' cosinor_reg(period = c(24, 8)) |>
-#' 	parsnip::set_engine("card") |>
-#' 	parsnip::set_mode("regression")
+#'   parsnip::set_engine("card") |>
+#'   parsnip::set_mode("regression") |>
+#'   parsnip::fit(rDYX ~ hour, data = twins)
 #' @export
 cosinor_reg <- function(mode = "regression", period = NULL) {
   # Check correct mode
@@ -438,20 +499,39 @@ summary.cosinor <- function(object, ...) {
   # Coefficients (estimate, SE, t.value, P.value)
   cat("\n")
   cat("Coefficients: \n")
-  names(object$coefficients) <- object$coef_names
-  coefs <- object$coefficients
-  coefs <- coefs[grep("mesor|amp|phi", names(coefs))]
-  se <- stats::confint(object)$se
-  l <- list(coefs = coefs, se = se)
-
-  mat <- do.call(
-    cbind,
-    lapply(l, function(x) {
-      x[match(names(l[[1]]), names(x))]
-    })
+  coefs <- stats::coef(object)
+  mat <- cbind(
+    "Estimate" = coefs,
+    "Std. Error" = sqrt(diag(stats::vcov(object, type = "cosinor")))[
+      names(coefs)
+    ]
   )
-  colnames(mat) <- c("Estimate", "Std. Error")
   print(mat)
+
+  # Rhythm detection
+  test <- cosinor_zero_amplitude(object)
+  cat("\n")
+  cat(sprintf(
+    "Zero-amplitude test: F = %.3f on %d and %d DF, p-value = %s\n",
+    test$fstat,
+    test$df1,
+    test$df2,
+    format.pval(test$p.value, digits = 4, eps = .Machine$double.eps)
+  ))
+
+  # Conditioning is surfaced on every look at the object rather than only in a
+  # warning at fit time, because periods the data cannot separate produce
+  # amplitudes that are wrong by an order of magnitude while looking ordinary.
+  kappa <- cosinor_vcov_parts(object)$kappa
+  if (!is.na(kappa)) {
+    cat(sprintf("Design condition number: %.1f", kappa))
+    if (kappa > getOption("card.cosinor.kappa", 30)) {
+      cat(" -- periods are poorly separated, see ?cosinor_identifiability")
+    }
+    cat("\n")
+  }
+
+  invisible(object)
 }
 
 #' @description Generic plot method
@@ -481,10 +561,17 @@ generics::tidy
 #' @description Tidy summarizes information about the components of a `cosinor`
 #'   model.
 #'
-#' @details `cosinor` objects do not necessarily have a T-statistic as the
-#'   standard error is not based on a mean value, but form a joint-confidence
-#'   interval. The standard error is generated using Taylor series expansion as
-#'   the object is a subspecies of harmonic regressions.
+#' @details The standard error is obtained by the delta method from the
+#'   covariance of the regression coefficients, since the amplitude and acrophase
+#'   are a nonlinear function of them. See [confint.cosinor()] for where that
+#'   approximation stops applying.
+#'
+#'   The `statistic` column reports each component's F test against zero
+#'   amplitude, on 2 and \eqn{N - 2p - 1} degrees of freedom. It is a
+#'   per-component test rather than a per-parameter one, so the amplitude and
+#'   acrophase of a given component share a statistic and a p-value: the null
+#'   being tested is \eqn{\beta_j = \gamma_j = 0}, and an acrophase has no
+#'   meaning under it. The mesor is tested separately by a t statistic.
 #'
 #' @param x A `cosinor` object created by [card::cosinor()]
 #'
@@ -499,27 +586,34 @@ generics::tidy
 #'
 #' @export
 tidy.cosinor <- function(x, conf.int = FALSE, conf.level = 0.95, ...) {
-  # Get base data
-  names(x$coefficients) <- x$coef_names
-  coefs <- x$coefficients
-  coefs <- coefs[grep("mesor|amp|phi", names(coefs))]
-  val <- stats::confint(x, level = conf.level)
-  l <- list("coefs" = coefs, "se" = val$se)
-  mat <- do.call(
-    cbind,
-    lapply(l, function(x) {
-      x[match(names(l[[1]]), names(x))]
-    })
-  )
+  p <- length(x$tau)
+  coefs <- stats::coef(x)
+  se <- sqrt(diag(stats::vcov(x, type = "cosinor")))[names(coefs)]
 
-  # Tibble it
+  # The mesor is a single linear parameter, so a t statistic; each component is
+  # a joint 2 degree of freedom test shared by its amplitude and acrophase
+  mesorTest <- cosinor_wald(x, "mesor")
+  statistic <- c(mesor = unname(coefs[["mesor"]] / se[["mesor"]]))
+  p.value <- c(mesor = mesorTest$p.value)
+
+  for (i in seq_len(p)) {
+    test <- cosinor_wald(x, paste0(c("beta", "gamma"), i))
+    statistic <- c(statistic, rep(test$statistic, 2))
+    p.value <- c(p.value, rep(test$p.value, 2))
+  }
+  names(statistic) <- names(p.value) <- names(coefs)
+
   result <-
-    mat |>
-    dplyr::as_tibble(rownames = "term") |>
-    dplyr::rename("estimate" = "coefs", "std.error" = "se")
+    tibble::tibble(
+      term = names(coefs),
+      estimate = unname(coefs),
+      std.error = unname(se[names(coefs)]),
+      statistic = unname(statistic[names(coefs)]),
+      p.value = unname(p.value[names(coefs)])
+    )
 
   if (conf.int) {
-    ci <- val$ci
+    ci <- stats::confint(x, level = conf.level)
     colnames(ci) <- c("conf.low", "conf.high")
     result <-
       ci |>
