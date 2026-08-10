@@ -171,3 +171,195 @@
 #' @docType data
 #' @keywords datasets
 "maude_complication_index"
+
+#' MAUDE Manufacturer Index for Cardiovascular Devices
+#'
+#' A regex lookup mapping the manufacturing entities that appear in MAUDE's
+#' `manufacturer_name` field onto a canonical entity name. Maintained in
+#' `data-raw/maude-entities/manufacturer-patterns.csv` and applied by
+#' [normalize_maude_manufacturer()], which takes the first pattern that matches.
+#'
+#' The entity is the company that made the device, not the company that owns it
+#' today. Plants and contract manufacturers resolve here -- `"MPRI"` is
+#' Medtronic, `"VENUSA DE MEXICO S.A. DE C.V."` builds under contract for
+#' Abbott -- because neither is an ownership relationship and neither has a date.
+#' Corporate ownership is [maude_ownership], and is applied separately by
+#' [resolve_maude_owner()], because it is the part that changes with time.
+#'
+#' Coverage is measured against the openFDA `count` endpoint each time the
+#' table is rebuilt and travels with the data rather than with this page, which
+#' would go stale on the next edit:
+#'
+#' ```r
+#' attr(maude_manufacturer_index, "coverage")
+#' ```
+#'
+#' The full report, including patterns that matched nothing and the largest
+#' strings that fell through, is written to
+#' `data-raw/maude-entities/coverage.md`. An entity the index does not cover
+#' returns `NA` rather than a guess.
+#'
+#' @format A `tbl_df` with five columns:
+#'
+#'   - **pattern**: Character. A case-insensitive regular expression matched
+#'     against the raw MAUDE manufacturer string.
+#'   - **entity**: Character. The canonical name of the entity that made the
+#'     device.
+#'   - **priority**: Integer. Lower patterns are tested first, defaulting to
+#'     `100`. Only a row that exists to pre-empt another carries a different
+#'     value: `CRYOCATH` is `10` because reports arrive as
+#'     `"MEDTRONIC CRYOCATH LP"` and the plain `MEDTRONIC` pattern would
+#'     otherwise claim them.
+#'   - **note**: Character. Why the row maps the way it does, where that is not
+#'     obvious. `NA` where it is.
+#'   - **source**: Character. A citation for the mapping, `NA` where none was
+#'     recorded.
+#'
+#'   The table carries a `coverage` attribute, described above.
+#'
+#' @examples
+#' # What the index knows about the Medtronic entities
+#' maude_manufacturer_index[
+#'   grepl("MEDTRONIC|CRYOCATH", maude_manufacturer_index$pattern),
+#' ]
+#'
+#' # Measured coverage, as of the last rebuild
+#' attr(maude_manufacturer_index, "coverage")
+#'
+#' @seealso [normalize_maude_manufacturer()], [maude_ownership]
+#' @docType data
+#' @keywords datasets
+"maude_manufacturer_index"
+
+#' Corporate Ownership of Medical Device Manufacturers
+#'
+#' A dated parent-pointer table recording which company owned which, and when.
+#' Maintained in `data-raw/maude-entities/ownership.csv` and walked by
+#' [resolve_maude_owner()], which follows an entity up the chain until no row
+#' matches the date it was given.
+#'
+#' # Why it is dated, and separate
+#'
+#' MAUDE reports span 1992 to the present, and the company that made a device is
+#' frequently not the company that owns that business now. Holding ownership as
+#' its own table, rather than as a parent baked into each pattern, means an
+#' acquisition is **one row** and an acquisition of a parent carries every
+#' entity beneath it. `"Telectronics Pacing Systems"` reaches Abbott through
+#' St. Jude Medical without anyone writing Abbott next to Telectronics.
+#'
+#' It also makes a divestiture expressible, which a single-parent column cannot
+#' do. An entity with no row matching the date owns itself, so Physio-Control
+#' resolves to Medtronic in 2005, to itself in 2014, and to Stryker in 2020.
+#'
+#' # What earns a row
+#'
+#' Three rules keep this from becoming a corporate database:
+#'
+#'   1. An entity earns a row only if a pattern index names it, or if it sits on
+#'      a chain between one and its parent.
+#'   2. A row requires a closing date that can be stated. A relationship that is
+#'      real but undated -- Stockert building generators for Biosense Webster --
+#'      is recorded in the pattern index instead.
+#'   3. The chain stops at the operating company the field would name. ZOLL has
+#'      been an Asahi Kasei subsidiary since 2012, and nobody calls it an Asahi
+#'      Kasei defibrillator.
+#'
+#' Where a precise closing date could not be established the row uses the start
+#' of the month or year and says so in `note`, and `source` is `NA`. That is a
+#' stated approximation rather than a confident-looking wrong date, and
+#' `coverage.md` lists every row lacking a source so the gap stays visible.
+#'
+#' @format A `tbl_df` with six columns:
+#'
+#'   - **entity**: Character. The company that was owned.
+#'   - **parent**: Character. The company that owned it.
+#'   - **from**: Date. When the ownership began, `NA` for unbounded, which is
+#'     used where the relationship predates the period MAUDE covers.
+#'   - **to**: Date. When it ended, `NA` for ongoing. A closed interval is a
+#'     divestiture.
+#'   - **note**: Character. The precision of the date, and the nature of the
+#'     transaction where it is not a plain acquisition.
+#'   - **source**: Character. A citation, `NA` where none was recorded.
+#'
+#'   Intervals do not overlap within an entity, which is what lets
+#'   [resolve_maude_owner()] take the first matching row.
+#'
+#' @examples
+#' # The chain from a 1990s pacemaker company to its owner today
+#' maude_ownership[maude_ownership$entity == "Telectronics Pacing Systems", ]
+#' resolve_maude_owner(
+#'   "Telectronics Pacing Systems",
+#'   as_of = as.Date(c("2000-01-01", "2020-01-01"))
+#' )
+#'
+#' # A divestiture, which a single-parent column cannot express
+#' maude_ownership[maude_ownership$entity == "Physio-Control", ]
+#'
+#' @seealso [resolve_maude_owner()], [maude_manufacturer_index]
+#' @docType data
+#' @keywords datasets
+"maude_ownership"
+
+#' MAUDE Cardiac Ablation Brand Index
+#'
+#' A regex lookup mapping cardiac ablation brand names as they appear in MAUDE's
+#' `device_brand_name` field onto a platform, an energy modality, and the entity
+#' that makes it. Maintained as two files --
+#' `data-raw/maude-entities/ablation-patterns.csv`, one brand alias per row, and
+#' `ablation-platforms.csv`, one platform per row -- joined at build time and
+#' applied by [normalize_maude_ablation()].
+#'
+#' It exists because product code does not determine modality: `OAE` covers
+#' cryoablation and radiofrequency alike, and a rule that resolves it from the
+#' product code alone will place cryoballoon, pulsed-field, and laser devices in
+#' a radiofrequency arm.
+#'
+#' Two things it is careful about. Substring matching on `"arctic"` is not a
+#' cryoablation signal, since `"ARCTIC SUN"` is a targeted temperature
+#' management console; the pattern is `"ARCTIC FRONT"`. And mapping, access, and
+#' irrigation devices share the ablation product codes, so `PENTARAY`,
+#' `OCTARAY`, `FARADRIVE`, `RHYTHMIA`, `ENSITE` and others are in the table with
+#' a `modality` of `NA` rather than being swept into whichever arm their product
+#' code implies.
+#'
+#' The `entity` column names the maker, never the corporate parent, so the table
+#' does not have to be edited when a company is acquired. Pass it to
+#' [resolve_maude_owner()] with a date for the parent.
+#'
+#' Coverage is measured on each rebuild and travels with the data:
+#' `attr(maude_ablation_index, "coverage")`, with the full report in
+#' `data-raw/maude-entities/coverage.md`.
+#'
+#' @format A `tbl_df` with seven columns:
+#'
+#'   - **pattern**: Character. A case-insensitive regular expression matched
+#'     against the raw MAUDE brand string.
+#'   - **platform**: Character. The device platform, such as `"Arctic Front"`.
+#'   - **modality**: Character. One of `"cryoablation"`, `"radiofrequency"`,
+#'     `"pulsed field"`, `"pulsed field or radiofrequency"` for the Affera
+#'     Sphere-9, which delivers both from one catheter, or `"laser"`. `NA` for a
+#'     device that delivers no energy.
+#'   - **entity**: Character. The entity that makes the platform, using the same
+#'     vocabulary as [maude_manufacturer_index].
+#'   - **priority**: Integer. Lower patterns are tested first, defaulting to
+#'     `100`.
+#'   - **note**: Character. What the device is, where the platform name does not
+#'     say. `NA` where it does.
+#'   - **source**: Character. A citation, `NA` where none was recorded.
+#'
+#'   The table carries a `coverage` attribute, described above.
+#'
+#' @examples
+#' # Every pulsed field platform the index knows
+#' maude_ablation_index[
+#'   !is.na(maude_ablation_index$modality) &
+#'     maude_ablation_index$modality == "pulsed field",
+#' ]
+#'
+#' # The devices that share the ablation product codes but do not ablate
+#' maude_ablation_index[is.na(maude_ablation_index$modality), ]
+#'
+#' @seealso [normalize_maude_ablation()], [maude_ownership]
+#' @docType data
+#' @keywords datasets
+"maude_ablation_index"

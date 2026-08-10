@@ -70,6 +70,15 @@
 #' @return A named list of complication families. Each family contains named
 #'   integer flags (`0`/`1`) for its adjudication classifications.
 #'
+#'   The list carries three attributes recording what produced it, so a run can
+#'   be reproduced without keeping notes beside it: `"adjudication_model"`, the
+#'   model reported by `chat_object`; `"prompt_hash"`, of the internal system
+#'   prompt; and `"definitions_hash"`, of the `definitions` actually used. The
+#'   prompt and the definitions will both change over time, and a dataset
+#'   adjudicated under one pair is not comparable to a dataset adjudicated under
+#'   another. Read them with `attributes()` or `attr()`, and store them beside
+#'   the flags when adjudicating in bulk.
+#'
 #' @examples
 #' \dontrun{
 #' # Assumes OPENAI_API_KEY is set in ~/.Renviron or the current environment.
@@ -260,6 +269,18 @@ maude_adjudicate <- function(
     }
   }
 
+  # Provenance travels with the adjudication rather than in a lab notebook.
+  # Both the system prompt and the complication definitions will change, and a
+  # dataset adjudicated under an older pair is not comparable to one adjudicated
+  # under a newer pair -- but nothing in the flags themselves says which was
+  # used. Hashes rather than version numbers because neither is versioned, and a
+  # hash cannot drift out of step with what it describes.
+  attr(out, "adjudication_model") <- tryCatch(
+    chat_object$get_model(),
+    error = function(e) NA_character_
+  )
+  attr(out, "prompt_hash") <- rlang::hash(system_prompt)
+  attr(out, "definitions_hash") <- rlang::hash(definitions)
   out
 }
 

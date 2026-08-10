@@ -14,7 +14,9 @@ load_maude_codes(annex)
 A \code{tbl_df} of codes and related metadata for the requested annex.
 All returned annexes share the same core columns:
 \code{annex}, \code{imdrf_code}, \code{fda_code}, \code{ncit_code}, \code{term},
-\code{level_1}, \code{level_2}, \code{level_3}, and \code{definition}.
+\code{level_1}, \code{level_2}, \code{level_3}, and \code{definition}. \code{level_1} is never
+missing; \code{level_2} and \code{level_3} are missing for terms that do not go that
+deep.
 }
 \description{
 Load Medical Device Report (MDR) adverse event coding tables
@@ -32,9 +34,37 @@ Supported annexes:
 \item \strong{F}: Health impact codes
 }
 }
+\section{Hierarchy}{
+Each row carries one coded term in \code{term}, and \code{level_1} through \code{level_3}
+give that term's place in the annex hierarchy, read from the IMDRF code
+rather than inferred. A three-character code such as \code{A05} is a \emph{family}, and
+on those rows \code{term} and \code{level_1} are the same value while \code{level_2} and
+\code{level_3} are \code{NA}. Deeper codes carry their ancestors, so \code{A0501} has
+\code{level_1} of \code{"Mechanical Problem"} and \code{level_2} of its own term.
+
+This matters because FDA codes a substantial share of reports \strong{at the family
+level}: \code{"Material Integrity Problem"} and \code{"Use of Device Problem"} are
+values that appear in the data, not merely headings above it. Joining
+returned MAUDE terms to this table on \code{term} therefore picks up leaf and
+family codings alike, and \code{level_1} rolls either up to its family.
+}
+
+\section{Polyhierarchy in Annex E}{
+Annex E places some terms under more than one family -- \code{"Brain Injury"}
+belongs to both \code{"Nervous System"} and \code{"Injury"} -- so those codes appear on
+one row per parent. A join on \code{term} or \code{imdrf_code} will multiply such rows,
+which is correct but will double-count if the result is then tallied. Reduce
+to \code{imdrf_code} first, or pick a parent, before counting.
+}
+
 \examples{
 # Load Annex E health effects codes
 annex_e <- load_maude_codes("E")
+
+# Roll device problem terms up to their family, leaf or family coded alike
+terms <- c("Material Deformation", "Material Integrity Problem")
+annex_a <- load_maude_codes("A")
+annex_a$level_1[match(terms, annex_a$term)]
 
 }
 \references{

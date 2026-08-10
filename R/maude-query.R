@@ -14,13 +14,38 @@
 #'   - **E**: Clinical signs, symptoms, or conditions
 #'   - **F**: Health impact codes
 #'
+#' # Hierarchy
+#'
+#' Each row carries one coded term in `term`, and `level_1` through `level_3`
+#' give that term's place in the annex hierarchy, read from the IMDRF code
+#' rather than inferred. A three-character code such as `A05` is a *family*, and
+#' on those rows `term` and `level_1` are the same value while `level_2` and
+#' `level_3` are `NA`. Deeper codes carry their ancestors, so `A0501` has
+#' `level_1` of `"Mechanical Problem"` and `level_2` of its own term.
+#'
+#' This matters because FDA codes a substantial share of reports **at the family
+#' level**: `"Material Integrity Problem"` and `"Use of Device Problem"` are
+#' values that appear in the data, not merely headings above it. Joining
+#' returned MAUDE terms to this table on `term` therefore picks up leaf and
+#' family codings alike, and `level_1` rolls either up to its family.
+#'
+#' # Polyhierarchy in Annex E
+#'
+#' Annex E places some terms under more than one family -- `"Brain Injury"`
+#' belongs to both `"Nervous System"` and `"Injury"` -- so those codes appear on
+#' one row per parent. A join on `term` or `imdrf_code` will multiply such rows,
+#' which is correct but will double-count if the result is then tallied. Reduce
+#' to `imdrf_code` first, or pick a parent, before counting.
+#'
 #' @param annex A single character identifying the FDA annex to load:
 #'   `"A"`, `"E"`, or `"F"`. Case-sensitive.
 #'
 #' @return A `tbl_df` of codes and related metadata for the requested annex.
 #'   All returned annexes share the same core columns:
 #'   `annex`, `imdrf_code`, `fda_code`, `ncit_code`, `term`,
-#'   `level_1`, `level_2`, `level_3`, and `definition`.
+#'   `level_1`, `level_2`, `level_3`, and `definition`. `level_1` is never
+#'   missing; `level_2` and `level_3` are missing for terms that do not go that
+#'   deep.
 #'
 #' @references
 #' FDA MDR Adverse Event Codes: Coding Resources for Medical Device Reports
@@ -29,6 +54,11 @@
 #' @examples
 #' # Load Annex E health effects codes
 #' annex_e <- load_maude_codes("E")
+#'
+#' # Roll device problem terms up to their family, leaf or family coded alike
+#' terms <- c("Material Deformation", "Material Integrity Problem")
+#' annex_a <- load_maude_codes("A")
+#' annex_a$level_1[match(terms, annex_a$term)]
 #'
 #' @export
 load_maude_codes <- function(annex) {
@@ -103,7 +133,36 @@ load_maude_codes <- function(annex) {
 #'
 #' **API Response Handling:** The openFDA API returns HTTP 404 for queries with
 #' no results (rather than an empty array). Both functions handle this by
-#' returning an empty tibble instead of throwing an error.
+#' returning an empty tibble instead of throwing an error. A 404 is therefore a
+#' legitimately empty stratum and is not retried.
+#'
+#' **Counting:** `maude_fda_api_call(count = )` uses the openFDA `count`
+#' endpoint, which aggregates on the server and returns one `term`/`count` pair
+#' per distinct value rather than the records themselves. A frequency table
+#' that would otherwise take hundreds of paginated record requests takes one:
+#'
+#' ```r
+#' maude_fda_api_call(
+#'   search_query = "device.device_report_product_code:QZI",
+#'   count = "product_problems.exact",
+#'   limit = 999
+#' )
+#' ```
+#'
+#' Two limits are worth knowing. The endpoint returns at most 1000 terms and
+#' offers no pagination cursor, so a field with a longer tail is silently
+#' truncated -- check whether `nrow()` has hit the cap before treating the table
+#' as complete. Without an `api_key` the usable ceiling is 999, and a `limit` of
+#' 1000 is refused with HTTP 403 and the message "No api_key was supplied",
+#' which is not what went wrong. And counts are of *mentions*, not reports: a
+#' report coded with three problems contributes to three terms, so the column
+#' does not sum to the number of matching reports.
+#'
+#' **Device Problem Terms:** the coded device problem terms are returned in the
+#' record's top-level `product_problems` field. They are never returned inside
+#' `device[]`, even though `device.device_problem_codes` is a valid field to
+#' search on, which is why `device_problem` is read from one field and filtered
+#' on another.
 #'
 #' **When to use `maude_fda_api_call()`:** Most users should use `maude_query()`.
 #' The lower-level `maude_fda_api_call()` is useful when you need:
@@ -137,7 +196,11 @@ load_maude_codes <- function(annex) {
 #'   filter on (`report_number`).
 #'
 #' @param device_problem Optional character vector of device problem codes to
-#'   filter on (`device.device_problem_codes`).
+#'   filter on (`device.device_problem_codes`). Note the asymmetry: openFDA
+#'   accepts this as a *search* field but never returns it, so the returned
+#'   `device_problem` column is read from the record's top-level
+#'   `product_problems` instead. Filtering and reading therefore name different
+#'   fields for the same terms.
 #'
 #' @param patient_problem Optional character vector of patient problems to
 #'   filter on (`patient.patient_problems`).
@@ -146,10 +209,14 @@ load_maude_codes <- function(annex) {
 #'   query. Names should match the openFDA searchable fields list.
 #'
 #' @param limit Integer specifying the maximum number of records to return.
-#'   For `maude_query()`, defaults to 100 and requests exceeding 1000 are
-#'   automatically paginated. Due to openFDA `skip` limits, `maude_query()`
-#'   currently supports up to 26,000 records per call. For
-#'   `maude_fda_api_call()`, maximum per request is 1000 per openFDA limits.
+#'   For `maude_query()` this is a cap on the whole call, not on each request:
+#'   it defaults to 100, and anything above 1000 is paginated internally into
+#'   requests of 999. Due to openFDA `skip` limits, `maude_query()` currently
+#'   supports up to 26,000 records per call and refuses a larger `limit`. When
+#'   the query matches more reports than `limit` returns, the result is
+#'   truncated and a warning says how many matched. For `maude_fda_api_call()`,
+#'   `limit` is the per-request maximum of 1000 per openFDA limits; when `count`
+#'   is given it caps the number of terms instead, at 1000.
 #'
 #' @param date_start Optional start date for filtering by `date_received`.
 #'   Prefer a `Date` object, such as `as.Date("2026-01-01")`. POSIXt,
@@ -168,6 +235,13 @@ load_maude_codes <- function(annex) {
 #'
 #' @param sort Optional sort specification for the openFDA API (e.g.,
 #'   `"date_received:desc"`). Only used by `maude_fda_api_call()`.
+#'
+#' @param count Optional openFDA field to tabulate on instead of returning
+#'   records, such as `"product_problems.exact"` or
+#'   `"device.manufacturer_d_name.exact"`. Only used by
+#'   `maude_fda_api_call()`. The `.exact` suffix counts whole field values;
+#'   without it openFDA counts individual tokens, so "Cardiac Tamponade" is
+#'   split into "cardiac" and "tamponade". See **Counting** in the details.
 #'
 #' @param api_key Optional character string containing your openFDA API key.
 #'   Not required, but recommended for heavy usage to avoid rate limiting.
@@ -198,11 +272,19 @@ load_maude_codes <- function(annex) {
 #'     \item{device_brand_name}{Brand name of the device}
 #'     \item{manufacturer_name}{Name of the device manufacturer}
 #'     \item{event_description}{Narrative description of the adverse event}
-#'     \item{patient_problem}{Reported problems affecting the patient}
-#'     \item{device_problem}{Reported problems with the device}
+#'     \item{patient_problem}{Reported problems affecting the patient, from
+#'       `patient[].patient_problems`, de-duplicated and `"; "`-delimited}
+#'     \item{device_problem}{Reported problems with the device, from the
+#'       top-level `product_problems`, de-duplicated and `"; "`-delimited}
 #'   }
 #'
 #'   Returns an empty *tibble* if no results are found.
+#'
+#'   The result carries a `"total"` attribute giving how many reports the query
+#'   matched, which is larger than `nrow()` whenever `limit` truncated it.
+#'
+#'   With `count`, `maude_fda_api_call()` returns a two-column *tibble* of
+#'   `term` and `count` instead, at most 1000 rows.
 #'
 #' @references
 #' openFDA Device Adverse Event API:
@@ -235,6 +317,14 @@ load_maude_codes <- function(annex) {
 #'   device_generic_name = "infusion pump",
 #'   device.product_code = "LVP",
 #'   limit = 50
+#' )
+#'
+#' # Frequency table of device problem terms in one request, rather than
+#' # paginating through every matching record
+#' problems <- maude_fda_api_call(
+#'   search_query = "device.device_report_product_code:QZI",
+#'   count = "product_problems.exact",
+#'   limit = 999
 #' )
 #' }
 #'
@@ -422,6 +512,7 @@ maude_query <- function(
   # Paginate if limit > 1000 (openFDA max per request).
   max_per_request <- 999
   sort <- "date_received:desc"
+  total <- NA_integer_
   if (limit <= max_per_request) {
     result <- maude_fda_api_call(
       search_query = query,
@@ -431,6 +522,7 @@ maude_query <- function(
       sort = sort,
       verbose = verbose
     )
+    total <- attr(result, "total")
   } else {
     all_results <- list()
     n_batches <- ceiling(limit / max_per_request)
@@ -455,6 +547,7 @@ maude_query <- function(
         verbose = verbose
       )
       if (nrow(batch) == 0) break
+      if (i == 1L) total <- attr(batch, "total")
       all_results[[i]] <- batch
       if (nrow(batch) < batch_limit) break
 
@@ -462,6 +555,21 @@ maude_query <- function(
     }
 
     result <- dplyr::bind_rows(all_results)
+  }
+
+  # `limit` is a cap on how many records this call returns, not a statement
+  # about how many exist. A query matching 41,000 reports and a query matching
+  # exactly `limit` of them otherwise come back looking identical, so say so
+  # rather than handing back a silently truncated frame.
+  if (is.null(total)) total <- NA_integer_
+  if (length(total) == 1L && !is.na(total) && total > nrow(result)) {
+    warning(
+      "Query matched ", total, " report(s) but 'limit' returned ", nrow(result),
+      ". Raise 'limit', or split the query with 'date_start'/'date_end' ",
+      "to retrieve the rest.",
+      immediate. = TRUE,
+      call. = FALSE
+    )
   }
 
   # Provide a short message about the outcome.
@@ -493,6 +601,7 @@ maude_query <- function(
     result$date_received <- suppressWarnings(as.Date(date_received))
   }
 
+  attr(result, "total") <- total
   result
 }
 
@@ -500,13 +609,19 @@ maude_query <- function(
 #' @export
 maude_fda_api_call <- function(
   search_query,
-  limit,
-  skip,
-  api_key,
+  limit = 100,
+  skip = 0,
+  api_key = NULL,
   sort = NULL,
+  count = NULL,
   max_retries = 3,
   verbose = FALSE
 ) {
+
+  if (!is.null(count) &&
+      (!is.character(count) || length(count) != 1 || !nzchar(count))) {
+    stop("'count' must be NULL or a single openFDA field name", call. = FALSE)
+  }
 
   # This is or query parameters for "direct" calling the API, not user friendly
   # Format =  "?search=pacemaker&limit=100&skip=0" (gets appended to URL)
@@ -517,6 +632,15 @@ maude_fda_api_call <- function(
   #   2. NULL values are automatically omitted from the query string
   #   3. The resulting URL is properly formatted without manual "&" joining
   params <- list(search = search_query, limit = limit, skip = skip)
+
+  # The count endpoint aggregates server-side and returns { term, count } pairs
+  # instead of records, which turns a frequency table over tens of thousands of
+  # reports into a single request. `skip` is meaningless there, and openFDA caps
+  # the response at 1000 terms with no pagination cursor.
+  if (!is.null(count)) {
+    params$count <- count
+    params$skip <- NULL
+  }
 
   # Conditionally add api_key only if provided.
   # When api_key is NULL, this line is skipped and the parameter is not
@@ -584,6 +708,18 @@ maude_fda_api_call <- function(
         }
       }
     }
+    # openFDA answers an anonymous caller with "No api_key was supplied"
+    # whenever it declines the request, whether because the per-minute rate was
+    # exceeded or because `limit` was above 999. Neither is what the message
+    # says, and both are fixable without registering for a key.
+    if (status == 403 && is.null(api_key)) {
+      err <- paste0(
+        err,
+        " (openFDA reports this for any refused anonymous request: `limit` ",
+        "above 999, or the per-minute rate exceeded. Lower 'limit', wait, or ",
+        "supply 'api_key'.)"
+      )
+    }
     if (nchar(err) > 0) {
       stop("openFDA API request failed with status ", status, ": ", err, call. = FALSE)
     }
@@ -606,10 +742,35 @@ maude_fda_api_call <- function(
     return(tibble::tibble())
   }
 
+  if (!is.null(count)) {
+    return(tibble::tibble(
+      term = vapply(
+        results,
+        function(x) as.character(purrr::pluck(x, "term", .default = NA_character_)),
+        character(1)
+      ),
+      count = vapply(
+        results,
+        function(x) as.integer(purrr::pluck(x, "count", .default = NA_integer_)),
+        integer(1)
+      )
+    ))
+  }
+
   # Transform each API result record into a standardized tibble row.
   # purrr::map_dfr iterates over results and row-binds the individual tibbles.
   # Parsed results are very nested
-  purrr::map_dfr(results, flatten_maude_record)
+  out <- purrr::map_dfr(results, flatten_maude_record)
+
+  # `meta$results$total` is how many reports the query actually matched, as
+  # against the `limit` that were asked for. Carrying it lets the caller find
+  # out that a result was truncated, which is otherwise invisible: a query that
+  # matched 41,000 reports and a query that matched exactly `limit` of them
+  # return the same thing.
+  attr(out, "total") <- as.integer(
+    purrr::pluck(parsed, "meta", "results", "total", .default = NA_integer_)
+  )
+  out
 }
 
 # OpenFDA MAUDE API helpers ----
@@ -709,10 +870,21 @@ flatten_maude_record <- function(rec) {
     vals[[1]]
   }
 
-  collapse_field <- function(x, field, delimiter = "; ") {
+  # openFDA emits the coded-term arrays twice for most records, so
+  # `product_problems` arrives as c("Material Deformation", "Material
+  # Deformation") on a single-device report. The repetition is an artefact of
+  # how the endpoint joins its tables, not a count of anything, and pasted
+  # through it reads as two separate problems. Narrative blocks are left alone:
+  # each carries its own `mdr_text_key` and a supplement may legitimately repeat
+  # the text of the report it amends.
+  collapse_field <- function(x, field, delimiter = "; ", unique_values = TRUE) {
     vals <- collect_maude_field_values(x, field)
     if (!length(vals)) {
       return(NA_character_)
+    }
+
+    if (unique_values) {
+      vals <- unique(vals)
     }
 
     paste(vals, collapse = delimiter)
@@ -743,15 +915,21 @@ flatten_maude_record <- function(rec) {
     event_description = collapse_field(
       purrr::pluck(rec, "mdr_text", .default = list()),
       "text",
-      delimiter = " | "
+      delimiter = " | ",
+      unique_values = FALSE
     ),
     patient_problem = collapse_field(
       purrr::pluck(rec, "patient", .default = list()),
       "patient_problems"
     ),
+    # The device problem terms live at the top level of the record, in
+    # `product_problems`. They are not returned inside `device[]` at all, even
+    # though `device.device_problem_codes` is a valid field to *search* on; that
+    # asymmetry is why this was previously read from the device list and came
+    # back NA for every record ever returned.
     device_problem = collapse_field(
-      devices,
-      "device_problem_codes"
+      rec["product_problems"],
+      "product_problems"
     )
   )
 }

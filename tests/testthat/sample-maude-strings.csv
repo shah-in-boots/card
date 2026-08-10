@@ -1,0 +1,77 @@
+field,string,expected
+manufacturer,BIOSENSE WEBSTER INC,Biosense Webster
+manufacturer,"BIOSENSE WEBSTER, INC. (JUAREZ)",Biosense Webster
+manufacturer,"BIOSENSE WEBSTER, INC (IRWINDALE)",Biosense Webster
+manufacturer,STOCKERT GMBH,Biosense Webster
+manufacturer,BOSTON SCIENTIFIC CORPORATION,Boston Scientific
+manufacturer,BOSTON SCIENTIFIC DE COSTA RICA S.R.L.,Boston Scientific
+manufacturer,BOSTON SCIENTIFIC - MAPLE GROVE,Boston Scientific
+manufacturer,"FARAPULSE, INC.",Farapulse
+manufacturer,"CARDIAC PACEMAKERS, INC",Cardiac Pacemakers
+manufacturer,CPI - DEL CARIBE,Cardiac Pacemakers
+manufacturer,"EP TECHNOLOGIES, INC.",EP Technologies
+manufacturer,MEDTRONIC CRYOCATH LP,CryoCath
+manufacturer,"MEDTRONIC, INC.",Medtronic
+manufacturer,"MEDTRONIC PUERTO RICO, INC.",Medtronic
+manufacturer,MEDTRONIC SINGAPORE OPERATIONS,Medtronic
+manufacturer,MEDTRONIC IRELAND,Medtronic
+manufacturer,MPRI,Medtronic
+manufacturer,IPG MFG SWITZERLAND,Medtronic
+manufacturer,EPIX THERAPEUTICS,EPiX Therapeutics
+manufacturer,ST. JUDE MEDICAL,St. Jude Medical
+manufacturer,"ST. JUDE MEDICAL, COSTA RICA LTDA",St. Jude Medical
+manufacturer,ST JUDE MEDICAL CARDIAC RHYTHM MANAGEMENT DIVISION,St. Jude Medical
+manufacturer,"IRVINE BIOMEDICAL, INC.",Irvine Biomedical
+manufacturer,TELECTRONICS PACING SYSTEMS,Telectronics Pacing Systems
+manufacturer,ABBOTT MEDICAL,Abbott
+manufacturer,VENUSA DE MEXICO S.A. DE C.V.,Abbott
+manufacturer,PHILIPS MEDICAL SYSTEMS,Philips
+manufacturer,ZOLL MEDICAL CORPORATION,ZOLL
+manufacturer,DATASCOPE CORP.,Datascope
+manufacturer,"PHYSIO-CONTROL, INC. - 3015876",Physio-Control
+manufacturer,"BARD PERIPHERAL VASCULAR, INC.",C. R. Bard
+manufacturer,CORDIS CORPORATION,Cordis
+manufacturer,"MEDIVANCE, INC.",NA
+manufacturer,PERFUSION SYSTEMS,NA
+brand,THERMOCOOL SMART TOUCH SF BI-DIRECTIONAL NAVIGATION CATHETER,Thermocool
+brand,NAVI-STAR THERMO-COOL ELECTROPHYSIOLOGY CATHETER,Thermocool
+brand,"THMCL SMTCH SF BID, TC, D-F",Thermocool
+brand,QDOT MICRO,QDOT Micro
+brand,SMARTABLATE SYSTEM RF GENERATOR,SmartAblate
+brand,FARAWAVE,Farapulse
+brand,"FARAWAVE PULSED FIELD ABLATION CATHETER, 31MM",Farapulse
+brand,FARADRIVE STEERABLE SHEATH CLEAR,Faradrive
+brand,PULSESELECT,PulseSelect
+brand,VARIPULSE BI-DIRECTIONAL CATHETER,Varipulse
+brand,AFFERA,Affera Sphere-9
+brand,SPHERE-9 ABLATION CATHETER,Affera Sphere-9
+brand,VOLT PFA CATHETER,Volt
+brand,ARCTIC FRONT ADVANCE CARDIAC CRYOABLATION CATHETER,Arctic Front
+brand,POLARX? FIT,PolarX
+brand,SMARTFREEZE,SmartFreeze
+brand,FREEZOR XTRA CARDIAC CRYOABLATION CATHETER,Freezor
+brand,CRYOCONSOLE,Medtronic CryoAblation
+brand,HEARTLIGHT,HeartLight
+brand,"TACTICATH QUARTZ CONTACT FORCE ABLATION CATHETER, 75MM",TactiCath
+brand,TACTISYS QUARTZ ABLATION SYSTEM,TactiCath
+brand,"FLEXABILITY ABLATION CATHETER, SENSOR ENABLED",FlexAbility
+brand,"COOL PATH DUO 7F, 1304-CP2-7-1.5(5)-L1-TE4BE1AB",Cool Path
+brand,THERAPY ABLATION CATHETER,Therapy
+brand,"THERAPY COOL FLEX, 1304-CF-7-0.5(5)2-L-TE4BE1EB",Therapy
+brand,AMPERE RF ABLATION GENERATOR,Ampere
+brand,DIAMONDTEMP,DiamondTemp
+brand,BLAZER II TEMPERATURE ABLATION CATHETER,Blazer
+brand,INTELLANAV MIFI OPEN-IRRIGATED,IntellaNav
+brand,MAESTRO 4000 CONTROLLER,Maestro
+brand,ATAKR II,Atakr
+brand,CARDIOBLATE G2,Cardioblate
+brand,ATRICURE EPI-SENSE,EPi-Sense
+brand,ALCATH FLUTTER FLUX CATHETER,Alcath
+brand,PENTARAY NAV HIGH-DENSITY MAPPING ECO CATHETER,Pentaray
+brand,OCTARAY MAPPING CATHETER,Octaray
+brand,RHYTHMIA HDX,Rhythmia
+brand,ENSITE MULTI-ELECTRODE ARRAY CATHETER,EnSite
+brand,METRIQ IRRIGATION TUBING SET,MetriQ
+brand,ARCTIC SUN 5000,NA
+brand,ARCTIC SUN STAT,NA
+brand,MAESTRO FOOT SWITCH,Maestro

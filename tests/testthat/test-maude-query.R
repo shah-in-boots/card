@@ -23,6 +23,46 @@ test_that("load_maude_codes rejects invalid annex", {
   expect_error(load_maude_codes("Z"), "Invalid annex")
 })
 
+test_that("every annex row carries its own term and its ancestry", {
+  # A term coded at the family level is a value in the data, not a heading:
+  # "Material Integrity Problem" and "Use of Device Problem" are both coded in
+  # MAUDE. Filling the level columns downward gave 26 of the 27 Annex A families
+  # the previous family's last child as their `term`, so joining returned terms
+  # to this table dropped every family-coded report.
+  for (annex in c("A", "E", "F")) {
+    dat <- load_maude_codes(annex)
+    families <- dat[nchar(dat$imdrf_code) == 3L, ]
+
+    expect_false(anyNA(dat$term))
+    expect_false(anyNA(dat$level_1))
+    expect_gt(nrow(families), 20)
+    expect_identical(families$term, families$level_1)
+    expect_true(all(is.na(families$level_2)))
+    expect_true(all(is.na(families$level_3)))
+  }
+})
+
+test_that("annex terms roll up to the family that owns them", {
+  a <- load_maude_codes("A")
+
+  expect_identical(
+    a$term[a$imdrf_code == "A05"],
+    "Mechanical Problem"
+  )
+  expect_identical(
+    a$level_1[a$imdrf_code == "A0501"],
+    "Mechanical Problem"
+  )
+
+  # Annex E is a polyhierarchy: "Brain Injury" sits under two families, so the
+  # code appears once per parent rather than once.
+  e <- load_maude_codes("E")
+  expect_setequal(
+    e$level_1[e$imdrf_code == "E0102"],
+    c("Nervous System", "Injury")
+  )
+})
+
 test_that("maude_query validates web description fill option", {
   expect_error(
     maude_query("pacemaker", descriptions_from_web = NA),
@@ -76,11 +116,11 @@ test_that("flatten_maude_record keeps all narrative text blocks", {
     report_number = "RPT-1",
     event_type = "Malfunction",
     date_received = "20260115",
+    product_problems = c("Detachment", "Migration"),
     device = list(list(
       generic_name = "Mapping Catheter",
       brand_name = "Alpha",
-      manufacturer_d_name = "Acme",
-      device_problem_codes = c("Detachment", "Migration")
+      manufacturer_d_name = "Acme"
     )),
     patient = list(list(
       patient_problems = c("Pain", "Bleeding")
@@ -102,6 +142,59 @@ test_that("flatten_maude_record keeps all narrative text blocks", {
   expect_identical(out$device_problem, "Detachment; Migration")
 })
 
+test_that("device problems are read from product_problems, not from device[]", {
+  # openFDA accepts `device.device_problem_codes` as a search field but never
+  # returns it. Reading the column from there gave an NA for every record ever
+  # returned, which reads as "MAUDE does not code device problems for these
+  # reports" rather than as a bug.
+  rec <- list(
+    report_number = "RPT-3",
+    product_problems = c("Material Deformation", "Material Integrity Problem"),
+    device = list(list(
+      generic_name = "Ablation Catheter",
+      device_problem_codes = c("Should Not Be Read", "Nor This")
+    ))
+  )
+
+  out <- getFromNamespace("flatten_maude_record", "card")(rec)
+
+  expect_identical(
+    out$device_problem,
+    "Material Deformation; Material Integrity Problem"
+  )
+
+  # And a record with no top-level terms is missing, not filled from device[].
+  rec$product_problems <- NULL
+  out <- getFromNamespace("flatten_maude_record", "card")(rec)
+  expect_identical(out$device_problem, NA_character_)
+})
+
+test_that("repeated coded terms are collapsed once, narrative blocks are not", {
+  # openFDA emits the coded-term arrays twice for most records; the repetition
+  # is an artefact of the join, not two separate problems. Narrative blocks each
+  # carry their own key and a supplement may legitimately repeat its text.
+  rec <- list(
+    report_number = "RPT-4",
+    product_problems = c("Material Deformation", "Material Deformation"),
+    patient = list(list(
+      patient_problems = c("Pericarditis", "Pericarditis")
+    )),
+    mdr_text = list(
+      list(mdr_text_key = "1", text = "Repeated narrative."),
+      list(mdr_text_key = "2", text = "Repeated narrative.")
+    )
+  )
+
+  out <- getFromNamespace("flatten_maude_record", "card")(rec)
+
+  expect_identical(out$device_problem, "Material Deformation")
+  expect_identical(out$patient_problem, "Pericarditis")
+  expect_identical(
+    out$event_description,
+    "Repeated narrative. | Repeated narrative."
+  )
+})
+
 test_that("flatten_maude_record preserves narrative text from simplified shapes", {
   device <- data.frame(
     generic_name = "Ablation Catheter",
@@ -109,8 +202,6 @@ test_that("flatten_maude_record preserves narrative text from simplified shapes"
     manufacturer_d_name = "Example Devices",
     stringsAsFactors = FALSE
   )
-  device$device_problem_codes <- I(list(c("Failure to Fire", "Arcing")))
-
   patient <- list(
     patient_problems = c("Arrhythmia", "Hypotension")
   )
@@ -125,6 +216,7 @@ test_that("flatten_maude_record preserves narrative text from simplified shapes"
     report_number = "RPT-2",
     event_type = "Injury",
     date_received = "20260201",
+    product_problems = c("Failure to Fire", "Arcing"),
     device = device,
     patient = patient,
     mdr_text = mdr_text
@@ -212,4 +304,95 @@ test_that("can fill out blank descriptions from the web", {
     c("Filled description", "Existing description")
   )
   expect_s3_class(dat_filled$date_received, "Date")
+})
+
+test_that("a truncated query warns rather than returning quietly", {
+  # `limit` caps the call, not the query. A query matching 41,000 reports and a
+  # query matching exactly `limit` of them otherwise come back identical.
+  testthat::local_mocked_bindings(
+    maude_fda_api_call = function(search_query, limit, skip, ...) {
+      out <- tibble::tibble(
+        report_number = paste0("RPT-", seq_len(limit)),
+        date_received = rep("20260115", limit)
+      )
+      attr(out, "total") <- 41403L
+      out
+    },
+    .package = "card"
+  )
+
+  expect_warning(
+    dat <- maude_query(search = "PFA", limit = 10, verbose = FALSE),
+    "matched 41403 report"
+  )
+  expect_identical(attr(dat, "total"), 41403L)
+
+  # No warning when everything that matched came back.
+  testthat::local_mocked_bindings(
+    maude_fda_api_call = function(search_query, limit, skip, ...) {
+      out <- tibble::tibble(report_number = paste0("RPT-", seq_len(limit)))
+      attr(out, "total") <- limit
+      out
+    },
+    .package = "card"
+  )
+  expect_no_warning(maude_query(search = "PFA", limit = 10, verbose = FALSE))
+})
+
+test_that("maude_fda_api_call rejects a malformed count field", {
+  expect_error(
+    maude_fda_api_call("pacemaker", count = c("a", "b")),
+    "'count' must be NULL or a single openFDA field name"
+  )
+  expect_error(
+    maude_fda_api_call("pacemaker", count = ""),
+    "'count' must be NULL or a single openFDA field name"
+  )
+})
+
+# openFDA answers an anonymous caller who has exceeded the per-minute rate with
+# HTTP 403 and the message "No api_key was supplied", which is indistinguishable
+# from a real refusal. Skip rather than fail the suite on it.
+skip_if_openfda_refuses <- function(expr) {
+  out <- tryCatch(expr, error = function(e) {
+    testthat::skip(paste("openFDA unavailable:", conditionMessage(e)))
+  })
+  out
+}
+
+test_that("VALIDATION the openFDA count endpoint returns a term frequency table", {
+  skip_if_offline()
+  skip_on_cran()
+
+  counts <- skip_if_openfda_refuses(maude_fda_api_call(
+    search_query = "device.device_report_product_code:QZI",
+    count = "product_problems.exact",
+    limit = 999
+  ))
+
+  expect_named(counts, c("term", "count"))
+  expect_gt(nrow(counts), 1)
+  expect_type(counts$count, "integer")
+  expect_false(anyNA(counts$term))
+
+  # Counts are of mentions, so they arrive ordered and the leading term is the
+  # most frequent rather than the alphabetically first.
+  expect_identical(counts$count, sort(counts$count, decreasing = TRUE))
+})
+
+test_that("VALIDATION device_problem is populated against the live API", {
+  skip_if_offline()
+  skip_on_cran()
+
+  # The column was previously read from `device[].device_problem_codes`, which
+  # openFDA does not return, so it was NA for all 41,403 rows of a real extract
+  # without anything erroring or warning.
+  dat <- skip_if_openfda_refuses(suppressWarnings(maude_query(
+    search = "device.device_report_product_code:QZI",
+    limit = 20,
+    verbose = FALSE
+  )))
+
+  expect_gt(nrow(dat), 0)
+  expect_false(all(is.na(dat$device_problem)))
 })

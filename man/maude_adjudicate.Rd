@@ -44,6 +44,15 @@ problem terms. Names must be a subset of the names in \code{definitions}, with o
 \value{
 A named list of complication families. Each family contains named
 integer flags (\code{0}/\code{1}) for its adjudication classifications.
+
+The list carries three attributes recording what produced it, so a run can
+be reproduced without keeping notes beside it: \code{"adjudication_model"}, the
+model reported by \code{chat_object}; \code{"prompt_hash"}, of the internal system
+prompt; and \code{"definitions_hash"}, of the \code{definitions} actually used. The
+prompt and the definitions will both change over time, and a dataset
+adjudicated under one pair is not comparable to a dataset adjudicated under
+another. Read them with \code{attributes()} or \code{attr()}, and store them beside
+the flags when adjudicating in bulk.
 }
 \description{
 \code{maude_adjudicate()} uses reported MAUDE problem terms to narrow the

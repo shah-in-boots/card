@@ -35,17 +35,23 @@
 #' @param version The version of the procedure codes, which are generally
 #'   written as a year. Currently supported: `c("2014", "2023")`
 #'
-#' @returns A `tbl_df` with two columns: `code` and `description`. The `code`
+#' @returns A `tbl_df` with the columns `code` and `description`. The `code`
 #'   refers to the procedure code, while the `description` refers to the
-#'   description of the procedure.
+#'   description of the procedure. The `cpt` tables carry a third column,
+#'   `category`, naming the procedure family the code belongs to (such as `AAA`
+#'   for infrarenal aortic aneurysm repair, or `CARD` for cardiac procedures),
+#'   which the other formats do not supply.
 #'
 #' @examples
 #' # Procedure codes from the 2014 version of ICD-9
-#' icd9 <- procedure_codes(format = "icd9", version = 2014)
+#' icd9 <- get_procedure_codes(format = "icd9", version = 2014)
 #'
-#' @name procedure_codes
+#' @seealso [load_maude_codes()] for the FDA MDR adverse event code tables,
+#'   which are bundled data rather than an accessor.
+#'
+#' @name get_procedure_codes
 #' @export
-procedure_codes <- function(format, version) {
+get_procedure_codes <- function(format, version) {
   # Identify which dataset to use based on format code
   # 	Check if the format is supported
   # 	Add checks to see if version is supported
@@ -53,6 +59,8 @@ procedure_codes <- function(format, version) {
   if (length(format) > 1) {
     stop("Only one format can be referenced at a time.")
   }
+
+  format <- tolower(format)
 
   if (!format %in% c("icd9", "icd10", "hcpcs", "cpt")) {
     stop(
@@ -90,8 +98,27 @@ procedure_codes <- function(format, version) {
     }
   }
 
-  dat <- .cms_codes[[format]][[version]]
+  dat <- cms_codes[[format]][[version]]
 
   # Return dataset
   return(dat)
+}
+
+#' @rdname get_procedure_codes
+#' @export
+procedure_codes <- function(format, version) {
+  # Renamed to follow the package's own `get_*()` convention for accessors.
+  # `procedure_codes` reads as a dataset next to `complication_definitions` and
+  # `maude_complication_index`, which are data, and tab-completes alongside
+  # them. Warned once per session rather than once per call, since this is
+  # frequently used inside a loop over codes.
+  if (!isTRUE(.deprecated$procedure_codes)) {
+    .deprecated$procedure_codes <- TRUE
+    warning(
+      "'procedure_codes()' is deprecated; use 'get_procedure_codes()'.",
+      call. = FALSE
+    )
+  }
+
+  get_procedure_codes(format = format, version = version)
 }

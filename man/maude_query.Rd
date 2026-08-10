@@ -25,10 +25,11 @@ maude_query(
 
 maude_fda_api_call(
   search_query,
-  limit,
-  skip,
-  api_key,
+  limit = 100,
+  skip = 0,
+  api_key = NULL,
   sort = NULL,
+  count = NULL,
   max_retries = 3,
   verbose = FALSE
 )
@@ -55,7 +56,11 @@ filter on (\code{device.manufacturer_d_name}).}
 filter on (\code{report_number}).}
 
 \item{device_problem}{Optional character vector of device problem codes to
-filter on (\code{device.device_problem_codes}).}
+filter on (\code{device.device_problem_codes}). Note the asymmetry: openFDA
+accepts this as a \emph{search} field but never returns it, so the returned
+\code{device_problem} column is read from the record's top-level
+\code{product_problems} instead. Filtering and reading therefore name different
+fields for the same terms.}
 
 \item{patient_problem}{Optional character vector of patient problems to
 filter on (\code{patient.patient_problems}).}
@@ -64,10 +69,14 @@ filter on (\code{patient.patient_problems}).}
 query. Names should match the openFDA searchable fields list.}
 
 \item{limit}{Integer specifying the maximum number of records to return.
-For \code{maude_query()}, defaults to 100 and requests exceeding 1000 are
-automatically paginated. Due to openFDA \code{skip} limits, \code{maude_query()}
-currently supports up to 26,000 records per call. For
-\code{maude_fda_api_call()}, maximum per request is 1000 per openFDA limits.}
+For \code{maude_query()} this is a cap on the whole call, not on each request:
+it defaults to 100, and anything above 1000 is paginated internally into
+requests of 999. Due to openFDA \code{skip} limits, \code{maude_query()} currently
+supports up to 26,000 records per call and refuses a larger \code{limit}. When
+the query matches more reports than \code{limit} returns, the result is
+truncated and a warning says how many matched. For \code{maude_fda_api_call()},
+\code{limit} is the per-request maximum of 1000 per openFDA limits; when \code{count}
+is given it caps the number of terms instead, at 1000.}
 
 \item{date_start}{Optional start date for filtering by \code{date_received}.
 Prefer a \code{Date} object, such as \code{as.Date("2026-01-01")}. POSIXt,
@@ -108,6 +117,13 @@ records in pages (e.g., skip=0 gets records 1-1000, skip=1000 gets
 \item{sort}{Optional sort specification for the openFDA API (e.g.,
 \code{"date_received:desc"}). Only used by \code{maude_fda_api_call()}.}
 
+\item{count}{Optional openFDA field to tabulate on instead of returning
+records, such as \code{"product_problems.exact"} or
+\code{"device.manufacturer_d_name.exact"}. Only used by
+\code{maude_fda_api_call()}. The \code{.exact} suffix counts whole field values;
+without it openFDA counts individual tokens, so "Cardiac Tamponade" is
+split into "cardiac" and "tamponade". See \strong{Counting} in the details.}
+
 \item{max_retries}{Integer giving the number of retry attempts for transient
 API failures in \code{maude_fda_api_call()} (HTTP 429/5xx). Defaults to \code{3}.}
 }
@@ -121,11 +137,19 @@ A \code{tbl_df} containing device adverse event reports with columns:
 \item{device_brand_name}{Brand name of the device}
 \item{manufacturer_name}{Name of the device manufacturer}
 \item{event_description}{Narrative description of the adverse event}
-\item{patient_problem}{Reported problems affecting the patient}
-\item{device_problem}{Reported problems with the device}
+\item{patient_problem}{Reported problems affecting the patient, from
+\verb{patient[].patient_problems}, de-duplicated and \code{"; "}-delimited}
+\item{device_problem}{Reported problems with the device, from the
+top-level \code{product_problems}, de-duplicated and \code{"; "}-delimited}
 }
 
 Returns an empty \emph{tibble} if no results are found.
+
+The result carries a \code{"total"} attribute giving how many reports the query
+matched, which is larger than \code{nrow()} whenever \code{limit} truncated it.
+
+With \code{count}, \code{maude_fda_api_call()} returns a two-column \emph{tibble} of
+\code{term} and \code{count} instead, at most 1000 rows.
 }
 \description{
 \code{maude_query()} queries the Manufacturer and User Facility Device Experience
@@ -172,7 +196,35 @@ The \code{...} names should match openFDA searchable fields, documented at:
 
 \strong{API Response Handling:} The openFDA API returns HTTP 404 for queries with
 no results (rather than an empty array). Both functions handle this by
-returning an empty tibble instead of throwing an error.
+returning an empty tibble instead of throwing an error. A 404 is therefore a
+legitimately empty stratum and is not retried.
+
+\strong{Counting:} \code{maude_fda_api_call(count = )} uses the openFDA \code{count}
+endpoint, which aggregates on the server and returns one \code{term}/\code{count} pair
+per distinct value rather than the records themselves. A frequency table
+that would otherwise take hundreds of paginated record requests takes one:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{maude_fda_api_call(
+  search_query = "device.device_report_product_code:QZI",
+  count = "product_problems.exact",
+  limit = 999
+)
+}\if{html}{\out{</div>}}
+
+Two limits are worth knowing. The endpoint returns at most 1000 terms and
+offers no pagination cursor, so a field with a longer tail is silently
+truncated -- check whether \code{nrow()} has hit the cap before treating the table
+as complete. Without an \code{api_key} the usable ceiling is 999, and a \code{limit} of
+1000 is refused with HTTP 403 and the message "No api_key was supplied",
+which is not what went wrong. And counts are of \emph{mentions}, not reports: a
+report coded with three problems contributes to three terms, so the column
+does not sum to the number of matching reports.
+
+\strong{Device Problem Terms:} the coded device problem terms are returned in the
+record's top-level \code{product_problems} field. They are never returned inside
+\code{device[]}, even though \code{device.device_problem_codes} is a valid field to
+search on, which is why \code{device_problem} is read from one field and filtered
+on another.
 
 \strong{When to use \code{maude_fda_api_call()}:} Most users should use \code{maude_query()}.
 The lower-level \code{maude_fda_api_call()} is useful when you need:
@@ -204,6 +256,14 @@ results <- maude_query(
   device_generic_name = "infusion pump",
   device.product_code = "LVP",
   limit = 50
+)
+
+# Frequency table of device problem terms in one request, rather than
+# paginating through every matching record
+problems <- maude_fda_api_call(
+  search_query = "device.device_report_product_code:QZI",
+  count = "product_problems.exact",
+  limit = 999
 )
 }
 
