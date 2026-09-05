@@ -133,6 +133,17 @@ A \code{tbl_df} containing device adverse event reports with columns:
 \item{report_number}{MDR report number (unique identifier)}
 \item{event_type}{Type of event (e.g., "Malfunction", "Injury", "Death")}
 \item{date_received}{Date the report was received by FDA}
+\item{date_of_event}{Date the event itself occurred, where the reporter
+gave one. The difference from \code{date_received} is the reporting lag}
+\item{report_source_code}{Who filed the report --- \code{"Manufacturer report"} (mandatory), \code{"Voluntary report"} (a clinician or patient), or
+\code{"User Facility report"}}
+\item{reporter_country_code}{Two-letter country of the reporter. MAUDE
+carries substantial ex-US reporting, so this is what separates reports
+that could have responded to a US regulatory action from those that
+could not}
+\item{mfr_report_type}{Whether the filing is \code{"Initial"},
+\code{"Thirty-Day"}, or a \code{"Follow-Up"} to an earlier one. It does not name
+the report it follows}
 \item{device_generic_name}{Generic name of the device}
 \item{device_brand_name}{Brand name of the device}
 \item{manufacturer_name}{Name of the device manufacturer}

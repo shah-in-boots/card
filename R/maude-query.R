@@ -268,6 +268,18 @@ load_maude_codes <- function(annex) {
 #'     \item{report_number}{MDR report number (unique identifier)}
 #'     \item{event_type}{Type of event (e.g., "Malfunction", "Injury", "Death")}
 #'     \item{date_received}{Date the report was received by FDA}
+#'     \item{date_of_event}{Date the event itself occurred, where the reporter
+#'       gave one. The difference from `date_received` is the reporting lag}
+#'     \item{report_source_code}{Who filed the report --- `"Manufacturer
+#'       report"` (mandatory), `"Voluntary report"` (a clinician or patient), or
+#'       `"User Facility report"`}
+#'     \item{reporter_country_code}{Two-letter country of the reporter. MAUDE
+#'       carries substantial ex-US reporting, so this is what separates reports
+#'       that could have responded to a US regulatory action from those that
+#'       could not}
+#'     \item{mfr_report_type}{Whether the filing is `"Initial"`,
+#'       `"Thirty-Day"`, or a `"Follow-Up"` to an earlier one. It does not name
+#'       the report it follows}
 #'     \item{device_generic_name}{Generic name of the device}
 #'     \item{device_brand_name}{Brand name of the device}
 #'     \item{manufacturer_name}{Name of the device manufacturer}
@@ -586,19 +598,8 @@ maude_query <- function(
     result <- get_maude_web_descriptions(result, quiet = !verbose)
   }
 
-  if ("date_received" %in% names(result)) {
-    date_received <- as.character(result$date_received)
-    date_received <- trimws(date_received)
-    date_received[!nzchar(date_received)] <- NA_character_
-
-    ymd_compact <- !is.na(date_received) & grepl("^\\d{8}$", date_received)
-    if (any(ymd_compact)) {
-      date_received[ymd_compact] <- as.character(
-        as.Date(date_received[ymd_compact], format = "%Y%m%d")
-      )
-    }
-
-    result$date_received <- suppressWarnings(as.Date(date_received))
+  for (col in intersect(c("date_received", "date_of_event"), names(result))) {
+    result[[col]] <- parse_maude_date(result[[col]])
   }
 
   attr(result, "total") <- total
@@ -775,6 +776,38 @@ maude_fda_api_call <- function(
 
 # OpenFDA MAUDE API helpers ----
 
+#' Parse an openFDA MAUDE date column
+#'
+#' @description Internal helper used by `maude_query()` to turn a MAUDE date
+#'   field into a *Date*. openFDA serves most of them as compact `YYYYMMDD`
+#'   strings but not all --- some records carry an ISO date, and empty strings
+#'   are common in the optional fields --- so the compact form is converted
+#'   where it is found and everything else is handed to `as.Date()` as it
+#'   stands.
+#'
+#'   An unparseable value becomes `NA` rather than an error, because a single
+#'   malformed date in a 40,000-report pull should not cost the pull.
+#'
+#' @param x A character or *Date* vector holding one MAUDE date field.
+#'
+#' @return A *Date* vector the same length as `x`.
+#'
+#' @keywords internal
+#' @noRd
+parse_maude_date <- function(x) {
+  x <- trimws(as.character(x))
+  x[!nzchar(x)] <- NA_character_
+
+  ymd_compact <- !is.na(x) & grepl("^\\d{8}$", x)
+  if (any(ymd_compact)) {
+    x[ymd_compact] <- as.character(
+      as.Date(x[ymd_compact], format = "%Y%m%d")
+    )
+  }
+
+  suppressWarnings(as.Date(x))
+}
+
 #' Collect a named field from nested openFDA MAUDE structures
 #'
 #' @description Internal helper used by `flatten_maude_record()` to normalize
@@ -902,6 +935,36 @@ flatten_maude_record <- function(rec) {
     ),
     date_received = first_value(
       purrr::pluck(rec, "date_received", .default = NULL)
+    ),
+    # The date the event happened, as against the date FDA received the report
+    # of it. Served for essentially every record (99.7% of a 300-report sample
+    # of ablation catheters) and the only way to measure reporting lag, which
+    # matters whenever an analysis is anchored to something that happened in
+    # the procedure room rather than in the mailroom.
+    date_of_event = first_value(
+      purrr::pluck(rec, "date_of_event", .default = NULL)
+    ),
+    # Who filed. Manufacturer reporting is mandatory and clinician reporting is
+    # voluntary, so the two streams answer to different pressures and a signal
+    # present in both is a different claim from one present in either. Fully
+    # populated, unlike `source_type`, which arrives as a pipe-joined list.
+    report_source_code = first_value(
+      purrr::pluck(rec, "report_source_code", .default = NULL)
+    ),
+    # MAUDE is a US database that receives a great deal of ex-US reporting --
+    # half the ablation sample above is not US -- so an analysis that reads a
+    # US regulatory action off this stream needs to know which reports could
+    # have responded to it. `event_location` would be the obvious field and is
+    # served empty (1.7%); this one is not (95%).
+    reporter_country_code = first_value(
+      purrr::pluck(rec, "reporter_country_code", .default = NULL)
+    ),
+    # Whether this filing is the manufacturer's initial report or a follow-up
+    # to an earlier one. It does not link the two -- `event_key`, the field
+    # documented for that, is served empty for every record tested -- so it
+    # supports a sensitivity that drops follow-ups, not a true de-duplication.
+    mfr_report_type = first_value(
+      purrr::pluck(rec, "mfr_report_type", .default = NULL)
     ),
     device_generic_name = first_value(
       collect_maude_field_values(devices, "generic_name")
