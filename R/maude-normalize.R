@@ -33,7 +33,7 @@
 #' @return An integer vector the same length as `x`, giving the index of the
 #'   matching pattern, or `NA_integer_` where nothing matched.
 #'
-#' @keywords internal
+#' @noRd
 #' @noRd
 match_maude_index <- function(x, patterns) {
   out <- rep(NA_integer_, length(x))
@@ -67,7 +67,7 @@ match_maude_index <- function(x, patterns) {
 #'   no owner on that date, which is how an entity that owns itself is
 #'   expressed.
 #'
-#' @keywords internal
+#' @noRd
 #' @noRd
 parent_of <- function(child, when, ownership) {
   out <- rep(NA_character_, length(child))
@@ -259,7 +259,7 @@ NULL
 #' @export
 normalize_maude_manufacturer <- function(
   manufacturer_name,
-  index = maude_manufacturer_index
+  index = card::maude_manufacturer_index
 ) {
   if (!is.character(manufacturer_name) && !all(is.na(manufacturer_name))) {
     stop("'manufacturer_name' must be a character vector", call. = FALSE)
@@ -278,7 +278,7 @@ normalize_maude_manufacturer <- function(
 #' @export
 normalize_maude_ablation <- function(
   device_brand_name,
-  index = maude_ablation_index
+  index = card::maude_ablation_index
 ) {
   if (!is.character(device_brand_name) && !all(is.na(device_brand_name))) {
     stop("'device_brand_name' must be a character vector", call. = FALSE)
@@ -304,7 +304,7 @@ normalize_maude_ablation <- function(
 
 #' @rdname maude_normalization
 #' @export
-resolve_maude_owner <- function(entity, as_of, ownership = maude_ownership) {
+resolve_maude_owner <- function(entity, as_of, ownership = card::maude_ownership) {
   # The message names the two things a caller is actually choosing between,
   # because the cost of a required argument is someone who does not know what
   # to pass, and "must be a Date" would not tell them.

@@ -1,4 +1,7 @@
-#' Validate that a list is a named list where each element has is named
+#' Validate that a list is named, with no element left unnamed
+#'
+#' @param x The object to check. Returns nothing; exists for its error.
+#' @noRd
 validate_named_list <- function(x) {
   if (!is.list(x) || is.null(names(x)) || any(names(x) == "")) {
     stop(

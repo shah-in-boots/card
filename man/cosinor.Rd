@@ -83,6 +83,10 @@ A \code{cosinor} object.
 continuous outcome use trigonometric features. This approaches uses the
 linearization of the parameters to assess their statistics and
 distribution.
+
+\code{cosinor()} and its companion functions will leave before version 1.0, for
+a separate package for recurring and periodic events that does not yet
+exist. Until it does they stay here unchanged; there is no replacement yet.
 }
 \examples{
 # Data setup

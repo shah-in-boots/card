@@ -1,4 +1,4 @@
-# card {development version}
+# card 0.2.0
 
 ## Bugs
 
@@ -28,6 +28,10 @@
 
 * `cosinor_features()` no longer scrambles the components of a multiple-component population model when reconstructing its fitted curve, and its harmonic check now considers every period rather than only the longest and shortest, so `tau = c(24, 5, 12)` is correctly reported as non-harmonic.
 
+* `normalize_maude_manufacturer()`, `normalize_maude_ablation()`, `resolve_maude_owner()`, `maude_adjudicate()` and `maude_term_to_complication()` work when the package is loaded but not attached. Their bundled tables were named bare as argument defaults, which resolve through the search path, so `card::normalize_maude_manufacturer("MEDTRONIC, INC.")` without a preceding `library(card)` stopped with `object 'maude_manufacturer_index' not found`. The defaults now name the package.
+
+* `query_genetic_variants()` refuses `max_results` above 10,000 up front, since NCBI E-utilities refuse to page past that record and the pull would otherwise fail part-way through.
+
 ## Features
 
 * `maude_query()` returns four more fields: `date_of_event`, `report_source_code`, `reporter_country_code` and `mfr_report_type`. Each answers a question the eleven columns it returned before could not. `date_of_event` gives the reporting lag -- median 23 days and mean 44 in a 200-report sample of pulsed-field ablation catheters, with a tail to 390 -- which is what any analysis anchored to something that happened in the procedure room rather than in the mailroom needs, since a quarter of reports received in the month after a labelling change describe procedures performed before it. `report_source_code` separates the mandatory manufacturer stream from the voluntary one, 95% against 3% in the same sample. `reporter_country_code` shows that only about half of that stream is US, which decides whether a US regulatory action could have reached the reports being counted.
@@ -41,6 +45,8 @@
 * `normalize_maude_ablation()` and the bundled `maude_ablation_index` derive the ablation platform, energy modality and maker from the brand name. Product code does not determine modality -- `OAE` covers cryoablation and radiofrequency alike -- so a rule resolving it from the product code and falling back to radiofrequency puts cryoballoon, pulsed-field and laser devices in a radiofrequency arm. Two things it is careful about: `"arctic"` as a substring is not a cryoablation signal, since `ARCTIC SUN` is a temperature management console, and the mapping, access and irrigation devices that share the ablation product codes (`PENTARAY`, `OCTARAY`, `FARADRIVE`, `RHYTHMIA`, `ENSITE`) are matched but carry no modality rather than being swept into an arm. The table names the entity that makes each platform, never its corporate parent, so it does not have to be edited when a company is acquired.
 
 * All three tables are curated as CSVs under `data-raw/maude-entities/`, one fact per row, so that a diff shows a single changed line and so that they can be edited without writing R. Precedence is an explicit `priority` column rather than row position -- `CRYOCATH` is tested before `MEDTRONIC` because reports arrive as `"MEDTRONIC CRYOCATH LP"` -- which means the files can be sorted for review without changing behaviour. Measured coverage travels with the data as a `coverage` attribute rather than as a number in the documentation that would go stale, and the full report, including patterns that matched nothing and the largest strings still falling through, is regenerated into `data-raw/maude-entities/coverage.md` on every rebuild.
+
+* `maude_manufacturer_index` covers nine more manufacturing entities, found from the largest strings still falling through: Abbott Vascular's Temecula plant, Medtronic Perfusion Systems, the contract manufacturers Plexus (Medtronic), HEI (Biosense Webster), Stellartech (Boston Scientific) and Medfact (Abbott), and Medivance, Remote Diagnostic Technologies and Adagio Medical as entities of their own. The first two of those gain ownership rows, cited. The coverage report now says that a pattern listed as never firing may only sit below the count endpoint's 999-term cut-off, as `CAMERON HEALTH` does with 2,770 reports.
 
 * `maude_fda_api_call()` gains a `count` argument, reaching the openFDA `count` endpoint. It aggregates on the server and returns a two-column tibble of `term` and `count`, so a device problem frequency table over 41,000 reports takes one request rather than roughly 414 paginated ones. Two things it will not tell you, both documented in `?maude_query`: the endpoint caps at 1000 terms with no pagination cursor, and the counts are of mentions rather than of reports. `limit`, `skip` and `api_key` now have defaults, so a count call needs only the query and the field.
 
@@ -66,6 +72,8 @@
 
 ## Updates
 
+* Internal helpers no longer have their own help pages. The 22 pages such as `?cosinor_jacobian` and `?.parse_csq_field` are gone; the same text stays as comments above each function in the source.
+
 * `maude_fda_api_call()` explains an HTTP 403 rather than passing openFDA's message through. openFDA answers any refused anonymous request with "No api_key was supplied", which is what it says whether the per-minute rate was exceeded or `limit` was set above 999 -- neither of which needs a key to fix.
 
 * `load_maude_codes()` documents the annex hierarchy and the polyhierarchy in Annex E, where a term such as "Brain Injury" belongs to two families and so appears on one row per parent. That is correct, and it will double-count if a join on `term` is then tallied without reducing to `imdrf_code` first.
@@ -88,16 +96,13 @@
 
 ## Next Steps
 
-* `cosinor()` to be expanded upon to include prediction, and integration into the __tidymodels__ approach in the `parsnip` package
-	* Evaluation of plotting functions for cosinor models
-
 * Intervals reported after `cosinor_order()` has chosen the harmonic order are anticonservative, since the selection looked at the same data. This is an open problem in the cosinor literature rather than something the package currently solves.
 
 ## Deprecations
 
 * `procedure_codes()` is renamed to `get_procedure_codes()`, following the package's own `get_*()` convention for accessors. The old name reads as a dataset and tab-completes next to `complication_definitions` and `maude_complication_index`, which are data, while it is in fact a function of `format` and `version`. The old name still works and warns once per session rather than once per call, since these are looked up in a loop over codes.
 
-* The circadian-focused features are being deprecated in this upcoming release. The goal is to position functions in the appropriate package, with the key `cosinor()` functions to move to a separate package in a future release.
+* `cosinor()` and its companion functions -- `cosinor_features()`, `cosinor_area()`, `cosinor_goodness_of_fit()`, `cosinor_zero_amplitude()`, `cosinor_order()`, `cosinor_reg()`, `ggcosinor()`, `ggellipse()` and the `cosinor` methods -- will leave before version 1.0, for a separate package for recurring and periodic events that does not yet exist. Nothing changes in this release beyond the notice on `?cosinor`; the deprecation warning and the removal will each get their own release.
 
 * The longitudinal event functions are being moved to a separate package to make maintenance more straightforward.
 

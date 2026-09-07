@@ -7,6 +7,10 @@
 #'   linearization of the parameters to assess their statistics and
 #'   distribution.
 #'
+#'   `cosinor()` and its companion functions will leave before version 1.0, for
+#'   a separate package for recurring and periodic events that does not yet
+#'   exist. Until it does they stay here unchanged; there is no replacement yet.
+#'
 #' @param t Represents the _ordered_ time indices that provide the positions for
 #'   the cosine wave. Depending on the context:
 #'

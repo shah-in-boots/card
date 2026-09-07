@@ -6,8 +6,8 @@
 \usage{
 maude_term_to_complication(
   term,
-  definitions = complication_definitions,
-  index = maude_complication_index
+  definitions = card::complication_definitions,
+  index = card::maude_complication_index
 )
 }
 \arguments{

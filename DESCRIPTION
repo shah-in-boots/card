@@ -1,7 +1,7 @@
 Package: card
 Type: Package
 Title: Cardiovascular Applications in Research Data
-Version: 0.1.1
+Version: 0.2.0
 Authors@R: c(
     person(given = "Anish S.",
            family = "Shah",
@@ -37,8 +37,7 @@ Imports:
     httr,
     parsnip,
     hardhat,
-    readr,
-    vroom
+    readr
 Suggests:
     ellmer (>= 0.1.0),
     knitr,

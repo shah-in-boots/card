@@ -1,24 +1,26 @@
 # MAUDE entity table coverage
 
-Measured against the openFDA `count` endpoint on 2026-08-08. Regenerate with `source("data-raw/maude-entities.R")`.
+Measured against the openFDA `count` endpoint on 2026-09-05. Regenerate with `source("data-raw/maude-entities.R")`.
 
 | stream | mentions | matched |
 |---|---:|---:|
-| manufacturers, cardiovascular | 1,463,645 | 89.4% |
-| manufacturers, cardiac ablation | 44,640 | 99.2% |
-| ablation brands | 43,777 | 97.1% |
+| manufacturers, cardiovascular | 1,472,849 | 92.9% |
+| manufacturers, cardiac ablation | 45,412 | 99.7% |
+| ablation brands | 44,509 | 97.0% |
 
 ## Patterns that never fired
 
-A pattern matching nothing in either stream is either a typo or an
-entity that does not report. Both are worth knowing; neither shows up
-in the percentages above.
+A pattern matching none of the 999 terms the count endpoint returns per
+stream is a typo, an entity that does not report, or one whose strings
+sit below the cut-off: `CAMERON HEALTH` names 2,770 reports and still
+lands here. Check with a direct search before dropping a row.
 
 ### Manufacturers
 
 - `AFFERA`
 - `CAMERON HEALTH`
 - `PREVENTICE`
+- `CARDIOMEMS`
 - `CYBERONICS`
 - `BIOTELEMETRY`
 
@@ -71,39 +73,39 @@ Where the next rows should come from, if anywhere.
 
 ### Manufacturers, cardiovascular
 
-- `MEDIVANCE, INC.  ¿ 1725056` (21,093)
-- `AV-TEMECULA-CT` (17,171)
-- `PLEXUS MANUFACTURING SDN. BHD` (4,754)
-- `MEDOS INTERNATIONAL SARL` (4,486)
-- `PERFUSION SYSTEMS` (4,342)
-- `` (3,707)
-- `REMOTE DIAGNOSTIC TECHNOLOGIES LTD.` (2,685)
-- `ASAHI INTECC CO., LTD.` (2,321)
+- `MEDOS INTERNATIONAL SARL` (4,508)
+- `` (3,726)
+- `ASAHI INTECC CO., LTD.` (2,347)
 - `WELCH ALLYN PROTOCOL, INC.` (2,201)
 - `MINDRAY DS USA, INC.` (2,089)
+- `MICROVENTION, INC.` (2,042)
+- `OSCOR INC.` (1,815)
+- `GREATBATCH MEDICAL` (1,751)
+- `BIO-DETEK INCORPORATED` (1,646)
+- `IRHYTHM TECHNOLOGIES, INC` (1,531)
 
 ### Manufacturers, cardiac ablation
 
-- `PERFUSION SYSTEMS` (147)
-- `` (23)
+- `` (24)
 - `ARDEN HILLS, MN` (21)
-- `HEI, INC.` (16)
-- `MEDFACT ENGINEERING GMBH` (8)
 - `UNKNOWN` (8)
-- `STELLARTECH RESEARCH CORPORATION` (7)
 - `UNK` (7)
 - `*` (5)
 - `NELLCOR PURITAN BENNETT IRELAND` (5)
+- `CARDIAC PATHWAYS CORP.` (4)
+- `RICE CREEK MFG` (4)
+- `TOPERA INC.` (4)
+- `MDT ABLATION FRONTIERS MFG` (3)
 
 ### Ablation brands
 
-- `` (230)
-- `NGEN GENERATOR` (38)
+- `` (258)
+- `NGEN GENERATOR` (39)
 - `ADVISOR¿ HD GRID X¿ MAPPING CATHETER, SENSOR ENABLED¿` (26)
-- `CURRENT¿ PFA GENERATOR` (23)
+- `CURRENT¿ PFA GENERATOR` (25)
+- `TRUPULSE¿ GENERATOR` (25)
+- `NGEN PUMP` (23)
 - `CANNULA ACCESSORIES` (22)
-- `NGEN PUMP` (22)
 - `ADVISOR¿ HD GRID MAPPING CATHETER, SENSOR ENABLED¿` (21)
+- `COOL POINT¿ IRRIGATION PUMP` (19)
 - `COOLFLOW® IRRIGATION PUMP` (19)
-- `TRUPULSE¿ GENERATOR` (19)
-- `7F ES STEER DS BI-DIRECTIONAL NAV CATHETER` (18)

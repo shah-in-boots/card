@@ -59,7 +59,7 @@ NULL
 #' @param type either `"linear"` for the regression coefficients or `"cosinor"`
 #'   for the amplitude and acrophase parameterisation
 #' @return a character vector of length `2 * p + 1`
-#' @keywords internal
+#' @noRd
 cosinor_par_names <- function(p, type = c("linear", "cosinor")) {
   type <- match.arg(type)
   pair <- if (type == "linear") c("beta", "gamma") else c("amp", "phi")
@@ -75,7 +75,7 @@ cosinor_par_names <- function(p, type = c("linear", "cosinor")) {
 #'   quadrant and returns `-2*pi` at the origin, which is at least deterministic.
 #' @param beta,gamma numeric vectors of regression coefficients
 #' @return a numeric vector of acrophases in `[-2*pi, 0]`
-#' @keywords internal
+#' @noRd
 cosinor_acrophase <- function(beta, gamma) {
   a <- atan2(-gamma, beta)
   ifelse(a >= 0, a - 2 * pi, a)
@@ -137,7 +137,7 @@ NULL
 #'   argument nor the values responsible.
 #' @param tau vector of periods as supplied by the user
 #' @return nothing; called for its error
-#' @keywords internal
+#' @noRd
 validate_cosinor_tau <- function(tau) {
   if (!is.numeric(tau) || length(tau) < 1) {
     stop(
@@ -184,7 +184,7 @@ validate_cosinor_tau <- function(tau) {
 #' @param tau vector of periods
 #' @param n_subjects number of subjects affected, for population models
 #' @return nothing; called for its warning
-#' @keywords internal
+#' @noRd
 warn_cosinor_condition <- function(kappa, tau, n_subjects = NULL) {
   threshold <- getOption("card.cosinor.kappa", 30)
   if (is.na(kappa) || kappa <= threshold || length(tau) < 2) {
@@ -220,7 +220,7 @@ warn_cosinor_condition <- function(kappa, tau, n_subjects = NULL) {
 #'   observation span. See [cosinor_identifiability] for why.
 #' @param xmat a design matrix
 #' @return a single numeric, or `NA_real_` if the matrix is degenerate
-#' @keywords internal
+#' @noRd
 cosinor_condition <- function(xmat) {
   out <- try(kappa(xmat, exact = TRUE), silent = TRUE)
   if (inherits(out, "try-error")) NA_real_ else out
@@ -235,7 +235,7 @@ cosinor_condition <- function(xmat) {
 #' @param object model of class `cosinor`
 #' @return a list with `V` (covariance over the linear parameters), `sigma`,
 #'   `nobs`, `df.residual` and `kappa`
-#' @keywords internal
+#' @noRd
 cosinor_vcov_parts <- function(object) {
   p <- length(object$tau)
   linearNames <- cosinor_par_names(p, type = "linear")
@@ -311,7 +311,7 @@ cosinor_vcov_parts <- function(object) {
 #'   terms from being written out separately and acquiring different signs.
 #' @param object model of class `cosinor`
 #' @return a `(2p+1) x (2p+1)` numeric matrix
-#' @keywords internal
+#' @noRd
 cosinor_jacobian <- function(object) {
   p <- length(object$tau)
   coefs <- stats::setNames(object$coefficients, object$coef_names)
@@ -347,7 +347,7 @@ cosinor_jacobian <- function(object) {
 #' @param object model of class `cosinor`
 #' @param parm character vector of linear parameter names to test jointly
 #' @return a list with `statistic`, `df1`, `df2` and `p.value`
-#' @keywords internal
+#' @noRd
 cosinor_wald <- function(object, parm) {
   parts <- cosinor_vcov_parts(object)
   coefs <- cosinor_coefficients(object, type = "linear")
@@ -369,11 +369,11 @@ cosinor_wald <- function(object, parm) {
 
 #' @title Coefficients In A Given Parameterisation
 #' @description Internal accessor returning a named coefficient vector in the
-#'   interleaved order used by [cosinor_par_names()].
+#'   interleaved order used by `cosinor_par_names()`.
 #' @param object model of class `cosinor`
 #' @param type either `"linear"` or `"cosinor"`
 #' @return a named numeric vector of length `2 * p + 1`
-#' @keywords internal
+#' @noRd
 cosinor_coefficients <- function(object, type = c("cosinor", "linear")) {
   type <- match.arg(type)
   p <- length(object$tau)
@@ -659,7 +659,7 @@ confint.cosinor <- function(
 #' @param type parameterisation requested
 #' @param cnames column names for the returned matrix
 #' @return a matrix of confidence limits
-#' @keywords internal
+#' @noRd
 cosinor_confint_ellipse <- function(object, parm, level, type, cnames) {
   if (type != "cosinor") {
     stop(
@@ -819,7 +819,7 @@ anova.cosinor <- function(object, ..., test = "F") {
 #'   the same observations.
 #' @param models a list of models of class `cosinor`
 #' @return a `data.frame` of class `anova`
-#' @keywords internal
+#' @noRd
 anova_cosinor_models <- function(models) {
   if (!all(vapply(models, inherits, logical(1), "cosinor"))) {
     stop("All objects compared must be of class `cosinor`.", call. = FALSE)

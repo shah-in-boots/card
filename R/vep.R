@@ -239,7 +239,7 @@ read_vep_data <- function(file,
 		# Parse tab-delimited data body
 		text_con <- textConnection(data_lines)
 		on.exit(close(text_con), add = TRUE)
-		df <- read.delim(
+		df <- utils::read.delim(
 			text_con,
 			header = FALSE,
 			sep = "\t",
@@ -285,7 +285,7 @@ read_vep_data <- function(file,
 				"Requested columns not found: ",
 				paste(missing, collapse = ", "),
 				"\nAvailable columns: ",
-				paste(head(available, 10), collapse = ", "),
+				paste(utils::head(available, 10), collapse = ", "),
 				if (length(available) > 10) "...",
 				call. = FALSE
 			)
@@ -313,7 +313,7 @@ read_vep_data <- function(file,
 #' @param metadata Character vector of `##`-prefixed metadata lines.
 #' @return Named list with elements `vep_version`, `assembly`, `command`, and
 #'   `raw` (the original metadata lines).
-#' @keywords internal
+#' @noRd
 .extract_meta_info <- function(metadata) {
 
 	# Version: tab format uses "ENSEMBL VARIANT EFFECT PREDICTOR", VCF uses "##VEP="
@@ -366,7 +366,7 @@ read_vep_data <- function(file,
 #' @param column_line The single-`#` column header line, or NULL if absent.
 #' @return Named character vector where names are column names and values are
 #'   descriptions (NA if no description found for a column).
-#' @keywords internal
+#' @noRd
 .extract_column_definitions <- function(metadata, column_line) {
 
 	if (is.null(column_line)) {
@@ -410,7 +410,7 @@ read_vep_data <- function(file,
 #' @param metadata Character vector of `##`-prefixed metadata lines.
 #' @return Named list where names are annotation field names and values are
 #'   their descriptions, or NULL if no annotations found.
-#' @keywords internal
+#' @noRd
 .extract_annotation_definitions <- function(metadata) {
 
 	marker_idx <- grep("^## Extra column keys:", metadata)
@@ -445,7 +445,7 @@ read_vep_data <- function(file,
 #' @param metadata Character vector of VCF `##`-prefixed metadata lines.
 #' @return Named list where names are CSQ field names and values are NA (VCF
 #'   format doesn't include field descriptions), or NULL if no CSQ header found.
-#' @keywords internal
+#' @noRd
 .extract_csq_fields <- function(metadata) {
 
 	csq_line <- grep("^##INFO=<ID=CSQ,", metadata, value = TRUE)
@@ -494,7 +494,7 @@ read_vep_data <- function(file,
 #'
 #' @param extra_col Character vector of Extra column values.
 #' @return Data frame with one column per unique key found across all rows.
-#' @keywords internal
+#' @noRd
 .parse_extra_column <- function(extra_col) {
 
 	split_pairs <- strsplit(ifelse(is.na(extra_col), "", extra_col), ";", fixed = TRUE)
@@ -557,7 +557,7 @@ read_vep_data <- function(file,
 #' @note If a VCF record contains multiple CSQ entries (comma-separated), only
 #'   the first entry is parsed. This keeps behavior predictable for single-
 #'   transcript workflows.
-#' @keywords internal
+#' @noRd
 .parse_csq_field <- function(info_col, csq_fields) {
 
 	if (length(csq_fields) == 0L) {

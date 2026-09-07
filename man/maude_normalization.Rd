@@ -9,12 +9,12 @@
 \usage{
 normalize_maude_manufacturer(
   manufacturer_name,
-  index = maude_manufacturer_index
+  index = card::maude_manufacturer_index
 )
 
-normalize_maude_ablation(device_brand_name, index = maude_ablation_index)
+normalize_maude_ablation(device_brand_name, index = card::maude_ablation_index)
 
-resolve_maude_owner(entity, as_of, ownership = maude_ownership)
+resolve_maude_owner(entity, as_of, ownership = card::maude_ownership)
 }
 \arguments{
 \item{manufacturer_name}{Character vector of raw MAUDE manufacturer strings,

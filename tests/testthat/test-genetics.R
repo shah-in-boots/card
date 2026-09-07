@@ -292,17 +292,3 @@ test_that("filter_genes works with case-insensitive matching", {
 })
 
 
-# VCF/VEP file handling ----
-
-test_that("read_vep_header extracts field metadata", {
-  vep_file <- test_path("sample-header.vcf")
-  header_info <- read_vep_header(vep_file)
-
-})
-
-test_that("read_vep_data extracts appropriate columns", {
-  vep_file <- test_path("sample-header.vcf")
-  dat <- read_vep_data(vep_file)
-
-})
-

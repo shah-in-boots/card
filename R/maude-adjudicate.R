@@ -102,8 +102,8 @@ maude_adjudicate <- function(
   delimiter = ";",
   event_narrative,
   chat_object,
-  definitions = complication_definitions,
-  index = maude_complication_index
+  definitions = card::complication_definitions,
+  index = card::maude_complication_index
 ) {
   # `ellmer` is optional for the package overall, so fail clearly only
   # when this LLM-dependent workflow is actually used.
@@ -323,8 +323,8 @@ maude_adjudicate <- function(
 #' @export
 maude_term_to_complication <- function(
   term,
-  definitions = complication_definitions,
-  index = maude_complication_index
+  definitions = card::complication_definitions,
+  index = card::maude_complication_index
 ) {
   # normalize and validate once up front so matching is stable and the
   # downstream output still preserves the original user-supplied wording.
@@ -335,7 +335,7 @@ maude_term_to_complication <- function(
     stop("'term' must not contain missing values", call. = FALSE)
   }
   if (length(term) == 0L) {
-    return(setNames(list(), character()))
+    return(stats::setNames(list(), character()))
   }
   validate_complication_definitions(definitions)
   validate_complication_index(
@@ -367,7 +367,7 @@ maude_term_to_complication <- function(
 # MAUDE helper functions -------------------------------------------------------
 
 #' Utility function to help manage problem terms such they are normalized and spacing or common typos, capitalizations, etc., don't become an issue
-#' @keywords internal
+#' @noRd
 normalize_maude_terms <- function(terms) {
   trimws(gsub(
     pattern = "[^a-z0-9]+",
@@ -377,7 +377,7 @@ normalize_maude_terms <- function(terms) {
 }
 
 #' Normalize complication classifications to a named character vector
-#' @keywords internal
+#' @noRd
 normalize_complication_classification <- function(classification) {
   has_names <- !is.null(names(classification)) &&
     !anyNA(names(classification)) &&
@@ -411,7 +411,7 @@ normalize_complication_classification <- function(classification) {
 #' @description Internal helper to validate that complication definitions are a
 #'   named list and that each definition includes a `"definition"` field and a
 #'   named `"classification"` field.
-#' @keywords internal
+#' @noRd
 validate_complication_definitions <- function(definitions) {
   # the adjudication schema assumes every family ends in a named
   # classification tree, so reject malformed inputs before any prompting.
@@ -445,7 +445,7 @@ validate_complication_definitions <- function(definitions) {
 #' Internal helper to validate that a complication index is a
 #' named list of character vectors whose names are present in the supplied
 #' complication definitions, with optional `"not_indexed"` allowed.
-#' @keywords internal
+#' @noRd
 validate_complication_index <- function(
   index,
   index_names

@@ -84,8 +84,13 @@ query_genetic_variants <- function(
     stop("'api_key' must be NULL or a single character string")
   }
 
-  if (!is.numeric(max_results) || length(max_results) != 1 || max_results < 1) {
-    stop("'max_results' must be a single number of 1 or greater")
+  # NCBI E-utilities refuse esearch results past record 10,000, so a larger
+  # value would page into an error part-way through the pull.
+  if (
+    !is.numeric(max_results) || length(max_results) != 1 ||
+      max_results < 1 || max_results > 10000
+  ) {
+    stop("'max_results' must be a single number between 1 and 10,000")
   }
 
   if (!is.null(genes) && !is.character(genes)) {
@@ -193,8 +198,8 @@ query_genes_by_phenotype <- function(
           grepl("conflicting", clinical_significance, ignore.case = TRUE),
         na.rm = TRUE
       ),
-      phenotypes = paste(unique(na.omit(phenotypes)), collapse = "; "),
-      chromosomes = paste(unique(na.omit(chromosome)), collapse = "; "),
+      phenotypes = paste(unique(stats::na.omit(phenotypes)), collapse = "; "),
+      chromosomes = paste(unique(stats::na.omit(chromosome)), collapse = "; "),
       database = dplyr::first(database),
       .groups = "drop"
     ) |>
@@ -206,7 +211,7 @@ query_genes_by_phenotype <- function(
 
 # Internal function to query ClinVar
 #' @noRd
-#' @keywords internal
+#' @noRd
 .query_clinvar <- function(phenotype, api_key, max_results) {
   search_term <- phenotype
   search_result <- .clinvar_search(search_term, api_key, max_results)
@@ -410,7 +415,7 @@ query_genes_by_phenotype <- function(
               NA_character_
             }
           })
-          paste(na.omit(trait_names), collapse = "; ")
+          paste(stats::na.omit(trait_names), collapse = "; ")
         } else {
           NA_character_
         }

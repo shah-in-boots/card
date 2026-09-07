@@ -70,11 +70,13 @@ load_maude_codes <- function(annex) {
   }
 
   # Map annex letters to internal data keys
-  annex_key <- switch(annex,
+  # Not switch(): its first argument is EXPR, and a name of E partially
+  # matches it, so switch(annex, E = ...) is read as switch(EXPR = ...).
+  annex_key <- c(
     A = "device_problems",
     E = "clinical_signs",
     F = "health_impact"
-  )
+  )[[annex]]
   codes <- get0("maude_annex_codes", inherits = TRUE)
   if (is.null(codes)) {
     stop("Internal MAUDE annex code data is not available.")
@@ -792,7 +794,7 @@ maude_fda_api_call <- function(
 #'
 #' @return A *Date* vector the same length as `x`.
 #'
-#' @keywords internal
+#' @noRd
 #' @noRd
 parse_maude_date <- function(x) {
   x <- trimws(as.character(x))
@@ -820,7 +822,7 @@ parse_maude_date <- function(x) {
 #'
 #' @return A character vector of non-missing values found for `field`.
 #'
-#' @keywords internal
+#' @noRd
 #' @noRd
 collect_maude_field_values <- function(x, field) {
   normalize_character <- function(value) {
@@ -884,7 +886,7 @@ collect_maude_field_values <- function(x, field) {
 #'
 #' @return A one-row tibble in the `maude_query()` output format.
 #'
-#' @keywords internal
+#' @noRd
 #' @noRd
 flatten_maude_record <- function(rec) {
   first_value <- function(x) {
@@ -1016,7 +1018,7 @@ flatten_maude_record <- function(rec) {
 #'   where FDA web pages provide narrative text.
 #'
 #' @author Reese Fuller
-#' @keywords internal
+#' @noRd
 #' @noRd
 get_maude_web_descriptions <- function(
   events,
@@ -1235,7 +1237,7 @@ get_maude_web_descriptions <- function(
 #'   where FDA bulk narrative archives provide narrative text.
 #'
 #' @author Reese Fuller
-#' @keywords internal
+#' @noRd
 #' @noRd
 get_maude_file_descriptions <- function(
   events,

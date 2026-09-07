@@ -9,8 +9,8 @@ maude_adjudicate(
   delimiter = ";",
   event_narrative,
   chat_object,
-  definitions = complication_definitions,
-  index = maude_complication_index
+  definitions = card::complication_definitions,
+  index = card::maude_complication_index
 )
 }
 \arguments{

@@ -31,8 +31,8 @@ manufacturer,DATASCOPE CORP.,Datascope
 manufacturer,"PHYSIO-CONTROL, INC. - 3015876",Physio-Control
 manufacturer,"BARD PERIPHERAL VASCULAR, INC.",C. R. Bard
 manufacturer,CORDIS CORPORATION,Cordis
-manufacturer,"MEDIVANCE, INC.",NA
-manufacturer,PERFUSION SYSTEMS,NA
+manufacturer,"MEDIVANCE, INC.",Medivance
+manufacturer,PERFUSION SYSTEMS,Medtronic
 brand,THERMOCOOL SMART TOUCH SF BI-DIRECTIONAL NAVIGATION CATHETER,Thermocool
 brand,NAVI-STAR THERMO-COOL ELECTROPHYSIOLOGY CATHETER,Thermocool
 brand,"THMCL SMTCH SF BID, TC, D-F",Thermocool
@@ -75,3 +75,12 @@ brand,METRIQ IRRIGATION TUBING SET,MetriQ
 brand,ARCTIC SUN 5000,NA
 brand,ARCTIC SUN STAT,NA
 brand,MAESTRO FOOT SWITCH,Maestro
+manufacturer,AV-TEMECULA-CT,Abbott
+manufacturer,PLEXUS MANUFACTURING SDN. BHD,Medtronic
+manufacturer,REMOTE DIAGNOSTIC TECHNOLOGIES LTD.,Remote Diagnostic Technologies
+manufacturer,"HEI, INC.",Biosense Webster
+manufacturer,STELLARTECH RESEARCH CORPORATION,Boston Scientific
+manufacturer,MEDFACT ENGINEERING GMBH,Abbott
+manufacturer,ADAGIO MEDICAL,Adagio Medical
+manufacturer,CAMERON HEALTH,Cameron Health
+manufacturer,MEDOS INTERNATIONAL SARL,NA
