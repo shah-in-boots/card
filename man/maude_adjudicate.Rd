@@ -14,45 +14,38 @@ maude_adjudicate(
 )
 }
 \arguments{
-\item{terms}{A character vector (not a list) of MAUDE problem terms or a single
-delimiter-separated string of MAUDE terms. Terms are normalized for
-matching against the bundled complication index.}
+\item{terms}{MAUDE problem terms, as a character vector or as one
+\code{delimiter}-separated string. Terms are normalised before they are matched
+against \code{index}.}
 
-\item{delimiter}{The character that separates MAUDE terms when \code{terms} is
-supplied as a single concatenated string. Defaults to \code{";"}.}
+\item{delimiter}{What separates the terms when \code{terms} arrives as a single
+string. Defaults to \code{";"}.}
 
-\item{event_narrative}{A single adverse-event narrative, usually the
-\code{event_narrative} or comparable free-text field returned by
-\code{\link[=maude_query]{maude_query()}}. This is the clinical text that the LLM adjudicates.}
+\item{event_narrative}{One adverse event narrative, usually the
+\code{event_description} column of \code{\link[=maude_query]{maude_query()}}. This is the clinical text
+the model reads.}
 
-\item{chat_object}{An \strong{{ellmer}} chat object. The object is cloned and reset
-before each complication-family request, so prior turns are not reused.
-The function uses \verb{$clone()}, \verb{$set_turns()}, \verb{$set_system_prompt()}, and
-\verb{$chat_structured()} on this object. See \code{\link[ellmer:chat]{ellmer::chat()}} for further
-details.}
+\item{chat_object}{An \strong{{ellmer}} chat object, cloned and reset before each
+family so prior turns are not reused. See \code{\link[ellmer:chat]{ellmer::chat()}}.}
 
-\item{definitions}{Named list of complication definitions. Names should be
-complication identifiers. Each element must contain a \code{definition} entry
-and a named \code{classification} entry. Defaults to
+\item{definitions}{Named list of complication definitions, each carrying a
+\code{definition} and a named \code{classification}. Defaults to
 \link{complication_definitions}.}
 
-\item{index}{Named list mapping complication identifiers to normalized MAUDE
-problem terms. Names must be a subset of the names in \code{definitions}, with optional
-\code{"not_indexed"} allowed as a residual bucket. Defaults to
-\link{maude_complication_index}.}
+\item{index}{Named list mapping complication identifiers to normalised MAUDE
+problem terms, named within \code{definitions} except for the residual
+\code{"not_indexed"}. Defaults to \link{maude_complication_index}.}
 }
 \value{
-A named list of complication families. Each family contains named
-integer flags (\code{0}/\code{1}) for its adjudication classifications.
+A named list of complication families, each holding named \code{0}/\code{1}
+flags for its classifications.
 
-The list carries three attributes recording what produced it, so a run can
-be reproduced without keeping notes beside it: \code{"adjudication_model"}, the
-model reported by \code{chat_object}; \code{"prompt_hash"}, of the internal system
-prompt; and \code{"definitions_hash"}, of the \code{definitions} actually used. The
-prompt and the definitions will both change over time, and a dataset
-adjudicated under one pair is not comparable to a dataset adjudicated under
-another. Read them with \code{attributes()} or \code{attr()}, and store them beside
-the flags when adjudicating in bulk.
+Three attributes record what produced the adjudication --
+\code{"adjudication_model"} from \code{chat_object}, \code{"prompt_hash"} of the internal
+system prompt, and \code{"definitions_hash"} of the \code{definitions} used. The
+prompt and the definitions both change over time, and a dataset
+adjudicated under one pair is not comparable to a dataset adjudicated
+under another, so store these beside the flags when adjudicating in bulk.
 }
 \description{
 \code{maude_adjudicate()} uses reported MAUDE problem terms to narrow the
@@ -61,38 +54,23 @@ candidate complication families, then sends each selected family to an
 supplied event narrative.
 }
 \details{
-Supply \code{chat_object} as an \code{ellmer} chat object created with a provider-specific
-constructor such as \code{ellmer::chat_openai()}, \code{ellmer::chat_anthropic()}, or
-another \verb{ellmer::chat_*()} backend. Users are responsible for supplying
-their own provider credentials or API key configuration when creating that
-chat object. \code{maude_adjudicate()} does not accept API keys directly;
-secrets should stay in the provider configuration layer, typically via
-environment variables such as \code{OPENAI_API_KEY}, before constructing the
-chat object.
+\code{chat_object} is an \strong{{ellmer}} chat built by \code{\link[ellmer:chat]{ellmer::chat()}} or one of the
+provider constructors such as \code{ellmer::chat_openai()}, and it has to support
+\verb{$chat_structured()}, \verb{$clone()}, \verb{$set_turns()} and \verb{$set_system_prompt()}.
+Credentials stay in that object, as \code{maude_adjudicate()} never sees an API
+key.
 
-The function uses a fixed internal system prompt. In summary, the prompt
-tells the LLM to act as an expert clinical adjudicator with experienced
-physician-level judgment, treat the MAUDE terms and narrative as untrusted
-text, ignore instructions embedded in the narrative, use only the supplied
-complication family definition and classification definitions, default all
-classifications to \code{FALSE} unless the narrative directly supports them, and
-return only the structured response.
+Each selected family is sent on its own, as a fresh clone of the chat with
+the turns and tools cleared, so narrative text from one family does not carry
+into the next. The schema is an \code{ellmer::type_object()} carrying one optional
+boolean per classification branch, described by that branch's clinical
+definition, and a branch the model omits keeps its default of \code{0}.
 
-For each selected complication family, the function builds an
-\code{ellmer::type_object()} schema with one optional \code{ellmer::type_boolean()}
-field per classification branch. \verb{$chat_structured()} then returns an R list
-that matches that schema, which this function converts into explicit \code{0}/\code{1}
-flags in the complication-family output shape.
-
-Each complication family is adjudicated in a fresh cloned chat with prior
-turns removed and tools cleared when supported, so clinical text from one
-request is not retained in the next request.
-
-Allowed chat objects are \code{ellmer} \code{Chat} objects created by \code{\link[ellmer:chat]{ellmer::chat()}}
-or provider-specific constructors such as \code{ellmer::chat_openai()} and
-\code{ellmer::chat_anthropic()}. In practice, the object should support
-\verb{$chat_structured()}, \verb{$clone()}, \verb{$set_turns()}, and
-\verb{$set_system_prompt()}.
+A fixed internal system prompt governs the adjudication. It treats the terms
+and the narrative as untrusted text and ignores instructions found inside
+them, decides only from the supplied definitions, and marks nothing \code{TRUE}
+that the narrative does not directly support. It will change over time, which
+is what the returned \code{"prompt_hash"} is for.
 }
 \examples{
 \dontrun{

@@ -7,77 +7,55 @@
 #' supplied event narrative.
 #'
 #' @details
-#' Supply `chat_object` as an `ellmer` chat object created with a provider-specific
-#' constructor such as `ellmer::chat_openai()`, `ellmer::chat_anthropic()`, or
-#' another `ellmer::chat_*()` backend. Users are responsible for supplying
-#' their own provider credentials or API key configuration when creating that
-#' chat object. `maude_adjudicate()` does not accept API keys directly;
-#' secrets should stay in the provider configuration layer, typically via
-#' environment variables such as `OPENAI_API_KEY`, before constructing the
-#' chat object.
+#' `chat_object` is an **{ellmer}** chat built by [ellmer::chat()] or one of the
+#' provider constructors such as `ellmer::chat_openai()`, and it has to support
+#' `$chat_structured()`, `$clone()`, `$set_turns()` and `$set_system_prompt()`.
+#' Credentials stay in that object, as `maude_adjudicate()` never sees an API
+#' key.
 #'
-#' The function uses a fixed internal system prompt. In summary, the prompt
-#' tells the LLM to act as an expert clinical adjudicator with experienced
-#' physician-level judgment, treat the MAUDE terms and narrative as untrusted
-#' text, ignore instructions embedded in the narrative, use only the supplied
-#' complication family definition and classification definitions, default all
-#' classifications to `FALSE` unless the narrative directly supports them, and
-#' return only the structured response.
+#' Each selected family is sent on its own, as a fresh clone of the chat with
+#' the turns and tools cleared, so narrative text from one family does not carry
+#' into the next. The schema is an `ellmer::type_object()` carrying one optional
+#' boolean per classification branch, described by that branch's clinical
+#' definition, and a branch the model omits keeps its default of `0`.
 #'
-#' For each selected complication family, the function builds an
-#' `ellmer::type_object()` schema with one optional `ellmer::type_boolean()`
-#' field per classification branch. `$chat_structured()` then returns an R list
-#' that matches that schema, which this function converts into explicit `0`/`1`
-#' flags in the complication-family output shape.
+#' A fixed internal system prompt governs the adjudication. It treats the terms
+#' and the narrative as untrusted text and ignores instructions found inside
+#' them, decides only from the supplied definitions, and marks nothing `TRUE`
+#' that the narrative does not directly support. It will change over time, which
+#' is what the returned `"prompt_hash"` is for.
 #'
-#' Each complication family is adjudicated in a fresh cloned chat with prior
-#' turns removed and tools cleared when supported, so clinical text from one
-#' request is not retained in the next request.
+#' @param terms MAUDE problem terms, as a character vector or as one
+#'   `delimiter`-separated string. Terms are normalised before they are matched
+#'   against `index`.
 #'
-#' Allowed chat objects are `ellmer` `Chat` objects created by [ellmer::chat()]
-#' or provider-specific constructors such as `ellmer::chat_openai()` and
-#' `ellmer::chat_anthropic()`. In practice, the object should support
-#' `$chat_structured()`, `$clone()`, `$set_turns()`, and
-#' `$set_system_prompt()`.
+#' @param delimiter What separates the terms when `terms` arrives as a single
+#'   string. Defaults to `";"`.
 #'
-#' @param terms A character vector (not a list) of MAUDE problem terms or a single
-#'   delimiter-separated string of MAUDE terms. Terms are normalized for
-#'   matching against the bundled complication index.
+#' @param event_narrative One adverse event narrative, usually the
+#'   `event_description` column of [maude_query()]. This is the clinical text
+#'   the model reads.
 #'
-#' @param delimiter The character that separates MAUDE terms when `terms` is
-#'   supplied as a single concatenated string. Defaults to `";"`.
+#' @param chat_object An **{ellmer}** chat object, cloned and reset before each
+#'   family so prior turns are not reused. See [ellmer::chat()].
 #'
-#' @param event_narrative A single adverse-event narrative, usually the
-#'   `event_narrative` or comparable free-text field returned by
-#'   [maude_query()]. This is the clinical text that the LLM adjudicates.
-#'
-#' @param chat_object An **{ellmer}** chat object. The object is cloned and reset
-#'   before each complication-family request, so prior turns are not reused.
-#'   The function uses `$clone()`, `$set_turns()`, `$set_system_prompt()`, and
-#'   `$chat_structured()` on this object. See [ellmer::chat()] for further
-#'   details.
-#'
-#' @param definitions Named list of complication definitions. Names should be
-#'   complication identifiers. Each element must contain a `definition` entry
-#'   and a named `classification` entry. Defaults to
+#' @param definitions Named list of complication definitions, each carrying a
+#'   `definition` and a named `classification`. Defaults to
 #'   [complication_definitions].
 #'
-#' @param index Named list mapping complication identifiers to normalized MAUDE
-#'   problem terms. Names must be a subset of the names in `definitions`, with optional
-#'   `"not_indexed"` allowed as a residual bucket. Defaults to
-#'   [maude_complication_index].
+#' @param index Named list mapping complication identifiers to normalised MAUDE
+#'   problem terms, named within `definitions` except for the residual
+#'   `"not_indexed"`. Defaults to [maude_complication_index].
 #'
-#' @return A named list of complication families. Each family contains named
-#'   integer flags (`0`/`1`) for its adjudication classifications.
+#' @return A named list of complication families, each holding named `0`/`1`
+#'   flags for its classifications.
 #'
-#'   The list carries three attributes recording what produced it, so a run can
-#'   be reproduced without keeping notes beside it: `"adjudication_model"`, the
-#'   model reported by `chat_object`; `"prompt_hash"`, of the internal system
-#'   prompt; and `"definitions_hash"`, of the `definitions` actually used. The
-#'   prompt and the definitions will both change over time, and a dataset
-#'   adjudicated under one pair is not comparable to a dataset adjudicated under
-#'   another. Read them with `attributes()` or `attr()`, and store them beside
-#'   the flags when adjudicating in bulk.
+#'   Three attributes record what produced the adjudication --
+#'   `"adjudication_model"` from `chat_object`, `"prompt_hash"` of the internal
+#'   system prompt, and `"definitions_hash"` of the `definitions` used. The
+#'   prompt and the definitions both change over time, and a dataset
+#'   adjudicated under one pair is not comparable to a dataset adjudicated
+#'   under another, so store these beside the flags when adjudicating in bulk.
 #'
 #' @examples
 #' \dontrun{
@@ -115,26 +93,19 @@ maude_adjudicate <- function(
   }
 
 
-  # MAUDE terms are parsed and then matched to complication families. Provides
-  # definitions for LLM without needing as many tokens. Only parsed if no
-  # delimiter present (assumes appropriately parsed otherwise).
+  # Matching the terms first is what keeps the prompt short: only the families
+  # the terms point at are ever described to the model.
   if (!is.null(delimiter)) {
-    # Apply string split to each terms element and then flatten result back to a
-    # character vector
     terms <- unlist(
       strsplit(terms, split = delimiter, fixed = TRUE),
       use.names = FALSE
     )
   }
 
-  # Clean up terms after
-  # They will be normalized when passed to the matching function below
   parsedTerms <- trimws(terms)
   parsedTerms <- parsedTerms[!is.na(parsedTerms) & nzchar(parsedTerms)]
 
 
-  # Select the matched terms for the complication families.
-  # MAUDE terms are normalized inside the helper below.
   matchedTerms <- maude_term_to_complication(
     term = parsedTerms,
     definitions = definitions,
@@ -168,8 +139,7 @@ maude_adjudicate <- function(
   # Final definitions to go through for adjudication
   selectedDefinitions <- definitions[selectedComplications]
 
-  # Creates the list of complication classifications with a default of 0L
-  # Named after comp family. To be updated by the LLM structured output
+  # Every branch starts at 0 and only a supported one is raised.
   out <- lapply(selectedDefinitions, function(x) {
     classification <- normalize_complication_classification(x$classification)
     flags <- as.list(rep.int(0L, length(classification)))
@@ -179,8 +149,8 @@ maude_adjudicate <- function(
   names(out) <- names(selectedDefinitions)
 
 
-  # System prompt needs to be created for adjudication purposes. Want tomake
-  # sure its protected from prompt injection attempts from event narrative.
+  # The narrative is reporter-written text arriving from a public API, so the
+  # prompt has to say that it is data and not instruction.
   system_prompt <- paste(
     "You are an expert clinical event adjudicator with the reasoning standard of an experienced physician.",
     "Your task is to determine whether the specified complication family and its classifications are supported by the provided adverse event narrative.",
@@ -289,12 +259,12 @@ maude_adjudicate <- function(
 #' @description
 #' `maude_term_to_complication()` groups MAUDE problem terms into the
 #' complication categories defined by a user-supplied matching index. Input
-#' terms are normalized before matching, so differences in capitalization,
+#' terms are normalised before matching, so differences in capitalisation,
 #' punctuation, and spacing do not affect the result.
 #'
 #' A term may appear in more than one complication category if the underlying
 #' MAUDE index overlaps across categories. Returned values preserve the original
-#' user-supplied terms rather than the normalized versions used for matching.
+#' user-supplied terms rather than the normalised versions used for matching.
 #' Terms that do not match any index entry are returned under `"not_indexed"`.
 #'
 #' @param term Character vector of MAUDE problem terms to group into
@@ -303,7 +273,7 @@ maude_adjudicate <- function(
 #' @param definitions Named list of complication definitions. Defaults to
 #'   [complication_definitions].
 #'
-#' @param index Named list mapping complication identifiers to normalized MAUDE
+#' @param index Named list mapping complication identifiers to normalised MAUDE
 #'   problem terms. Defaults to [maude_complication_index].
 #'
 #' @return A named list. Each list name is a complication identifier, or
@@ -326,8 +296,6 @@ maude_term_to_complication <- function(
   definitions = card::complication_definitions,
   index = card::maude_complication_index
 ) {
-  # normalize and validate once up front so matching is stable and the
-  # downstream output still preserves the original user-supplied wording.
   if (!is.character(term)) {
     stop("'term' must be a character vector", call. = FALSE)
   }
@@ -343,8 +311,7 @@ maude_term_to_complication <- function(
     names(definitions)
   )
 
-  # Matching on normalized text prevents trivial punctuation or casing
-  # differences from changing the complication family assignment.
+  # Matched on normalised text, returned in the caller's own wording.
   normalized_terms <- normalize_maude_terms(term)
   normalized_index <- lapply(index, normalize_maude_terms)
   term_matches <- lapply(normalized_index, function(x) {
@@ -366,7 +333,8 @@ maude_term_to_complication <- function(
 
 # MAUDE helper functions -------------------------------------------------------
 
-#' Utility function to help manage problem terms such they are normalized and spacing or common typos, capitalizations, etc., don't become an issue
+#' Normalise problem terms so that case, punctuation and spacing do not decide
+#' whether a term matches
 #' @noRd
 normalize_maude_terms <- function(terms) {
   trimws(gsub(
@@ -413,8 +381,8 @@ normalize_complication_classification <- function(classification) {
 #'   named `"classification"` field.
 #' @noRd
 validate_complication_definitions <- function(definitions) {
-  # the adjudication schema assumes every family ends in a named
-  # classification tree, so reject malformed inputs before any prompting.
+  # The schema is built from the classification names, so a malformed
+  # definition has to be refused before any request is sent.
   validate_named_list(definitions)
 
   has_definition <- vapply(
@@ -450,8 +418,8 @@ validate_complication_index <- function(
   index,
   index_names
 ) {
-  # the MAUDE pre-filter only works if index names line up exactly with
-  # the complication families that can be shown to the model.
+  # The pre-filter selects families by name, so a name absent from the
+  # definitions would silently select nothing.
   validate_named_list(index)
 
   if (!all(vapply(index, is.character, logical(1)))) {

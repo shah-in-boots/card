@@ -3,13 +3,9 @@
 #' Load FDA MAUDE Coding Resources by Annex
 #'
 #' @description Load Medical Device Report (MDR) adverse event coding tables
-#'   published by the FDA. The `annex` argument selects which FDA annex to load.
-#'   The interface is designed to support additional annexes over time as more
-#'   code tables are added to the package data.
+#'   published by the FDA, as bundled with the package.
 #'
-#' @details The FDA publishes MDR adverse event codes as annexed code tables.
-#'   This function returns the annex-specific table bundled with the package.
-#'   Supported annexes:
+#' @details The annexes are:
 #'   - **A**: Device problem codes
 #'   - **E**: Clinical signs, symptoms, or conditions
 #'   - **F**: Health impact codes
@@ -29,7 +25,7 @@
 #' returned MAUDE terms to this table on `term` therefore picks up leaf and
 #' family codings alike, and `level_1` rolls either up to its family.
 #'
-#' # Polyhierarchy in Annex E
+#' ## Annex E
 #'
 #' Annex E places some terms under more than one family -- `"Brain Injury"`
 #' belongs to both `"Nervous System"` and `"Injury"` -- so those codes appear on
@@ -62,11 +58,13 @@
 #'
 #' @export
 load_maude_codes <- function(annex) {
-  # Validate annex input
   valid_annexes <- c("A", "E", "F")
   if (!(annex %in% valid_annexes)) {
-    stop("Invalid annex specified. Valid options are: ",
-         paste(valid_annexes, collapse = ", "))
+    stop(
+      "'annex' was given as ", paste(annex, collapse = ", "),
+      ", but the bundled annexes are ", paste(valid_annexes, collapse = ", "),
+      call. = FALSE
+    )
   }
 
   # Map annex letters to internal data keys
@@ -82,10 +80,7 @@ load_maude_codes <- function(annex) {
     stop("Internal MAUDE annex code data is not available.")
   }
 
-  dat <- codes[[annex_key]]
-
-  # Return
-  dat
+  codes[[annex_key]]
 }
 
 # OpenFDA MAUDE Query ----
@@ -93,206 +88,155 @@ load_maude_codes <- function(annex) {
 #' Query the FDA MAUDE Database
 #'
 #' @description
-#' `maude_query()` queries the Manufacturer and User Facility Device Experience
-#' (MAUDE) database using the openFDA API. This is the recommended interface
-#' for most users, providing automatic pagination, date range handling, and
-#' input validation.
+#' `maude_query()` searches the Manufacturer and User Facility Device Experience
+#' (MAUDE) database through the openFDA API, building the search string,
+#' paginating, and parsing the records, which is what most calls want.
 #'
-#' `maude_fda_api_call()` is the lower-level function that makes direct API calls.
-#' Use this for advanced scenarios requiring manual pagination control or
-#' pre-constructed query strings.
+#' `maude_fda_api_call()` sends one request as written, since custom pagination
+#' and the `count` endpoint need a query string the caller controls.
 #'
 #' @details
-#' **Database Coverage:** The openFDA device adverse event endpoint contains
-#' reports from mandatory reporters (manufacturers, importers, and device user
-#' facilities) and voluntary reporters (healthcare professionals, patients, and
-#' consumers). Data covers publicly releasable records from approximately 1992
-#' to present and is updated weekly.
+#' The endpoint carries publicly releasable reports from mandatory reporters
+#' (manufacturers, importers, and device user facilities) and from voluntary
+#' ones (clinicians, patients, and consumers), covering roughly 1992 onward and
+#' updated weekly.
 #'
-#' **Rate Limits:** The openFDA API allows approximately 240 requests per
-#' minute (4 per second) without an API key, and 240 requests per minute with
-#' a key. Large queries are automatically paginated in batches of up to 1000
-#' records.
+#' `maude_query()` sorts on `date_received:desc` so that pagination is
+#' deterministic, splits a large `limit` into requests of 999, and waits between
+#' them to stay under openFDA's rate limit of about 240 requests a minute. The
+#' daily ceiling is 1,000 requests for an anonymous caller and 120,000 with an
+#' `api_key`, so a key is worth registering for bulk work and changes nothing
+#' otherwise. openFDA also refuses a `skip` beyond 25,000 records, which caps
+#' `limit` at 26,000, so a larger pull has to be split by date range.
 #'
-#' **Result Order:** `maude_query()` requests results sorted in reverse
-#' chronological order by `date_received` (`date_received:desc`). This provides
-#' deterministic pagination for large requests.
+#' `search` takes *Elasticsearch* syntax over the fields openFDA publishes at
+#' <https://open.fda.gov/apis/device/event/searchable-fields/>, and the field
+#' arguments and `...` are conveniences that build that same string. See
+#' `vignette("maude")` for the syntax and worked queries, and openFDA's own
+#' documentation for the field list, which changes more often than this page
+#' can follow.
 #'
-#' **Search Syntax:** The `search` parameter uses *Elasticsearch* query syntax.
-#' Common patterns include:
-#' - Simple term: `"pacemaker"`
-#' - Field-specific: `"device.generic_name:pacemaker"`
-#' - Multiple terms: `"device.generic_name:pacemaker AND event_type:malfunction"`
-#' - Date range: `"date_received:[20200101 TO 20201231]"`
-#' - Exact phrase: `"device.brand_name:\"Medtronic\""`
+#' A query matching nothing is answered with HTTP 404 rather than an empty
+#' array. Both functions return an empty tibble for it rather than raising an
+#' error, since an empty stratum is a result and not a failure to retry.
 #'
-#' **Building Queries in `maude_query()`:** `maude_query()` is designed to help
-#' you build a valid search string without writing the full query yourself.
-#' Use the common field arguments (e.g., `device_generic_name`, `event_type`)
-#' to add structured filters, and pass any additional fields through `...`.
-#' The `...` names should match openFDA searchable fields, documented at:
-#' <https://open.fda.gov/apis/device/event/searchable-fields/>.
+#' # Counting rather than retrieving
 #'
-#' **API Response Handling:** The openFDA API returns HTTP 404 for queries with
-#' no results (rather than an empty array). Both functions handle this by
-#' returning an empty tibble instead of throwing an error. A 404 is therefore a
-#' legitimately empty stratum and is not retried.
-#'
-#' **Counting:** `maude_fda_api_call(count = )` uses the openFDA `count`
-#' endpoint, which aggregates on the server and returns one `term`/`count` pair
-#' per distinct value rather than the records themselves. A frequency table
-#' that would otherwise take hundreds of paginated record requests takes one:
-#'
-#' ```r
-#' maude_fda_api_call(
-#'   search_query = "device.device_report_product_code:QZI",
-#'   count = "product_problems.exact",
-#'   limit = 999
-#' )
-#' ```
+#' `maude_fda_api_call(count = )` reaches the openFDA count endpoint, which
+#' aggregates on the server and returns one `term`/`count` pair per distinct
+#' value, so a frequency table that would otherwise take hundreds of paginated
+#' requests takes one.
 #'
 #' Two limits are worth knowing. The endpoint returns at most 1000 terms and
-#' offers no pagination cursor, so a field with a longer tail is silently
-#' truncated -- check whether `nrow()` has hit the cap before treating the table
-#' as complete. Without an `api_key` the usable ceiling is 999, and a `limit` of
-#' 1000 is refused with HTTP 403 and the message "No api_key was supplied",
-#' which is not what went wrong. And counts are of *mentions*, not reports: a
-#' report coded with three problems contributes to three terms, so the column
-#' does not sum to the number of matching reports.
+#' offers no pagination cursor, so a longer tail is truncated silently -- check
+#' whether `nrow()` has hit the cap before treating the table as complete. And
+#' counts are of *mentions* rather than of reports, since a report coded with
+#' three problems contributes to three terms, so the column does not sum to the
+#' number of matching reports.
 #'
-#' **Device Problem Terms:** the coded device problem terms are returned in the
-#' record's top-level `product_problems` field. They are never returned inside
-#' `device[]`, even though `device.device_problem_codes` is a valid field to
-#' search on, which is why `device_problem` is read from one field and filtered
-#' on another.
+#' # Device problem terms
 #'
-#' **When to use `maude_fda_api_call()`:** Most users should use `maude_query()`.
-#' The lower-level `maude_fda_api_call()` is useful when you need:
-#' - Direct control over `skip` for custom pagination strategies
-#' - Pre-constructed query strings with complex *Elasticsearch* syntax
-#' - Integration into custom retry/error-handling logic
-#' - Full control over `search_query`, `sort`, and other openFDA parameters
+#' The coded device problem terms arrive at the top level of the record, in
+#' `product_problems`, and are never returned inside `device[]`, even though
+#' `device.device_problem_codes` is a valid field to search on. That asymmetry
+#' is why `device_problem` filters on one field and is read from another.
 #'
-#' @param search Character string specifying the search query or `NULL`. For
-#'   `maude_query()`, this can be a simple term (e.g., `"pacemaker"`) or a
-#'   field-specific query (e.g., `"device.generic_name:pacemaker"`). Use the
-#'   other `maude_query()` arguments to add additional filters.
+#' @param search A search string, or `NULL`. Either a bare term such as
+#'   `"pacemaker"` or a field-specific query such as
+#'   `"device.generic_name:pacemaker"`, combined with the other arguments by
+#'   `AND`.
 #'
-#' @param search_query Fully constructed query string to send to the openFDA
-#'   API (advanced use). This should include any date or field filters that you
-#'   want applied exactly as written.
+#' @param search_query The whole query string, sent to openFDA as written,
+#'   including any date or field filters. Used by `maude_fda_api_call()`.
 #'
-#' @param device_generic_name Optional character vector of device generic names
-#'   to filter on (`device.generic_name`).
+#' @param device_generic_name Character vector filtering `device.generic_name`.
 #'
-#' @param device_brand_name Optional character vector of device brand names to
-#'   filter on (`device.brand_name`).
+#' @param device_brand_name Character vector filtering `device.brand_name`.
 #'
-#' @param manufacturer_name Optional character vector of manufacturer names to
-#'   filter on (`device.manufacturer_d_name`).
+#' @param manufacturer_name Character vector filtering
+#'   `device.manufacturer_d_name`.
 #'
-#' @param event_type Optional character vector of event types to filter on
-#'   (`event_type`).
+#' @param event_type Character vector filtering `event_type`.
 #'
-#' @param report_number Optional character vector of MDR report numbers to
-#'   filter on (`report_number`).
+#' @param report_number Character vector filtering `report_number`.
 #'
-#' @param device_problem Optional character vector of device problem codes to
-#'   filter on (`device.device_problem_codes`). Note the asymmetry: openFDA
-#'   accepts this as a *search* field but never returns it, so the returned
-#'   `device_problem` column is read from the record's top-level
-#'   `product_problems` instead. Filtering and reading therefore name different
-#'   fields for the same terms.
+#' @param device_problem Character vector filtering
+#'   `device.device_problem_codes`, which is searchable but never returned, so
+#'   the `device_problem` column comes from a different field than this filters
+#'   on.
 #'
-#' @param patient_problem Optional character vector of patient problems to
-#'   filter on (`patient.patient_problems`).
+#' @param patient_problem Character vector filtering
+#'   `patient.patient_problems`.
 #'
-#' @param ... Additional named search fields and values to include in the
-#'   query. Names should match the openFDA searchable fields list.
+#' @param ... Further named openFDA fields and the values to filter them on.
 #'
-#' @param limit Integer specifying the maximum number of records to return.
-#'   For `maude_query()` this is a cap on the whole call, not on each request:
-#'   it defaults to 100, and anything above 1000 is paginated internally into
-#'   requests of 999. Due to openFDA `skip` limits, `maude_query()` currently
-#'   supports up to 26,000 records per call and refuses a larger `limit`. When
-#'   the query matches more reports than `limit` returns, the result is
-#'   truncated and a warning says how many matched. For `maude_fda_api_call()`,
-#'   `limit` is the per-request maximum of 1000 per openFDA limits; when `count`
-#'   is given it caps the number of terms instead, at 1000.
+#' @param limit How many records to return. For `maude_query()` this caps the
+#'   whole call rather than each request, and a larger `limit` is paginated
+#'   internally, up to the 26,000 openFDA allows. A query matching more reports
+#'   than `limit` returns is truncated with a warning saying how many matched.
+#'   For `maude_fda_api_call()` it is the per-request maximum of 1000, or the
+#'   number of terms when `count` is given.
 #'
-#' @param date_start Optional start date for filtering by `date_received`.
-#'   Prefer a `Date` object, such as `as.Date("2026-01-01")`. POSIXt,
-#'   `"YYYYMMDD"`, and `"YYYY-MM-DD"` values are also accepted and converted to
-#'   `Date`. Only used by `maude_query()`.
+#' @param date_start,date_end Bounds on `date_received`, as `Date` objects for
+#'   preference. POSIXt and `"YYYYMMDD"` or `"YYYY-MM-DD"` strings are also
+#'   accepted. Used by `maude_query()`.
 #'
-#' @param date_end Optional end date for filtering by `date_received`. Prefer a
-#'   `Date` object, such as `as.Date("2026-01-31")`. POSIXt, `"YYYYMMDD"`, and
-#'   `"YYYY-MM-DD"` values are also accepted and converted to `Date`. Only used
-#'   by `maude_query()`.
+#' @param skip How many records to skip, which is how `maude_fda_api_call()`
+#'   pages through a result.
 #'
-#' @param skip Integer specifying the number of records to skip for pagination.
-#'   Only used by `maude_fda_api_call()`. Combined with `limit`, allows fetching
-#'   records in pages (e.g., skip=0 gets records 1-1000, skip=1000 gets
-#'   1001-2000).
+#' @param sort An openFDA sort specification, such as `"date_received:desc"`.
+#'   Used by `maude_fda_api_call()`.
 #'
-#' @param sort Optional sort specification for the openFDA API (e.g.,
-#'   `"date_received:desc"`). Only used by `maude_fda_api_call()`.
+#' @param count An openFDA field to tabulate instead of returning records,
+#'   such as `"product_problems.exact"`, used by `maude_fda_api_call()`. The
+#'   `.exact` suffix counts whole field values, and without it openFDA counts
+#'   individual tokens, splitting "Cardiac Tamponade" into "cardiac" and
+#'   "tamponade".
 #'
-#' @param count Optional openFDA field to tabulate on instead of returning
-#'   records, such as `"product_problems.exact"` or
-#'   `"device.manufacturer_d_name.exact"`. Only used by
-#'   `maude_fda_api_call()`. The `.exact` suffix counts whole field values;
-#'   without it openFDA counts individual tokens, so "Cardiac Tamponade" is
-#'   split into "cardiac" and "tamponade". See **Counting** in the details.
+#' @param api_key An openFDA API key, which raises the daily request ceiling.
+#'   Register at <https://open.fda.gov/apis/authentication/>.
 #'
-#' @param api_key Optional character string containing your openFDA API key.
-#'   Not required, but recommended for heavy usage to avoid rate limiting.
-#'   Register at: <https://open.fda.gov/apis/authentication/>
+#' @param descriptions_from_web Whether to backfill missing
+#'   `event_description` values after the query, first from FDA's bulk
+#'   narrative archives, which are downloaded once and cached, and then from
+#'   the MAUDE detail page of each report still missing one. Off by default,
+#'   as the second pass costs one request per report and needs the **{rvest}**
+#'   and **{xml2}** packages.
 #'
-#' @param descriptions_from_web Logical. If `TRUE`, after the API call
-#'   `maude_query()` backfills missing `event_description` values in two
-#'   passes: first from FDA's bulk MAUDE narrative archives
-#'   (`foitext{YYYY}.zip`, `foitextadd.zip`, `foitextchange.zip`,
-#'   `foitextthru1995.zip`), then by scraping the FDA MAUDE detail page for
-#'   any rows still missing. Disabled by default because the web pass adds
-#'   one HTTP request per remaining missing report. The bulk archives are
-#'   downloaded once and cached locally. Requires the `rvest` and `xml2`
-#'   packages for the web pass.
+#' @param verbose Whether to report pagination, retries, and how many records
+#'   came back. Defaults to `interactive()`.
 #'
-#' @param verbose Logical. If `TRUE`, prints progress messages for pagination,
-#'   retries, and total records retrieved. Defaults to `interactive()`.
+#' @param max_retries How many times to retry a transient API failure, meaning
+#'   HTTP 429 or 5xx. Defaults to `3`.
 #'
-#' @param max_retries Integer giving the number of retry attempts for transient
-#'   API failures in `maude_fda_api_call()` (HTTP 429/5xx). Defaults to `3`.
+#' @return A `tbl_df` of device adverse event reports, one row per report:
+#'   - `mdr_report_key` — the record's key in MAUDE, and what the narrative
+#'     archives and FDA detail pages are keyed on.
+#'   - `report_number` — MDR report number.
+#'   - `event_type` — `"Malfunction"`, `"Injury"`, `"Death"`, or `"Other"`.
+#'   - `date_received` — date FDA received the report.
+#'   - `date_of_event` — date the event itself happened, where the reporter
+#'     gave one. Its distance from `date_received` is the reporting lag.
+#'   - `report_source_code` — who filed, as `"Manufacturer report"`
+#'     (mandatory), `"Voluntary report"` (a clinician or patient), or
+#'     `"User Facility report"`.
+#'   - `reporter_country_code` — two-letter country of the reporter. MAUDE
+#'     carries substantial ex-US reporting, so this is what separates reports
+#'     that could have responded to a US regulatory action from those that
+#'     could not.
+#'   - `mfr_report_type` — `"Initial"`, `"Thirty-Day"`, or `"Follow-Up"`. It
+#'     does not name the report it follows.
+#'   - `device_generic_name`, `device_brand_name`, `manufacturer_name` — the
+#'     device and its maker as the reporter typed them, which is what
+#'     [normalize_maude_manufacturer()] and [normalize_maude_ablation()] are
+#'     for.
+#'   - `event_description` — the narrative blocks, `" | "`-delimited.
+#'   - `patient_problem` — coded patient problems from
+#'     `patient[].patient_problems`, de-duplicated and `"; "`-delimited.
+#'   - `device_problem` — coded device problems from the top-level
+#'     `product_problems`, de-duplicated and `"; "`-delimited.
 #'
-#' @return A `tbl_df` containing device adverse event reports with columns:
-#'   \describe{
-#'     \item{report_number}{MDR report number (unique identifier)}
-#'     \item{event_type}{Type of event (e.g., "Malfunction", "Injury", "Death")}
-#'     \item{date_received}{Date the report was received by FDA}
-#'     \item{date_of_event}{Date the event itself occurred, where the reporter
-#'       gave one. The difference from `date_received` is the reporting lag}
-#'     \item{report_source_code}{Who filed the report --- `"Manufacturer
-#'       report"` (mandatory), `"Voluntary report"` (a clinician or patient), or
-#'       `"User Facility report"`}
-#'     \item{reporter_country_code}{Two-letter country of the reporter. MAUDE
-#'       carries substantial ex-US reporting, so this is what separates reports
-#'       that could have responded to a US regulatory action from those that
-#'       could not}
-#'     \item{mfr_report_type}{Whether the filing is `"Initial"`,
-#'       `"Thirty-Day"`, or a `"Follow-Up"` to an earlier one. It does not name
-#'       the report it follows}
-#'     \item{device_generic_name}{Generic name of the device}
-#'     \item{device_brand_name}{Brand name of the device}
-#'     \item{manufacturer_name}{Name of the device manufacturer}
-#'     \item{event_description}{Narrative description of the adverse event}
-#'     \item{patient_problem}{Reported problems affecting the patient, from
-#'       `patient[].patient_problems`, de-duplicated and `"; "`-delimited}
-#'     \item{device_problem}{Reported problems with the device, from the
-#'       top-level `product_problems`, de-duplicated and `"; "`-delimited}
-#'   }
-#'
-#'   Returns an empty *tibble* if no results are found.
+#'   An empty *tibble* is returned when nothing matched.
 #'
 #'   The result carries a `"total"` attribute giving how many reports the query
 #'   matched, which is larger than `nrow()` whenever `limit` truncated it.
@@ -315,10 +259,7 @@ load_maude_codes <- function(annex) {
 #' # Search for pacemaker-related adverse events
 #' pacemaker_events <- maude_query("pacemaker", limit = 10)
 #'
-#' # Search by device generic name
-#' results <- maude_query(device_generic_name = "defibrillator", limit = 50)
-#'
-#' # Filter by received-date range using Date objects
+#' # Filter by received-date range
 #' results <- maude_query(
 #'   search = "pacemaker",
 #'   date_start = as.Date("2026-01-01"),
@@ -436,7 +377,6 @@ maude_query <- function(
     paste0(field, ":(", paste(escaped, collapse = " OR "), ")")
   }
 
-  # Basic input validation.
   if (!is.null(search) &&
       (!is.character(search) || length(search) != 1 || nchar(search) == 0)) {
     stop("'search' must be NULL or a non-empty character string")
@@ -476,7 +416,14 @@ maude_query <- function(
     )
   }
 
-  # Collect extra terms supplied via ...
+  # A filter naming a company that has acquired others reaches only the reports
+  # filed under the name given, and a result that is missing 20 years of them
+  # looks exactly like one that is not. Say so rather than expanding the query,
+  # which would send something other than what was written.
+  if (!is.null(manufacturer_name)) {
+    warn_maude_family(manufacturer_name)
+  }
+
   extra_terms <- list(...)
   if (length(extra_terms) > 0) {
     if (is.null(names(extra_terms)) || any(names(extra_terms) == "")) {
@@ -484,7 +431,6 @@ maude_query <- function(
     }
   }
 
-  # Build the search terms from common fields and extras.
   terms <- character(0)
   if (!is.null(search)) terms <- c(terms, search)
 
@@ -506,7 +452,6 @@ maude_query <- function(
     terms <- c(terms, build_field_terms(field, extra_terms[[field]]))
   }
 
-  # Assemble the final query string, including an optional date range.
   clauses <- terms[!is.na(terms)]
   if (!is.null(date_start) || !is.null(date_end)) {
     ds <- if (is.null(date_start)) "19920101" else date_start
@@ -523,7 +468,8 @@ maude_query <- function(
   }
   query <- paste(clauses, collapse = " AND ")
 
-  # Paginate if limit > 1000 (openFDA max per request).
+  # 999 rather than 1000: an anonymous caller asking for 1000 is refused
+  # with a 403 that blames the missing api_key.
   max_per_request <- 999
   sort <- "date_received:desc"
   total <- NA_integer_
@@ -586,7 +532,6 @@ maude_query <- function(
     )
   }
 
-  # Provide a short message about the outcome.
   if (verbose) {
     if (nrow(result) == 0) {
       message("No adverse event reports found for query: ", query)
@@ -626,7 +571,6 @@ maude_fda_api_call <- function(
     stop("'count' must be NULL or a single openFDA field name", call. = FALSE)
   }
 
-  # This is or query parameters for "direct" calling the API, not user friendly
   # Format =  "?search=pacemaker&limit=100&skip=0" (gets appended to URL)
   # The `httr::GET()` function accepts the query argument in form of named list
   #
@@ -645,9 +589,6 @@ maude_fda_api_call <- function(
     params$skip <- NULL
   }
 
-  # Conditionally add api_key only if provided.
-  # When api_key is NULL, this line is skipped and the parameter is not
-  # included in the request, resulting in an unauthenticated call.
   if (!is.null(api_key)) {
     params$api_key <- api_key
   }
@@ -655,9 +596,7 @@ maude_fda_api_call <- function(
     params$sort <- sort
   }
 
-  # Make the HTTP GET request to the openFDA device adverse event endpoint.
-  # The `query` parameter passes the list
-  # Example URL response:
+  # Example request:
   #   https://api.fda.gov/device/event.json?search=pacemaker&limit=100&skip=0
   attempt <- 1L
   max_attempts <- max_retries + 1L
@@ -673,9 +612,6 @@ maude_fda_api_call <- function(
       )
     )
 
-    # Handle HTTP errors from the API response.
-    # The openFDA API returns 404 when no results match the query.
-    # We return an empty tibble in that case.
     if (!req$error) {
       break
     }
@@ -729,10 +665,7 @@ maude_fda_api_call <- function(
     stop("openFDA API request failed with status ", status, call. = FALSE)
   }
 
-  # Parse JSON response and extract the results array.
-  # httr::content with as="parsed" uses jsonlite to convert JSON to R lists.
-  # The openFDA response structure is: { "meta": {...}, "results": [...] }
-  # We only need the results array; if missing/NULL, default to empty list.
+  # Response shape: { "meta": {...}, "results": [...] }
   parsed <- req$parsed
   if (!is.list(parsed)) {
     return(tibble::tibble())
@@ -760,9 +693,7 @@ maude_fda_api_call <- function(
     ))
   }
 
-  # Transform each API result record into a standardized tibble row.
-  # purrr::map_dfr iterates over results and row-binds the individual tibbles.
-  # Parsed results are very nested
+  # One row per record, flattened out of a deeply nested list.
   out <- purrr::map_dfr(results, flatten_maude_record)
 
   # `meta$results$total` is how many reports the query actually matched, as
@@ -795,7 +726,6 @@ maude_fda_api_call <- function(
 #' @return A *Date* vector the same length as `x`.
 #'
 #' @noRd
-#' @noRd
 parse_maude_date <- function(x) {
   x <- trimws(as.character(x))
   x[!nzchar(x)] <- NA_character_
@@ -812,17 +742,15 @@ parse_maude_date <- function(x) {
 
 #' Collect a named field from nested openFDA MAUDE structures
 #'
-#' @description Internal helper used by `flatten_maude_record()` to normalize
-#'   openFDA MAUDE fields that may arrive as nested lists, list-columns, or
-#'   data frames. It walks the structure recursively and returns all non-empty
-#'   character values stored under `field`.
+#' @description Internal helper used by `flatten_maude_record()` to reduce
+#'   openFDA MAUDE fields, which arrive as nested lists, list-columns, or data
+#'   frames, into the non-empty character values held under `field`.
 #'
 #' @param x Nested MAUDE field content.
 #' @param field Scalar character string naming the field to collect.
 #'
 #' @return A character vector of non-missing values found for `field`.
 #'
-#' @noRd
 #' @noRd
 collect_maude_field_values <- function(x, field) {
   normalize_character <- function(value) {
@@ -879,14 +807,13 @@ collect_maude_field_values <- function(x, field) {
 #'
 #' @description Internal helper used by `maude_fda_api_call()` to convert a
 #'   single parsed MAUDE API record into the standard tibble row returned by
-#'   `maude_query()`. This centralizes the logic for preserving event narrative
-#'   text and normalizing variable nested shapes from the API response.
+#'   `maude_query()`, keeping the narrative text whole and flattening the
+#'   nested shapes the API varies between.
 #'
 #' @param rec A single parsed MAUDE record from the openFDA API response.
 #'
 #' @return A one-row tibble in the `maude_query()` output format.
 #'
-#' @noRd
 #' @noRd
 flatten_maude_record <- function(rec) {
   first_value <- function(x) {
@@ -1018,7 +945,6 @@ flatten_maude_record <- function(rec) {
 #'   where FDA web pages provide narrative text.
 #'
 #' @author Reese Fuller
-#' @noRd
 #' @noRd
 get_maude_web_descriptions <- function(
   events,
@@ -1237,7 +1163,6 @@ get_maude_web_descriptions <- function(
 #'   where FDA bulk narrative archives provide narrative text.
 #'
 #' @author Reese Fuller
-#' @noRd
 #' @noRd
 get_maude_file_descriptions <- function(
   events,

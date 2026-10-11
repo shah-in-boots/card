@@ -35,126 +35,105 @@ maude_fda_api_call(
 )
 }
 \arguments{
-\item{search}{Character string specifying the search query or \code{NULL}. For
-\code{maude_query()}, this can be a simple term (e.g., \code{"pacemaker"}) or a
-field-specific query (e.g., \code{"device.generic_name:pacemaker"}). Use the
-other \code{maude_query()} arguments to add additional filters.}
+\item{search}{A search string, or \code{NULL}. Either a bare term such as
+\code{"pacemaker"} or a field-specific query such as
+\code{"device.generic_name:pacemaker"}, combined with the other arguments by
+\code{AND}.}
 
-\item{device_generic_name}{Optional character vector of device generic names
-to filter on (\code{device.generic_name}).}
+\item{device_generic_name}{Character vector filtering \code{device.generic_name}.}
 
-\item{device_brand_name}{Optional character vector of device brand names to
-filter on (\code{device.brand_name}).}
+\item{device_brand_name}{Character vector filtering \code{device.brand_name}.}
 
-\item{manufacturer_name}{Optional character vector of manufacturer names to
-filter on (\code{device.manufacturer_d_name}).}
+\item{manufacturer_name}{Character vector filtering
+\code{device.manufacturer_d_name}.}
 
-\item{event_type}{Optional character vector of event types to filter on
-(\code{event_type}).}
+\item{event_type}{Character vector filtering \code{event_type}.}
 
-\item{report_number}{Optional character vector of MDR report numbers to
-filter on (\code{report_number}).}
+\item{report_number}{Character vector filtering \code{report_number}.}
 
-\item{device_problem}{Optional character vector of device problem codes to
-filter on (\code{device.device_problem_codes}). Note the asymmetry: openFDA
-accepts this as a \emph{search} field but never returns it, so the returned
-\code{device_problem} column is read from the record's top-level
-\code{product_problems} instead. Filtering and reading therefore name different
-fields for the same terms.}
+\item{device_problem}{Character vector filtering
+\code{device.device_problem_codes}, which is searchable but never returned, so
+the \code{device_problem} column comes from a different field than this filters
+on.}
 
-\item{patient_problem}{Optional character vector of patient problems to
-filter on (\code{patient.patient_problems}).}
+\item{patient_problem}{Character vector filtering
+\code{patient.patient_problems}.}
 
-\item{...}{Additional named search fields and values to include in the
-query. Names should match the openFDA searchable fields list.}
+\item{...}{Further named openFDA fields and the values to filter them on.}
 
-\item{limit}{Integer specifying the maximum number of records to return.
-For \code{maude_query()} this is a cap on the whole call, not on each request:
-it defaults to 100, and anything above 1000 is paginated internally into
-requests of 999. Due to openFDA \code{skip} limits, \code{maude_query()} currently
-supports up to 26,000 records per call and refuses a larger \code{limit}. When
-the query matches more reports than \code{limit} returns, the result is
-truncated and a warning says how many matched. For \code{maude_fda_api_call()},
-\code{limit} is the per-request maximum of 1000 per openFDA limits; when \code{count}
-is given it caps the number of terms instead, at 1000.}
+\item{limit}{How many records to return. For \code{maude_query()} this caps the
+whole call rather than each request, and a larger \code{limit} is paginated
+internally, up to the 26,000 openFDA allows. A query matching more reports
+than \code{limit} returns is truncated with a warning saying how many matched.
+For \code{maude_fda_api_call()} it is the per-request maximum of 1000, or the
+number of terms when \code{count} is given.}
 
-\item{date_start}{Optional start date for filtering by \code{date_received}.
-Prefer a \code{Date} object, such as \code{as.Date("2026-01-01")}. POSIXt,
-\code{"YYYYMMDD"}, and \code{"YYYY-MM-DD"} values are also accepted and converted to
-\code{Date}. Only used by \code{maude_query()}.}
+\item{date_start, date_end}{Bounds on \code{date_received}, as \code{Date} objects for
+preference. POSIXt and \code{"YYYYMMDD"} or \code{"YYYY-MM-DD"} strings are also
+accepted. Used by \code{maude_query()}.}
 
-\item{date_end}{Optional end date for filtering by \code{date_received}. Prefer a
-\code{Date} object, such as \code{as.Date("2026-01-31")}. POSIXt, \code{"YYYYMMDD"}, and
-\code{"YYYY-MM-DD"} values are also accepted and converted to \code{Date}. Only used
-by \code{maude_query()}.}
+\item{api_key}{An openFDA API key, which raises the daily request ceiling.
+Register at \url{https://open.fda.gov/apis/authentication/}.}
 
-\item{api_key}{Optional character string containing your openFDA API key.
-Not required, but recommended for heavy usage to avoid rate limiting.
-Register at: \url{https://open.fda.gov/apis/authentication/}}
+\item{descriptions_from_web}{Whether to backfill missing
+\code{event_description} values after the query, first from FDA's bulk
+narrative archives, which are downloaded once and cached, and then from
+the MAUDE detail page of each report still missing one. Off by default,
+as the second pass costs one request per report and needs the \strong{{rvest}}
+and \strong{{xml2}} packages.}
 
-\item{descriptions_from_web}{Logical. If \code{TRUE}, after the API call
-\code{maude_query()} backfills missing \code{event_description} values in two
-passes: first from FDA's bulk MAUDE narrative archives
-(\verb{foitext\{YYYY\}.zip}, \code{foitextadd.zip}, \code{foitextchange.zip},
-\code{foitextthru1995.zip}), then by scraping the FDA MAUDE detail page for
-any rows still missing. Disabled by default because the web pass adds
-one HTTP request per remaining missing report. The bulk archives are
-downloaded once and cached locally. Requires the \code{rvest} and \code{xml2}
-packages for the web pass.}
+\item{verbose}{Whether to report pagination, retries, and how many records
+came back. Defaults to \code{interactive()}.}
 
-\item{verbose}{Logical. If \code{TRUE}, prints progress messages for pagination,
-retries, and total records retrieved. Defaults to \code{interactive()}.}
+\item{search_query}{The whole query string, sent to openFDA as written,
+including any date or field filters. Used by \code{maude_fda_api_call()}.}
 
-\item{search_query}{Fully constructed query string to send to the openFDA
-API (advanced use). This should include any date or field filters that you
-want applied exactly as written.}
+\item{skip}{How many records to skip, which is how \code{maude_fda_api_call()}
+pages through a result.}
 
-\item{skip}{Integer specifying the number of records to skip for pagination.
-Only used by \code{maude_fda_api_call()}. Combined with \code{limit}, allows fetching
-records in pages (e.g., skip=0 gets records 1-1000, skip=1000 gets
-1001-2000).}
+\item{sort}{An openFDA sort specification, such as \code{"date_received:desc"}.
+Used by \code{maude_fda_api_call()}.}
 
-\item{sort}{Optional sort specification for the openFDA API (e.g.,
-\code{"date_received:desc"}). Only used by \code{maude_fda_api_call()}.}
+\item{count}{An openFDA field to tabulate instead of returning records,
+such as \code{"product_problems.exact"}, used by \code{maude_fda_api_call()}. The
+\code{.exact} suffix counts whole field values, and without it openFDA counts
+individual tokens, splitting "Cardiac Tamponade" into "cardiac" and
+"tamponade".}
 
-\item{count}{Optional openFDA field to tabulate on instead of returning
-records, such as \code{"product_problems.exact"} or
-\code{"device.manufacturer_d_name.exact"}. Only used by
-\code{maude_fda_api_call()}. The \code{.exact} suffix counts whole field values;
-without it openFDA counts individual tokens, so "Cardiac Tamponade" is
-split into "cardiac" and "tamponade". See \strong{Counting} in the details.}
-
-\item{max_retries}{Integer giving the number of retry attempts for transient
-API failures in \code{maude_fda_api_call()} (HTTP 429/5xx). Defaults to \code{3}.}
+\item{max_retries}{How many times to retry a transient API failure, meaning
+HTTP 429 or 5xx. Defaults to \code{3}.}
 }
 \value{
-A \code{tbl_df} containing device adverse event reports with columns:
-\describe{
-\item{report_number}{MDR report number (unique identifier)}
-\item{event_type}{Type of event (e.g., "Malfunction", "Injury", "Death")}
-\item{date_received}{Date the report was received by FDA}
-\item{date_of_event}{Date the event itself occurred, where the reporter
-gave one. The difference from \code{date_received} is the reporting lag}
-\item{report_source_code}{Who filed the report --- \code{"Manufacturer report"} (mandatory), \code{"Voluntary report"} (a clinician or patient), or
-\code{"User Facility report"}}
-\item{reporter_country_code}{Two-letter country of the reporter. MAUDE
+A \code{tbl_df} of device adverse event reports, one row per report:
+\itemize{
+\item \code{mdr_report_key} — the record's key in MAUDE, and what the narrative
+archives and FDA detail pages are keyed on.
+\item \code{report_number} — MDR report number.
+\item \code{event_type} — \code{"Malfunction"}, \code{"Injury"}, \code{"Death"}, or \code{"Other"}.
+\item \code{date_received} — date FDA received the report.
+\item \code{date_of_event} — date the event itself happened, where the reporter
+gave one. Its distance from \code{date_received} is the reporting lag.
+\item \code{report_source_code} — who filed, as \code{"Manufacturer report"}
+(mandatory), \code{"Voluntary report"} (a clinician or patient), or
+\code{"User Facility report"}.
+\item \code{reporter_country_code} — two-letter country of the reporter. MAUDE
 carries substantial ex-US reporting, so this is what separates reports
 that could have responded to a US regulatory action from those that
-could not}
-\item{mfr_report_type}{Whether the filing is \code{"Initial"},
-\code{"Thirty-Day"}, or a \code{"Follow-Up"} to an earlier one. It does not name
-the report it follows}
-\item{device_generic_name}{Generic name of the device}
-\item{device_brand_name}{Brand name of the device}
-\item{manufacturer_name}{Name of the device manufacturer}
-\item{event_description}{Narrative description of the adverse event}
-\item{patient_problem}{Reported problems affecting the patient, from
-\verb{patient[].patient_problems}, de-duplicated and \code{"; "}-delimited}
-\item{device_problem}{Reported problems with the device, from the
-top-level \code{product_problems}, de-duplicated and \code{"; "}-delimited}
+could not.
+\item \code{mfr_report_type} — \code{"Initial"}, \code{"Thirty-Day"}, or \code{"Follow-Up"}. It
+does not name the report it follows.
+\item \code{device_generic_name}, \code{device_brand_name}, \code{manufacturer_name} — the
+device and its maker as the reporter typed them, which is what
+\code{\link[=normalize_maude_manufacturer]{normalize_maude_manufacturer()}} and \code{\link[=normalize_maude_ablation]{normalize_maude_ablation()}} are
+for.
+\item \code{event_description} — the narrative blocks, \code{" | "}-delimited.
+\item \code{patient_problem} — coded patient problems from
+\verb{patient[].patient_problems}, de-duplicated and \code{"; "}-delimited.
+\item \code{device_problem} — coded device problems from the top-level
+\code{product_problems}, de-duplicated and \code{"; "}-delimited.
 }
 
-Returns an empty \emph{tibble} if no results are found.
+An empty \emph{tibble} is returned when nothing matched.
 
 The result carries a \code{"total"} attribute giving how many reports the query
 matched, which is larger than \code{nrow()} whenever \code{limit} truncated it.
@@ -163,98 +142,65 @@ With \code{count}, \code{maude_fda_api_call()} returns a two-column \emph{tibble
 \code{term} and \code{count} instead, at most 1000 rows.
 }
 \description{
-\code{maude_query()} queries the Manufacturer and User Facility Device Experience
-(MAUDE) database using the openFDA API. This is the recommended interface
-for most users, providing automatic pagination, date range handling, and
-input validation.
+\code{maude_query()} searches the Manufacturer and User Facility Device Experience
+(MAUDE) database through the openFDA API, building the search string,
+paginating, and parsing the records, which is what most calls want.
 
-\code{maude_fda_api_call()} is the lower-level function that makes direct API calls.
-Use this for advanced scenarios requiring manual pagination control or
-pre-constructed query strings.
+\code{maude_fda_api_call()} sends one request as written, since custom pagination
+and the \code{count} endpoint need a query string the caller controls.
 }
 \details{
-\strong{Database Coverage:} The openFDA device adverse event endpoint contains
-reports from mandatory reporters (manufacturers, importers, and device user
-facilities) and voluntary reporters (healthcare professionals, patients, and
-consumers). Data covers publicly releasable records from approximately 1992
-to present and is updated weekly.
+The endpoint carries publicly releasable reports from mandatory reporters
+(manufacturers, importers, and device user facilities) and from voluntary
+ones (clinicians, patients, and consumers), covering roughly 1992 onward and
+updated weekly.
 
-\strong{Rate Limits:} The openFDA API allows approximately 240 requests per
-minute (4 per second) without an API key, and 240 requests per minute with
-a key. Large queries are automatically paginated in batches of up to 1000
-records.
+\code{maude_query()} sorts on \code{date_received:desc} so that pagination is
+deterministic, splits a large \code{limit} into requests of 999, and waits between
+them to stay under openFDA's rate limit of about 240 requests a minute. The
+daily ceiling is 1,000 requests for an anonymous caller and 120,000 with an
+\code{api_key}, so a key is worth registering for bulk work and changes nothing
+otherwise. openFDA also refuses a \code{skip} beyond 25,000 records, which caps
+\code{limit} at 26,000, so a larger pull has to be split by date range.
 
-\strong{Result Order:} \code{maude_query()} requests results sorted in reverse
-chronological order by \code{date_received} (\code{date_received:desc}). This provides
-deterministic pagination for large requests.
+\code{search} takes \emph{Elasticsearch} syntax over the fields openFDA publishes at
+\url{https://open.fda.gov/apis/device/event/searchable-fields/}, and the field
+arguments and \code{...} are conveniences that build that same string. See
+\code{vignette("maude")} for the syntax and worked queries, and openFDA's own
+documentation for the field list, which changes more often than this page
+can follow.
 
-\strong{Search Syntax:} The \code{search} parameter uses \emph{Elasticsearch} query syntax.
-Common patterns include:
-\itemize{
-\item Simple term: \code{"pacemaker"}
-\item Field-specific: \code{"device.generic_name:pacemaker"}
-\item Multiple terms: \code{"device.generic_name:pacemaker AND event_type:malfunction"}
-\item Date range: \code{"date_received:[20200101 TO 20201231]"}
-\item Exact phrase: \verb{"device.brand_name:\\"Medtronic\\""}
+A query matching nothing is answered with HTTP 404 rather than an empty
+array. Both functions return an empty tibble for it rather than raising an
+error, since an empty stratum is a result and not a failure to retry.
 }
-
-\strong{Building Queries in \code{maude_query()}:} \code{maude_query()} is designed to help
-you build a valid search string without writing the full query yourself.
-Use the common field arguments (e.g., \code{device_generic_name}, \code{event_type})
-to add structured filters, and pass any additional fields through \code{...}.
-The \code{...} names should match openFDA searchable fields, documented at:
-\url{https://open.fda.gov/apis/device/event/searchable-fields/}.
-
-\strong{API Response Handling:} The openFDA API returns HTTP 404 for queries with
-no results (rather than an empty array). Both functions handle this by
-returning an empty tibble instead of throwing an error. A 404 is therefore a
-legitimately empty stratum and is not retried.
-
-\strong{Counting:} \code{maude_fda_api_call(count = )} uses the openFDA \code{count}
-endpoint, which aggregates on the server and returns one \code{term}/\code{count} pair
-per distinct value rather than the records themselves. A frequency table
-that would otherwise take hundreds of paginated record requests takes one:
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{maude_fda_api_call(
-  search_query = "device.device_report_product_code:QZI",
-  count = "product_problems.exact",
-  limit = 999
-)
-}\if{html}{\out{</div>}}
+\section{Counting rather than retrieving}{
+\code{maude_fda_api_call(count = )} reaches the openFDA count endpoint, which
+aggregates on the server and returns one \code{term}/\code{count} pair per distinct
+value, so a frequency table that would otherwise take hundreds of paginated
+requests takes one.
 
 Two limits are worth knowing. The endpoint returns at most 1000 terms and
-offers no pagination cursor, so a field with a longer tail is silently
-truncated -- check whether \code{nrow()} has hit the cap before treating the table
-as complete. Without an \code{api_key} the usable ceiling is 999, and a \code{limit} of
-1000 is refused with HTTP 403 and the message "No api_key was supplied",
-which is not what went wrong. And counts are of \emph{mentions}, not reports: a
-report coded with three problems contributes to three terms, so the column
-does not sum to the number of matching reports.
-
-\strong{Device Problem Terms:} the coded device problem terms are returned in the
-record's top-level \code{product_problems} field. They are never returned inside
-\code{device[]}, even though \code{device.device_problem_codes} is a valid field to
-search on, which is why \code{device_problem} is read from one field and filtered
-on another.
-
-\strong{When to use \code{maude_fda_api_call()}:} Most users should use \code{maude_query()}.
-The lower-level \code{maude_fda_api_call()} is useful when you need:
-\itemize{
-\item Direct control over \code{skip} for custom pagination strategies
-\item Pre-constructed query strings with complex \emph{Elasticsearch} syntax
-\item Integration into custom retry/error-handling logic
-\item Full control over \code{search_query}, \code{sort}, and other openFDA parameters
+offers no pagination cursor, so a longer tail is truncated silently -- check
+whether \code{nrow()} has hit the cap before treating the table as complete. And
+counts are of \emph{mentions} rather than of reports, since a report coded with
+three problems contributes to three terms, so the column does not sum to the
+number of matching reports.
 }
+
+\section{Device problem terms}{
+The coded device problem terms arrive at the top level of the record, in
+\code{product_problems}, and are never returned inside \code{device[]}, even though
+\code{device.device_problem_codes} is a valid field to search on. That asymmetry
+is why \code{device_problem} filters on one field and is read from another.
 }
+
 \examples{
 \dontrun{
 # Search for pacemaker-related adverse events
 pacemaker_events <- maude_query("pacemaker", limit = 10)
 
-# Search by device generic name
-results <- maude_query(device_generic_name = "defibrillator", limit = 50)
-
-# Filter by received-date range using Date objects
+# Filter by received-date range
 results <- maude_query(
   search = "pacemaker",
   date_start = as.Date("2026-01-01"),

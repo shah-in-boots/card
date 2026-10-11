@@ -25,9 +25,9 @@ test_that("plants and spelling variants collapse onto one entity", {
   )
 })
 
-test_that("an undated relationship resolves at the pattern layer", {
-  # `ownership.csv` requires a closing date. A contract manufacturer is not an
-  # acquisition and has none, so the string maps straight to the entity whose
+test_that("an undated relationship resolves as an alias", {
+  # An ownership row requires a closing date. A contract manufacturer is not an
+  # acquisition and has none, so the string is an alias of the entity whose
   # product it builds -- VENUSA names neither Abbott nor St. Jude anywhere.
   expect_identical(
     normalize_maude_manufacturer("VENUSA DE MEXICO S.A. DE C.V."),
@@ -55,10 +55,10 @@ test_that("an acquired entity keeps its own name until it is resolved", {
   )
 })
 
-test_that("a specific pattern is not claimed by the parent's general one", {
-  # "MEDTRONIC CRYOCATH LP" contains "MEDTRONIC", so `CRYOCATH` carries a
-  # priority of 10 to be tested first. Both resolve to Medtronic today, which is
-  # why this went unnoticed while the tables held parents instead of entities.
+test_that("a specific alias is not claimed by the parent's general one", {
+  # "MEDTRONIC CRYOCATH LP" contains "MEDTRONIC", and CryoCath wins because it
+  # sits below Medtronic in the ownership graph. Both resolve to Medtronic
+  # today, which is why this would go unnoticed if it broke.
   expect_identical(
     normalize_maude_manufacturer("MEDTRONIC CRYOCATH LP"),
     "CryoCath"
@@ -160,36 +160,50 @@ test_that("devices that do not ablate carry no modality", {
   expect_identical(out$entity[[3]], "Farapulse")
 })
 
-test_that("the first matching pattern wins", {
-  index <- tibble::tribble(
-    ~pattern,     ~platform,  ~modality,        ~entity,
-    "ARCTIC SUN", "Not This", NA_character_,    "Medivance",
-    "ARCTIC",     "Too Broad", "cryoablation",  "Medtronic"
+test_that("the longer alias wins where neither entity owns the other", {
+  # Nothing relates these two, so the tie is broken by how much of the string
+  # each alias explains.
+  platforms <- tibble::tribble(
+    ~platform,   ~aliases,     ~modality,       ~entity,
+    "Too Broad", "arctic",     "cryoablation",  "Medtronic",
+    "Not This",  "arctic sun", NA_character_,   "Medivance"
   )
 
-  out <- normalize_maude_ablation("ARCTIC SUN 5000", index = index)
+  out <- normalize_maude_ablation("ARCTIC SUN 5000", platforms = platforms)
   expect_identical(out$platform, "Not This")
   expect_identical(out$modality, NA_character_)
 })
 
-test_that("the normalizers refuse an index missing its value columns", {
+test_that("a subsidiary is matched ahead of its parent whatever the row order", {
+  # The ownership graph supplies the precedence, so sorting the registry
+  # alphabetically cannot change what a string resolves to.
+  entities <- maude_entities()
+  shuffled <- entities[order(entities$entity), ]
+
+  expect_identical(
+    normalize_maude_manufacturer("MEDTRONIC CRYOCATH LP", entities = shuffled),
+    "CryoCath"
+  )
+})
+
+test_that("the lookups refuse a registry missing its columns", {
   expect_error(
-    normalize_maude_manufacturer("MEDTRONIC", index = tibble::tibble(x = 1)),
-    "'index' must be a data frame with 'pattern' and 'entity' columns"
+    normalize_maude_manufacturer("MEDTRONIC", entities = tibble::tibble(x = 1)),
+    "'entities' must be a data frame with the columns entity, aliases, parent"
   )
   expect_error(
     normalize_maude_ablation(
       "FARAWAVE",
-      index = tibble::tibble(pattern = "FARAWAVE", platform = "Farapulse")
+      platforms = tibble::tibble(platform = "Farapulse", aliases = "farawave")
     ),
-    "'index' must be a data frame"
+    "'platforms' must be a data frame"
   )
   expect_error(
     resolve_maude_owner(
       "Farapulse",
       as_of = Sys.Date(),
-      ownership = tibble::tibble(entity = "Farapulse")
+      entities = tibble::tibble(entity = "Farapulse")
     ),
-    "'ownership' must be a data frame"
+    "'entities' must be a data frame"
   )
 })

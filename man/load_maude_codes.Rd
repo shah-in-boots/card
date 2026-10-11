@@ -20,14 +20,10 @@ deep.
 }
 \description{
 Load Medical Device Report (MDR) adverse event coding tables
-published by the FDA. The \code{annex} argument selects which FDA annex to load.
-The interface is designed to support additional annexes over time as more
-code tables are added to the package data.
+published by the FDA, as bundled with the package.
 }
 \details{
-The FDA publishes MDR adverse event codes as annexed code tables.
-This function returns the annex-specific table bundled with the package.
-Supported annexes:
+The annexes are:
 \itemize{
 \item \strong{A}: Device problem codes
 \item \strong{E}: Clinical signs, symptoms, or conditions
@@ -47,14 +43,14 @@ level}: \code{"Material Integrity Problem"} and \code{"Use of Device Problem"} a
 values that appear in the data, not merely headings above it. Joining
 returned MAUDE terms to this table on \code{term} therefore picks up leaf and
 family codings alike, and \code{level_1} rolls either up to its family.
-}
+\subsection{Annex E}{
 
-\section{Polyhierarchy in Annex E}{
 Annex E places some terms under more than one family -- \code{"Brain Injury"}
 belongs to both \code{"Nervous System"} and \code{"Injury"} -- so those codes appear on
 one row per parent. A join on \code{term} or \code{imdrf_code} will multiply such rows,
 which is correct but will double-count if the result is then tallied. Reduce
 to \code{imdrf_code} first, or pick a parent, before counting.
+}
 }
 
 \examples{

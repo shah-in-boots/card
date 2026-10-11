@@ -15,8 +15,225 @@ knitr:
 library(card)
 ```
 
-# Key Resources
+MAUDE is the FDA's database of medical device adverse event reports, filed by manufacturers, importers and device user facilities under a mandatory reporting requirement, and by clinicians, patients and consumers voluntarily.
+It is a passive surveillance system, so a count of reports is a count of filings rather than of events, and the denominator of devices in use is never given.
 
-[About MAUDE](https://www.fda.gov/medical-devices/mandatory-reporting-requirements-manufacturers-importers-and-device-user-facilities/about-manufacturer-and-user-facility-device-experience-maude-database)
+{card} covers four steps against it: querying openFDA for reports, filling in the narratives openFDA withholds, mapping the free-text manufacturer and brand strings onto entities, and grouping the coded problem terms into clinical complications.
+Chunks that reach FDA are not evaluated when this vignette is built, while everything shown against bundled data is.
 
-[Coding Resources](https://www.fda.gov/medical-devices/mdr-adverse-event-codes/coding-resources-medical-device-reports)
+# Querying
+
+`maude_query()` builds the search string, paginates, and returns one row per report.
+
+```{r}
+#| eval: false
+events <- maude_query(
+  device_generic_name = "catheter, percutaneous",
+  date_start = as.Date("2024-01-01"),
+  date_end = as.Date("2024-12-31"),
+  limit = 500
+)
+```
+
+`limit` caps the whole call rather than each request.
+A query matching more reports than `limit` returns is truncated with a warning, and the number that actually matched is carried on the result:
+
+```{r}
+#| eval: false
+attr(events, "total")
+```
+
+## Search syntax
+
+openFDA reads *Elasticsearch* query syntax, and `search` takes it verbatim.
+The field arguments and `...` are conveniences that build the same string, so anything they cannot express can be written out by hand.
+
+| What you want | How it is written |
+|---|---|
+| A bare term anywhere in the record | `"pacemaker"` |
+| One field | `"device.generic_name:pacemaker"` |
+| Two conditions | `"device.generic_name:pacemaker AND event_type:malfunction"` |
+| Either of two values | `"device.brand_name:(farawave OR farapulse)"` |
+| A phrase, rather than its words | `"device.brand_name:\"arctic front\""` |
+| A date range | `"date_received:[20200101 TO 20201231]"` |
+| Records where a field is missing | `"_missing_:date_of_event"` |
+
+The field names are openFDA's own and are listed at <https://open.fda.gov/apis/device/event/searchable-fields/>.
+They change from time to time, so that list is the authority rather than this page.
+
+These three calls send the same query:
+
+```{r}
+#| eval: false
+maude_query(search = "device.brand_name:farawave AND event_type:malfunction")
+
+maude_query(device_brand_name = "FARAWAVE", event_type = "Malfunction")
+
+maude_fda_api_call(
+  search_query = "device.brand_name:farawave AND event_type:malfunction",
+  limit = 100
+)
+```
+
+`maude_query()` is the one to reach for.
+`maude_fda_api_call()` sends a single request as written, which is what you want for custom pagination, for the count endpoint below, or for a query the argument list cannot express.
+
+## Counting without retrieving
+
+A frequency table does not need the records.
+The openFDA count endpoint aggregates on the server and returns one term and its count per distinct value, which turns hundreds of paginated requests into one:
+
+```{r}
+#| eval: false
+problems <- maude_fda_api_call(
+  search_query = "device.device_report_product_code:QZI",
+  count = "product_problems.exact",
+  limit = 999
+)
+```
+
+The `.exact` suffix counts whole field values.
+Without it openFDA counts individual tokens, so `"Cardiac Tamponade"` is split into `"cardiac"` and `"tamponade"`.
+
+Two things to hold onto.
+The endpoint returns at most 1000 terms and offers no way to page past them, so check whether the result has hit that cap before treating it as complete.
+And the counts are of mentions rather than of reports, since a report coded with three problems contributes to three terms.
+
+## Narratives
+
+openFDA returns the narrative for many reports and not for others.
+`descriptions_from_web = TRUE` fills the gaps, first from FDA's bulk narrative archives, which are downloaded once and cached, and then from the MAUDE detail page of each report still missing one.
+
+```{r}
+#| eval: false
+events <- maude_query("pacemaker", limit = 100, descriptions_from_web = TRUE)
+```
+
+The second pass costs one request per report, which is why it is off by default.
+
+# Coding tables
+
+FDA codes each report against annexed term lists, and the annexes are bundled:
+
+```{r}
+#| label: annex
+annex_a <- load_maude_codes("A")
+head(annex_a[, c("imdrf_code", "term", "level_1")], 4)
+```
+
+FDA codes a substantial share of reports at the family level, so `"Material Integrity Problem"` is a value that appears in the data and not merely a heading above it.
+Joining returned terms on `term` therefore picks up leaf and family codings alike, and `level_1` rolls either up to its family.
+
+# Manufacturers, brands and owners
+
+`manufacturer_name` is the manufacturing entity as the reporter typed it, which is the plant rather than the company.
+Counting the raw strings splits one maker across its plants and hides another behind its contract manufacturer:
+
+```{r}
+#| label: manufacturer
+normalize_maude_manufacturer(c(
+  "BIOSENSE WEBSTER, INC. (JUAREZ)",
+  "FARAPULSE, INC.",
+  "VENUSA DE MEXICO S.A. DE C.V.",
+  "SOME COMPANY NOT IN THE INDEX"
+))
+```
+
+A string the registry does not cover returns `NA` rather than a guess.
+
+Normalising happens after the reports are in hand, which is no help for the reports a query never asked for.
+A filter on `"Abbott"` reaches nothing St. Jude Medical filed before 2017, and a result missing twenty years of reports looks exactly like one that is not.
+`maude_search_terms()` runs the other way, from a company to every name its reports have been filed under:
+
+```{r}
+#| label: search-terms
+maude_search_terms("Abbott")
+```
+
+Pass those terms to the query, and the family comes back whole:
+
+```{r}
+#| eval: false
+abbott <- maude_search_terms("Abbott")
+maude_query(manufacturer_name = abbott$term, limit = 1000)
+```
+
+`from` and `to` are the window during which the company owned that entity, so `as_of` narrows the set to a point in time.
+Abbott's set in 2016 is Abbott alone.
+`maude_query()` warns when a manufacturer filter names a company whose other names were left out, so the omission is said out loud rather than discovered later.
+
+Ablation modality comes from the brand, since the product code does not determine it -- `OAE` covers cryoablation and radiofrequency alike:
+
+```{r}
+#| label: ablation
+normalize_maude_ablation(c(
+  "FARAWAVE PULSED FIELD ABLATION CATHETER",
+  "ARCTIC FRONT ADVANCE PRO",
+  "PENTARAY NAV"
+))
+```
+
+`PENTARAY NAV` is matched but has no modality, because a mapping catheter delivers no energy.
+That is different from an unmatched brand, and `platform` tells the two apart.
+
+Who owns an entity changes with time, which is why it is resolved separately and why `as_of` has no default:
+
+```{r}
+#| label: ownership
+resolve_maude_owner("Farapulse", as_of = as.Date(c("2019-01-01", "2024-01-01")))
+```
+
+Pass `Sys.Date()` for the company that owns the entity now, or a report's `date_received` for the company that owned it when the report was filed.
+The two answer different questions, and picking one silently would answer the question you did not ask.
+
+Ownership is dated rather than a company name written next to each entity, which is what lets one acquisition be one row and lets an entity change hands twice.
+Cordis was Johnson & Johnson's, then Cardinal Health's from 2015, then Hellman & Friedman's from 2021:
+
+```{r}
+#| label: cordis
+resolve_maude_owner(
+  rep("Cordis", 3),
+  as_of = as.Date(c("2010-01-01", "2018-01-01", "2024-01-01"))
+)
+```
+
+The facts behind all of this are in `maude_entities()`, one row per entity per ownership interval, each dated row citing the announcement it came from.
+
+# Complications
+
+The coded problem terms are FDA's vocabulary rather than a clinical one, so they are grouped into complication families before analysis:
+
+```{r}
+#| label: complications
+maude_term_to_complication(c(
+  "Cardiac Tamponade",
+  "Low blood pressure / hypotension",
+  "Unknown (for use when the device problem is not known)"
+))
+```
+
+A term can land in more than one family, and anything unmatched is returned under `not_indexed`.
+
+The terms say a complication is plausible, and the narrative says whether it happened.
+`maude_adjudicate()` sends each candidate family, and only the candidates, to an **{ellmer}** chat with a schema of one boolean per classification:
+
+```{r}
+#| eval: false
+chat <- ellmer::chat_openai(model = "gpt-4.1-mini")
+
+maude_adjudicate(
+  terms = "Pericardial Effusion; Low blood pressure / hypotension",
+  event_narrative = events$event_description[[1]],
+  chat_object = chat
+)
+```
+
+The result carries the model, a hash of the system prompt, and a hash of the definitions used.
+Both the prompt and the definitions change over time, and a dataset adjudicated under one pair is not comparable to a dataset adjudicated under another, so keep those attributes beside the flags.
+
+# Sources
+
+- [About MAUDE](https://www.fda.gov/medical-devices/mandatory-reporting-requirements-manufacturers-importers-and-device-user-facilities/about-manufacturer-and-user-facility-device-experience-maude-database)
+- [MDR adverse event coding resources](https://www.fda.gov/medical-devices/mdr-adverse-event-codes/coding-resources-medical-device-reports)
+- [openFDA device event API](https://open.fda.gov/apis/device/event/)
+- [openFDA searchable fields](https://open.fda.gov/apis/device/event/searchable-fields/)

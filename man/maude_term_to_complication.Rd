@@ -17,7 +17,7 @@ complications.}
 \item{definitions}{Named list of complication definitions. Defaults to
 \link{complication_definitions}.}
 
-\item{index}{Named list mapping complication identifiers to normalized MAUDE
+\item{index}{Named list mapping complication identifiers to normalised MAUDE
 problem terms. Defaults to \link{maude_complication_index}.}
 }
 \value{
@@ -29,12 +29,12 @@ complication groups are omitted.
 \description{
 \code{maude_term_to_complication()} groups MAUDE problem terms into the
 complication categories defined by a user-supplied matching index. Input
-terms are normalized before matching, so differences in capitalization,
+terms are normalised before matching, so differences in capitalisation,
 punctuation, and spacing do not affect the result.
 
 A term may appear in more than one complication category if the underlying
 MAUDE index overlaps across categories. Returned values preserve the original
-user-supplied terms rather than the normalized versions used for matching.
+user-supplied terms rather than the normalised versions used for matching.
 Terms that do not match any index entry are returned under \code{"not_indexed"}.
 }
 \examples{

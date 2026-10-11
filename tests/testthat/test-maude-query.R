@@ -20,7 +20,7 @@ test_that("load_maude_codes returns annex A (device problems)", {
 })
 
 test_that("load_maude_codes rejects invalid annex", {
-  expect_error(load_maude_codes("Z"), "Invalid annex")
+  expect_error(load_maude_codes("Z"), "'annex' was given as Z")
 })
 
 test_that("every annex row carries its own term and its ancestry", {
