@@ -2,24 +2,21 @@
 % Please edit documentation in R/maude-adjudicate.R
 \name{maude_adjudicate}
 \alias{maude_adjudicate}
-\title{Adjudicate MAUDE adverse events with a structured \code{ellmer} chat}
+\title{Adjudicate a MAUDE Adverse Event With a Chat Model}
 \usage{
 maude_adjudicate(
   terms,
-  delimiter = ";",
   event_narrative,
   chat_object,
   definitions = card::complication_definitions,
-  index = card::maude_complication_index
+  index = card::maude_complication_index,
+  delimiter = ";"
 )
 }
 \arguments{
 \item{terms}{MAUDE problem terms, as a character vector or as one
 \code{delimiter}-separated string. Terms are normalised before they are matched
 against \code{index}.}
-
-\item{delimiter}{What separates the terms when \code{terms} arrives as a single
-string. Defaults to \code{";"}.}
 
 \item{event_narrative}{One adverse event narrative, usually the
 \code{event_description} column of \code{\link[=maude_query]{maude_query()}}. This is the clinical text
@@ -35,6 +32,9 @@ family so prior turns are not reused. See \code{\link[ellmer:chat]{ellmer::chat(
 \item{index}{Named list mapping complication identifiers to normalised MAUDE
 problem terms, named within \code{definitions} except for the residual
 \code{"not_indexed"}. Defaults to \link{maude_complication_index}.}
+
+\item{delimiter}{What separates the terms when \code{terms} arrives as a single
+string. Defaults to \code{";"}; \code{NULL} takes \code{terms} as already split.}
 }
 \value{
 A named list of complication families, each holding named \code{0}/\code{1}
@@ -48,10 +48,10 @@ adjudicated under one pair is not comparable to a dataset adjudicated
 under another, so store these beside the flags when adjudicating in bulk.
 }
 \description{
-\code{maude_adjudicate()} uses reported MAUDE problem terms to narrow the
-candidate complication families, then sends each selected family to an
-\code{ellmer} chat object one at a time for structured adjudication against the
-supplied event narrative.
+\code{maude_adjudicate()} reads one report's narrative and returns, for each
+complication family its coded problem terms point at, a set of \code{0}/\code{1}
+flags decided by an \strong{{ellmer}} chat model. Only the families the terms
+suggest are sent, one at a time, each with its clinical definition.
 }
 \details{
 \code{chat_object} is an \strong{{ellmer}} chat built by \code{\link[ellmer:chat]{ellmer::chat()}} or one of the

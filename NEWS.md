@@ -10,7 +10,7 @@
 
 * `maude_query()` now returns the device problem terms it promises. The `device_problem` column was read from `device[].device_problem_codes`, which the openFDA device event endpoint never returns; the terms are at the top level of the record, in `product_problems`. Nothing errored and nothing warned, so the column arrived present, typed, and `NA` for every row of every query ever run, which reads as "MAUDE does not code device problems for these reports" rather than as a bug. In a 41,403-report extract of pulsed-field ablation reports it was empty throughout and the malfunction-mechanism analysis was nearly abandoned on that basis. Note the asymmetry that caused it: `device.device_problem_codes` is a valid field to *search* on, so the `device_problem` argument was always filtering correctly on a field that is never returned.
 
-* `load_maude_codes()` no longer gives 26 of the 27 Annex A families the wrong term. The bundled table was built by filling the level columns downward, which carries the previous family's last child into the next family row -- a family's Level 2 cell is blank because a family has no Level 2 term, not because the value is missing. `A02` was therefore returned as `"Implant subsidence"` rather than `"Manufacturing, Packaging or Shipping Problem"`. FDA codes a large share of reports at the family level, so joining returned MAUDE terms to this table on `term` silently dropped them: measured on the same pulsed-field extract, leaf-only matching left 3,466 of 11,683 device problem mentions unmatched. The hierarchy is now read from the IMDRF code, which spells the ancestry out exactly, and `level_1` is populated for every row of every annex. It was previously missing on 783 of 807 Annex E rows and 43 of 72 Annex F rows, so those two annexes had effectively no hierarchy at all.
+* `maude_codes()` no longer gives 26 of the 27 Annex A families the wrong term. The bundled table was built by filling the level columns downward, which carries the previous family's last child into the next family row -- a family's Level 2 cell is blank because a family has no Level 2 term, not because the value is missing. `A02` was therefore returned as `"Implant subsidence"` rather than `"Manufacturing, Packaging or Shipping Problem"`. FDA codes a large share of reports at the family level, so joining returned MAUDE terms to this table on `term` silently dropped them: measured on the same pulsed-field extract, leaf-only matching left 3,466 of 11,683 device problem mentions unmatched. The hierarchy is now read from the IMDRF code, which spells the ancestry out exactly, and `level_1` is populated for every row of every annex. It was previously missing on 783 of 807 Annex E rows and 43 of 72 Annex F rows, so those two annexes had effectively no hierarchy at all.
 
 * `maude_query()` no longer repeats each coded term. openFDA emits the `product_problems` and `patient.patient_problems` arrays twice for most records, an artefact of how the endpoint joins its tables, so a single-device report came back as `"Pericarditis; Pericarditis"`. Narrative blocks are still returned in full: each carries its own `mdr_text_key` and a supplement may legitimately repeat the text of the report it amends.
 
@@ -50,11 +50,11 @@ It had been left terminal on the rule that the chain stops at the operating comp
 
 * Two fields that would have been the obvious choices are not returned, because openFDA serves them empty: `event_key`, documented as the link between an initial report and its supplements, was blank for every one of 300 records tested, and `event_location` for all but 1.7%. `mfr_report_type` is returned in place of the first and marks a filing as `"Follow-Up"` without naming what it follows, which supports dropping follow-ups as a sensitivity but not a true de-duplication. `reporter_country_code` stands in for the second. Both substitutions are recorded here rather than only in the code, since "the field for this is served empty" is a stronger limitation than "we did not have it".
 
-* `normalize_maude_manufacturer()` maps MAUDE's manufacturing entities onto a canonical name.
+* `maude_normalize_manufacturer()` maps MAUDE's manufacturing entities onto a canonical name.
 `manufacturer_name` is the plant, not the company, so counting the raw strings splits Biosense Webster across four plants plus `STOCKERT GMBH`, divides Boston Scientific's pulsed-field reports between `BOSTON SCIENTIFIC CORPORATION` and `FARAPULSE, INC.`, and hides Abbott behind `VENUSA DE MEXICO S.A. DE C.V.`, a contract manufacturer.
 A string the registry does not cover returns `NA` rather than a guess.
 
-* `resolve_maude_owner()` answers the separate question of who owned an entity, and when.
+* `maude_resolve_owner()` answers the separate question of who owned an entity, and when.
 Ownership is dated rather than a company name baked into each alias, which is what makes an acquisition **one row**: `"Telectronics Pacing Systems"` reaches Abbott through St. Jude Medical without anyone writing Abbott next to Telectronics, and acquiring a parent carries every entity beneath it.
 It also expresses a divestiture, which a single-parent column cannot — an entity with no row matching the date owns itself, so Physio-Control resolves to Medtronic in 2005, to itself in 2014, and to Stryker in 2020 — and an entity sold on twice, so Cordis resolves to Johnson & Johnson in 2010, to Cardinal Health in 2018, and to Hellman & Friedman today.
 `as_of` has deliberately no default: pass `Sys.Date()` for the company that owns the entity now, or a report's `date_received` for the company that owned it when the report was filed.
@@ -67,7 +67,7 @@ It returns the terms with the window each was in use, so `maude_query(manufactur
 * `maude_query()` warns when a manufacturer filter names a company whose other names are being left out, saying which ones and pointing at `maude_search_terms()`.
 It does not expand the query, since the query sent should stay the query written.
 
-* `normalize_maude_ablation()` derives the ablation platform, energy modality and maker from the brand name.
+* `maude_normalize_ablation()` derives the ablation platform, energy modality and maker from the brand name.
 Product code does not determine modality — `OAE` covers cryoablation and radiofrequency alike — so a rule resolving it from the product code and falling back to radiofrequency puts cryoballoon, pulsed-field and laser devices in a radiofrequency arm.
 Two things it is careful about: `"arctic"` as a substring is not a cryoablation signal, since `ARCTIC SUN` is a temperature management console, and the mapping, access and irrigation devices that share the ablation product codes (`PENTARAY`, `OCTARAY`, `FARADRIVE`, `RHYTHMIA`, `ENSITE`) are matched but carry no modality rather than being swept into an arm.
 The table names the entity that makes each platform, never its corporate parent, so it does not have to be edited when a company is acquired.
@@ -103,11 +103,17 @@ Precedence is no longer a hand-maintained `priority` column: where a string matc
 
 ## Updates
 
+* Every user-facing MAUDE function now starts with `maude_`, so the family tab-completes together: `query_maude()` is `maude_query()`, `adjudicate_maude_event()` is `maude_adjudicate()`, `load_maude_codes()` is `maude_codes()`, and the three entity lookups are `maude_normalize_manufacturer()`, `maude_normalize_ablation()` and `maude_resolve_owner()`. The old names are removed rather than kept as aliases; `normalize_maude_terms()` is no longer exported.
+
+* `maude_adjudicate()` refuses a bad argument before anything is sent to the model. Passing `chat_object = NULL` previously died inside the function with `attempt to apply non-function`, which named neither the argument nor the fix. `delimiter` has moved to the end of the argument list, so the three required arguments come first.
+
+* `maude_codes()` and `maude_search_terms()` accept their name in any case, so `maude_codes("a")` and `maude_search_terms("abbott")` work. An unknown company is reported with the registry's closest names where there are any, and without an empty clause where there are not.
+
 * Internal helpers no longer have their own help pages. The 22 pages such as `?cosinor_jacobian` and `?.parse_csq_field` are gone; the same text stays as comments above each function in the source.
 
 * `maude_fda_api_call()` explains an HTTP 403 rather than passing openFDA's message through. openFDA answers any refused anonymous request with "No api_key was supplied", which is what it says whether the per-minute rate was exceeded or `limit` was set above 999 -- neither of which needs a key to fix.
 
-* `load_maude_codes()` documents the annex hierarchy and the polyhierarchy in Annex E, where a term such as "Brain Injury" belongs to two families and so appears on one row per parent. That is correct, and it will double-count if a join on `term` is then tallied without reducing to `imdrf_code` first.
+* `maude_codes()` documents the annex hierarchy and the polyhierarchy in Annex E, where a term such as "Brain Injury" belongs to two families and so appears on one row per parent. That is correct, and it will double-count if a join on `term` is then tallied without reducing to `imdrf_code` first.
 
 * The `extract_*()` echocardiogram functions are now vectorized over `text` and return one element per report. `extract_echo_findings()` accordingly returns a tibble with one row per report instead of a list.
 

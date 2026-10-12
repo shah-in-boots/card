@@ -46,7 +46,7 @@
 #' # Procedure codes from the 2014 version of ICD-9
 #' icd9 <- get_procedure_codes(format = "icd9", version = 2014)
 #'
-#' @seealso [load_maude_codes()] for the FDA MDR adverse event code tables,
+#' @seealso [maude_codes()] for the FDA MDR adverse event code tables,
 #'   which are bundled data rather than an accessor.
 #'
 #' @name get_procedure_codes

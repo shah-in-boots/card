@@ -284,3 +284,28 @@ test_that("maude_adjudicate returns an empty result when no terms remain", {
   )
   expect_identical(out, list())
 })
+
+test_that("maude_adjudicate refuses a bad argument before anything is sent", {
+  skip_if_not_installed("ellmer")
+  chat <- new_mock_maude_chat(list())
+
+  # Each guard trips on its own argument, so the message names the fix. A NULL
+  # chat previously died inside the function with "attempt to apply
+  # non-function".
+  expect_error(
+    maude_adjudicate(1, event_narrative = "x", chat_object = chat),
+    "'terms' must be a character vector"
+  )
+  expect_error(
+    maude_adjudicate("Pericardial Effusion", event_narrative = c("a", "b"), chat_object = chat),
+    "'event_narrative' must be a single character string"
+  )
+  expect_error(
+    maude_adjudicate("Pericardial Effusion", event_narrative = "x", chat_object = NULL),
+    "'chat_object' must be an ellmer chat"
+  )
+  expect_error(
+    maude_adjudicate("Pericardial Effusion", event_narrative = "x", chat_object = chat, delimiter = 1),
+    "'delimiter' must be NULL or a single character string"
+  )
+})

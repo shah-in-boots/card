@@ -124,7 +124,7 @@ could not.
 does not name the report it follows.
 \item \code{device_generic_name}, \code{device_brand_name}, \code{manufacturer_name} — the
 device and its maker as the reporter typed them, which is what
-\code{\link[=normalize_maude_manufacturer]{normalize_maude_manufacturer()}} and \code{\link[=normalize_maude_ablation]{normalize_maude_ablation()}} are
+\code{\link[=maude_normalize_manufacturer]{maude_normalize_manufacturer()}} and \code{\link[=maude_normalize_ablation]{maude_normalize_ablation()}} are
 for.
 \item \code{event_description} — the narrative blocks, \code{" | "}-delimited.
 \item \code{patient_problem} — coded patient problems from
@@ -143,36 +143,37 @@ With \code{count}, \code{maude_fda_api_call()} returns a two-column \emph{tibble
 }
 \description{
 \code{maude_query()} searches the Manufacturer and User Facility Device Experience
-(MAUDE) database through the openFDA API, building the search string,
-paginating, and parsing the records, which is what most calls want.
+(MAUDE) database through the openFDA API and returns one row per report. It
+builds the search string, paginates, and parses the records.
 
-\code{maude_fda_api_call()} sends one request as written, since custom pagination
-and the \code{count} endpoint need a query string the caller controls.
+\code{maude_fda_api_call()} sends one request as written. Reach for it for the
+\code{count} endpoint, for custom pagination, or for a query the arguments of
+\code{maude_query()} cannot express.
 }
 \details{
-The endpoint carries publicly releasable reports from mandatory reporters
-(manufacturers, importers, and device user facilities) and from voluntary
-ones (clinicians, patients, and consumers), covering roughly 1992 onward and
-updated weekly.
+A query is built from the named field arguments, \code{...}, and \code{search}, joined
+by \code{AND}. \code{search} takes \emph{Elasticsearch} syntax over the fields openFDA lists
+at \url{https://open.fda.gov/apis/device/event/searchable-fields/}, so anything
+the arguments cannot say can be written there by hand. \code{vignette("maude")}
+has the syntax and worked queries. The field list is openFDA's and changes
+more often than this page can follow.
 
-\code{maude_query()} sorts on \code{date_received:desc} so that pagination is
-deterministic, splits a large \code{limit} into requests of 999, and waits between
-them to stay under openFDA's rate limit of about 240 requests a minute. The
-daily ceiling is 1,000 requests for an anonymous caller and 120,000 with an
-\code{api_key}, so a key is worth registering for bulk work and changes nothing
-otherwise. openFDA also refuses a \code{skip} beyond 25,000 records, which caps
-\code{limit} at 26,000, so a larger pull has to be split by date range.
-
-\code{search} takes \emph{Elasticsearch} syntax over the fields openFDA publishes at
-\url{https://open.fda.gov/apis/device/event/searchable-fields/}, and the field
-arguments and \code{...} are conveniences that build that same string. See
-\code{vignette("maude")} for the syntax and worked queries, and openFDA's own
-documentation for the field list, which changes more often than this page
-can follow.
+\code{limit} caps the whole call. \code{maude_query()} requests 999 records at a time,
+sorted on \code{date_received:desc} so that pages do not shift, and pauses between
+requests to stay under openFDA's rate limit of about 240 a minute. The daily
+ceiling is 1,000 requests without an \code{api_key} and 120,000 with one, so a key
+is worth registering for bulk work. openFDA refuses a \code{skip} past 25,000
+records, which caps \code{limit} at 26,000; a larger pull has to be split by date
+range.
 
 A query matching nothing is answered with HTTP 404 rather than an empty
-array. Both functions return an empty tibble for it rather than raising an
-error, since an empty stratum is a result and not a failure to retry.
+array. Both functions return an empty tibble for it, since an empty stratum
+is a result and not a failure to retry.
+
+MAUDE holds publicly releasable reports from mandatory reporters
+(manufacturers, importers, and device user facilities) and voluntary ones
+(clinicians, patients, and consumers), from about 1992 onward, updated
+weekly.
 }
 \section{Counting rather than retrieving}{
 \code{maude_fda_api_call(count = )} reaches the openFDA count endpoint, which

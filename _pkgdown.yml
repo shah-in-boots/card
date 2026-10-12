@@ -24,10 +24,9 @@ development:
 home:
   title: Cardiovascular Applications for Research Data
   description: >
-    A collection of cardiovascular research datasets and analytical tools,
-    including methods for cardiovascular procedural data, such as
-    electrocardiography, echocardiography, and catheterization data.
-    Additional methods exist for analysis of procedural billing codes.
+    Datasets and tools for cardiovascular research data: FDA MAUDE device
+    adverse event reports, echocardiogram report text, procedural billing
+    codes, variant annotations, and cosinor models of circadian rhythm.
 
 navbar:
   structure:

@@ -14,7 +14,7 @@ A \code{tbl_df} with columns \code{platform}, \code{aliases}, \code{modality}, \
 Curated table mapping the brand strings that appear in MAUDE
 onto the ablation platform they belong to, the energy that platform
 delivers, and the entity that makes it. Read by
-\code{\link[=normalize_maude_ablation]{normalize_maude_ablation()}}.
+\code{\link[=maude_normalize_ablation]{maude_normalize_ablation()}}.
 }
 \details{
 \code{aliases} work as they do in \code{\link[=maude_entities]{maude_entities()}}: literal terms separated by
@@ -27,7 +27,7 @@ them into an energy arm would count an access device as an ablation.
 
 \code{entity} names the company that makes the platform, never its corporate
 parent, so the table does not have to be edited when a company is acquired.
-Pass it to \code{\link[=resolve_maude_owner]{resolve_maude_owner()}} for the parent.
+Pass it to \code{\link[=maude_resolve_owner]{maude_resolve_owner()}} for the parent.
 }
 \examples{
 # Which platforms deliver pulsed field energy, and who makes them
@@ -39,5 +39,5 @@ platforms[
 
 }
 \seealso{
-\code{\link[=normalize_maude_ablation]{normalize_maude_ablation()}}, \code{\link[=maude_entities]{maude_entities()}}
+\code{\link[=maude_normalize_ablation]{maude_normalize_ablation()}}, \code{\link[=maude_entities]{maude_entities()}}
 }

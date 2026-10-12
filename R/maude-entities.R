@@ -62,7 +62,7 @@
 #'
 #' @description Curated table of the manufacturing entities that appear in
 #'   MAUDE, the strings each is known by, and the dated corporate ownership
-#'   above it. Read by [normalize_maude_manufacturer()], [resolve_maude_owner()]
+#'   above it. Read by [maude_normalize_manufacturer()], [maude_resolve_owner()]
 #'   and [maude_search_terms()].
 #'
 #' @details
@@ -83,7 +83,7 @@
 #'   `note` and `source`. `from` and `to` are `Date`.
 #'
 #' @seealso [maude_platforms()] for the ablation brands,
-#'   [normalize_maude_manufacturer()] and [maude_search_terms()] for the lookups
+#'   [maude_normalize_manufacturer()] and [maude_search_terms()] for the lookups
 #'   over this table.
 #'
 #' @examples
@@ -199,7 +199,7 @@ maude_entities <- function() {
 #' @description Curated table mapping the brand strings that appear in MAUDE
 #'   onto the ablation platform they belong to, the energy that platform
 #'   delivers, and the entity that makes it. Read by
-#'   [normalize_maude_ablation()].
+#'   [maude_normalize_ablation()].
 #'
 #' @details
 #' `aliases` work as they do in [maude_entities()]: literal terms separated by
@@ -212,12 +212,12 @@ maude_entities <- function() {
 #'
 #' `entity` names the company that makes the platform, never its corporate
 #' parent, so the table does not have to be edited when a company is acquired.
-#' Pass it to [resolve_maude_owner()] for the parent.
+#' Pass it to [maude_resolve_owner()] for the parent.
 #'
 #' @return A `tbl_df` with columns `platform`, `aliases`, `modality`, `entity`,
 #'   `note` and `source`.
 #'
-#' @seealso [normalize_maude_ablation()], [maude_entities()]
+#' @seealso [maude_normalize_ablation()], [maude_entities()]
 #'
 #' @examples
 #' # Which platforms deliver pulsed field energy, and who makes them
@@ -465,14 +465,14 @@ parent_of <- function(child, when, registry) {
 #' Normalise MAUDE Manufacturer and Device Strings
 #'
 #' @description
-#' `normalize_maude_manufacturer()` maps the `manufacturer_name` returned by
+#' `maude_normalize_manufacturer()` maps the `manufacturer_name` returned by
 #' [maude_query()] onto the entity that made the device, collapsing plants,
 #' spelling variants, and contract manufacturers onto one name.
 #'
-#' `normalize_maude_ablation()` maps a cardiac ablation `device_brand_name` onto
+#' `maude_normalize_ablation()` maps a cardiac ablation `device_brand_name` onto
 #' its platform, the energy modality it delivers, and the entity that makes it.
 #'
-#' `resolve_maude_owner()` follows an entity up its chain of acquisitions to the
+#' `maude_resolve_owner()` follows an entity up its chain of acquisitions to the
 #' company that owned it on a given date.
 #'
 #' `maude_search_terms()` runs the other way, from a company to every name its
@@ -480,25 +480,26 @@ parent_of <- function(child, when, registry) {
 #'
 #' @details
 #' All four read [maude_entities()] or [maude_platforms()], and all return `NA`
-#' rather than a guess for a value the registry does not cover.
+#' rather than a guess for a value the registry does not cover. On the result of
+#' [maude_query()] the usual pipeline is:
+#'
+#' ```r
+#' events |>
+#'   dplyr::mutate(
+#'     entity  = maude_normalize_manufacturer(manufacturer_name),
+#'     company = maude_resolve_owner(entity, as_of = Sys.Date()),
+#'     at_time = maude_resolve_owner(entity, as_of = date_received)
+#'   )
+#' ```
 #'
 #' # Why normalising and resolving are separate
 #'
 #' Which company a string names does not change with time. Who owns that company
 #' does. Keeping them apart is what lets one acquisition be one row rather than a
-#' rewrite of every alias beneath it, and it is why `resolve_maude_owner()`
-#' requires `as_of` while `normalize_maude_manufacturer()` takes no date at all:
+#' rewrite of every alias beneath it, and it is why `maude_resolve_owner()`
+#' requires `as_of` while `maude_normalize_manufacturer()` takes no date at all.
 #'
-#' ```r
-#' events |>
-#'   dplyr::mutate(
-#'     entity  = normalize_maude_manufacturer(manufacturer_name),
-#'     company = resolve_maude_owner(entity, as_of = Sys.Date()),
-#'     at_time = resolve_maude_owner(entity, as_of = date_received)
-#'   )
-#' ```
-#'
-#' `company` counts every St. Jude report as Abbott, which is what a question
+#' In the pipeline above, `company` counts every St. Jude report as Abbott, which is what a question
 #' about today's market wants. `at_time` counts a 2010 report as St. Jude, which
 #' is what a question about who was shipping the device then wants. Neither is a
 #' default, because picking one silently would answer a question the caller did
@@ -536,12 +537,12 @@ parent_of <- function(child, when, registry) {
 #'   returned in the `device_brand_name` column of [maude_query()].
 #'
 #' @param entity Character vector of entity names, as returned by
-#'   `normalize_maude_manufacturer()` or in the `entity` column of
-#'   `normalize_maude_ablation()`.
+#'   `maude_normalize_manufacturer()` or in the `entity` column of
+#'   `maude_normalize_ablation()`.
 #'
 #' @param company The company to search from, named as the registry names it.
 #'
-#' @param as_of For `resolve_maude_owner()`, the date to resolve ownership at,
+#' @param as_of For `maude_resolve_owner()`, the date to resolve ownership at,
 #'   recycled against `entity`. There is deliberately no default: the answer
 #'   changes with it, and a `Sys.Date()` default would make the same code return
 #'   different results after a future acquisition without anything in the call
@@ -556,11 +557,11 @@ parent_of <- function(child, when, registry) {
 #' @param platforms The platform registry to read, defaulting to
 #'   [maude_platforms()].
 #'
-#' @return `normalize_maude_manufacturer()` returns a character vector the same
+#' @return `maude_normalize_manufacturer()` returns a character vector the same
 #'   length as `manufacturer_name`, holding the entity name or `NA` where the
 #'   registry does not cover the string.
 #'
-#'   `resolve_maude_owner()` returns a character vector the same length as
+#'   `maude_resolve_owner()` returns a character vector the same length as
 #'   `entity`, holding the company that owned it on `as_of`. An entity nobody
 #'   owned on that date resolves to itself, which is how a divestiture is
 #'   expressed: Physio-Control resolves to Medtronic in 2005, to itself in 2014,
@@ -573,7 +574,7 @@ parent_of <- function(child, when, registry) {
 #'     where the window is unbounded. The company's own terms carry `NA` for
 #'     both.
 #'
-#'   `normalize_maude_ablation()` returns a `tbl_df` with one row per input:
+#'   `maude_normalize_ablation()` returns a `tbl_df` with one row per input:
 #'   - `device_brand_name` — the input string, unchanged.
 #'   - `platform` — the device platform, such as `"Arctic Front"`.
 #'   - `modality` — one of `"cryoablation"`, `"radiofrequency"`,
@@ -581,7 +582,7 @@ parent_of <- function(child, when, registry) {
 #'     both for an unmatched brand and for a matched device that delivers no
 #'     energy, so check `platform` to tell the two apart.
 #'   - `entity` — the entity that makes the platform. Pass it to
-#'     `resolve_maude_owner()` for the corporate parent.
+#'     `maude_resolve_owner()` for the corporate parent.
 #'
 #' @seealso [maude_entities()] and [maude_platforms()] for the registries these
 #'   read, and [maude_query()] for the columns they are applied to.
@@ -589,7 +590,7 @@ parent_of <- function(child, when, registry) {
 #' @examples
 #' # Plants, spelling variants, and a contract manufacturer collapse onto one
 #' # entity, without anyone having to say when
-#' normalize_maude_manufacturer(c(
+#' maude_normalize_manufacturer(c(
 #'   "BOSTON SCIENTIFIC CORPORATION",
 #'   "FARAPULSE, INC.",
 #'   "BIOSENSE WEBSTER, INC. (JUAREZ)",
@@ -598,13 +599,13 @@ parent_of <- function(child, when, registry) {
 #' ))
 #'
 #' # Ownership is the part that needs a date
-#' resolve_maude_owner(
+#' maude_resolve_owner(
 #'   "St. Jude Medical",
 #'   as_of = as.Date(c("2010-01-01", "2024-01-01"))
 #' )
 #'
 #' # A divestiture, which a single-parent table cannot express
-#' resolve_maude_owner(
+#' maude_resolve_owner(
 #'   "Physio-Control",
 #'   as_of = as.Date(c("2005-01-01", "2014-01-01", "2020-01-01"))
 #' )
@@ -613,7 +614,7 @@ parent_of <- function(child, when, registry) {
 #' maude_search_terms("Abbott")
 #'
 #' # Modality comes from the brand, not the product code
-#' normalize_maude_ablation(c(
+#' maude_normalize_ablation(c(
 #'   "ARCTIC FRONT ADVANCE PRO CARDIAC CRYOABLATION CATHETER",
 #'   "FARAWAVE PULSED FIELD ABLATION CATHETER",
 #'   "PENTARAY NAV"
@@ -624,7 +625,7 @@ NULL
 
 #' @rdname maude_normalization
 #' @export
-normalize_maude_manufacturer <- function(
+maude_normalize_manufacturer <- function(
   manufacturer_name,
   entities = maude_entities()
 ) {
@@ -640,7 +641,7 @@ normalize_maude_manufacturer <- function(
 
 #' @rdname maude_normalization
 #' @export
-normalize_maude_ablation <- function(
+maude_normalize_ablation <- function(
   device_brand_name,
   platforms = maude_platforms()
 ) {
@@ -665,7 +666,7 @@ normalize_maude_ablation <- function(
 
 #' @rdname maude_normalization
 #' @export
-resolve_maude_owner <- function(entity, as_of, entities = maude_entities()) {
+maude_resolve_owner <- function(entity, as_of, entities = maude_entities()) {
   # The message names the two things a caller is actually choosing between,
   # because the cost of a required argument is someone who does not know what
   # to pass, and "must be a Date" would not tell them.
@@ -744,15 +745,19 @@ maude_search_terms <- function(company, as_of = NULL, entities = maude_entities(
   )
 
   known <- unique(c(entities$entity, stats::na.omit(entities$parent)))
-  if (!company %in% known) {
+  hit <- match(tolower(company), tolower(known))
+  if (is.na(hit)) {
+    close <- utils::head(agrep(company, known, value = TRUE, ignore.case = TRUE), 5)
     stop(
       "'company' was given as ", company,
-      ", which the registry does not name. Names it does carry that look ",
-      "close: ", paste(utils::head(agrep(company, known, value = TRUE), 5),
-                       collapse = ", "),
+      ", which the registry does not name.",
+      if (length(close)) {
+        paste0(" Names it does carry that look close: ", paste(close, collapse = ", "))
+      },
       call. = FALSE
     )
   }
+  company <- known[[hit]]
 
   # Walk down from the company rather than up from each entity, carrying the
   # window each step was owned within. The window of a chain is the intersection
@@ -880,7 +885,7 @@ as_bounded_date <- function(x) {
 #' @noRd
 warn_maude_family <- function(manufacturer_name, entities = maude_entities()) {
   named <- unique(stats::na.omit(
-    normalize_maude_manufacturer(manufacturer_name, entities)
+    maude_normalize_manufacturer(manufacturer_name, entities)
   ))
   if (!length(named)) {
     return(invisible(NULL))

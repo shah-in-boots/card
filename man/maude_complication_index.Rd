@@ -5,17 +5,24 @@
 \alias{maude_complication_index}
 \title{MAUDE Complication Index for Cardiovascular Procedure Adverse Events}
 \format{
-An object of class \code{list} of length 16.
+A named list of character vectors. Names are the complication
+identifiers of \link{complication_definitions}, plus \code{not_indexed}.
 }
 \usage{
 maude_complication_index
 }
 \description{
-A named list of normalized MAUDE problem terms organized into the
-complication categories defined in \code{complication_definitions}, plus a
-residual \code{not_indexed} bucket. The list is maintained explicitly in
-\code{data-raw/complications.R} as hand-written term vectors. Overlap between
-categories is expected.
+A named list of MAUDE problem terms, lower-cased, grouped under the
+complication categories of \link{complication_definitions}, plus a residual
+\code{not_indexed} group. It is what \code{\link[=maude_term_to_complication]{maude_term_to_complication()}} and
+\code{\link[=maude_adjudicate]{maude_adjudicate()}} read to decide which families a report's coded terms
+point at. A term may sit under more than one category.
+}
+\details{
+To use your own grouping, build a list of the same shape, one character
+vector per category and named as in your \code{definitions}, and pass it as
+\code{index}. Terms are compared after case, punctuation and spacing are
+stripped, so they can be written as MAUDE displays them.
 }
 \examples{
 maude_complication_index$pericardial

@@ -1,26 +1,26 @@
-test_that("load_maude_codes returns annex E (clinical signs)", {
-  e <- load_maude_codes("E")
+test_that("maude_codes returns annex E (clinical signs)", {
+  e <- maude_codes("E")
   expect_s3_class(e, "tbl_df")
   expect_true(nrow(e) > 0)
   expect_true(all(c("term", "definition", "fda_code", "imdrf_code") %in% names(e)))
   expect_true("Arrhythmia" %in% e$term)
 })
 
-test_that("load_maude_codes returns annex F (health impact)", {
-  f <- load_maude_codes("F")
+test_that("maude_codes returns annex F (health impact)", {
+  f <- maude_codes("F")
   expect_s3_class(f, "tbl_df")
   expect_true(nrow(f) > 0)
   expect_true(all(c("term", "definition", "fda_code", "imdrf_code") %in% names(f)))
 })
 
-test_that("load_maude_codes returns annex A (device problems)", {
-  a <- load_maude_codes("A")
+test_that("maude_codes returns annex A (device problems)", {
+  a <- maude_codes("A")
   expect_s3_class(a, "tbl_df")
   expect_true(nrow(a) > 0)
 })
 
-test_that("load_maude_codes rejects invalid annex", {
-  expect_error(load_maude_codes("Z"), "'annex' was given as Z")
+test_that("maude_codes rejects invalid annex", {
+  expect_error(maude_codes("Z"), "'annex' was given as Z")
 })
 
 test_that("every annex row carries its own term and its ancestry", {
@@ -30,7 +30,7 @@ test_that("every annex row carries its own term and its ancestry", {
   # the previous family's last child as their `term`, so joining returned terms
   # to this table dropped every family-coded report.
   for (annex in c("A", "E", "F")) {
-    dat <- load_maude_codes(annex)
+    dat <- maude_codes(annex)
     families <- dat[nchar(dat$imdrf_code) == 3L, ]
 
     expect_false(anyNA(dat$term))
@@ -43,7 +43,7 @@ test_that("every annex row carries its own term and its ancestry", {
 })
 
 test_that("annex terms roll up to the family that owns them", {
-  a <- load_maude_codes("A")
+  a <- maude_codes("A")
 
   expect_identical(
     a$term[a$imdrf_code == "A05"],
@@ -56,7 +56,7 @@ test_that("annex terms roll up to the family that owns them", {
 
   # Annex E is a polyhierarchy: "Brain Injury" sits under two families, so the
   # code appears once per parent rather than once.
-  e <- load_maude_codes("E")
+  e <- maude_codes("E")
   expect_setequal(
     e$level_1[e$imdrf_code == "E0102"],
     c("Nervous System", "Injury")
@@ -395,4 +395,9 @@ test_that("VALIDATION device_problem is populated against the live API", {
 
   expect_gt(nrow(dat), 0)
   expect_false(all(is.na(dat$device_problem)))
+})
+
+test_that("maude_codes accepts the annex letter in either case", {
+  expect_identical(maude_codes("a"), maude_codes("A"))
+  expect_error(maude_codes(c("A", "E")), "must be a single letter")
 })

@@ -21,14 +21,10 @@ frequency](https://img.shields.io/github/commit-activity/w/shah-in-boots/card)](
 
 ## Cardiovascular Applications for Research Data
 
-The inspiration for `{card}` was to create useful functions and
-analytical approaches in computational neurocardiology, with a on
-electrocardiography and epidemiology.
-
-The areas of focus of this package are the following:
-
-- handling of recurrent and circadian events
-- epidemiological focus on effective model building
+`{card}` collects datasets and tools for cardiovascular research data:
+FDA MAUDE device adverse event reports, echocardiogram report text,
+procedural billing codes, and clinical genetics annotations, with
+cosinor rhythm models that are moving to a package of their own.
 
 ## Installation
 
@@ -117,7 +113,39 @@ head(geh)
 #> #   lab_tchol <dbl>, lab_ldlchol <dbl>, lab_hdlchol <dbl>, lab_triglyc <dbl>, …
 ```
 
+### MAUDE adverse event reports
+
+`{card}` queries the FDA’s MAUDE database through openFDA, resolves the
+free-text manufacturer and brand strings onto companies and ablation
+platforms, and groups the coded problem terms into clinical complication
+families. Every user-facing function starts with `maude_`.
+
+``` r
+events <- maude_query(device_brand_name = "FARAWAVE", limit = 500)
+```
+
+The manufacturer field names the plant rather than the company, and who
+owns a company changes with time, so the two are resolved separately:
+
+``` r
+maude_normalize_manufacturer(c("BIOSENSE WEBSTER, INC. (JUAREZ)", "FARAPULSE, INC."))
+#> [1] "Biosense Webster" "Farapulse"
+maude_resolve_owner("Farapulse", as_of = as.Date(c("2019-01-01", "2024-01-01")))
+#> [1] "Farapulse"         "Boston Scientific"
+maude_term_to_complication(c("Cardiac Tamponade", "Pericardial Effusion"))
+#> $pericardial
+#> [1] "Cardiac Tamponade"    "Pericardial Effusion"
+```
+
+`maude_adjudicate()` sends a report’s narrative to an **{ellmer}** chat
+model and returns one set of 0/1 flags per candidate complication
+family. `vignette("maude")` walks through the whole workflow.
+
 ### Cosinor Analysis
+
+`cosinor()` and its companions will leave `{card}` before version 1.0,
+for a separate package for recurring and periodic events; see
+`?cosinor`.
 
 This modeling algorithm requires only base `R`, which allows internal
 flexibility for modeling heuristics and improved efficiency. For the
@@ -168,7 +196,7 @@ ggcosinor(m)
 #> `geom_smooth()` using formula = 'y ~ s(x, bs = "cs")'
 ```
 
-<img src="man/figures/unnamed-chunk-6-1.png" alt="" width="100%" />
+<img src="man/figures/cosinor-1.png" alt="" width="100%" />
 
 ``` r
 

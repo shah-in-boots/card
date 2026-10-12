@@ -117,7 +117,7 @@ FDA codes each report against annexed term lists, and the annexes are bundled:
 
 ```{r}
 #| label: annex
-annex_a <- load_maude_codes("A")
+annex_a <- maude_codes("A")
 head(annex_a[, c("imdrf_code", "term", "level_1")], 4)
 ```
 
@@ -131,11 +131,11 @@ Counting the raw strings splits one maker across its plants and hides another be
 
 ```{r}
 #| label: manufacturer
-normalize_maude_manufacturer(c(
+maude_normalize_manufacturer(c(
   "BIOSENSE WEBSTER, INC. (JUAREZ)",
   "FARAPULSE, INC.",
   "VENUSA DE MEXICO S.A. DE C.V.",
-  "SOME COMPANY NOT IN THE INDEX"
+  "SOME COMPANY NOT IN THE REGISTRY"
 ))
 ```
 
@@ -166,7 +166,7 @@ Ablation modality comes from the brand, since the product code does not determin
 
 ```{r}
 #| label: ablation
-normalize_maude_ablation(c(
+maude_normalize_ablation(c(
   "FARAWAVE PULSED FIELD ABLATION CATHETER",
   "ARCTIC FRONT ADVANCE PRO",
   "PENTARAY NAV"
@@ -180,7 +180,7 @@ Who owns an entity changes with time, which is why it is resolved separately and
 
 ```{r}
 #| label: ownership
-resolve_maude_owner("Farapulse", as_of = as.Date(c("2019-01-01", "2024-01-01")))
+maude_resolve_owner("Farapulse", as_of = as.Date(c("2019-01-01", "2024-01-01")))
 ```
 
 Pass `Sys.Date()` for the company that owns the entity now, or a report's `date_received` for the company that owned it when the report was filed.
@@ -191,7 +191,7 @@ Cordis was Johnson & Johnson's, then Cardinal Health's from 2015, then Hellman &
 
 ```{r}
 #| label: cordis
-resolve_maude_owner(
+maude_resolve_owner(
   rep("Cordis", 3),
   as_of = as.Date(c("2010-01-01", "2018-01-01", "2024-01-01"))
 )

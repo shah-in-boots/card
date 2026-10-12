@@ -13,7 +13,7 @@ A \code{tbl_df} with columns \code{entity}, \code{aliases}, \code{parent}, \code
 \description{
 Curated table of the manufacturing entities that appear in
 MAUDE, the strings each is known by, and the dated corporate ownership
-above it. Read by \code{\link[=normalize_maude_manufacturer]{normalize_maude_manufacturer()}}, \code{\link[=resolve_maude_owner]{resolve_maude_owner()}}
+above it. Read by \code{\link[=maude_normalize_manufacturer]{maude_normalize_manufacturer()}}, \code{\link[=maude_resolve_owner]{maude_resolve_owner()}}
 and \code{\link[=maude_search_terms]{maude_search_terms()}}.
 }
 \details{
@@ -38,6 +38,6 @@ entities[!is.na(entities$parent) & entities$parent == "Medtronic", ]
 }
 \seealso{
 \code{\link[=maude_platforms]{maude_platforms()}} for the ablation brands,
-\code{\link[=normalize_maude_manufacturer]{normalize_maude_manufacturer()}} and \code{\link[=maude_search_terms]{maude_search_terms()}} for the lookups
+\code{\link[=maude_normalize_manufacturer]{maude_normalize_manufacturer()}} and \code{\link[=maude_search_terms]{maude_search_terms()}} for the lookups
 over this table.
 }

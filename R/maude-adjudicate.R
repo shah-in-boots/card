@@ -1,10 +1,10 @@
-#' Adjudicate MAUDE adverse events with a structured `ellmer` chat
+#' Adjudicate a MAUDE Adverse Event With a Chat Model
 #'
 #' @description
-#' `maude_adjudicate()` uses reported MAUDE problem terms to narrow the
-#' candidate complication families, then sends each selected family to an
-#' `ellmer` chat object one at a time for structured adjudication against the
-#' supplied event narrative.
+#' `maude_adjudicate()` reads one report's narrative and returns, for each
+#' complication family its coded problem terms point at, a set of `0`/`1`
+#' flags decided by an **{ellmer}** chat model. Only the families the terms
+#' suggest are sent, one at a time, each with its clinical definition.
 #'
 #' @details
 #' `chat_object` is an **{ellmer}** chat built by [ellmer::chat()] or one of the
@@ -29,9 +29,6 @@
 #'   `delimiter`-separated string. Terms are normalised before they are matched
 #'   against `index`.
 #'
-#' @param delimiter What separates the terms when `terms` arrives as a single
-#'   string. Defaults to `";"`.
-#'
 #' @param event_narrative One adverse event narrative, usually the
 #'   `event_description` column of [maude_query()]. This is the clinical text
 #'   the model reads.
@@ -46,6 +43,9 @@
 #' @param index Named list mapping complication identifiers to normalised MAUDE
 #'   problem terms, named within `definitions` except for the residual
 #'   `"not_indexed"`. Defaults to [maude_complication_index].
+#'
+#' @param delimiter What separates the terms when `terms` arrives as a single
+#'   string. Defaults to `";"`; `NULL` takes `terms` as already split.
 #'
 #' @return A named list of complication families, each holding named `0`/`1`
 #'   flags for its classifications.
@@ -77,11 +77,11 @@
 #' @export
 maude_adjudicate <- function(
   terms,
-  delimiter = ";",
   event_narrative,
   chat_object,
   definitions = card::complication_definitions,
-  index = card::maude_complication_index
+  index = card::maude_complication_index,
+  delimiter = ";"
 ) {
   # `ellmer` is optional for the package overall, so fail clearly only
   # when this LLM-dependent workflow is actually used.
@@ -90,6 +90,34 @@ maude_adjudicate <- function(
       "Package 'ellmer' must be installed to use 'maude_adjudicate()'",
       call. = FALSE
     )
+  }
+
+  # Everything below costs a model call per family, so the arguments are
+  # refused here rather than failing inside the chat with a message that names
+  # neither the argument nor the function.
+  if (!is.character(terms)) {
+    stop("'terms' must be a character vector of MAUDE problem terms", call. = FALSE)
+  }
+  if (
+    !is.character(event_narrative) || length(event_narrative) != 1 ||
+      is.na(event_narrative)
+  ) {
+    stop("'event_narrative' must be a single character string", call. = FALSE)
+  }
+  # Duck-typed rather than `inherits(, "Chat")`, since the four methods are all
+  # that is used and a test double need not be an ellmer object.
+  chat_methods <- c("chat_structured", "clone", "set_turns", "set_system_prompt")
+  has_methods <- (is.environment(chat_object) || is.list(chat_object)) &&
+    all(vapply(chat_methods, function(m) is.function(chat_object[[m]]), logical(1)))
+  if (!has_methods) {
+    stop(
+      "'chat_object' must be an ellmer chat, as returned by ",
+      "'ellmer::chat_openai()' or another 'ellmer::chat_*()' constructor",
+      call. = FALSE
+    )
+  }
+  if (!is.null(delimiter) && (!is.character(delimiter) || length(delimiter) != 1)) {
+    stop("'delimiter' must be NULL or a single character string", call. = FALSE)
   }
 
 
@@ -286,9 +314,7 @@ maude_adjudicate <- function(
 #'   "Cardiac Tamponade",
 #'   "Low blood pressure / hypotension",
 #'   "No Health Consequences or Impact"
-#' ),
-#' definitions = complication_definitions,
-#' index = maude_complication_index)
+#' ))
 #'
 #' @export
 maude_term_to_complication <- function(

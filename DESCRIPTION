@@ -13,9 +13,13 @@ Authors@R: c(
         role = "ctb",
         email = "reese@ss4medical.com")
     )
-Description: A collection of cardiovascular research datasets and analytical
-		tools, including methods for cardiovascular procedural data, such as 
-		electrocardiography, echocardiography, and catheterization data. Additional methods exist for analysis of procedural billing codes.
+Description: Datasets and tools for cardiovascular research data. Queries the
+    FDA MAUDE database of medical device adverse event reports through
+    'openFDA', resolves its free-text manufacturer and brand strings onto
+    companies and ablation platforms, and groups its coded problem terms into
+    clinical complications. Extracts measurements from echocardiogram report
+    text, looks up procedural billing codes, reads variant annotations, and
+    fits cosinor models of circadian rhythm.
 License: MIT + file LICENSE
 URL: https://cran.r-project.org/package=card
 BugReports: https://github.com/shah-in-boots/card/issues
@@ -50,5 +54,5 @@ Suggests:
     rvest,
     xml2
 VignetteBuilder: knitr, quarto
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0
 Config/testthat/edition: 3

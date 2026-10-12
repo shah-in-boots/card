@@ -4,7 +4,7 @@
 ^CRAN-SUBMISSION$
 ^LICENSE\.md$
 ^R/dev\.R$
-^README\.rmd$
+^readme\.(rmd|html)$
 ^README_cache$
 ^\.Rproj\.user$
 ^\.claude$

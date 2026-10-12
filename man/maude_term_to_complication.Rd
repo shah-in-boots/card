@@ -42,8 +42,6 @@ maude_term_to_complication(c(
   "Cardiac Tamponade",
   "Low blood pressure / hypotension",
   "No Health Consequences or Impact"
-),
-definitions = complication_definitions,
-index = maude_complication_index)
+))
 
 }

@@ -57,6 +57,6 @@ icd9 <- get_procedure_codes(format = "icd9", version = 2014)
 
 }
 \seealso{
-\code{\link[=load_maude_codes]{load_maude_codes()}} for the FDA MDR adverse event code tables,
+\code{\link[=maude_codes]{maude_codes()}} for the FDA MDR adverse event code tables,
 which are bundled data rather than an accessor.
 }

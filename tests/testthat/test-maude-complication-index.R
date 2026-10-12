@@ -7,9 +7,9 @@ normalize_maude_test_term <- function(x) {
 test_that("maude_complication_index covers all MAUDE problem terms", {
   source_terms <-
     dplyr::bind_rows(
-      load_maude_codes("A"),
-      load_maude_codes("E"),
-      load_maude_codes("F")
+      maude_codes("A"),
+      maude_codes("E"),
+      maude_codes("F")
     ) |>
     dplyr::distinct(annex, imdrf_code, .keep_all = TRUE) |>
     dplyr::transmute(term = normalize_maude_test_term(term)) |>

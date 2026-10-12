@@ -156,11 +156,19 @@
 
 #' MAUDE Complication Index for Cardiovascular Procedure Adverse Events
 #'
-#' A named list of normalized MAUDE problem terms organized into the
-#' complication categories defined in `complication_definitions`, plus a
-#' residual `not_indexed` bucket. The list is maintained explicitly in
-#' `data-raw/complications.R` as hand-written term vectors. Overlap between
-#' categories is expected.
+#' A named list of MAUDE problem terms, lower-cased, grouped under the
+#' complication categories of [complication_definitions], plus a residual
+#' `not_indexed` group. It is what [maude_term_to_complication()] and
+#' [maude_adjudicate()] read to decide which families a report's coded terms
+#' point at. A term may sit under more than one category.
+#'
+#' To use your own grouping, build a list of the same shape, one character
+#' vector per category and named as in your `definitions`, and pass it as
+#' `index`. Terms are compared after case, punctuation and spacing are
+#' stripped, so they can be written as MAUDE displays them.
+#'
+#' @format A named list of character vectors. Names are the complication
+#'   identifiers of [complication_definitions], plus `not_indexed`.
 #'
 #' @examples
 #' maude_complication_index$pericardial

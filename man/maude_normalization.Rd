@@ -2,17 +2,17 @@
 % Please edit documentation in R/maude-entities.R
 \name{maude_normalization}
 \alias{maude_normalization}
-\alias{normalize_maude_manufacturer}
-\alias{normalize_maude_ablation}
-\alias{resolve_maude_owner}
+\alias{maude_normalize_manufacturer}
+\alias{maude_normalize_ablation}
+\alias{maude_resolve_owner}
 \alias{maude_search_terms}
 \title{Normalise MAUDE Manufacturer and Device Strings}
 \usage{
-normalize_maude_manufacturer(manufacturer_name, entities = maude_entities())
+maude_normalize_manufacturer(manufacturer_name, entities = maude_entities())
 
-normalize_maude_ablation(device_brand_name, platforms = maude_platforms())
+maude_normalize_ablation(device_brand_name, platforms = maude_platforms())
 
-resolve_maude_owner(entity, as_of, entities = maude_entities())
+maude_resolve_owner(entity, as_of, entities = maude_entities())
 
 maude_search_terms(company, as_of = NULL, entities = maude_entities())
 }
@@ -30,10 +30,10 @@ returned in the \code{device_brand_name} column of \code{\link[=maude_query]{mau
 \code{\link[=maude_platforms]{maude_platforms()}}.}
 
 \item{entity}{Character vector of entity names, as returned by
-\code{normalize_maude_manufacturer()} or in the \code{entity} column of
-\code{normalize_maude_ablation()}.}
+\code{maude_normalize_manufacturer()} or in the \code{entity} column of
+\code{maude_normalize_ablation()}.}
 
-\item{as_of}{For \code{resolve_maude_owner()}, the date to resolve ownership at,
+\item{as_of}{For \code{maude_resolve_owner()}, the date to resolve ownership at,
 recycled against \code{entity}. There is deliberately no default: the answer
 changes with it, and a \code{Sys.Date()} default would make the same code return
 different results after a future acquisition without anything in the call
@@ -45,11 +45,11 @@ result to the entities the company owned on that date.}
 \item{company}{The company to search from, named as the registry names it.}
 }
 \value{
-\code{normalize_maude_manufacturer()} returns a character vector the same
+\code{maude_normalize_manufacturer()} returns a character vector the same
 length as \code{manufacturer_name}, holding the entity name or \code{NA} where the
 registry does not cover the string.
 
-\code{resolve_maude_owner()} returns a character vector the same length as
+\code{maude_resolve_owner()} returns a character vector the same length as
 \code{entity}, holding the company that owned it on \code{as_of}. An entity nobody
 owned on that date resolves to itself, which is how a divestiture is
 expressed: Physio-Control resolves to Medtronic in 2005, to itself in 2014,
@@ -64,7 +64,7 @@ where the window is unbounded. The company's own terms carry \code{NA} for
 both.
 }
 
-\code{normalize_maude_ablation()} returns a \code{tbl_df} with one row per input:
+\code{maude_normalize_ablation()} returns a \code{tbl_df} with one row per input:
 \itemize{
 \item \code{device_brand_name} — the input string, unchanged.
 \item \code{platform} — the device platform, such as \code{"Arctic Front"}.
@@ -73,18 +73,18 @@ both.
 both for an unmatched brand and for a matched device that delivers no
 energy, so check \code{platform} to tell the two apart.
 \item \code{entity} — the entity that makes the platform. Pass it to
-\code{resolve_maude_owner()} for the corporate parent.
+\code{maude_resolve_owner()} for the corporate parent.
 }
 }
 \description{
-\code{normalize_maude_manufacturer()} maps the \code{manufacturer_name} returned by
+\code{maude_normalize_manufacturer()} maps the \code{manufacturer_name} returned by
 \code{\link[=maude_query]{maude_query()}} onto the entity that made the device, collapsing plants,
 spelling variants, and contract manufacturers onto one name.
 
-\code{normalize_maude_ablation()} maps a cardiac ablation \code{device_brand_name} onto
+\code{maude_normalize_ablation()} maps a cardiac ablation \code{device_brand_name} onto
 its platform, the energy modality it delivers, and the entity that makes it.
 
-\code{resolve_maude_owner()} follows an entity up its chain of acquisitions to the
+\code{maude_resolve_owner()} follows an entity up its chain of acquisitions to the
 company that owned it on a given date.
 
 \code{maude_search_terms()} runs the other way, from a company to every name its
@@ -92,23 +92,24 @@ reports have been filed under, which is what a query has to search on.
 }
 \details{
 All four read \code{\link[=maude_entities]{maude_entities()}} or \code{\link[=maude_platforms]{maude_platforms()}}, and all return \code{NA}
-rather than a guess for a value the registry does not cover.
+rather than a guess for a value the registry does not cover. On the result of
+\code{\link[=maude_query]{maude_query()}} the usual pipeline is:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{events |>
+  dplyr::mutate(
+    entity  = maude_normalize_manufacturer(manufacturer_name),
+    company = maude_resolve_owner(entity, as_of = Sys.Date()),
+    at_time = maude_resolve_owner(entity, as_of = date_received)
+  )
+}\if{html}{\out{</div>}}
 }
 \section{Why normalising and resolving are separate}{
 Which company a string names does not change with time. Who owns that company
 does. Keeping them apart is what lets one acquisition be one row rather than a
-rewrite of every alias beneath it, and it is why \code{resolve_maude_owner()}
-requires \code{as_of} while \code{normalize_maude_manufacturer()} takes no date at all:
+rewrite of every alias beneath it, and it is why \code{maude_resolve_owner()}
+requires \code{as_of} while \code{maude_normalize_manufacturer()} takes no date at all.
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{events |>
-  dplyr::mutate(
-    entity  = normalize_maude_manufacturer(manufacturer_name),
-    company = resolve_maude_owner(entity, as_of = Sys.Date()),
-    at_time = resolve_maude_owner(entity, as_of = date_received)
-  )
-}\if{html}{\out{</div>}}
-
-\code{company} counts every St. Jude report as Abbott, which is what a question
+In the pipeline above, \code{company} counts every St. Jude report as Abbott, which is what a question
 about today's market wants. \code{at_time} counts a 2010 report as St. Jude, which
 is what a question about who was shipping the device then wants. Neither is a
 default, because picking one silently would answer a question the caller did
@@ -142,7 +143,7 @@ mapping catheter or a sheath, carries \code{NA} rather than being swept into an 
 \examples{
 # Plants, spelling variants, and a contract manufacturer collapse onto one
 # entity, without anyone having to say when
-normalize_maude_manufacturer(c(
+maude_normalize_manufacturer(c(
   "BOSTON SCIENTIFIC CORPORATION",
   "FARAPULSE, INC.",
   "BIOSENSE WEBSTER, INC. (JUAREZ)",
@@ -151,13 +152,13 @@ normalize_maude_manufacturer(c(
 ))
 
 # Ownership is the part that needs a date
-resolve_maude_owner(
+maude_resolve_owner(
   "St. Jude Medical",
   as_of = as.Date(c("2010-01-01", "2024-01-01"))
 )
 
 # A divestiture, which a single-parent table cannot express
-resolve_maude_owner(
+maude_resolve_owner(
   "Physio-Control",
   as_of = as.Date(c("2005-01-01", "2014-01-01", "2020-01-01"))
 )
@@ -166,7 +167,7 @@ resolve_maude_owner(
 maude_search_terms("Abbott")
 
 # Modality comes from the brand, not the product code
-normalize_maude_ablation(c(
+maude_normalize_ablation(c(
   "ARCTIC FRONT ADVANCE PRO CARDIAC CRYOABLATION CATHETER",
   "FARAWAVE PULSED FIELD ABLATION CATHETER",
   "PENTARAY NAV"

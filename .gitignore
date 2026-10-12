@@ -56,3 +56,6 @@ revdep/library
 revdep/checks.noindex
 revdep/library.noindex
 revdep/data.sqlite
+
+# github_document preview
+readme.html

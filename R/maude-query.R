@@ -33,8 +33,7 @@
 #' which is correct but will double-count if the result is then tallied. Reduce
 #' to `imdrf_code` first, or pick a parent, before counting.
 #'
-#' @param annex A single character identifying the FDA annex to load:
-#'   `"A"`, `"E"`, or `"F"`. Case-sensitive.
+#' @param annex Which annex to return: `"A"`, `"E"` or `"F"`, in either case.
 #'
 #' @return A `tbl_df` of codes and related metadata for the requested annex.
 #'   All returned annexes share the same core columns:
@@ -49,16 +48,20 @@
 #'
 #' @examples
 #' # Load Annex E health effects codes
-#' annex_e <- load_maude_codes("E")
+#' annex_e <- maude_codes("E")
 #'
 #' # Roll device problem terms up to their family, leaf or family coded alike
 #' terms <- c("Material Deformation", "Material Integrity Problem")
-#' annex_a <- load_maude_codes("A")
+#' annex_a <- maude_codes("A")
 #' annex_a$level_1[match(terms, annex_a$term)]
 #'
 #' @export
-load_maude_codes <- function(annex) {
+maude_codes <- function(annex) {
   valid_annexes <- c("A", "E", "F")
+  if (!is.character(annex) || length(annex) != 1) {
+    stop("'annex' must be a single letter: A, E or F", call. = FALSE)
+  }
+  annex <- toupper(annex)
   if (!(annex %in% valid_annexes)) {
     stop(
       "'annex' was given as ", paste(annex, collapse = ", "),
@@ -89,36 +92,37 @@ load_maude_codes <- function(annex) {
 #'
 #' @description
 #' `maude_query()` searches the Manufacturer and User Facility Device Experience
-#' (MAUDE) database through the openFDA API, building the search string,
-#' paginating, and parsing the records, which is what most calls want.
+#' (MAUDE) database through the openFDA API and returns one row per report. It
+#' builds the search string, paginates, and parses the records.
 #'
-#' `maude_fda_api_call()` sends one request as written, since custom pagination
-#' and the `count` endpoint need a query string the caller controls.
+#' `maude_fda_api_call()` sends one request as written. Reach for it for the
+#' `count` endpoint, for custom pagination, or for a query the arguments of
+#' `maude_query()` cannot express.
 #'
 #' @details
-#' The endpoint carries publicly releasable reports from mandatory reporters
-#' (manufacturers, importers, and device user facilities) and from voluntary
-#' ones (clinicians, patients, and consumers), covering roughly 1992 onward and
-#' updated weekly.
+#' A query is built from the named field arguments, `...`, and `search`, joined
+#' by `AND`. `search` takes *Elasticsearch* syntax over the fields openFDA lists
+#' at <https://open.fda.gov/apis/device/event/searchable-fields/>, so anything
+#' the arguments cannot say can be written there by hand. `vignette("maude")`
+#' has the syntax and worked queries. The field list is openFDA's and changes
+#' more often than this page can follow.
 #'
-#' `maude_query()` sorts on `date_received:desc` so that pagination is
-#' deterministic, splits a large `limit` into requests of 999, and waits between
-#' them to stay under openFDA's rate limit of about 240 requests a minute. The
-#' daily ceiling is 1,000 requests for an anonymous caller and 120,000 with an
-#' `api_key`, so a key is worth registering for bulk work and changes nothing
-#' otherwise. openFDA also refuses a `skip` beyond 25,000 records, which caps
-#' `limit` at 26,000, so a larger pull has to be split by date range.
-#'
-#' `search` takes *Elasticsearch* syntax over the fields openFDA publishes at
-#' <https://open.fda.gov/apis/device/event/searchable-fields/>, and the field
-#' arguments and `...` are conveniences that build that same string. See
-#' `vignette("maude")` for the syntax and worked queries, and openFDA's own
-#' documentation for the field list, which changes more often than this page
-#' can follow.
+#' `limit` caps the whole call. `maude_query()` requests 999 records at a time,
+#' sorted on `date_received:desc` so that pages do not shift, and pauses between
+#' requests to stay under openFDA's rate limit of about 240 a minute. The daily
+#' ceiling is 1,000 requests without an `api_key` and 120,000 with one, so a key
+#' is worth registering for bulk work. openFDA refuses a `skip` past 25,000
+#' records, which caps `limit` at 26,000; a larger pull has to be split by date
+#' range.
 #'
 #' A query matching nothing is answered with HTTP 404 rather than an empty
-#' array. Both functions return an empty tibble for it rather than raising an
-#' error, since an empty stratum is a result and not a failure to retry.
+#' array. Both functions return an empty tibble for it, since an empty stratum
+#' is a result and not a failure to retry.
+#'
+#' MAUDE holds publicly releasable reports from mandatory reporters
+#' (manufacturers, importers, and device user facilities) and voluntary ones
+#' (clinicians, patients, and consumers), from about 1992 onward, updated
+#' weekly.
 #'
 #' # Counting rather than retrieving
 #'
@@ -228,7 +232,7 @@ load_maude_codes <- function(annex) {
 #'     does not name the report it follows.
 #'   - `device_generic_name`, `device_brand_name`, `manufacturer_name` — the
 #'     device and its maker as the reporter typed them, which is what
-#'     [normalize_maude_manufacturer()] and [normalize_maude_ablation()] are
+#'     [maude_normalize_manufacturer()] and [maude_normalize_ablation()] are
 #'     for.
 #'   - `event_description` — the narrative blocks, `" | "`-delimited.
 #'   - `patient_problem` — coded patient problems from
